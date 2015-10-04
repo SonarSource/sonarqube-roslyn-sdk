@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis.Diagnostics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,6 @@ namespace Roslyn.SonarQube
     /// </summary>
     public interface IRuleGenerator
     {
-        string GenerateRuleXml(IEnumerable<DiagnosticAnalyzer> analyzers);
+        Rules GenerateRules(IEnumerable<DiagnosticAnalyzer> analyzers);
     }
 }
