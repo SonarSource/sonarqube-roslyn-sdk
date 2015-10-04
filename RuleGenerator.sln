@@ -1,0 +1,62 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuleGenerator", "RuleGenerator\RuleGenerator.csproj", "{B6ED3E87-10A9-4E99-B0E2-FC35C7D39CF4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{AEB50389-D3DD-4EF3-9974-109BC5F20646}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuleGeneratorTests", "Tests\RuleGeneratorTests\RuleGeneratorTests.csproj", "{A4B797F9-1166-418D-B4B4-AB302A0FF0D7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExampleAnalyzers", "ExampleAnalyzers", "{A0234F11-305B-4409-AEA9-1982C397C395}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleAnalyzer1", "Tests\ExampleAnalyzers\ExampleAnalyzer1\ExampleAnalyzer1\ExampleAnalyzer1.csproj", "{B43B3D94-F457-4BBA-A0D2-EF460F43B906}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleAnalyzer1.Test", "Tests\ExampleAnalyzers\ExampleAnalyzer1\ExampleAnalyzer1.Test\ExampleAnalyzer1.Test.csproj", "{44F10088-B46F-458B-A8CF-D449DAD49332}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleAnalyzer1.Vsix", "Tests\ExampleAnalyzers\ExampleAnalyzer1\ExampleAnalyzer1.Vsix\ExampleAnalyzer1.Vsix.csproj", "{7390711F-B363-45E5-AD27-43EE0DAEC7E4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C65178C6-608B-45B5-8740-0F3396C3C778}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\..\..\Data\Code\Java\test\rules.xml = ..\..\..\..\..\Data\Code\Java\test\rules.xml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B6ED3E87-10A9-4E99-B0E2-FC35C7D39CF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6ED3E87-10A9-4E99-B0E2-FC35C7D39CF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6ED3E87-10A9-4E99-B0E2-FC35C7D39CF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6ED3E87-10A9-4E99-B0E2-FC35C7D39CF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4B797F9-1166-418D-B4B4-AB302A0FF0D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4B797F9-1166-418D-B4B4-AB302A0FF0D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4B797F9-1166-418D-B4B4-AB302A0FF0D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4B797F9-1166-418D-B4B4-AB302A0FF0D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B43B3D94-F457-4BBA-A0D2-EF460F43B906}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B43B3D94-F457-4BBA-A0D2-EF460F43B906}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B43B3D94-F457-4BBA-A0D2-EF460F43B906}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B43B3D94-F457-4BBA-A0D2-EF460F43B906}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44F10088-B46F-458B-A8CF-D449DAD49332}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44F10088-B46F-458B-A8CF-D449DAD49332}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44F10088-B46F-458B-A8CF-D449DAD49332}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44F10088-B46F-458B-A8CF-D449DAD49332}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7390711F-B363-45E5-AD27-43EE0DAEC7E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7390711F-B363-45E5-AD27-43EE0DAEC7E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7390711F-B363-45E5-AD27-43EE0DAEC7E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7390711F-B363-45E5-AD27-43EE0DAEC7E4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A4B797F9-1166-418D-B4B4-AB302A0FF0D7} = {AEB50389-D3DD-4EF3-9974-109BC5F20646}
+		{A0234F11-305B-4409-AEA9-1982C397C395} = {AEB50389-D3DD-4EF3-9974-109BC5F20646}
+		{B43B3D94-F457-4BBA-A0D2-EF460F43B906} = {A0234F11-305B-4409-AEA9-1982C397C395}
+		{44F10088-B46F-458B-A8CF-D449DAD49332} = {A0234F11-305B-4409-AEA9-1982C397C395}
+		{7390711F-B363-45E5-AD27-43EE0DAEC7E4} = {A0234F11-305B-4409-AEA9-1982C397C395}
+	EndGlobalSection
+EndGlobal
