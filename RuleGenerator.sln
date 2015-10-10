@@ -19,8 +19,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleAnalyzer1.Vsix", "Te
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C65178C6-608B-45B5-8740-0F3396C3C778}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\..\..\..\Data\Code\Java\test\rules.xml = ..\..\..\..\..\Data\Code\Java\test\rules.xml
+		DevNotes.txt = DevNotes.txt
+		MANIFEST.MF = MANIFEST.MF
+		PluginDefinition.xml = PluginDefinition.xml
+		rules.xml = rules.xml
+		test1.jar = test1.jar
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginGenerator", "PluginGenerator\PluginGenerator.csproj", "{DB16CCFA-B97F-4C5E-A99A-A6062ECF5D98}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginGeneratorTests", "Tests\PluginGeneratorTests\PluginGeneratorTests.csproj", "{F6C01441-DD3F-465B-8E24-BCEB239819F5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,6 +56,14 @@ Global
 		{7390711F-B363-45E5-AD27-43EE0DAEC7E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7390711F-B363-45E5-AD27-43EE0DAEC7E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7390711F-B363-45E5-AD27-43EE0DAEC7E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB16CCFA-B97F-4C5E-A99A-A6062ECF5D98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB16CCFA-B97F-4C5E-A99A-A6062ECF5D98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB16CCFA-B97F-4C5E-A99A-A6062ECF5D98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB16CCFA-B97F-4C5E-A99A-A6062ECF5D98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6C01441-DD3F-465B-8E24-BCEB239819F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6C01441-DD3F-465B-8E24-BCEB239819F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6C01441-DD3F-465B-8E24-BCEB239819F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6C01441-DD3F-465B-8E24-BCEB239819F5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -58,5 +74,6 @@ Global
 		{B43B3D94-F457-4BBA-A0D2-EF460F43B906} = {A0234F11-305B-4409-AEA9-1982C397C395}
 		{44F10088-B46F-458B-A8CF-D449DAD49332} = {A0234F11-305B-4409-AEA9-1982C397C395}
 		{7390711F-B363-45E5-AD27-43EE0DAEC7E4} = {A0234F11-305B-4409-AEA9-1982C397C395}
+		{F6C01441-DD3F-465B-8E24-BCEB239819F5} = {AEB50389-D3DD-4EF3-9974-109BC5F20646}
 	EndGlobalSection
 EndGlobal

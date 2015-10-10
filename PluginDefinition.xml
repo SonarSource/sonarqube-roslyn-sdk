@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Plugin>
+  <Key></Key>
+  <Version></Version>
+  <Name></Name>
+  <Description></Description>
+  <License></License>
+  <Organization></Organization>
+  <Homepage></Homepage>
+  <OrganizationUrl></OrganizationUrl>
+  <SourcesUrl></SourcesUrl>
+  <Developers></Developers>
+  <IssueTrackerUrl></IssueTrackerUrl>
+  <TermsConditionsUrl></TermsConditionsUrl>
+
+  <!-- Repository info -->
+  <Language></Language>
+  
+  <!-- Generated -->
+  <Class></Class>
+  <Built-By></Built-By>
+  <BuildDate>2015-09-27T13:50:19+0100</BuildDate>
+
+  <!-- Hard-coded / tool-generated -->
+  <!--Sonar-Version: 4.5.2
+  Manifest-Version: 1.0
+  Created-By: Apache Maven 3.3.3
+  Build-Jdk: 1.7.0_79
+  Archiver-Version: Plexus Archiver-->
+  
+</Plugin>

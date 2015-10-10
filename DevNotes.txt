@@ -1,0 +1,18 @@
+Creating a plug-in jar file:
+----------------------------
+
+* generate the MD file containing the plugin info
+  - License, OrganizationUrl, BuildDate, Version, Class, Sonar-Version, Organization, Name, Description, Key
+
+Plugin-BuildDate: 2015-09-27T13:50:19+0100
+Sonar-Version: 4.5.2
+
+* create folder structure: folder per namespace
+  - RulesDefinition.java, Plugin.java, rules.xml
+
+* Compile the classes
+ javac myorg\*.* -classpath sonar-plugin-api-4.5.2.jar
+
+* Create the jar file
+ jar cvfm test.jar MANIFEST.MF myorg\*.class* resources\*.*
+
