@@ -63,8 +63,12 @@
     <EmbeddedResource Include="resources\myorg\myappClass1.java" />
     <EmbeddedResource Include="resources\myorg\NotJavaCode.txt" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="resources\myorg\myapp\" />
+    <EmbeddedResource Include="resources\myorg\myapp\myappClass2.java" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\myorg\myapp\NotJavaCode2.txt" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
