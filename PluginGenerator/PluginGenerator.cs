@@ -20,7 +20,7 @@ namespace PluginGenerator
             public string OutputJar { get; set; }
         }
 
-        public void GeneratePlugin(PluginDefinition definition, string outputDirectory)
+        public void GeneratePlugin(PluginDefinition definition, string outputDirectory, ILogger logger)
         {
             if (definition == null)
             {
@@ -29,6 +29,10 @@ namespace PluginGenerator
             if (string.IsNullOrWhiteSpace(outputDirectory))
             {
                 throw new ArgumentNullException("outputDirectory");
+            }
+            if (logger == null)
+            {
+                throw new ArgumentNullException("logger");
             }
 
             ValidateDefinition(definition);
