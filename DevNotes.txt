@@ -13,6 +13,26 @@ Sonar-Version: 4.5.2
 * Compile the classes
  javac myorg\*.* -classpath sonar-plugin-api-4.5.2.jar
 
+ Note: the code references the sonar-plugin-api jar, which must be locatable
+
 * Create the jar file
  jar cvfm test.jar MANIFEST.MF myorg\*.class* resources\*.*
+
+
+
+ Expected file layout inside the jar file
+ ----------------------------------------
+
+ [root folder]
+
+	MANIFEST.MF			: manifest file containing plugin property values used by SonarQube
+
+	[myorg]
+		[plugin] etc	i.e. folder structure corresponding to the namespaces of the class components
+			Plugin.class
+			RuleDefinitions.class
+
+	[resources]
+		rules.xml		: XML file containing the new rules (loaded by RulesDefinition.class)
+
 

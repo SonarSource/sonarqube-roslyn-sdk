@@ -68,5 +68,32 @@ namespace PluginGenerator {
                 return ResourceManager.GetString("Cmd_Error_IncorrectArguments", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This file has already been added to the jar: {0}.
+        /// </summary>
+        internal static string JarB_Error_FileAlreadySpecified {
+            get {
+                return ResourceManager.GetString("JarB_Error_FileAlreadySpecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ths specified file to be included in the jar does not exist: {0}.
+        /// </summary>
+        internal static string JarB_Error_FileNotFound {
+            get {
+                return ResourceManager.GetString("JarB_Error_FileNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This jar output location has already been used: {0}. File: {1}.
+        /// </summary>
+        internal static string JarB_Error_RelativeJarPathAlreadySpecified {
+            get {
+                return ResourceManager.GetString("JarB_Error_RelativeJarPathAlreadySpecified", resourceCulture);
+            }
+        }
     }
 }

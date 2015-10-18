@@ -120,4 +120,13 @@
   <data name="Cmd_Error_IncorrectArguments" xml:space="preserve">
     <value>Expecting one argument (the name of the plugin definition file)</value>
   </data>
+  <data name="JarB_Error_FileAlreadySpecified" xml:space="preserve">
+    <value>This file has already been added to the jar: {0}</value>
+  </data>
+  <data name="JarB_Error_FileNotFound" xml:space="preserve">
+    <value>Ths specified file to be included in the jar does not exist: {0}</value>
+  </data>
+  <data name="JarB_Error_RelativeJarPathAlreadySpecified" xml:space="preserve">
+    <value>This jar output location has already been used: {0}. File: {1}</value>
+  </data>
 </root>

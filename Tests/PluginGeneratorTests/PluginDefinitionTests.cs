@@ -1,11 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PluginGenerator;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Tests.Common;
 
 namespace PluginGeneratorTests
 {
@@ -17,8 +13,7 @@ namespace PluginGeneratorTests
         [TestMethod]
         public void Defn_Serialization()
         {
-            string testDir = Path.Combine(this.TestContext.TestDeploymentDir, this.TestContext.TestName);
-            Directory.CreateDirectory(testDir);
+            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
             string filePath = Path.Combine(testDir, "defn1.txt");
 
             PluginDefinition originalDefn = new PluginDefinition()
