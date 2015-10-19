@@ -54,6 +54,12 @@ namespace PluginGenerator
 
             bool success = CompileJavaFiles(folders, logger);
 
+            if (success)
+            {
+                string jarFullPath = Path.Combine(outputDirectory, definition.Key + ".jar");
+                success = BuildJar(definition, jarFullPath, folders.CompiledClasses, logger);
+            }
+
             return success;
         }
 
@@ -101,7 +107,6 @@ namespace PluginGenerator
             replacementMap.Add("[LANGUAGE]", definition.Language);
             replacementMap.Add("[PLUGIN_KEY]", definition.Key);
             replacementMap.Add("[PLUGIN_NAME]", definition.Name);
-
         }
 
         private bool CompileJavaFiles(FolderStructure folders, ILogger logger)
@@ -120,7 +125,7 @@ namespace PluginGenerator
                 builder.AddClassPath(jarFile);
             }
 
-            // TODO: Add the source files
+            // Add the source files
             foreach(string sourceFile in Directory.GetFiles(folders.SourcesRoot, "*.java", SearchOption.AllDirectories))
             {
                 builder.AddSources(sourceFile);
@@ -139,10 +144,26 @@ namespace PluginGenerator
             return success;
         }
 
-        private static void BuildJar(string jarFileName, string targetDir, string outputDirectory)
+        private bool BuildJar(PluginDefinition defn, string fullJarFilePath, string classesDirectory, ILogger logger)
         {
-            
+            JarBuilder builder = new JarBuilder(logger, this.jdkWrapper);
+
+            AddPluginManifestProperties(defn, builder);
+
+            int lenClassPath = classesDirectory.Length + 1;
+            foreach (string classFile in Directory.GetFiles(classesDirectory, "*.class", SearchOption.AllDirectories))
+            {
+                builder.AddFile(classFile, classFile.Substring(lenClassPath));
+            }
+
+            return builder.Build(fullJarFilePath);
         }
+
+        private static void AddPluginManifestProperties(PluginDefinition defn, JarBuilder builder)
+        {
+            //TODO
+        }
+
 
     }
 }

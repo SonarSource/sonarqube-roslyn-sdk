@@ -1,11 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PluginGenerator;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tests.Common;
 
 namespace PluginGeneratorTests
@@ -13,7 +8,6 @@ namespace PluginGeneratorTests
     [TestClass]
     public class JarBuilderTests
     {
-
         public TestContext TestContext { get; set; }
 
         [TestMethod]
