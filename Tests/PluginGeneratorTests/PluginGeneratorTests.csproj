@@ -50,6 +50,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Framework\MockJdkWrapper.cs" />
     <Compile Include="JarBuilderTests.cs" />
     <Compile Include="PluginDefinitionTests.cs" />
     <Compile Include="SourceGeneratorTests.cs" />

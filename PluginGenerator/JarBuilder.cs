@@ -1,31 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace PluginGenerator
 {
     public class JarBuilder
     {
-        public const string MANIFEST_FILE_NAME = "MANIFEST.MF";
+        public const string JAR_CONTENT_DIRECTORY_NAME = "jarContent";
 
-        private ILogger logger;
+        private readonly ILogger logger;
+        private readonly IJdkWrapper jdkWrapper;
 
-        private IDictionary<string, string> manifestProperties;
+        private readonly IDictionary<string, string> manifestProperties;
 
-        private IDictionary<string, string> sourceFileToRelativePathMap;
+        private readonly IDictionary<string, string> sourceFileToRelativePathMap;
 
-        public JarBuilder(ILogger logger)
+
+        private class JarFolders
+        {
+            private readonly string rootTempFolder;
+
+            public JarFolders(string rootTempFolder)
+            {
+                this.rootTempFolder = rootTempFolder;
+            }
+
+            public string RootTempFolder { get { return this.rootTempFolder; } }
+            public string ManifestFilePath {  get { return Path.Combine(this.rootTempFolder, JdkWrapper.MANIFEST_FILE_NAME); } }
+            public string JarContentDirectory { get { return Path.Combine(this.rootTempFolder, JAR_CONTENT_DIRECTORY_NAME); } }
+        }
+
+        public JarBuilder(ILogger logger, IJdkWrapper jdkWrapper)
         {
             if (logger == null)
             {
                 throw new ArgumentNullException("logger");
             }
+            if (jdkWrapper == null)
+            {
+                throw new ArgumentNullException("jdkWrapper");
+            }
 
             this.logger = logger;
+            this.jdkWrapper = jdkWrapper;
 
             this.manifestProperties = new Dictionary<string, string>();
             this.sourceFileToRelativePathMap = new Dictionary<string, string>();
@@ -98,22 +117,40 @@ namespace PluginGenerator
                 Directory.CreateDirectory(outputDirectory);
             }
 
-            this.WriteManifestFile(outputDirectory);
+            JarFolders folders = new JarFolders(outputDirectory);
 
-            this.WriteContentFiles(outputDirectory);
+            this.WriteManifestFile(folders.ManifestFilePath);
+
+            this.WriteContentFiles(folders.JarContentDirectory);
         }
 
-        public void Build(string fullJarPath)
+        public bool Build(string fullJarPath)
         {
             if (string.IsNullOrWhiteSpace(fullJarPath))
             {
                 throw new ArgumentNullException("fullJarPath");
             }
 
+            if (!this.jdkWrapper.IsJdkInstalled())
+            {
+                throw new InvalidOperationException(UIResources.JarB_JDK_NotInstalled);
+            }
+
             string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+            JarFolders folders = new JarFolders(tempPath);
             this.LayoutFiles(tempPath);
 
-            CompileJarFile(fullJarPath, tempPath);
+            bool success = this.jdkWrapper.CompileJar(folders.JarContentDirectory, folders.ManifestFilePath, fullJarPath, this.logger);
+            if (success)
+            {
+                this.logger.LogInfo(UIResources.JarB_JarBuiltSuccessfully, fullJarPath);
+            }
+            else
+            {
+                this.logger.LogInfo(UIResources.JarB_JarBuildingFailed);
+            }
+            return success;
         }
 
         private string TryGetExistingJarPathKey(string relativePath)
@@ -122,19 +159,18 @@ namespace PluginGenerator
             return existing.Key;
         }
 
-        private void WriteManifestFile(string outputDirectory)
+        private void WriteManifestFile(string manifestFilePath)
         {
             StringBuilder sb = new StringBuilder();
             foreach (KeyValuePair<string, string> kvp in this.manifestProperties)
             {
                 sb.AppendFormat(System.Globalization.CultureInfo.CurrentCulture,
-                    "{0}={1}",
+                    "{0}: {1}",
                     kvp.Key, kvp.Value);
                 sb.AppendLine();
             }
 
-            string fullPath = Path.Combine(outputDirectory, MANIFEST_FILE_NAME);
-            File.WriteAllText(fullPath, sb.ToString());
+            File.WriteAllText(manifestFilePath, sb.ToString());
         }
 
         private void WriteContentFiles(string outputDirectory)
@@ -154,9 +190,5 @@ namespace PluginGenerator
 
         }
 
-        private void CompileJarFile(string fullJarPath, string workingDir)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

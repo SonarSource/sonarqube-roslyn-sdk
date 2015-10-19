@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace PluginGenerator {
+namespace SonarQube.Common {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace PluginGenerator {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class UIResources {
+    internal class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal UIResources() {
+        internal Resources() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace PluginGenerator {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("PluginGenerator.UIResources", typeof(UIResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("PluginGenerator.SonarQube.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,65 +61,69 @@ namespace PluginGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expecting one argument (the name of the plugin definition file).
+        ///   Looks up a localized string similar to Execution failed. The specified executable does not exist: {0}.
         /// </summary>
-        internal static string Cmd_Error_IncorrectArguments {
+        internal static string ERROR_ProcessRunner_ExeNotFound {
             get {
-                return ResourceManager.GetString("Cmd_Error_IncorrectArguments", resourceCulture);
+                return ResourceManager.GetString("ERROR_ProcessRunner_ExeNotFound", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This file has already been added to the jar: {0}.
+        ///   Looks up a localized string similar to {sensitive data removed}.
         /// </summary>
-        internal static string JarB_Error_FileAlreadySpecified {
+        internal static string MSG_CmdLine_SensitiveCmdLineArgsAlternativeText {
             get {
-                return ResourceManager.GetString("JarB_Error_FileAlreadySpecified", resourceCulture);
+                return ResourceManager.GetString("MSG_CmdLine_SensitiveCmdLineArgsAlternativeText", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ths specified file to be included in the jar does not exist: {0}.
+        ///   Looks up a localized string similar to Executing file {0}
+        ///  Args: {1}
+        ///  Working directory: {2}
+        ///  Timeout (ms):{3}
+        ///  Process id: {4}.
         /// </summary>
-        internal static string JarB_Error_FileNotFound {
+        internal static string MSG_ExecutingFile {
             get {
-                return ResourceManager.GetString("JarB_Error_FileNotFound", resourceCulture);
+                return ResourceManager.GetString("MSG_ExecutingFile", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This jar output location has already been used: {0}. File: {1}.
+        ///   Looks up a localized string similar to Process returned exit code {0}.
         /// </summary>
-        internal static string JarB_Error_RelativeJarPathAlreadySpecified {
+        internal static string MSG_ExecutionExitCode {
             get {
-                return ResourceManager.GetString("JarB_Error_RelativeJarPathAlreadySpecified", resourceCulture);
+                return ResourceManager.GetString("MSG_ExecutionExitCode", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to build jar file.
+        ///   Looks up a localized string similar to Overwriting the value of environment variable &apos;{0}&apos;. Old value: {1}, new value: {2}.
         /// </summary>
-        internal static string JarB_JarBuildingFailed {
+        internal static string MSG_Runner_OverwritingEnvVar {
             get {
-                return ResourceManager.GetString("JarB_JarBuildingFailed", resourceCulture);
+                return ResourceManager.GetString("MSG_Runner_OverwritingEnvVar", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Successfully built jar file: {0}.
+        ///   Looks up a localized string similar to Setting environment variable &apos;{0}&apos;. Value: {1}.
         /// </summary>
-        internal static string JarB_JarBuiltSuccessfully {
+        internal static string MSG_Runner_SettingEnvVar {
             get {
-                return ResourceManager.GetString("JarB_JarBuiltSuccessfully", resourceCulture);
+                return ResourceManager.GetString("MSG_Runner_SettingEnvVar", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The JDK is not installed or is not discoverable on this machine.
+        ///   Looks up a localized string similar to Timed out after waiting {0} ms for process {1} to complete. The process may still be running..
         /// </summary>
-        internal static string JarB_JDK_NotInstalled {
+        internal static string WARN_ExecutionTimedOut {
             get {
-                return ResourceManager.GetString("JarB_JDK_NotInstalled", resourceCulture);
+                return ResourceManager.GetString("WARN_ExecutionTimedOut", resourceCulture);
             }
         }
     }

@@ -28,9 +28,18 @@ namespace Tests.Common
             return fullPath;
         }
 
-        public static string AssertFileExists(string fileName, string outputDir)
+        public static string AssertFileExists(string fileName, string parentDirectory = null)
         {
-            string fullPath = Path.Combine(outputDir, fileName);
+            string fullPath;
+            if (parentDirectory == null)
+            {
+                Assert.IsTrue(Path.IsPathRooted(fileName), "Test error: expecting the supplied file path to be absolute. File: {0}", fileName);
+                fullPath = fileName;
+            }
+            else
+            {
+                 fullPath = Path.Combine(parentDirectory, fileName);
+            }
             Assert.IsTrue(File.Exists(fullPath), "Expected file does not exist: {0}", fullPath);
 
             return File.ReadAllText(fullPath);

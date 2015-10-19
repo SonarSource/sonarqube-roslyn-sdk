@@ -44,12 +44,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConsoleLogger.cs" />
+    <Compile Include="Interfaces\IJdkWrapper.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
     <Compile Include="JarBuilder.cs" />
+    <Compile Include="JdkWrapper.cs" />
     <Compile Include="PluginDefinition.cs" />
     <Compile Include="PluginGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SonarQube\NativeMethods.cs" />
+    <Compile Include="SonarQube\ProcessRunner.cs" />
+    <Compile Include="SonarQube\ProcessRunnerArguments.cs" />
+    <Compile Include="SonarQube\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="SourceGenerator.cs" />
     <Compile Include="UIResources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -62,6 +72,11 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\sonar-plugin-api-4.5.2.jar" />
+    <EmbeddedResource Include="SonarQube\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>SonarQube.Common</CustomToolNamespace>
+    </EmbeddedResource>
     <EmbeddedResource Include="UIResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>UIResources.Designer.cs</LastGenOutput>
@@ -70,6 +85,7 @@
   <ItemGroup>
     <Content Include="Resources\Plugin.java" />
     <Content Include="Resources\RulesDefinition.java" />
+    <Content Include="SonarQube\License.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
