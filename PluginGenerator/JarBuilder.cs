@@ -67,7 +67,6 @@ namespace PluginGenerator
         /// <summary>
         /// Adds a new file to the jar
         /// </summary>
-        /// <param name="fullPath"></param>
         /// <param name="relativeJarPath">The path and file name in the jar where the file will be written
         /// e.g. resources\rules.xml. If the argument is null the file will be added at the root level using
         /// the file name.</param>

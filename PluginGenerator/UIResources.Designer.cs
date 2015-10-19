@@ -70,6 +70,15 @@ namespace PluginGenerator {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Required plugin definition property is missing: {0}.
+        /// </summary>
+        internal static string Error_MissingProperty {
+            get {
+                return ResourceManager.GetString("Error_MissingProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This file has already been added to the jar: {0}.
         /// </summary>
         internal static string JarB_Error_FileAlreadySpecified {
@@ -120,6 +129,24 @@ namespace PluginGenerator {
         internal static string JarB_JDK_NotInstalled {
             get {
                 return ResourceManager.GetString("JarB_JDK_NotInstalled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Java source code compilation failed.
+        /// </summary>
+        internal static string JComp_SourceCompilationFailed {
+            get {
+                return ResourceManager.GetString("JComp_SourceCompilationFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully compiled Java source code.
+        /// </summary>
+        internal static string JComp_SourceCompilationSucceeded {
+            get {
+                return ResourceManager.GetString("JComp_SourceCompilationSucceeded", resourceCulture);
             }
         }
     }

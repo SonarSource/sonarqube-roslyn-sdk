@@ -138,4 +138,13 @@
   <data name="JarB_JDK_NotInstalled" xml:space="preserve">
     <value>The JDK is not installed or is not discoverable on this machine</value>
   </data>
+  <data name="Error_MissingProperty" xml:space="preserve">
+    <value>Required plugin definition property is missing: {0}</value>
+  </data>
+  <data name="JComp_SourceCompilationFailed" xml:space="preserve">
+    <value>Java source code compilation failed</value>
+  </data>
+  <data name="JComp_SourceCompilationSucceeded" xml:space="preserve">
+    <value>Successfully compiled Java source code</value>
+  </data>
 </root>

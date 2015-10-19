@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PluginGenerator</RootNamespace>
-    <AssemblyName>PluginGenerator</AssemblyName>
+    <AssemblyName>Sonar</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -50,7 +50,7 @@
     <Compile Include="JavaCompilationBuilder.cs" />
     <Compile Include="JdkWrapper.cs" />
     <Compile Include="PluginDefinition.cs" />
-    <Compile Include="PluginGenerator.cs" />
+    <Compile Include="Generator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SonarQube\NativeMethods.cs" />
@@ -84,8 +84,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\Plugin.java" />
-    <Content Include="Resources\RulesDefinition.java" />
+    <EmbeddedResource Include="Resources\Plugin.java" />
+    <EmbeddedResource Include="Resources\PluginRulesDefinition.java" />
     <Content Include="SonarQube\License.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

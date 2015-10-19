@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace PluginGenerator
 {
     public class PluginDefinition
     {
+        public string Language { get; set; }
+
         public string Key { get; set; }
         public string Version { get; set; }
         public string Name { get; set; }

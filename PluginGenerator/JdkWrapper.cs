@@ -68,7 +68,6 @@ namespace PluginGenerator
             {
                 throw new ArgumentNullException("args");
             }
-
             if (logger == null)
             {
                 throw new ArgumentNullException("logger");

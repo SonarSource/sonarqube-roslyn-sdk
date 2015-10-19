@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PluginGenerator
 {
@@ -49,8 +47,13 @@ namespace PluginGenerator
             return this;
         }
         
-        public bool Compile(string outputDirectory, ILogger logger)
+        public bool Compile(string sourcesDirectory, string outputDirectory, ILogger logger)
         {
+            if (string.IsNullOrWhiteSpace(sourcesDirectory))
+            {
+                throw new ArgumentNullException("sourcesDirectory");
+            }
+
             if (string.IsNullOrWhiteSpace(outputDirectory))
             {
                 throw new ArgumentNullException("outputDirectory");
@@ -65,20 +68,36 @@ namespace PluginGenerator
 
             foreach (string classPath in this.classPaths)
             {
-                args.Add(string.Format(CultureInfo.CurrentCulture, "-cp {0} ", ProcessRunnerArguments.GetQuotedArg(classPath)));
+                args.Add(string.Format(CultureInfo.CurrentCulture, " -cp {0}", GetQuotedArg(classPath)));
             }
 
-            foreach(string source in this.sources)
+            args.Add(string.Format(CultureInfo.CurrentCulture, " -d {0}", GetQuotedArg(outputDirectory)));
+
+            args.Add(string.Format(CultureInfo.CurrentCulture, " -s {0}", GetQuotedArg(sourcesDirectory)));
+
+            foreach (string source in this.sources)
             {
-                args.Add(string.Format(CultureInfo.CurrentCulture, "{0} ", ProcessRunnerArguments.GetQuotedArg(source)));
+                args.Add(string.Format(CultureInfo.CurrentCulture, " {0}", GetQuotedArg(source)));
             }
-
-            args.Add(string.Format(CultureInfo.CurrentCulture, "-d {0}", ProcessRunnerArguments.GetQuotedArg(outputDirectory)));
 
             bool success = this.jdkWrapper.CompileSources(args, logger);
 
             return success;
         }
 
+
+        private static string GetQuotedArg(string argument)
+        {
+            string quotedArg = argument;
+
+            // If an argument contains a quote then we assume it has been correctly quoted.
+            if (quotedArg != null && !argument.Contains('"'))
+            {
+                quotedArg = "\"" + argument + "\"";
+            }
+
+            return quotedArg;
+        }
+        
     }
 }

@@ -53,6 +53,7 @@
     <Compile Include="Framework\MockJdkWrapper.cs" />
     <Compile Include="JarBuilderTests.cs" />
     <Compile Include="PluginDefinitionTests.cs" />
+    <Compile Include="GeneratorTests.cs" />
     <Compile Include="SourceGeneratorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

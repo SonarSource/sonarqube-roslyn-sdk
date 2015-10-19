@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PluginGenerator
 {
@@ -23,9 +20,10 @@ namespace PluginGenerator
         /// extracted into myorg\myapp\class1.java</remarks>
         public static void CreateSourceFiles(Assembly resourceAssembly, string rootResourceName, string outputDir, IDictionary<string, string> replacementMap)
         {
-            if (!rootResourceName.EndsWith("."))
+            string fixedRootResourceName = rootResourceName;
+            if (!fixedRootResourceName.EndsWith("."))
             {
-                rootResourceName += ".";
+                fixedRootResourceName += ".";
             }
 
             // Unpack the source files into the sources directory
@@ -41,7 +39,7 @@ namespace PluginGenerator
                         content = content.Replace(kvp.Key, kvp.Value);
                     }
 
-                    string newFilePath = CalculateFilePath(rootResourceName, resourceName, outputDir);
+                    string newFilePath = CalculateSourceFilePath(fixedRootResourceName, resourceName, outputDir);
 
                     if (newFilePath != null)
                     {
@@ -53,14 +51,13 @@ namespace PluginGenerator
 
         }
 
-        private static string CalculateFilePath(string rootResourceName, string resourceName, string rootOutputPath)
+        private static string CalculateSourceFilePath(string rootResourceName, string resourceName, string rootOutputPath)
         {
             if (!resourceName.StartsWith(rootResourceName))
             {
                 return null;
             }
 
-            // TODO: create directories
             string relativePath = resourceName.Replace(rootResourceName, string.Empty);
             relativePath = relativePath.Trim('.');
 
@@ -80,6 +77,43 @@ namespace PluginGenerator
             }
 
             return Path.Combine(rootOutputPath, dir ?? string.Empty, fileName);
+        }
+
+        public static void UnpackReferencedJarFiles(Assembly resourceAssembly, string rootResourceName, string outputDir)
+        {
+            // Unpack the embedded jar files into the output directory
+            foreach (string resourceName in resourceAssembly.GetManifestResourceNames().Where(n => n.EndsWith(".jar")))
+            {
+                string fullJarPath = Path.Combine(outputDir, CalculateJarFileName(rootResourceName, resourceName));
+
+                byte[] buffer = new byte[1024];
+                using (BinaryReader reader = new BinaryReader(resourceAssembly.GetManifestResourceStream(resourceName)))
+                using (BinaryWriter writer = new BinaryWriter(File.OpenWrite(fullJarPath)))
+                {
+                    int bytesRead;                    
+                    do
+                    {
+                        bytesRead = reader.Read(buffer, 0, buffer.Length);
+                        writer.Write(buffer, 0, bytesRead);
+                    } while (bytesRead > 0) ;
+                }
+            }
+
+        }
+
+        private static string CalculateJarFileName(string rootResourceName, string fullResourceName)
+        {
+            if (!fullResourceName.StartsWith(rootResourceName))
+            {
+                return null;
+            }
+
+            Debug.Assert(fullResourceName.EndsWith(".jar"), "Expecting the resource to be a jar file");
+
+            string relativePath = fullResourceName.Replace(rootResourceName, string.Empty);
+            relativePath = relativePath.Trim('.');
+
+            return relativePath;
         }
     }
 }

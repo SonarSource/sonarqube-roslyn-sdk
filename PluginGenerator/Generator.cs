@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PluginGenerator
 {
-    public class PluginGenerator
+    public class Generator
     {
         private class FolderStructure
         {
@@ -22,17 +18,17 @@ namespace PluginGenerator
 
         private readonly IJdkWrapper jdkWrapper;
 
-        public PluginGenerator(IJdkWrapper jdkWrapper)
+        public Generator(IJdkWrapper jdkWrapper)
         {
             if (jdkWrapper == null)
             {
                 throw new ArgumentNullException("param");
             }
-
+            
             this.jdkWrapper = jdkWrapper;
         }
 
-        public void GeneratePlugin(PluginDefinition definition, string outputDirectory, ILogger logger)
+        public bool GeneratePlugin(PluginDefinition definition, string outputDirectory, ILogger logger)
         {
             if (definition == null)
             {
@@ -52,16 +48,31 @@ namespace PluginGenerator
             FolderStructure folders = CreateFolderStructure(outputDirectory);
 
             Dictionary<string, string> replacementMap = new Dictionary<string, string>();
+            PopulateSourceFileReplacements(definition, replacementMap);
 
-            SourceGenerator.CreateSourceFiles(typeof(PluginGenerator).Assembly, "PluginGenerator/resources/", folders.SourcesRoot, replacementMap);
+            SourceGenerator.CreateSourceFiles(typeof(Generator).Assembly, "PluginGenerator.Resources.", folders.SourcesRoot, replacementMap);
 
-            CompileJavaFiles(folders);
+            bool success = CompileJavaFiles(folders, logger);
 
+            return success;
         }
 
         private static void ValidateDefinition(PluginDefinition definition)
         {
             // TODO
+            CheckPropertyIsSet(definition.Language, "Language");
+
+            CheckPropertyIsSet(definition.Key, "Key");
+            CheckPropertyIsSet(definition.Name, "Name");
+        }
+
+        private static void CheckPropertyIsSet(string value, string name)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture,
+                    UIResources.Error_MissingProperty, name));
+            }
         }
 
         private static FolderStructure CreateFolderStructure(string outputDirectory)
@@ -84,20 +95,53 @@ namespace PluginGenerator
 
             return folders;
         }
-   
-        private void CompileJavaFiles(FolderStructure folders)
+
+        private static void PopulateSourceFileReplacements(PluginDefinition definition, IDictionary<string, string> replacementMap)
+        {
+            replacementMap.Add("[LANGUAGE]", definition.Language);
+            replacementMap.Add("[PLUGIN_KEY]", definition.Key);
+            replacementMap.Add("[PLUGIN_NAME]", definition.Name);
+
+        }
+
+        private bool CompileJavaFiles(FolderStructure folders, ILogger logger)
         {
             if (!this.jdkWrapper.IsJdkInstalled())
             {
                 throw new InvalidOperationException(UIResources.JarB_JDK_NotInstalled);
             }
 
-            
+            JavaCompilationBuilder builder = new JavaCompilationBuilder(this.jdkWrapper);
+
+            // Unpack and reference the required jar files
+            SourceGenerator.UnpackReferencedJarFiles(typeof(Generator).Assembly, "PluginGenerator.Resources", folders.References);
+            foreach (string jarFile in Directory.GetFiles(folders.References, "*.jar"))
+            {
+                builder.AddClassPath(jarFile);
+            }
+
+            // TODO: Add the source files
+            foreach(string sourceFile in Directory.GetFiles(folders.SourcesRoot, "*.java", SearchOption.AllDirectories))
+            {
+                builder.AddSources(sourceFile);
+            }
+
+            bool success = builder.Compile(folders.SourcesRoot, folders.CompiledClasses, logger);
+
+            if (success)
+            {
+                logger.LogInfo(UIResources.JComp_SourceCompilationSucceeded);
+            }
+            else
+            {
+                logger.LogError(UIResources.JComp_SourceCompilationFailed);
+            }
+            return success;
         }
 
         private static void BuildJar(string jarFileName, string targetDir, string outputDirectory)
         {
-
+            
         }
 
     }
