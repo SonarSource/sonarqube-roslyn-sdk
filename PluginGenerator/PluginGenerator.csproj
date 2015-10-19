@@ -47,6 +47,7 @@
     <Compile Include="Interfaces\IJdkWrapper.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
     <Compile Include="JarBuilder.cs" />
+    <Compile Include="JavaCompilationBuilder.cs" />
     <Compile Include="JdkWrapper.cs" />
     <Compile Include="PluginDefinition.cs" />
     <Compile Include="PluginGenerator.cs" />

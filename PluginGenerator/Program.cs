@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PluginGenerator
 {
-    class Program
+    static class Program
     {
         internal const int ERROR_CODE = -1;
         internal const int SUCCESS_CODE = 0;
@@ -24,7 +24,7 @@ namespace PluginGenerator
             PluginDefinition defn = PluginDefinition.Load(args[0]);
             string outputDir = Directory.GetCurrentDirectory();
 
-            PluginGenerator generator = new PluginGenerator();
+            PluginGenerator generator = new PluginGenerator(new JdkWrapper());
             generator.GeneratePlugin(defn, outputDir, logger);
 
             return SUCCESS_CODE;

@@ -1,5 +1,6 @@
 ﻿using PluginGenerator;
 using System;
+using System.Collections.Generic;
 
 namespace PluginGeneratorTests
 {
@@ -13,6 +14,11 @@ namespace PluginGeneratorTests
         }
 
         public bool IsJdkInstalled()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool CompileSources(IEnumerable<string> args, ILogger logger)
         {
             throw new NotImplementedException();
         }

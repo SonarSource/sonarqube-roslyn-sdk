@@ -17,7 +17,19 @@ namespace PluginGenerator
             public string Resources { get; set; }
             public string CompiledClasses { get; set; }
             public string References { get; set; }
-            public string OutputJar { get; set; }
+            public string OutputJarFilePath { get; set; }
+        }
+
+        private readonly IJdkWrapper jdkWrapper;
+
+        public PluginGenerator(IJdkWrapper jdkWrapper)
+        {
+            if (jdkWrapper == null)
+            {
+                throw new ArgumentNullException("param");
+            }
+
+            this.jdkWrapper = jdkWrapper;
         }
 
         public void GeneratePlugin(PluginDefinition definition, string outputDirectory, ILogger logger)
@@ -44,18 +56,18 @@ namespace PluginGenerator
             SourceGenerator.CreateSourceFiles(typeof(PluginGenerator).Assembly, "PluginGenerator/resources/", folders.SourcesRoot, replacementMap);
 
             CompileJavaFiles(folders);
-            
+
         }
 
         private static void ValidateDefinition(PluginDefinition definition)
         {
-
+            // TODO
         }
 
         private static FolderStructure CreateFolderStructure(string outputDirectory)
         {
             FolderStructure folders = new FolderStructure();
-            folders.OutputJar = outputDirectory;
+            folders.OutputJarFilePath = outputDirectory;
 
             folders.WorkingDir = Path.GetTempPath() + Guid.NewGuid().ToString();
 
@@ -73,8 +85,14 @@ namespace PluginGenerator
             return folders;
         }
    
-        private static void CompileJavaFiles(FolderStructure folders)
+        private void CompileJavaFiles(FolderStructure folders)
         {
+            if (!this.jdkWrapper.IsJdkInstalled())
+            {
+                throw new InvalidOperationException(UIResources.JarB_JDK_NotInstalled);
+            }
+
+            
         }
 
         private static void BuildJar(string jarFileName, string targetDir, string outputDirectory)
