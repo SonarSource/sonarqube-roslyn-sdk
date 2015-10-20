@@ -1,11 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Roslyn.SonarQube;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RuleGeneratorTests
 {
@@ -17,7 +12,7 @@ namespace RuleGeneratorTests
         #region Tests
 
         [TestMethod]
-        public void Gen_SimpleRules()
+        public void RuleGen_SimpleRules()
         {
             // Arrange
             ExampleAnalyzer1.ExampleAnalyzer1Analyzer analyzer1 = new ExampleAnalyzer1.ExampleAnalyzer1Analyzer();
