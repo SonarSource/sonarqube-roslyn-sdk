@@ -1,8 +1,7 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Roslyn.SonarQube;
-using System.Collections.Generic;
 using System.IO;
+using Tests.Common;
 
 namespace RuleGeneratorTests
 {
@@ -41,7 +40,7 @@ namespace RuleGeneratorTests
             });
 
 
-            string testDir = TestUtils.CreateTestDir(this.TestContext);
+            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
             string rulesFile = Path.Combine(testDir, "rules.xml");
 
             rules.Save(rulesFile);

@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Roslyn.SonarQube;
 using System.IO;
+using Tests.Common;
 
 namespace RuleGeneratorTests
 {
@@ -25,7 +26,7 @@ namespace RuleGeneratorTests
             // Assert
             AssertExpectedRuleCount(1, rules);
 
-            string testDir = TestUtils.CreateTestDir(this.TestContext);
+            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
             string rulesFile = Path.Combine(testDir, "rules.xml");
             rules.Save(rulesFile);
             this.TestContext.AddResultFile(rulesFile);
