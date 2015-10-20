@@ -147,4 +147,7 @@
   <data name="JComp_SourceCompilationSucceeded" xml:space="preserve">
     <value>Successfully compiled Java source code</value>
   </data>
+  <data name="Gen_Error_JarFileExists" xml:space="preserve">
+    <value>A file with this name already exists: {0}</value>
+  </data>
 </root>

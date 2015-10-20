@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PluginGenerator;
+using System.IO;
 using Tests.Common;
 
 namespace PluginGeneratorTests
@@ -13,6 +14,7 @@ namespace PluginGeneratorTests
         public void PluginGen_Simple()
         {
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, "output");
+            string fullJarFilePath = Path.Combine(outputDir, "myPlugin.jar");
 
             IJdkWrapper jdkWrapper = new JdkWrapper();
             Generator generator = new Generator(jdkWrapper);
@@ -22,10 +24,20 @@ namespace PluginGeneratorTests
             {
                 Key = "MyPlugin",
                 Name = "My Plugin",
-                Language = "java"
+                Language = "java",
+                Description = "Generated plugin",
+                Version = "0.1-SNAPSHOT",
+                Organization = "ACME Software Ltd",
+                License = "Commercial",
+                Developers = typeof(Generator).FullName
+
             };
 
-            bool success = generator.GeneratePlugin(defn, outputDir, new TestLogger());
+            bool success = generator.GeneratePlugin(defn, fullJarFilePath, new TestLogger());
+            if (File.Exists(fullJarFilePath))
+            {
+                this.TestContext.AddResultFile(fullJarFilePath);
+            }
 
             Assert.IsTrue(success, "Expecting compilation to have succeeded");
 

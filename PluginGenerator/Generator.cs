@@ -6,6 +6,9 @@ namespace PluginGenerator
 {
     public class Generator
     {
+
+        public const string SONARQUBE_API_VERSION = "4.5.2";
+
         private class FolderStructure
         {
             public string WorkingDir { get; set; }
@@ -28,23 +31,28 @@ namespace PluginGenerator
             this.jdkWrapper = jdkWrapper;
         }
 
-        public bool GeneratePlugin(PluginDefinition definition, string outputDirectory, ILogger logger)
+        public bool GeneratePlugin(PluginDefinition definition, string fullJarFilePath, ILogger logger)
         {
             if (definition == null)
             {
                 throw new ArgumentNullException("definition");
             }
-            if (string.IsNullOrWhiteSpace(outputDirectory))
+            if (string.IsNullOrWhiteSpace(fullJarFilePath))
             {
-                throw new ArgumentNullException("outputDirectory");
+                throw new ArgumentNullException("fullJarFilePath");
             }
             if (logger == null)
             {
                 throw new ArgumentNullException("logger");
             }
+            if (File.Exists(fullJarFilePath))
+            {
+                throw new ArgumentException(UIResources.Gen_Error_JarFileExists, fullJarFilePath);
+            }
 
             ValidateDefinition(definition);
 
+            string outputDirectory = Path.GetDirectoryName(fullJarFilePath);
             FolderStructure folders = CreateFolderStructure(outputDirectory);
 
             Dictionary<string, string> replacementMap = new Dictionary<string, string>();
@@ -56,8 +64,7 @@ namespace PluginGenerator
 
             if (success)
             {
-                string jarFullPath = Path.Combine(outputDirectory, definition.Key + ".jar");
-                success = BuildJar(definition, jarFullPath, folders.CompiledClasses, logger);
+                success = BuildJar(definition, fullJarFilePath, folders.CompiledClasses, logger);
             }
 
             return success;
@@ -161,9 +168,31 @@ namespace PluginGenerator
 
         private static void AddPluginManifestProperties(PluginDefinition defn, JarBuilder builder)
         {
-            //TODO
+            builder.SetManifestPropety("Sonar-Version", SONARQUBE_API_VERSION);
+            builder.SetManifestPropety("Plugin-Class", "myorg." + defn.Key + ".Plugin");
+//            SetNonNullManifestProperty("Plugin-Class", defn.Class, builder);
+
+            SetNonNullManifestProperty("Plugin-License", defn.License, builder);
+            SetNonNullManifestProperty("Plugin-OrganizationUrl", defn.OrganizationUrl, builder);
+            SetNonNullManifestProperty("Plugin-Version", defn.Version, builder);
+            SetNonNullManifestProperty("Plugin-Homepage", defn.Homepage, builder);
+            SetNonNullManifestProperty("Plugin-SourcesUrl", defn.SourcesUrl, builder);
+            SetNonNullManifestProperty("Plugin-Developers", defn.Developers, builder);
+            SetNonNullManifestProperty("Plugin-IssueTrackerUrl", defn.IssueTrackerUrl, builder);
+            SetNonNullManifestProperty("Plugin-TermsConditionsUrl", defn.TermsConditionsUrl, builder);
+            SetNonNullManifestProperty("Plugin-Organization", defn.Organization, builder);
+            SetNonNullManifestProperty("Plugin-Name", defn.Name, builder);
+            SetNonNullManifestProperty("Plugin-Description", defn.Description, builder);
+            SetNonNullManifestProperty("Plugin-Key", defn.Key, builder);
         }
 
+        private static void SetNonNullManifestProperty(string property, string value, JarBuilder jarBuilder)
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                jarBuilder.SetManifestPropety(property, value);
+            }
+        }
 
     }
 }

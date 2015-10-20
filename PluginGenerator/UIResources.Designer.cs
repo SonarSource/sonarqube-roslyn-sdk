@@ -79,6 +79,15 @@ namespace PluginGenerator {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A file with this name already exists: {0}.
+        /// </summary>
+        internal static string Gen_Error_JarFileExists {
+            get {
+                return ResourceManager.GetString("Gen_Error_JarFileExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This file has already been added to the jar: {0}.
         /// </summary>
         internal static string JarB_Error_FileAlreadySpecified {
