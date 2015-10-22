@@ -45,7 +45,7 @@ namespace Roslyn.SonarQube
                 newRule.Description = diagnostic.Description.ToString(System.Globalization.CultureInfo.InvariantCulture);
                 newRule.Name = diagnostic.Title.ToString(System.Globalization.CultureInfo.InvariantCulture);
                 newRule.Severity = GetSonarQubeSeverity(diagnostic.DefaultSeverity);
-                
+
                 if (diagnostic.CustomTags.Any())
                 {
                     var tags = new List<string>();
@@ -99,5 +99,6 @@ namespace Roslyn.SonarQube
         }
 
         #endregion
+
     }
 }

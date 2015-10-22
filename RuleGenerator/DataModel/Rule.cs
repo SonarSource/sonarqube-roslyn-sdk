@@ -30,7 +30,7 @@ namespace Roslyn.SonarQube
 
         [XmlElement(ElementName = "status")]
         public string Status { get; set; }
-        
+
         [XmlElement(ElementName = "tag")]
         public string[] Tags { get; set; }
     }

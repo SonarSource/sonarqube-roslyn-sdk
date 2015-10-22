@@ -15,7 +15,7 @@ namespace RuleGeneratorTests
         public void SerializeRules()
         {
             Rules rules = new Rules();
-            
+
             rules.Add(new Rule()
             {
                 Key = "key1",
