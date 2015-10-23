@@ -44,11 +44,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConsoleLogger.cs" />
+    <Compile Include="Generator2.cs" />
     <Compile Include="Interfaces\IJdkWrapper.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
     <Compile Include="JarBuilder.cs" />
     <Compile Include="JavaCompilationBuilder.cs" />
     <Compile Include="JdkWrapper.cs" />
+    <Compile Include="PluginBuilder.cs" />
     <Compile Include="PluginDefinition.cs" />
     <Compile Include="Generator.cs" />
     <Compile Include="Program.cs" />
