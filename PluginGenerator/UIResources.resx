@@ -150,4 +150,7 @@
   <data name="Gen_Error_JarFileExists" xml:space="preserve">
     <value>A file with this name already exists: {0}</value>
   </data>
+  <data name="JComp_CompliationFailed" xml:space="preserve">
+    <value>Java compilation failed</value>
+  </data>
 </root>

@@ -142,6 +142,15 @@ namespace PluginGenerator {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Java compilation failed.
+        /// </summary>
+        internal static string JComp_CompliationFailed {
+            get {
+                return ResourceManager.GetString("JComp_CompliationFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Java source code compilation failed.
         /// </summary>
         internal static string JComp_SourceCompilationFailed {

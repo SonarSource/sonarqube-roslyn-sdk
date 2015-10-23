@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConsoleLogger.cs" />
+    <Compile Include="Exceptions\CompilerException.cs" />
     <Compile Include="Generator.cs" />
     <Compile Include="Interfaces\IJdkWrapper.cs" />
     <Compile Include="Interfaces\ILogger.cs" />

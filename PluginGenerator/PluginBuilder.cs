@@ -138,7 +138,7 @@ namespace PluginGenerator
 
         #region Private methods
 
-        private bool CompileJavaFiles(string workingDirectory)
+        private void CompileJavaFiles(string workingDirectory)
         {
             JavaCompilationBuilder compiler = new JavaCompilationBuilder(this.jdkWrapper);
 
@@ -168,8 +168,8 @@ namespace PluginGenerator
             else
             {
                 logger.LogError(UIResources.JComp_SourceCompilationFailed);
+                throw new CompilerException(UIResources.JComp_CompliationFailed);
             }
-            return success;
         }
 
         private bool BuildJar(string classesDirectory)
