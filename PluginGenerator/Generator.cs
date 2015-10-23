@@ -6,32 +6,21 @@ namespace PluginGenerator
 {
     public class Generator
     {
-
-        public const string SONARQUBE_API_VERSION = "4.5.2";
-
-        private class FolderStructure
-        {
-            public string WorkingDir { get; set; }
-            public string SourcesRoot { get; set; }
-            public string Resources { get; set; }
-            public string CompiledClasses { get; set; }
-            public string References { get; set; }
-            public string OutputJarFilePath { get; set; }
-        }
-
         private readonly IJdkWrapper jdkWrapper;
+        private readonly ILogger logger;
 
-        public Generator(IJdkWrapper jdkWrapper)
+        public Generator(IJdkWrapper jdkWrapper, ILogger logger)
         {
             if (jdkWrapper == null)
             {
                 throw new ArgumentNullException("param");
             }
-            
+
             this.jdkWrapper = jdkWrapper;
+            this.logger = logger;
         }
 
-        public bool GeneratePlugin(PluginDefinition definition, string fullJarFilePath, ILogger logger)
+        public void GeneratePlugin(PluginDefinition definition, string fullJarFilePath)
         {
             if (definition == null)
             {
@@ -41,10 +30,6 @@ namespace PluginGenerator
             {
                 throw new ArgumentNullException("fullJarFilePath");
             }
-            if (logger == null)
-            {
-                throw new ArgumentNullException("logger");
-            }
             if (File.Exists(fullJarFilePath))
             {
                 throw new ArgumentException(UIResources.Gen_Error_JarFileExists, fullJarFilePath);
@@ -52,22 +37,11 @@ namespace PluginGenerator
 
             ValidateDefinition(definition);
 
-            string outputDirectory = Path.GetDirectoryName(fullJarFilePath);
-            FolderStructure folders = CreateFolderStructure(outputDirectory);
+            // Temp folder which resources will be unpacked into
+            string tempWorkingDir = Path.GetTempPath() + Guid.NewGuid().ToString();
+            Directory.CreateDirectory(tempWorkingDir);
 
-            Dictionary<string, string> replacementMap = new Dictionary<string, string>();
-            PopulateSourceFileReplacements(definition, replacementMap);
-
-            SourceGenerator.CreateSourceFiles(typeof(Generator).Assembly, "PluginGenerator.Resources.", folders.SourcesRoot, replacementMap);
-
-            bool success = CompileJavaFiles(folders, logger);
-
-            if (success)
-            {
-                success = BuildJar(definition, fullJarFilePath, folders.CompiledClasses, logger);
-            }
-
-            return success;
+            BuildPlugin(definition, fullJarFilePath, tempWorkingDir);
         }
 
         private static void ValidateDefinition(PluginDefinition definition)
@@ -88,25 +62,33 @@ namespace PluginGenerator
             }
         }
 
-        private static FolderStructure CreateFolderStructure(string outputDirectory)
+        private void BuildPlugin(PluginDefinition definition, string fullJarPath, string workingFolder)
         {
-            FolderStructure folders = new FolderStructure();
-            folders.OutputJarFilePath = outputDirectory;
+            if (!this.jdkWrapper.IsJdkInstalled())
+            {
+                throw new InvalidOperationException(UIResources.JarB_JDK_NotInstalled);
+            }
 
-            folders.WorkingDir = Path.GetTempPath() + Guid.NewGuid().ToString();
+            PluginBuilder builder = new PluginBuilder(this.jdkWrapper, this.logger);
 
-            folders.SourcesRoot = Path.Combine(folders.WorkingDir, "src");
-            folders.Resources = Path.Combine(folders.WorkingDir, "resources");
-            folders.CompiledClasses = Path.Combine(folders.WorkingDir, "classes");
-            folders.References= Path.Combine(folders.WorkingDir, "references");
+            // No additional jar files apart from the SonarQube API jar are required for this source
 
-            Directory.CreateDirectory(folders.WorkingDir);
-            Directory.CreateDirectory(folders.SourcesRoot);
-            Directory.CreateDirectory(folders.CompiledClasses);
-            Directory.CreateDirectory(folders.Resources);
-            Directory.CreateDirectory(folders.References);
+            // Generate the source files
+            Dictionary<string, string> replacementMap = new Dictionary<string, string>();
+            PopulateSourceFileReplacements(definition, replacementMap);
+            SourceGenerator.CreateSourceFiles(typeof(Generator).Assembly, "PluginGenerator.Resources.", workingFolder, replacementMap);
 
-            return folders;
+            // Add the source files
+            foreach (string sourceFile in Directory.GetFiles(workingFolder, "*.java", SearchOption.AllDirectories))
+            {
+                builder.AddSourceFile(sourceFile);
+            }
+
+            builder.SetProperties(definition);
+            builder.SetJarFilePath(fullJarPath);
+            builder.SetProperty(WellKnownPluginProperties.Class, "myorg." + definition.Key + ".Plugin");
+
+            builder.Build();
         }
 
         private static void PopulateSourceFileReplacements(PluginDefinition definition, IDictionary<string, string> replacementMap)
@@ -114,84 +96,6 @@ namespace PluginGenerator
             replacementMap.Add("[LANGUAGE]", definition.Language);
             replacementMap.Add("[PLUGIN_KEY]", definition.Key);
             replacementMap.Add("[PLUGIN_NAME]", definition.Name);
-        }
-
-        private bool CompileJavaFiles(FolderStructure folders, ILogger logger)
-        {
-            if (!this.jdkWrapper.IsJdkInstalled())
-            {
-                throw new InvalidOperationException(UIResources.JarB_JDK_NotInstalled);
-            }
-
-            JavaCompilationBuilder builder = new JavaCompilationBuilder(this.jdkWrapper);
-
-            // Unpack and reference the required jar files
-            SourceGenerator.UnpackReferencedJarFiles(typeof(Generator).Assembly, "PluginGenerator.Resources", folders.References);
-            foreach (string jarFile in Directory.GetFiles(folders.References, "*.jar"))
-            {
-                builder.AddClassPath(jarFile);
-            }
-
-            // Add the source files
-            foreach(string sourceFile in Directory.GetFiles(folders.SourcesRoot, "*.java", SearchOption.AllDirectories))
-            {
-                builder.AddSources(sourceFile);
-            }
-
-            bool success = builder.Compile(folders.SourcesRoot, folders.CompiledClasses, logger);
-
-            if (success)
-            {
-                logger.LogInfo(UIResources.JComp_SourceCompilationSucceeded);
-            }
-            else
-            {
-                logger.LogError(UIResources.JComp_SourceCompilationFailed);
-            }
-            return success;
-        }
-
-        private bool BuildJar(PluginDefinition defn, string fullJarFilePath, string classesDirectory, ILogger logger)
-        {
-            JarBuilder builder = new JarBuilder(logger, this.jdkWrapper);
-
-            AddPluginManifestProperties(defn, builder);
-
-            int lenClassPath = classesDirectory.Length + 1;
-            foreach (string classFile in Directory.GetFiles(classesDirectory, "*.class", SearchOption.AllDirectories))
-            {
-                builder.AddFile(classFile, classFile.Substring(lenClassPath));
-            }
-
-            return builder.Build(fullJarFilePath);
-        }
-
-        private static void AddPluginManifestProperties(PluginDefinition defn, JarBuilder builder)
-        {
-            builder.SetManifestPropety("Sonar-Version", SONARQUBE_API_VERSION);
-            builder.SetManifestPropety("Plugin-Class", "myorg." + defn.Key + ".Plugin");
-//            SetNonNullManifestProperty("Plugin-Class", defn.Class, builder);
-
-            SetNonNullManifestProperty("Plugin-License", defn.License, builder);
-            SetNonNullManifestProperty("Plugin-OrganizationUrl", defn.OrganizationUrl, builder);
-            SetNonNullManifestProperty("Plugin-Version", defn.Version, builder);
-            SetNonNullManifestProperty("Plugin-Homepage", defn.Homepage, builder);
-            SetNonNullManifestProperty("Plugin-SourcesUrl", defn.SourcesUrl, builder);
-            SetNonNullManifestProperty("Plugin-Developers", defn.Developers, builder);
-            SetNonNullManifestProperty("Plugin-IssueTrackerUrl", defn.IssueTrackerUrl, builder);
-            SetNonNullManifestProperty("Plugin-TermsConditionsUrl", defn.TermsConditionsUrl, builder);
-            SetNonNullManifestProperty("Plugin-Organization", defn.Organization, builder);
-            SetNonNullManifestProperty("Plugin-Name", defn.Name, builder);
-            SetNonNullManifestProperty("Plugin-Description", defn.Description, builder);
-            SetNonNullManifestProperty("Plugin-Key", defn.Key, builder);
-        }
-
-        private static void SetNonNullManifestProperty(string property, string value, JarBuilder jarBuilder)
-        {
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                jarBuilder.SetManifestPropety(property, value);
-            }
         }
 
     }

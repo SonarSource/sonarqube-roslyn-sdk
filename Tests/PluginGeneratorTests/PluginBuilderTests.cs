@@ -27,13 +27,11 @@ namespace PluginGeneratorTests
 
 public final class Program
 {
-
     public final void Main(int[] args)
     {
         System.out.println(""testing..."");
     }
 }
-
 ");
 
             PluginBuilder builder = new PluginBuilder(new TestLogger());

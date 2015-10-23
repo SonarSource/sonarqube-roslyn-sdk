@@ -17,8 +17,7 @@ namespace PluginGeneratorTests
             string fullJarFilePath = Path.Combine(outputDir, "myPlugin.jar");
 
             IJdkWrapper jdkWrapper = new JdkWrapper();
-            Generator generator = new Generator(jdkWrapper);
-
+            Generator generator = new Generator(jdkWrapper, new TestLogger());
 
             PluginDefinition defn = new PluginDefinition()
             {
@@ -30,17 +29,15 @@ namespace PluginGeneratorTests
                 Organization = "ACME Software Ltd",
                 License = "Commercial",
                 Developers = typeof(Generator).FullName
-
             };
 
-            bool success = generator.GeneratePlugin(defn, fullJarFilePath, new TestLogger());
+            generator.GeneratePlugin(defn, fullJarFilePath);
             if (File.Exists(fullJarFilePath))
             {
                 this.TestContext.AddResultFile(fullJarFilePath);
             }
 
-            Assert.IsTrue(success, "Expecting compilation to have succeeded");
-
+            TestUtils.AssertFileExists(fullJarFilePath);
         }
 
     }

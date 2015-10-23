@@ -24,8 +24,8 @@ namespace PluginGenerator
             PluginDefinition defn = PluginDefinition.Load(args[0]);
             string outputDir = Directory.GetCurrentDirectory();
 
-            Generator generator = new Generator(new JdkWrapper());
-            generator.GeneratePlugin(defn, outputDir, logger);
+            Generator generator = new Generator(new JdkWrapper(), logger);
+            generator.GeneratePlugin(defn, outputDir);
 
             return SUCCESS_CODE;
         }
