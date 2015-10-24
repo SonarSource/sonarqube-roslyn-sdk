@@ -17,7 +17,7 @@
         public const string Homepage = "Plugin-Homepage";
         public const string SourcesUrl = "Plugin-SourcesUrl";
         public const string Developers = "Plugin-Developers";
-        public const string IssueTrackerUrl = "Plugin - IssueTrackerUrl";
+        public const string IssueTrackerUrl = "Plugin-IssueTrackerUrl";
         public const string TermsAndConditionsUrl = "Plugin-TermsConditionsUrl";
         public const string OrganizationName = "Plugin-Organization";
     }

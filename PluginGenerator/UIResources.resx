@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Cmd_Error_IncorrectArguments" xml:space="preserve">
-    <value>Expecting one argument (the name of the plugin definition file)</value>
+    <value>Expecting two arguments: the name of the plugin definition file, and the rules xml file.</value>
   </data>
   <data name="JarB_Error_FileAlreadySpecified" xml:space="preserve">
     <value>This file has already been added to the jar: {0}</value>
@@ -152,5 +152,8 @@
   </data>
   <data name="JComp_CompliationFailed" xml:space="preserve">
     <value>Java compilation failed</value>
+  </data>
+  <data name="Gen_Error_RulesFileDoesNotExists" xml:space="preserve">
+    <value>The specified rules file does not exist: {0}</value>
   </data>
 </root>

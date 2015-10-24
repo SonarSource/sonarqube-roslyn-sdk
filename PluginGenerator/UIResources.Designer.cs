@@ -61,7 +61,7 @@ namespace PluginGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expecting one argument (the name of the plugin definition file).
+        ///   Looks up a localized string similar to Expecting two arguments: the name of the plugin definition file, and the rules xml file..
         /// </summary>
         internal static string Cmd_Error_IncorrectArguments {
             get {
@@ -84,6 +84,15 @@ namespace PluginGenerator {
         internal static string Gen_Error_JarFileExists {
             get {
                 return ResourceManager.GetString("Gen_Error_JarFileExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The specified rules file does not exist: {0}.
+        /// </summary>
+        internal static string Gen_Error_RulesFileDoesNotExists {
+            get {
+                return ResourceManager.GetString("Gen_Error_RulesFileDoesNotExists", resourceCulture);
             }
         }
         

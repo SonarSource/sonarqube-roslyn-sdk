@@ -21,7 +21,17 @@ namespace PluginGeneratorTests
                 Name = "name",
                 Class = "class",
                 Description = "description",
-                Key = "key"
+                Key = "key",
+                Developers = "developers",
+                Homepage = "homepage",
+                IssueTrackerUrl = "issuetracker",
+                Language = "language",
+                License ="license",
+                Organization = "organization",
+                OrganizationUrl = "organizationurl",
+                SourcesUrl ="sources",
+                TermsConditionsUrl = "terms",
+                Version = "version"      
             };
 
             originalDefn.Save(filePath);
@@ -35,9 +45,18 @@ namespace PluginGeneratorTests
             Assert.AreEqual("description", reloadedDefn.Description, "Unexpected description");
             Assert.AreEqual("key", reloadedDefn.Key, "Unexpected key");
 
-            Assert.AreEqual(null, reloadedDefn.IssueTrackerUrl, "Unexpected issue tracker url");
-            Assert.AreEqual(null, reloadedDefn.License, "Unexpected license");
+            Assert.AreEqual("issuetracker", reloadedDefn.IssueTrackerUrl, "Unexpected issue tracker url");
+            Assert.AreEqual("license", reloadedDefn.License, "Unexpected license");
+            Assert.AreEqual("developers", reloadedDefn.Developers, "Unexpected developers");
+            Assert.AreEqual("homepage", reloadedDefn.Homepage, "Unexpected homepage");
+            Assert.AreEqual("language", reloadedDefn.Language, "Unexpected language");
+            Assert.AreEqual("organization", reloadedDefn.Organization, "Unexpected organization");
+            Assert.AreEqual("organizationurl", reloadedDefn.OrganizationUrl, "Unexpected organization url");
+            Assert.AreEqual("sources", reloadedDefn.SourcesUrl, "Unexpected sources");
+            Assert.AreEqual("terms", reloadedDefn.TermsConditionsUrl, "Unexpected terms");
+            Assert.AreEqual("version", reloadedDefn.Version, "Unexpected version");
 
+            this.TestContext.AddResultFile(filePath);
         }
     }
 }

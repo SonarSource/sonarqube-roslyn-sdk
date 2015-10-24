@@ -36,6 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.IO.Compression.FileSystem" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -50,11 +51,12 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="JarChecker.cs" />
     <Compile Include="Framework\MockJdkWrapper.cs" />
     <Compile Include="JarBuilderTests.cs" />
     <Compile Include="PluginBuilderTests.cs" />
     <Compile Include="PluginDefinitionTests.cs" />
-    <Compile Include="GeneratorTests.cs" />
+    <Compile Include="RulePluginGeneratorTests.cs" />
     <Compile Include="SourceGeneratorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

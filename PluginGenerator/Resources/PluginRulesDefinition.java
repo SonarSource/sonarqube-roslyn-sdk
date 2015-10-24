@@ -42,11 +42,13 @@ public final class PluginRulesDefinition implements RulesDefinition {
   }
 
   public static String getRepositoryKeyForLanguage(String languageKey) {
-    return languageKey.toLowerCase() + "-" + KEY;
+    //return languageKey.toLowerCase() + "-" + KEY;
+	return KEY.toLowerCase();
   }
 
   public static String getRepositoryNameForLanguage(String languageKey) {
-    return languageKey.toUpperCase() + " " + NAME;
+    //return languageKey.toUpperCase() + " " + NAME;
+    return NAME;
   }
 
 }

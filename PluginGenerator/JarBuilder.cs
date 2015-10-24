@@ -15,7 +15,7 @@ namespace PluginGenerator
 
         private readonly IDictionary<string, string> manifestProperties;
 
-        private readonly IDictionary<string, string> sourceFileToRelativePathMap;
+        private readonly IDictionary<string, string> fileToRelativePathMap;
 
 
         private class JarFolders
@@ -47,7 +47,7 @@ namespace PluginGenerator
             this.jdkWrapper = jdkWrapper;
 
             this.manifestProperties = new Dictionary<string, string>();
-            this.sourceFileToRelativePathMap = new Dictionary<string, string>();
+            this.fileToRelativePathMap = new Dictionary<string, string>();
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace PluginGenerator
                 throw new ArgumentNullException("fullPath");
             }
 
-            if (this.sourceFileToRelativePathMap.ContainsKey(fullPath))
+            if (this.fileToRelativePathMap.ContainsKey(fullPath))
             {
                 throw new ArgumentException(
                     string.Format(System.Globalization.CultureInfo.CurrentCulture,
@@ -97,7 +97,7 @@ namespace PluginGenerator
                         existingKey));
             }
 
-            this.sourceFileToRelativePathMap.Add(fullPath, finalJarPath);
+            this.fileToRelativePathMap.Add(fullPath, finalJarPath);
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace PluginGenerator
 
         private string TryGetExistingJarPathKey(string relativePath)
         {
-            KeyValuePair<string, string> existing = this.sourceFileToRelativePathMap.FirstOrDefault(k => k.Value.Equals(relativePath));
+            KeyValuePair<string, string> existing = this.fileToRelativePathMap.FirstOrDefault(k => k.Value.Equals(relativePath));
             return existing.Key;
         }
 
@@ -175,7 +175,7 @@ namespace PluginGenerator
         private void WriteContentFiles(string outputDirectory)
         {
             foreach (KeyValuePair<string, string> sourceToPathEntry
-                in this.sourceFileToRelativePathMap)
+                in this.fileToRelativePathMap)
             {
                 if (!File.Exists(sourceToPathEntry.Key))
                 {

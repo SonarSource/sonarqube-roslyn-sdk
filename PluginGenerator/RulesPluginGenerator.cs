@@ -4,12 +4,12 @@ using System.IO;
 
 namespace PluginGenerator
 {
-    public class Generator
+    public class RulesPluginGenerator
     {
         private readonly IJdkWrapper jdkWrapper;
         private readonly ILogger logger;
 
-        public Generator(IJdkWrapper jdkWrapper, ILogger logger)
+        public RulesPluginGenerator(IJdkWrapper jdkWrapper, ILogger logger)
         {
             if (jdkWrapper == null)
             {
@@ -20,28 +20,41 @@ namespace PluginGenerator
             this.logger = logger;
         }
 
-        public void GeneratePlugin(PluginDefinition definition, string fullJarFilePath)
+        public void GeneratePlugin(PluginDefinition definition, string rulesFilePath, string fullJarFilePath)
         {
             if (definition == null)
             {
                 throw new ArgumentNullException("definition");
             }
+            if (string.IsNullOrWhiteSpace(rulesFilePath))
+            {
+                throw new ArgumentNullException("rulesFilePath");
+            }
             if (string.IsNullOrWhiteSpace(fullJarFilePath))
             {
                 throw new ArgumentNullException("fullJarFilePath");
+            }
+
+            if (!File.Exists(rulesFilePath))
+            {
+                throw new FileNotFoundException(UIResources.Gen_Error_RulesFileDoesNotExists, rulesFilePath);
             }
             if (File.Exists(fullJarFilePath))
             {
                 throw new ArgumentException(UIResources.Gen_Error_JarFileExists, fullJarFilePath);
             }
+            if (!this.jdkWrapper.IsJdkInstalled())
+            {
+                throw new InvalidOperationException(UIResources.JarB_JDK_NotInstalled);
+            }
 
             ValidateDefinition(definition);
 
             // Temp folder which resources will be unpacked into
-            string tempWorkingDir = Path.GetTempPath() + Guid.NewGuid().ToString();
+            string tempWorkingDir = Path.Combine(Path.GetTempPath(), "plugins", Guid.NewGuid().ToString());
             Directory.CreateDirectory(tempWorkingDir);
 
-            BuildPlugin(definition, fullJarFilePath, tempWorkingDir);
+            BuildPlugin(definition, rulesFilePath, fullJarFilePath, tempWorkingDir);
         }
 
         private static void ValidateDefinition(PluginDefinition definition)
@@ -62,13 +75,8 @@ namespace PluginGenerator
             }
         }
 
-        private void BuildPlugin(PluginDefinition definition, string fullJarPath, string workingFolder)
+        private void BuildPlugin(PluginDefinition definition, string rulesFilePath, string fullJarPath, string workingFolder)
         {
-            if (!this.jdkWrapper.IsJdkInstalled())
-            {
-                throw new InvalidOperationException(UIResources.JarB_JDK_NotInstalled);
-            }
-
             PluginBuilder builder = new PluginBuilder(this.jdkWrapper, this.logger);
 
             // No additional jar files apart from the SonarQube API jar are required for this source
@@ -76,7 +84,7 @@ namespace PluginGenerator
             // Generate the source files
             Dictionary<string, string> replacementMap = new Dictionary<string, string>();
             PopulateSourceFileReplacements(definition, replacementMap);
-            SourceGenerator.CreateSourceFiles(typeof(Generator).Assembly, "PluginGenerator.Resources.", workingFolder, replacementMap);
+            SourceGenerator.CreateSourceFiles(typeof(RulesPluginGenerator).Assembly, "PluginGenerator.Resources.", workingFolder, replacementMap);
 
             // Add the source files
             foreach (string sourceFile in Directory.GetFiles(workingFolder, "*.java", SearchOption.AllDirectories))
@@ -84,6 +92,8 @@ namespace PluginGenerator
                 builder.AddSourceFile(sourceFile);
             }
 
+            // Add the rules file as a resource
+            builder.AddResourceFile(rulesFilePath, "resources/rules.xml");
             builder.SetProperties(definition);
             builder.SetJarFilePath(fullJarPath);
             builder.SetProperty(WellKnownPluginProperties.Class, "myorg." + definition.Key + ".Plugin");

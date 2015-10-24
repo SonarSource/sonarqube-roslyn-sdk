@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PluginGenerator
 {
@@ -18,7 +15,7 @@ namespace PluginGenerator
         private readonly ISet<string> referencedJars;
 
         private readonly IDictionary<string, string> properties;
-
+        private readonly IDictionary<string, string> fileToRelativePathMap;
 
         private string outputJarFilePath;
 
@@ -39,6 +36,7 @@ namespace PluginGenerator
             this.sourceFiles = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
             this.referencedJars = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
             this.properties = new Dictionary<string, string>();
+            this.fileToRelativePathMap = new Dictionary<string, string>();
         }
 
         public PluginBuilder(ILogger logger) : this(new JdkWrapper(), logger)
@@ -101,12 +99,14 @@ namespace PluginGenerator
         /// Adds a file to the jar. The location of the file in the jar
         /// is specified by the <paramref name="relativeJarPath"/>.
         /// </summary>
-        public PluginBuilder AddResourceFile(string relativeJarPath, string fullFilePath)
+        public PluginBuilder AddResourceFile(string fullFilePath, string relativeJarPath)
         {
             if (string.IsNullOrWhiteSpace(fullFilePath))
             {
                 throw new ArgumentNullException("fullFilePath");
             }
+
+            this.fileToRelativePathMap[fullFilePath] = relativeJarPath;
 
             return this;
         }
@@ -124,7 +124,7 @@ namespace PluginGenerator
             // TODO: validate inputs
 
             // Temp working folder
-            string tempWorkingDir = Path.GetTempPath() + Guid.NewGuid().ToString();
+            string tempWorkingDir = Path.Combine(Path.GetTempPath(), "plugins",  Guid.NewGuid().ToString());
             Directory.CreateDirectory(tempWorkingDir);
 
             // Compile sources
@@ -134,8 +134,6 @@ namespace PluginGenerator
             BuildJar(tempWorkingDir);
         }
 
-
-
         #region Private methods
 
         private void CompileJavaFiles(string workingDirectory)
@@ -143,7 +141,7 @@ namespace PluginGenerator
             JavaCompilationBuilder compiler = new JavaCompilationBuilder(this.jdkWrapper);
 
             // Unpack and reference the required jar files
-            SourceGenerator.UnpackReferencedJarFiles(typeof(Generator).Assembly, "PluginGenerator.Resources", workingDirectory);
+            SourceGenerator.UnpackReferencedJarFiles(typeof(RulesPluginGenerator).Assembly, "PluginGenerator.Resources", workingDirectory);
             foreach (string jarFile in Directory.GetFiles(workingDirectory, "*.jar"))
             {
                 compiler.AddClassPath(jarFile);
@@ -189,6 +187,12 @@ namespace PluginGenerator
             foreach (string classFile in Directory.GetFiles(classesDirectory, "*.class", SearchOption.AllDirectories))
             {
                 jarBuilder.AddFile(classFile, classFile.Substring(lenClassPath));
+            }
+
+            // Add any other content files
+            foreach(KeyValuePair<string, string> pathToFilePair in this.fileToRelativePathMap)
+            {
+                jarBuilder.AddFile(pathToFilePair.Key, pathToFilePair.Value);
             }
 
             return jarBuilder.Build(this.outputJarFilePath);

@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PluginGenerator</RootNamespace>
-    <AssemblyName>Sonar</AssemblyName>
+    <AssemblyName>rpg</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -45,7 +45,7 @@
   <ItemGroup>
     <Compile Include="ConsoleLogger.cs" />
     <Compile Include="Exceptions\CompilerException.cs" />
-    <Compile Include="Generator.cs" />
+    <Compile Include="RulesPluginGenerator.cs" />
     <Compile Include="Interfaces\IJdkWrapper.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
     <Compile Include="JarBuilder.cs" />

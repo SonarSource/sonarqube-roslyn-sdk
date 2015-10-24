@@ -77,9 +77,12 @@ namespace PluginGeneratorTests
 
             // Assert
             Assert.IsTrue(success, "Failed to build the jar file");
-            TestUtils.AssertFileExists(finalJarPath);
-
-            Assert.Inconclusive("TODO: check the jar contents");
+            
+            new JarChecker(this.TestContext, finalJarPath)
+                .JarContainsFiles(
+                    "META-INF\\MANIFEST.MF",
+                    "file1.txt",
+                    "myorg\\myapp\\f2.txt");
         }
 
         private static void AssertManifestPropertyExists(string content, string key, string value)

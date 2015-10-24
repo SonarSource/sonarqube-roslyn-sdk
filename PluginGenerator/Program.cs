@@ -15,17 +15,21 @@ namespace PluginGenerator
         static int Main(string[] args)
         {
             ILogger logger = new ConsoleLogger();
-            if (args.Length != 1)
+            if (args.Length != 2)
             {
                 logger.LogError(UIResources.Cmd_Error_IncorrectArguments);
                 return ERROR_CODE;
             }
 
-            PluginDefinition defn = PluginDefinition.Load(args[0]);
-            string outputDir = Directory.GetCurrentDirectory();
+            string pluginDefnFilePath = args[0];
+            string rulesFilePath = args[1];
 
-            Generator generator = new Generator(new JdkWrapper(), logger);
-            generator.GeneratePlugin(defn, outputDir);
+            PluginDefinition defn = PluginDefinition.Load(pluginDefnFilePath);
+            string fullNewJarFilePath = Path.Combine(Directory.GetCurrentDirectory(),
+                Path.GetFileNameWithoutExtension(pluginDefnFilePath) + ".jar");
+
+            RulesPluginGenerator generator = new RulesPluginGenerator(new JdkWrapper(), logger);
+            generator.GeneratePlugin(defn, rulesFilePath, fullNewJarFilePath);
 
             return SUCCESS_CODE;
         }

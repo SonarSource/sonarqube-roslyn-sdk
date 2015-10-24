@@ -6,18 +6,21 @@ using Tests.Common;
 namespace PluginGeneratorTests
 {
     [TestClass]
-    public class GeneratorTests
+    public class RulePluginGeneratorTests
     {
         public TestContext TestContext { get; set; }
 
         [TestMethod]
         public void PluginGen_Simple()
         {
+            string inputDir = TestUtils.CreateTestDirectory(this.TestContext, "input");
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, "output");
             string fullJarFilePath = Path.Combine(outputDir, "myPlugin.jar");
 
+            string rulesXmlFilePath = TestUtils.CreateTextFile("rules.xml", inputDir, "<xml Rules />");
+
             IJdkWrapper jdkWrapper = new JdkWrapper();
-            Generator generator = new Generator(jdkWrapper, new TestLogger());
+            RulesPluginGenerator generator = new RulesPluginGenerator(jdkWrapper, new TestLogger());
 
             PluginDefinition defn = new PluginDefinition()
             {
@@ -28,16 +31,20 @@ namespace PluginGeneratorTests
                 Version = "0.1-SNAPSHOT",
                 Organization = "ACME Software Ltd",
                 License = "Commercial",
-                Developers = typeof(Generator).FullName
+                Developers = typeof(RulesPluginGenerator).FullName
             };
 
-            generator.GeneratePlugin(defn, fullJarFilePath);
+            generator.GeneratePlugin(defn, rulesXmlFilePath, fullJarFilePath);
             if (File.Exists(fullJarFilePath))
             {
                 this.TestContext.AddResultFile(fullJarFilePath);
             }
 
-            TestUtils.AssertFileExists(fullJarFilePath);
+            new JarChecker(this.TestContext, fullJarFilePath)
+                .JarContainsFiles(
+                    "resources\\rules.xml",
+                    "myorg\\MyPlugin\\Plugin.class",
+                    "myorg\\MyPlugin\\PluginRulesDefinition.class");
         }
 
     }
