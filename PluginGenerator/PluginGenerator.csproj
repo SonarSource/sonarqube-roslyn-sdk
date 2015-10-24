@@ -45,6 +45,8 @@
   <ItemGroup>
     <Compile Include="ConsoleLogger.cs" />
     <Compile Include="Exceptions\CompilerException.cs" />
+    <Compile Include="NuGet\DataModel.cs" />
+    <Compile Include="NuGet\NuGetSpecReader.cs" />
     <Compile Include="RulesPluginGenerator.cs" />
     <Compile Include="Interfaces\IJdkWrapper.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
@@ -64,6 +66,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SonarQube\Serializer.cs" />
     <Compile Include="SourceGenerator.cs" />
     <Compile Include="UIResources.Designer.cs">
       <AutoGen>True</AutoGen>
