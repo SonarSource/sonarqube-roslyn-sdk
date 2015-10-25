@@ -37,12 +37,19 @@ namespace Roslyn.SonarQube
 
             Rules rules = new Rules();
 
-            foreach(DiagnosticDescriptor diagnostic in analyzer.SupportedDiagnostics)
+            foreach (DiagnosticDescriptor diagnostic in analyzer.SupportedDiagnostics)
             {
                 rule newRule = new rule();
                 newRule.Key = diagnostic.Id;
                 newRule.InternalKey = diagnostic.Id;
                 newRule.Description = diagnostic.Description.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+
+                if (string.IsNullOrWhiteSpace(newRule.Description))
+                {
+                    newRule.Description = "{unspecified}";
+                }
+
                 newRule.Name = diagnostic.Title.ToString(System.Globalization.CultureInfo.InvariantCulture);
                 newRule.Severity = GetSonarQubeSeverity(diagnostic.DefaultSeverity);
 
@@ -54,7 +61,7 @@ namespace Roslyn.SonarQube
                 // XmlTextWriter https://msdn.microsoft.com/en-us/library/system.xml.xmltextwriter.writestartdocument(v=vs.110).aspx
                 if (diagnostic.CustomTags.Any())
                 {
-                    newRule.Tag = diagnostic.CustomTags.First();
+                    newRule.Tag = diagnostic.CustomTags.First().ToLowerInvariant();
                 }
 
                 // Rule XML properties that don't have an obvious Diagnostic equivalent:
@@ -68,7 +75,15 @@ namespace Roslyn.SonarQube
                 //diagnostic.MessageFormat;
 
 
-                rules.Add(newRule);
+                if (rules.Any(r => r.Key.Equals(newRule.Key)))
+                {
+                    // TODO: Log duplicate rule
+                    Console.WriteLine("ERROR: duplicate rule id: {0}, {1} ", newRule.Key, newRule.Description);
+                }
+                else
+                {
+                    rules.Add(newRule);
+                }
             }
             return rules;
         }
