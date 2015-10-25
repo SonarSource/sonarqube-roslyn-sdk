@@ -62,6 +62,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Common\Common.csproj">
+      <Project>{bb89698a-0807-44d2-87ec-6aa271200759}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\PluginGenerator\PluginGenerator.csproj">
       <Project>{db16ccfa-b97f-4c5e-a99a-a6062ecf5d98}</Project>
       <Name>PluginGenerator</Name>

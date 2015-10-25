@@ -1,4 +1,4 @@
-﻿namespace PluginGenerator
+﻿namespace Roslyn.SonarQube.Common
 {
     public interface ILogger
     {

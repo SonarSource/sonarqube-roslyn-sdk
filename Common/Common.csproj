@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F60478FF-1EEA-4FB4-9BF4-50D11F94FA57}</ProjectGuid>
+    <ProjectGuid>{BB89698A-0807-44D2-87EC-6AA271200759}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Tests.Common</RootNamespace>
-    <AssemblyName>Tests.Common</AssemblyName>
+    <RootNamespace>Roslyn.SonarQube.Common</RootNamespace>
+    <AssemblyName>Roslyn.SonarQube.Common</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,7 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -41,21 +40,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssertException.cs" />
-    <Compile Include="TestLogger.cs" />
-    <Compile Include="TestUtils.cs" />
+    <Compile Include="ConsoleLogger.cs" />
+    <Compile Include="Interfaces\ILogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Common\Common.csproj">
-      <Project>{bb89698a-0807-44d2-87ec-6aa271200759}</Project>
-      <Name>Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PluginGenerator\PluginGenerator.csproj">
-      <Project>{db16ccfa-b97f-4c5e-a99a-a6062ecf5d98}</Project>
-      <Name>PluginGenerator</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

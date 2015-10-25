@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Roslyn.SonarQube.Common;
+using System.Collections.Generic;
 
 namespace PluginGenerator
 {

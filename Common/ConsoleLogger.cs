@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace PluginGenerator
+namespace Roslyn.SonarQube.Common
 {
-    internal class ConsoleLogger : ILogger
+    public class ConsoleLogger : ILogger
     {
         public const string DEBUG_PREFIX = "[DEBUG] ";
         public const string WARNING_PREFIX = "[WARNING] ";

@@ -1,4 +1,5 @@
-﻿using SonarQube.Common;
+﻿using Roslyn.SonarQube.Common;
+using SonarQube.Common;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
