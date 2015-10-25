@@ -10,6 +10,11 @@ namespace Roslyn.SonarQube.PluginGenerator
         private readonly IJdkWrapper jdkWrapper;
         private readonly ILogger logger;
 
+        public RulesPluginGenerator(ILogger logger)
+            :this(new JdkWrapper(), logger)
+        {
+        }
+
         public RulesPluginGenerator(IJdkWrapper jdkWrapper, ILogger logger)
         {
             if (jdkWrapper == null)
@@ -40,13 +45,14 @@ namespace Roslyn.SonarQube.PluginGenerator
             {
                 throw new FileNotFoundException(UIResources.Gen_Error_RulesFileDoesNotExists, rulesFilePath);
             }
-            if (File.Exists(fullJarFilePath))
-            {
-                throw new ArgumentException(UIResources.Gen_Error_JarFileExists, fullJarFilePath);
-            }
             if (!this.jdkWrapper.IsJdkInstalled())
             {
                 throw new InvalidOperationException(UIResources.JarB_JDK_NotInstalled);
+            }
+
+            if (File.Exists(fullJarFilePath))
+            {
+                this.logger.LogWarning(UIResources.Gen_ExistingJarWillBeOvewritten);
             }
 
             ValidateDefinition(definition);

@@ -16,6 +16,9 @@ namespace Roslyn.SonarQube.PluginGenerator
         static int Main(string[] args)
         {
             ILogger logger = new ConsoleLogger();
+
+            Utilities.LogAssemblyVersion(typeof(Program).Assembly, UIResources.AssemblyDescription, logger);
+
             if (args.Length != 2)
             {
                 logger.LogError(UIResources.Cmd_Error_IncorrectArguments);

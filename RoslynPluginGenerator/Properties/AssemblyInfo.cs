@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("PluginGenerator")]
+[assembly: AssemblyTitle("RoslynPluginGenerator")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("PluginGenerator")]
+[assembly: AssemblyProduct("RoslynPluginGenerator")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("db16ccfa-b97f-4c5e-a99a-a6062ecf5d98")]
+[assembly: Guid("ff1a3253-1888-412c-a870-922c08b29a1a")]
 
 // Version information for an assembly consists of the following four values:
 //

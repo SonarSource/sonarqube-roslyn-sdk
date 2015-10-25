@@ -117,46 +117,75 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Cmd_Error_IncorrectArguments" xml:space="preserve">
-    <value>Expecting two arguments: the name of the plugin definition file, and the rules xml file.</value>
+  <data name="AF_CreatedAnalyzer" xml:space="preserve">
+    <value>Created analyzer: {0}</value>
   </data>
-  <data name="JarB_Error_FileAlreadySpecified" xml:space="preserve">
-    <value>This file has already been added to the jar: {0}</value>
+  <data name="AF_ProcessedAssembly" xml:space="preserve">
+    <value>Processed assembly. Analyzers located: {0}</value>
   </data>
-  <data name="JarB_Error_FileNotFound" xml:space="preserve">
-    <value>Ths specified file to be included in the jar does not exist: {0}</value>
+  <data name="AF_ProcessingAssembly" xml:space="preserve">
+    <value>Processing assembly: {0}</value>
   </data>
-  <data name="JarB_Error_RelativeJarPathAlreadySpecified" xml:space="preserve">
-    <value>This jar output location has already been used: {0}. File: {1}</value>
+  <data name="AF_WARN_ExceptionCreatingAnalyzer" xml:space="preserve">
+    <value>Exception occurred creating analyzer of type '{0}'. Message: {1}</value>
   </data>
-  <data name="JarB_JarBuildingFailed" xml:space="preserve">
-    <value>Failed to build jar file</value>
+  <data name="AF_WARN_ExceptionFetchingTypes" xml:space="preserve">
+    <value>Exception occurred fetching types. Message: {0}</value>
   </data>
-  <data name="JarB_JarBuiltSuccessfully" xml:space="preserve">
-    <value>Successfully built jar file: {0}</value>
+  <data name="AF_WARN_ExceptionLoadingAssembly" xml:space="preserve">
+    <value>Exception occurred loading assembly {0}. Message: {1}</value>
   </data>
-  <data name="JarB_JDK_NotInstalled" xml:space="preserve">
-    <value>The JDK is not installed or is not discoverable on this machine</value>
+  <data name="APG_AnalyzersLocated" xml:space="preserve">
+    <value>Number of analyzers located in package: {0}</value>
   </data>
-  <data name="Error_MissingProperty" xml:space="preserve">
-    <value>Required plugin definition property is missing: {0}</value>
+  <data name="APG_GeneratingPlugin" xml:space="preserve">
+    <value>Generating plugin...</value>
   </data>
-  <data name="JComp_SourceCompilationFailed" xml:space="preserve">
-    <value>Java source code compilation failed</value>
+  <data name="APG_GeneratingRules" xml:space="preserve">
+    <value>Generating rules...</value>
   </data>
-  <data name="JComp_SourceCompilationSucceeded" xml:space="preserve">
-    <value>Successfully compiled Java source code</value>
+  <data name="APG_LocatingAnalyzers" xml:space="preserve">
+    <value>Looking for analyzers in the package...</value>
   </data>
-  <data name="JComp_CompliationFailed" xml:space="preserve">
-    <value>Java compilation failed</value>
+  <data name="APG_NoAnalyzersFound" xml:space="preserve">
+    <value>No analyzers were found in the specified package</value>
   </data>
-  <data name="Gen_Error_RulesFileDoesNotExists" xml:space="preserve">
-    <value>The specified rules file does not exist: {0}</value>
+  <data name="APG_PluginGenerated" xml:space="preserve">
+    <value>Plugin generated: {0}</value>
+  </data>
+  <data name="APG_RulesGeneratedToFile" xml:space="preserve">
+    <value>{0} rules generated to {1}</value>
   </data>
   <data name="AssemblyDescription" xml:space="preserve">
-    <value>Rules Plugin Generator for SonarQube</value>
+    <value>Roslyn Analyzer Plugin Generator for SonarQube</value>
   </data>
-  <data name="Gen_ExistingJarWillBeOvewritten" xml:space="preserve">
-    <value>The existing jar file will be overwritten</value>
+  <data name="CmdLine_ERROR_InvalidArgumentCount" xml:space="preserve">
+    <value>Expecting one or two arguments:
+* NuGet package Id (mandatory), and
+* NuGet package version (optional)</value>
+  </data>
+  <data name="CmdLine_ERROR_InvalidVersion" xml:space="preserve">
+    <value>Invalid NuGet package version: {0}</value>
+  </data>
+  <data name="NG_CreatingRepository" xml:space="preserve">
+    <value>Creating NuGet repository: {0}</value>
+  </data>
+  <data name="NG_DownloadingFile" xml:space="preserve">
+    <value>Downloading file '{0}' to {1}</value>
+  </data>
+  <data name="NG_DownloadingPackage" xml:space="preserve">
+    <value>Downloading package ({0} files)...</value>
+  </data>
+  <data name="NG_ERROR_PackageNotFound" xml:space="preserve">
+    <value>No packages with the specified id were found: {0}</value>
+  </data>
+  <data name="NG_ERROR_PackageVersionNotFound" xml:space="preserve">
+    <value>Package version was not found: {0}</value>
+  </data>
+  <data name="NG_LocatingPackages" xml:space="preserve">
+    <value>Attempting to locate package with id '{0}'</value>
+  </data>
+  <data name="NG_NumberOfPackagesLocated" xml:space="preserve">
+    <value>Number of packages located: {0}</value>
   </data>
 </root>

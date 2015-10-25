@@ -36,6 +36,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Common", "..\Tests.Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "..\Common\Common.csproj", "{BB89698A-0807-44D2-87EC-6AA271200759}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoslynPluginGenerator", "..\RoslynPluginGenerator\RoslynPluginGenerator.csproj", "{FF1A3253-1888-412C-A870-922C08B29A1A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,6 +80,10 @@ Global
 		{BB89698A-0807-44D2-87EC-6AA271200759}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB89698A-0807-44D2-87EC-6AA271200759}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB89698A-0807-44D2-87EC-6AA271200759}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF1A3253-1888-412C-A870-922C08B29A1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF1A3253-1888-412C-A870-922C08B29A1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF1A3253-1888-412C-A870-922C08B29A1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF1A3253-1888-412C-A870-922C08B29A1A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

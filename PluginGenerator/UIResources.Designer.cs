@@ -61,6 +61,15 @@ namespace Roslyn.SonarQube.PluginGenerator {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Rules Plugin Generator for SonarQube.
+        /// </summary>
+        internal static string AssemblyDescription {
+            get {
+                return ResourceManager.GetString("AssemblyDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expecting two arguments: the name of the plugin definition file, and the rules xml file..
         /// </summary>
         internal static string Cmd_Error_IncorrectArguments {
@@ -79,20 +88,20 @@ namespace Roslyn.SonarQube.PluginGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A file with this name already exists: {0}.
-        /// </summary>
-        internal static string Gen_Error_JarFileExists {
-            get {
-                return ResourceManager.GetString("Gen_Error_JarFileExists", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The specified rules file does not exist: {0}.
         /// </summary>
         internal static string Gen_Error_RulesFileDoesNotExists {
             get {
                 return ResourceManager.GetString("Gen_Error_RulesFileDoesNotExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The existing jar file will be overwritten.
+        /// </summary>
+        internal static string Gen_ExistingJarWillBeOvewritten {
+            get {
+                return ResourceManager.GetString("Gen_ExistingJarWillBeOvewritten", resourceCulture);
             }
         }
         
