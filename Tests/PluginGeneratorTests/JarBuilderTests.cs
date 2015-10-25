@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PluginGenerator;
+using Roslyn.SonarQube.PluginGenerator;
 using System.IO;
 using Tests.Common;
 
-namespace PluginGeneratorTests
+namespace Roslyn.SonarQube.PluginGeneratorTests
 {
     [TestClass]
     public class JarBuilderTests

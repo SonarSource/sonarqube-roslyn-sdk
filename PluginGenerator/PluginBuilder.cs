@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace PluginGenerator
+namespace Roslyn.SonarQube.PluginGenerator
 {
     public class PluginBuilder
     {
@@ -142,7 +142,7 @@ namespace PluginGenerator
             JavaCompilationBuilder compiler = new JavaCompilationBuilder(this.jdkWrapper);
 
             // Unpack and reference the required jar files
-            SourceGenerator.UnpackReferencedJarFiles(typeof(RulesPluginGenerator).Assembly, "PluginGenerator.Resources", workingDirectory);
+            SourceGenerator.UnpackReferencedJarFiles(typeof(RulesPluginGenerator).Assembly, "Roslyn.SonarQube.PluginGenerator.Resources", workingDirectory);
             foreach (string jarFile in Directory.GetFiles(workingDirectory, "*.jar"))
             {
                 compiler.AddClassPath(jarFile);

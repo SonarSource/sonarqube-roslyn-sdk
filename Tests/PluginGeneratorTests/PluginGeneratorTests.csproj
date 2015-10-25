@@ -6,7 +6,7 @@
     <ProjectGuid>{F6C01441-DD3F-465B-8E24-BCEB239819F5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PluginGeneratorTests</RootNamespace>
+    <RootNamespace>Roslyn.SonarQube.PluginGeneratorTests</RootNamespace>
     <AssemblyName>PluginGeneratorTests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

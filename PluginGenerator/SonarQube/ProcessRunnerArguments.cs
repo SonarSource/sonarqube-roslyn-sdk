@@ -5,7 +5,6 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using PluginGenerator;
 using Roslyn.SonarQube.Common;
 using System;
 using System.Collections.Generic;

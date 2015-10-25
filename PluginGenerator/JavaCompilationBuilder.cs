@@ -6,7 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
-namespace PluginGenerator
+namespace Roslyn.SonarQube.PluginGenerator
 {
     public class JavaCompilationBuilder
     {

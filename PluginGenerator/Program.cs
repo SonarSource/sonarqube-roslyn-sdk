@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PluginGenerator
+namespace Roslyn.SonarQube.PluginGenerator
 {
     static class Program
     {

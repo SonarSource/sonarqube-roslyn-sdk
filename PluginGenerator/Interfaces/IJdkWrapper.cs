@@ -1,7 +1,7 @@
 ﻿using Roslyn.SonarQube.Common;
 using System.Collections.Generic;
 
-namespace PluginGenerator
+namespace Roslyn.SonarQube.PluginGenerator
 {
     /// <summary>
     /// Encapsulates the interactions with the JDK components

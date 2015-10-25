@@ -1,10 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PluginGenerator.NuGet;
+using Roslyn.SonarQube.PluginGenerator.NuGet;
 using System.Collections.Generic;
 using System.IO;
 using Tests.Common;
 
-namespace PluginGeneratorTests
+namespace Roslyn.SonarQube.PluginGeneratorTests
 {
     [TestClass]
     public class NuGetDataModelTests

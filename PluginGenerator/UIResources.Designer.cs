@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace PluginGenerator {
+namespace Roslyn.SonarQube.PluginGenerator {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace PluginGenerator {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("PluginGenerator.UIResources", typeof(UIResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Roslyn.SonarQube.PluginGenerator.UIResources", typeof(UIResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

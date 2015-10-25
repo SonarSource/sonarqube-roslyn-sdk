@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
-namespace PluginGenerator
+namespace Roslyn.SonarQube.PluginGenerator
 {
     public class JdkWrapper : IJdkWrapper
     {

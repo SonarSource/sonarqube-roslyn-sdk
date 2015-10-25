@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PluginGenerator
+namespace Roslyn.SonarQube.PluginGenerator
 {
     [Serializable]
     public class CompilerException : Exception

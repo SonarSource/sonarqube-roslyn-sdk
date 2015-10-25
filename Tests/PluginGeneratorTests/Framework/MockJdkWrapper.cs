@@ -1,9 +1,9 @@
-﻿using PluginGenerator;
-using Roslyn.SonarQube.Common;
+﻿using Roslyn.SonarQube.Common;
+using Roslyn.SonarQube.PluginGenerator;
 using System;
 using System.Collections.Generic;
 
-namespace PluginGeneratorTests
+namespace Roslyn.SonarQube.PluginGeneratorTests
 {
     internal class MockJdkWrapper : IJdkWrapper
     {

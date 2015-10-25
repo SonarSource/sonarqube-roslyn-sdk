@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace PluginGenerator.NuGet
+namespace Roslyn.SonarQube.PluginGenerator.NuGet
 {
     [XmlRoot("package", Namespace = XmlNamespace)]
     public class NuGetPackage

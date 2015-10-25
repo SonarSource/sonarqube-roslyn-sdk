@@ -1,4 +1,4 @@
-﻿namespace PluginGenerator
+﻿namespace Roslyn.SonarQube.PluginGenerator
 {
     /// <summary>
     /// Constants for well-known plugin properties that can

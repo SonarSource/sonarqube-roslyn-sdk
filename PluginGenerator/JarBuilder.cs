@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace PluginGenerator
+namespace Roslyn.SonarQube.PluginGenerator
 {
     public class JarBuilder
     {

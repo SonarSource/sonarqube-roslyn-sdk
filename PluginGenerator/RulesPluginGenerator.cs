@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace PluginGenerator
+namespace Roslyn.SonarQube.PluginGenerator
 {
     public class RulesPluginGenerator
     {
@@ -85,7 +85,7 @@ namespace PluginGenerator
             // Generate the source files
             Dictionary<string, string> replacementMap = new Dictionary<string, string>();
             PopulateSourceFileReplacements(definition, replacementMap);
-            SourceGenerator.CreateSourceFiles(typeof(RulesPluginGenerator).Assembly, "PluginGenerator.Resources.", workingFolder, replacementMap);
+            SourceGenerator.CreateSourceFiles(typeof(RulesPluginGenerator).Assembly, "Roslyn.SonarQube.PluginGenerator.Resources.", workingFolder, replacementMap);
 
             // Add the source files
             foreach (string sourceFile in Directory.GetFiles(workingFolder, "*.java", SearchOption.AllDirectories))

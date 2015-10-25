@@ -1,11 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PluginGenerator;
+using Roslyn.SonarQube.PluginGenerator;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Tests.Common;
 
-namespace PluginGeneratorTests
+namespace Roslyn.SonarQube.PluginGeneratorTests
 {
     [TestClass]
     public class SourceGeneratorTests
@@ -22,7 +22,7 @@ namespace PluginGeneratorTests
             replacements.Add("[REPLACE2]", "222");
 
             // Act
-            SourceGenerator.CreateSourceFiles(this.GetType().Assembly, "PluginGeneratorTests.resources", outputDir, replacements);
+            SourceGenerator.CreateSourceFiles(this.GetType().Assembly, "Roslyn.SonarQube.PluginGeneratorTests.resources", outputDir, replacements);
 
             // Assert
             string content;
@@ -45,7 +45,7 @@ namespace PluginGeneratorTests
             replacements.Add("[REPLACE2]", "222");
 
             // Act
-            SourceGenerator.CreateSourceFiles(this.GetType().Assembly, "PluginGeneratorTests.resources.myorg.myapp", outputDir, replacements);
+            SourceGenerator.CreateSourceFiles(this.GetType().Assembly, "Roslyn.SonarQube.PluginGeneratorTests.resources.myorg.myapp", outputDir, replacements);
 
             // Assert
             string content;
