@@ -16,7 +16,7 @@ namespace RuleGeneratorTests
         {
             Rules rules = new Rules();
             
-            rules.Add(new rule()
+            rules.Add(new Rule()
             {
                 Key = "key1",
                 InternalKey = "internalKey1",
@@ -25,10 +25,10 @@ namespace RuleGeneratorTests
                 Severity = "CRITICAL",
                 Cardinality = "SINGLE",
                 Status = "READY",
-                Tags = new string[2] { "tag_1_A", "tag_1_B" }
+                Tags = new string[0]
             });
 
-            rules.Add(new rule()
+            rules.Add(new Rule()
             {
                 Key = "key2",
                 InternalKey = "internalKey2",
@@ -63,8 +63,6 @@ namespace RuleGeneratorTests
     <severity>CRITICAL</severity>
     <cardinality>SINGLE</cardinality>
     <status>READY</status>
-    <tag>tag_1_A</tag>
-    <tag>tag_1_B</tag>
   </rule>
   <rule>
     <key>key2</key>

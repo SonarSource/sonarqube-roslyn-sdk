@@ -7,9 +7,10 @@ using System.Xml.Serialization;
 
 namespace Roslyn.SonarQube
 {
-    public class rule
+    [XmlType(TypeName = "rule")]
+    public class Rule
     {
-        [XmlElement(ElementName="key")]
+        [XmlElement(ElementName = "key")]
         public string Key { get; set; }
 
         [XmlElement(ElementName = "name")]

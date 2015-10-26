@@ -39,7 +39,7 @@ namespace Roslyn.SonarQube
 
             foreach(DiagnosticDescriptor diagnostic in analyzer.SupportedDiagnostics)
             {
-                rule newRule = new rule();
+                Rule newRule = new Rule();
                 newRule.Key = diagnostic.Id;
                 newRule.InternalKey = diagnostic.Id;
                 newRule.Description = diagnostic.Description.ToString(System.Globalization.CultureInfo.InvariantCulture);
@@ -96,22 +96,6 @@ namespace Roslyn.SonarQube
             }
 
             return sqSeverity;
-        }
-
-        #endregion
-
-        #region static methods
-
-        public static void Main()
-        {
-            var ruleGenerator = new RuleGenerator();
-            
-            var analysersToGenerateFrom = new List<DiagnosticAnalyzer>();
-            /*DiagnosticAnalyzer codeCracker = CodeCracker.CSharp
-            DiagnosticAnalyzer example = new ExampleAnalyzer1.ExampleAnalyzer1Analyzer();
-
-            Rules generatedRules = ruleGenerator.GenerateRules();
-            generatedRules.Save("generatedRules.xml");*/
         }
 
         #endregion
