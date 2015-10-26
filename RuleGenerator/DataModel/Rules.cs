@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 namespace Roslyn.SonarQube
 {
     [XmlRoot(ElementName ="rules")]
-    public class Rules : List<rule>
+    public class Rules : List<Rule>
     {
         #region Serialization
 

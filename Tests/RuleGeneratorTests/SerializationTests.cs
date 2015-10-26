@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Roslyn.SonarQube;
+using System.Collections.Generic;
 using System.IO;
 using Tests.Common;
 
@@ -14,8 +15,8 @@ namespace RuleGeneratorTests
         public void SerializeRules()
         {
             Rules rules = new Rules();
-
-            rules.Add(new rule()
+            
+            rules.Add(new Rule()
             {
                 Key = "key1",
                 InternalKey = "internalKey1",
@@ -24,10 +25,10 @@ namespace RuleGeneratorTests
                 Severity = "CRITICAL",
                 Cardinality = "SINGLE",
                 Status = "READY",
-                Tag = "tag1"
+                Tags = new string[0]
             });
 
-            rules.Add(new rule()
+            rules.Add(new Rule()
             {
                 Key = "key2",
                 InternalKey = "internalKey2",
@@ -36,7 +37,8 @@ namespace RuleGeneratorTests
                 Severity = "MAJOR",
                 Cardinality = "SINGLE",
                 Status = "READY",
-                Tag = "tag2"
+                Tags = new string[2] { "tag_2_A", "tag_2_B" }
+
             });
 
 
@@ -61,7 +63,6 @@ namespace RuleGeneratorTests
     <severity>CRITICAL</severity>
     <cardinality>SINGLE</cardinality>
     <status>READY</status>
-    <tag>tag1</tag>
   </rule>
   <rule>
     <key>key2</key>
@@ -71,7 +72,8 @@ namespace RuleGeneratorTests
     <severity>MAJOR</severity>
     <cardinality>SINGLE</cardinality>
     <status>READY</status>
-    <tag>tag2</tag>
+    <tag>tag_2_A</tag>
+    <tag>tag_2_B</tag>
   </rule>
 </rules>";
 
