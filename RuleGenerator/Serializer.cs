@@ -22,19 +22,19 @@ namespace SonarQube.Common
         /// <summary>
         /// Save the object as XML
         /// </summary>
-        public static void SaveModel<T>(T model, string fileName)
+        public static void SaveModel<T>(T model, string fileName) where T : class
         {
             if (model == null)
             {
                 throw new ArgumentNullException("model");
             }
+
             if (string.IsNullOrWhiteSpace(fileName))
             {
                 throw new ArgumentNullException("fileName");
             }
 
             XmlSerializer serializer = new XmlSerializer(typeof(T));
-
             XmlWriterSettings settings = new XmlWriterSettings();
 
             settings.CloseOutput = true;
@@ -79,7 +79,6 @@ namespace SonarQube.Common
             return model;
         }
 
-        #endregion
-
+        #endregion Serialisation methods
     }
 }

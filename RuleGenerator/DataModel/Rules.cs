@@ -1,16 +1,13 @@
 ﻿using SonarQube.Common;
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Serialization;
 
 namespace Roslyn.SonarQube
 {
-    [XmlRoot(ElementName ="rules")]
+    [XmlRoot(ElementName = "rules")]
     public class Rules : List<Rule>
     {
         #region Serialization
@@ -28,58 +25,34 @@ namespace Roslyn.SonarQube
                 throw new ArgumentNullException("fileName");
             }
 
-            // Keep track to make sure we don't write duplicate rules into the XML
-            var ruleKeys = new HashSet<string>();
-
-            var xmlWriter = new XmlTextWriter(fileName, Encoding.UTF8);
-            xmlWriter.Formatting = Formatting.Indented;
-
-            xmlWriter.WriteStartElement("rules");
-            foreach (rule rule in this)
-            {
-                if (!String.IsNullOrWhiteSpace(rule.Key))
-                {
-                    if (!ruleKeys.Contains(rule.Key)) 
-                    {
-
-#pragma warning disable CC0021 // We want a <rule> tag, it just happens that we have a rule class
-                        xmlWriter.WriteStartElement("rule");
-#pragma warning restore CC0021
-
-                        xmlWriter.WriteElementString("name", rule.Name);
-                        xmlWriter.WriteElementString("key", rule.Key);
-                        xmlWriter.WriteElementString("severity", rule.Severity);
-                        if (rule.Description == null || rule.Description.Length == 0)
-                        {
-                            rule.Description = "There was no description associated with this rule.";
-                        }
-                        xmlWriter.WriteElementString("description", rule.Description);
-                        xmlWriter.WriteElementString("cardinality", rule.Cardinality);
-                        xmlWriter.WriteElementString("status", rule.Status);
-                        xmlWriter.WriteElementString("internalKey", rule.InternalKey);
-                        if (rule.Tags != null)
-                        {
-                            foreach (string tag in rule.Tags)
-                            {
-                                xmlWriter.WriteElementString("tag", tag.ToLower());
-                            }
-                        }
-
-                        xmlWriter.WriteEndElement();
-
-                        // Add key to the set
-                        ruleKeys.Add(rule.Key);
-                    }
-                }
-
-
-            }
-            xmlWriter.WriteEndElement();
             this.FileName = fileName;
 
-            xmlWriter.Close();
+            Rules rulesToSave = new Rules();
 
-            return ruleKeys.Count();
+            foreach (Rule rule in this)
+                {
+                if (String.IsNullOrWhiteSpace(rule.Key))
+                    {
+                    Console.WriteLine(Resources.WARN_EmptyKey);
+                    continue;
+                }
+
+                if (rulesToSave.Any(r => String.Equals(r.Key, rule.Key, Rule.RuleKeyComparer)))
+                        {
+                    Console.WriteLine(Resources.WARN_DuplicateKey, rule.Key);
+                    continue;
+                        }
+
+                Debug.Assert(
+                    rule.Tags.All(t => String.Equals(t, t.ToLowerInvariant(), StringComparison.Ordinal)), 
+                    "SonarQube tags have to be lower case ");
+
+                rulesToSave.Add(rule);
+            }
+
+            Serializer.SaveModel(rulesToSave, fileName);
+
+            return rulesToSave.Count;
         }
 
         /// <summary>
@@ -97,7 +70,6 @@ namespace Roslyn.SonarQube
             return model;
         }
 
-        #endregion
-
+        #endregion Serialization
     }
 }

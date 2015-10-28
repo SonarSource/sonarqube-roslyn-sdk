@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace Roslyn.SonarQube
@@ -30,8 +27,13 @@ namespace Roslyn.SonarQube
 
         [XmlElement(ElementName = "status")]
         public string Status { get; set; }
-
+        
         [XmlElement(ElementName = "tag")]
         public string[] Tags { get; set; }
+
+        /// <summary>
+        /// Specified the culture and case when comparing rule keys
+        /// </summary>
+        public static StringComparison RuleKeyComparer = StringComparison.OrdinalIgnoreCase;
     }
 }

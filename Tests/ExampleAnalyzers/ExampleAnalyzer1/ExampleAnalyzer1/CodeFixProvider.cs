@@ -22,7 +22,7 @@ namespace ExampleAnalyzer1
 
         public sealed override ImmutableArray<string> FixableDiagnosticIds
         {
-            get { return ImmutableArray.Create(ExampleAnalyzer1Analyzer.DiagnosticId); }
+            get { return ImmutableArray.Create(ConfigurableAnalyzer.DiagnosticId); }
         }
 
         public sealed override FixAllProvider GetFixAllProvider()

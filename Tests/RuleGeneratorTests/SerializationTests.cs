@@ -2,6 +2,7 @@
 using Roslyn.SonarQube;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Tests.Common;
 
 namespace RuleGeneratorTests
@@ -20,12 +21,12 @@ namespace RuleGeneratorTests
             {
                 Key = "key1",
                 InternalKey = "internalKey1",
-                Name="Rule1",
+                Name = "Rule1",
                 Description = "description 1",
                 Severity = "CRITICAL",
                 Cardinality = "SINGLE",
                 Status = "READY",
-                Tags = new string[0]
+                Tags = new[] { "tag_1_a", "tag_1_b" } // tags cannot contain uppercase chars
             });
 
             rules.Add(new Rule()
@@ -37,10 +38,8 @@ namespace RuleGeneratorTests
                 Severity = "MAJOR",
                 Cardinality = "SINGLE",
                 Status = "READY",
-                Tags = new string[2] { "tag_2_A", "tag_2_B" }
-
+                Tags = new[] { "tag_2_a", "tag_2_b" }
             });
-
 
             string testDir = TestUtils.CreateTestDirectory(this.TestContext);
             string rulesFile = Path.Combine(testDir, "rules.xml");
@@ -53,7 +52,7 @@ namespace RuleGeneratorTests
 
             Assert.AreEqual(2, reloaded.Count, "Unexpected number of rules in reloaded rules file");
 
-            string expectedXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+            string expectedXmlContent = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <rules xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
   <rule>
     <key>key1</key>
@@ -63,6 +62,8 @@ namespace RuleGeneratorTests
     <severity>CRITICAL</severity>
     <cardinality>SINGLE</cardinality>
     <status>READY</status>
+    <tag>tag_1_a</tag>
+    <tag>tag_1_b</tag>
   </rule>
   <rule>
     <key>key2</key>
@@ -72,12 +73,15 @@ namespace RuleGeneratorTests
     <severity>MAJOR</severity>
     <cardinality>SINGLE</cardinality>
     <status>READY</status>
-    <tag>tag_2_A</tag>
-    <tag>tag_2_B</tag>
+    <tag>tag_2_a</tag>
+    <tag>tag_2_b</tag>
   </rule>
 </rules>";
 
-            Assert.AreEqual(expectedXml, File.ReadAllText(rulesFile), "Unexpected XML content");
+            File.WriteAllText(Path.ChangeExtension(rulesFile, ".xml2"), expectedXmlContent);
+
+            string actualXmlContent = File.ReadAllText(rulesFile);
+            Assert.AreEqual(expectedXmlContent, actualXmlContent, "Unexpected XML content");
         }
     }
 }
