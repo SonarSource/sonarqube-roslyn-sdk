@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B6ED3E87-10A9-4E99-B0E2-FC35C7D39CF4}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Roslyn.SonarQube</RootNamespace>
     <AssemblyName>Roslyn.SonarQube.RuleGenerator</AssemblyName>
@@ -91,8 +91,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DiagnosticAssemblyScanner.cs" />
     <Compile Include="DataModel\Rule.cs" />
     <Compile Include="DataModel\Rules.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

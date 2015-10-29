@@ -118,10 +118,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AssemblyLoadError" xml:space="preserve">
-    <value>Could not load the assembly {0} because {1}</value>
+    <value>Could not load the assembly {0}. Error: {1}</value>
   </data>
   <data name="CommandLineUsage" xml:space="preserve">
     <value>Usage: {0} pathToAnalyzerAssembly</value>
+  </data>
+  <data name="ERR_ArgFileDoesNotExist" xml:space="preserve">
+    <value>File {0} does not exist. Provide the path to an existing assembly</value>
   </data>
   <data name="NoAnalysers" xml:space="preserve">
     <value>Could not load the analyzer assembly or no DiagnosticAnalyser subtypes were found</value>

@@ -61,7 +61,7 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not load the assembly {0} because {1}.
+        ///   Looks up a localized string similar to Could not load the assembly {0}. Error: {1}.
         /// </summary>
         internal static string AssemblyLoadError {
             get {
@@ -75,6 +75,15 @@ namespace Roslyn.SonarQube {
         internal static string CommandLineUsage {
             get {
                 return ResourceManager.GetString("CommandLineUsage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File {0} does not exist. Provide the path to an existing assembly.
+        /// </summary>
+        internal static string ERR_ArgFileDoesNotExist {
+            get {
+                return ResourceManager.GetString("ERR_ArgFileDoesNotExist", resourceCulture);
             }
         }
         
