@@ -30,21 +30,22 @@ namespace Roslyn.SonarQube
             Rules rulesToSave = new Rules();
 
             foreach (Rule rule in this)
-                {
+            {
                 if (String.IsNullOrWhiteSpace(rule.Key))
-                    {
+                {
                     Console.WriteLine(Resources.WARN_EmptyKey);
                     continue;
                 }
 
                 if (rulesToSave.Any(r => String.Equals(r.Key, rule.Key, Rule.RuleKeyComparer)))
-                        {
+                {
                     Console.WriteLine(Resources.WARN_DuplicateKey, rule.Key);
                     continue;
-                        }
+                }
 
                 Debug.Assert(
-                    rule.Tags.All(t => String.Equals(t, t.ToLowerInvariant(), StringComparison.Ordinal)), 
+                    rule.Tags == null ||
+                    rule.Tags.All(t => String.Equals(t, t.ToLowerInvariant(), StringComparison.Ordinal)),
                     "SonarQube tags have to be lower case ");
 
                 rulesToSave.Add(rule);

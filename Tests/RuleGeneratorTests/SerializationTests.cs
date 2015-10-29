@@ -38,7 +38,6 @@ namespace RuleGeneratorTests
                 Severity = "MAJOR",
                 Cardinality = "SINGLE",
                 Status = "READY",
-                Tags = new[] { "tag_2_a", "tag_2_b" }
             });
 
             string testDir = TestUtils.CreateTestDirectory(this.TestContext);
@@ -73,8 +72,6 @@ namespace RuleGeneratorTests
     <severity>MAJOR</severity>
     <cardinality>SINGLE</cardinality>
     <status>READY</status>
-    <tag>tag_2_a</tag>
-    <tag>tag_2_b</tag>
   </rule>
 </rules>";
 
