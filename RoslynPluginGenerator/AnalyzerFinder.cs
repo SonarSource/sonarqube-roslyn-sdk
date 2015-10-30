@@ -70,7 +70,7 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
 
             try
             {
-                analyzerTypes = asm.GetTypes().Where(t => t.IsSubclassOf(typeof(DiagnosticAnalyzer))).ToArray();
+                analyzerTypes = asm.GetTypes().Where(t => !t.IsAbstract && t.IsSubclassOf(typeof(DiagnosticAnalyzer))).ToArray();
             }
             catch(Exception ex)
             {

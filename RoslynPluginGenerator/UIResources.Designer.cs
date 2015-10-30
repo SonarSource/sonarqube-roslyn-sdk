@@ -216,16 +216,16 @@ namespace Roslyn.SonarQube.AnalyzerPlugins {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Downloading file &apos;{0}&apos; to {1}.
+        ///   Looks up a localized string similar to ... downloaded ({0} files).
         /// </summary>
-        internal static string NG_DownloadingFile {
+        internal static string NG_DownloadedPackage {
             get {
-                return ResourceManager.GetString("NG_DownloadingFile", resourceCulture);
+                return ResourceManager.GetString("NG_DownloadedPackage", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Downloading package ({0} files)....
+        ///   Looks up a localized string similar to Downloading package....
         /// </summary>
         internal static string NG_DownloadingPackage {
             get {
@@ -252,6 +252,15 @@ namespace Roslyn.SonarQube.AnalyzerPlugins {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Extracting file &apos;{0}&apos; to {1}.
+        /// </summary>
+        internal static string NG_ExtractingFile {
+            get {
+                return ResourceManager.GetString("NG_ExtractingFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Attempting to locate package with id &apos;{0}&apos;.
         /// </summary>
         internal static string NG_LocatingPackages {
@@ -266,6 +275,15 @@ namespace Roslyn.SonarQube.AnalyzerPlugins {
         internal static string NG_NumberOfPackagesLocated {
             get {
                 return ResourceManager.GetString("NG_NumberOfPackagesLocated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Version was not specified. Using version {0}..
+        /// </summary>
+        internal static string NG_SelectedPackageVersion {
+            get {
+                return ResourceManager.GetString("NG_SelectedPackageVersion", resourceCulture);
             }
         }
     }

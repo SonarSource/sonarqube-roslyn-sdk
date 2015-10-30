@@ -75,7 +75,12 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
                 if (packageVersion == null)
                 {
                     package = packages.FirstOrDefault(p => p.IsLatestVersion);
-                    Debug.Assert(package != null, "Expecting latest package to exist");
+                    if (package == null)
+                    {
+                        package = packages.OrderBy(p => p.Version.Version).Last();
+                    }
+                    Debug.Assert(package != null, "Failed to select a package");
+                    logger.LogInfo(UIResources.NG_SelectedPackageVersion, package.Version);
                 }
                 else
                 {
@@ -92,23 +97,31 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
 
         private void DownloadPackage(NuGet.IPackage package, string downloadDirectory)
         {
+            // Calling "GetFiles" will download the dlls to a temporary location
+            // (somewhere under AppData\Local\Temp\nuget). We don't know exactly where,
+            // so we need to unpack the files to a known location
+
+            this.logger.LogInfo(UIResources.NG_DownloadingPackage);
             IList<NuGet.IPackageFile> files = package.GetFiles().ToList();
+            this.logger.LogInfo(UIResources.NG_DownloadedPackage, files.Count);
 
-            this.logger.LogInfo(UIResources.NG_DownloadingPackage, files.Count);
-
-            // Download all of the files
+            // Extract all of the files
             foreach (NuGet.IPackageFile file in files)
             {
-                DownloadFile(file, downloadDirectory);
+                ExtractFile(file, downloadDirectory);
             }
         }
 
-        private void DownloadFile(NuGet.IPackageFile file, string downloadDirectory)
+        private void ExtractFile(NuGet.IPackageFile file, string downloadDirectory)
         {
+            // We're dumping all of the files into the same directory currently
+            // to simplify that the assembly resolver code that attempts to reflect
+            // on them. This might need to change e.g. if the extracted assemblies
+            // include resource assemblies that need to be in a particular folder.
             byte[] buffer = new byte[4096];
 
             string fullFilePath = Path.Combine(downloadDirectory, Path.GetFileName(file.Path));
-            this.logger.LogDebug(UIResources.NG_DownloadingFile, file.Path, fullFilePath);
+            this.logger.LogDebug(UIResources.NG_ExtractingFile, file.Path, fullFilePath);
 
             using (FileStream outputStream = File.OpenWrite(fullFilePath))
             using (Stream inputStream = file.GetStream())
