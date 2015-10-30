@@ -10,7 +10,7 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
 {
     public class AnalyzerFinder
     {
-        private ILogger logger;
+        private readonly ILogger logger;
 
         public AnalyzerFinder(ILogger logger)
         {
@@ -30,21 +30,22 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
 
             IList<DiagnosticAnalyzer> analyzers = new List<DiagnosticAnalyzer>();
 
-            Resolver resolver = new Resolver(assemblyDirectory);
-
-            // Look in every assembly under the supplied directory to see if
-            // we can find and create any analyzers
-            foreach (string assemblyPath in Directory.GetFiles(assemblyDirectory, "*.dll", SearchOption.AllDirectories))
+            using (new Resolver(assemblyDirectory))
             {
-                logger.LogDebug(UIResources.AF_ProcessingAssembly, assemblyPath);
-                Type[] analyzerTypes = this.SafeGetAnalyzerTypes(assemblyPath);
-
-                foreach (Type t in analyzerTypes)
+                // Look in every assembly under the supplied directory to see if
+                // we can find and create any analyzers
+                foreach (string assemblyPath in Directory.GetFiles(assemblyDirectory, "*.dll", SearchOption.AllDirectories))
                 {
-                    DiagnosticAnalyzer analyzer = this.SafeCreateAnalyzerInstance(t);
-                    if (analyzer != null)
+                    logger.LogDebug(UIResources.AF_ProcessingAssembly, assemblyPath);
+                    IEnumerable<Type> analyzerTypes = this.SafeGetAnalyzerTypes(assemblyPath) ?? Enumerable.Empty<Type>();
+
+                    foreach (Type t in analyzerTypes)
                     {
-                        analyzers.Add(analyzer);
+                        DiagnosticAnalyzer analyzer = this.SafeCreateAnalyzerInstance(t);
+                        if (analyzer != null)
+                        {
+                            analyzers.Add(analyzer);
+                        }
                     }
                 }
             }
@@ -53,7 +54,7 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
             return analyzers;
         }
 
-        private Type[] SafeGetAnalyzerTypes(string assemblyFilePath)
+        private IEnumerable<Type> SafeGetAnalyzerTypes(string assemblyFilePath)
         {
             Type[] analyzerTypes = null;
 
@@ -72,7 +73,11 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
             {
                 analyzerTypes = asm.GetTypes().Where(t => !t.IsAbstract && t.IsSubclassOf(typeof(DiagnosticAnalyzer))).ToArray();
             }
-            catch(Exception ex)
+            catch(ReflectionTypeLoadException ex)
+            {
+                this.logger.LogWarning(UIResources.AF_WARN_ExceptionFetchingTypes, ex.LoaderExceptions);
+            }
+            catch (Exception ex)
             {
                 this.logger.LogWarning(UIResources.AF_WARN_ExceptionFetchingTypes, ex.Message);
                 return null;
@@ -95,9 +100,9 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
             return analyzer;
         }
 
-        private class Resolver
+        private sealed class Resolver : IDisposable
         {
-            private string downloadDir;
+            private readonly string downloadDir;
 
             public Resolver(string path)
             {
@@ -121,6 +126,30 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
                 }
                 return asm;
             }
+
+            #region IDisposable Support
+            private bool disposedValue = false; // To detect redundant calls
+
+            private void Dispose(bool disposing)
+            {
+                if (!disposedValue)
+                {
+                    if (disposing)
+                    {
+                        AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomain_AssemblyResolve;
+                    }
+
+                    disposedValue = true;
+                }
+            }
+
+            // This code added to correctly implement the disposable pattern.
+            public void Dispose()
+            {
+                // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+                Dispose(true);
+            }
+            #endregion
         }
 
     }
