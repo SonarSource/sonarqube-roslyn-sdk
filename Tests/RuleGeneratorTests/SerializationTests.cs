@@ -1,6 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Roslyn.SonarQube;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Tests.Common;
 
 namespace RuleGeneratorTests
@@ -15,19 +17,19 @@ namespace RuleGeneratorTests
         {
             Rules rules = new Rules();
 
-            rules.Add(new rule()
+            rules.Add(new Rule()
             {
                 Key = "key1",
                 InternalKey = "internalKey1",
-                Name="Rule1",
+                Name = "Rule1",
                 Description = "description 1",
                 Severity = "CRITICAL",
                 Cardinality = "SINGLE",
                 Status = "READY",
-                Tag = "tag1"
+                Tags = new[] { "tag_1_a", "tag_1_b" } // tags cannot contain uppercase chars
             });
 
-            rules.Add(new rule()
+            rules.Add(new Rule()
             {
                 Key = "key2",
                 InternalKey = "internalKey2",
@@ -36,9 +38,7 @@ namespace RuleGeneratorTests
                 Severity = "MAJOR",
                 Cardinality = "SINGLE",
                 Status = "READY",
-                Tag = "tag2"
             });
-
 
             string testDir = TestUtils.CreateTestDirectory(this.TestContext);
             string rulesFile = Path.Combine(testDir, "rules.xml");
@@ -51,7 +51,7 @@ namespace RuleGeneratorTests
 
             Assert.AreEqual(2, reloaded.Count, "Unexpected number of rules in reloaded rules file");
 
-            string expectedXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+            string expectedXmlContent = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <rules xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
   <rule>
     <key>key1</key>
@@ -61,7 +61,8 @@ namespace RuleGeneratorTests
     <severity>CRITICAL</severity>
     <cardinality>SINGLE</cardinality>
     <status>READY</status>
-    <tag>tag1</tag>
+    <tag>tag_1_a</tag>
+    <tag>tag_1_b</tag>
   </rule>
   <rule>
     <key>key2</key>
@@ -71,11 +72,13 @@ namespace RuleGeneratorTests
     <severity>MAJOR</severity>
     <cardinality>SINGLE</cardinality>
     <status>READY</status>
-    <tag>tag2</tag>
   </rule>
 </rules>";
 
-            Assert.AreEqual(expectedXml, File.ReadAllText(rulesFile), "Unexpected XML content");
+            File.WriteAllText(Path.ChangeExtension(rulesFile, ".xml2"), expectedXmlContent);
+
+            string actualXmlContent = File.ReadAllText(rulesFile);
+            Assert.AreEqual(expectedXmlContent, actualXmlContent, "Unexpected XML content");
         }
     }
 }

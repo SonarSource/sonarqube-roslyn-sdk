@@ -6,10 +6,20 @@ using System.Linq;
 
 namespace Roslyn.SonarQube
 {
+    /// <summary>
+    /// Responsible for transforming Roslyn analyzer rule definitions to SonarQube rules format
+    /// </summary>
     public class RuleGenerator : IRuleGenerator
     {
+        public const string Cardinality = "SINGLE";
+        public const string Status = "READY";
+        public const string NoDescription = "No description";
+
         #region IRuleGenerator
 
+        /// <summary>
+        /// Generate SonarQube specifc rules based on Roslyn based diagnostics
+        /// </summary>
         public Rules GenerateRules(IEnumerable<DiagnosticAnalyzer> analyzers)
         {
             if (analyzers == null)
@@ -17,17 +27,17 @@ namespace Roslyn.SonarQube
                 throw new ArgumentNullException("analyzers");
             }
 
-            Rules allRules = new Rules();
+            Rules rules = new Rules();
 
-            foreach(DiagnosticAnalyzer analyzer in analyzers)
+            foreach (DiagnosticAnalyzer analyzer in analyzers)
             {
-                allRules.AddRange(GetAnalyzerRules(analyzer));
+                rules.AddRange(GetAnalyzerRules(analyzer));
             }
 
-            return allRules;
+            return rules;
         }
 
-        #endregion
+        #endregion IRuleGenerator
 
         #region Private methods
 
@@ -39,34 +49,25 @@ namespace Roslyn.SonarQube
 
             foreach (DiagnosticDescriptor diagnostic in analyzer.SupportedDiagnostics)
             {
-                rule newRule = new rule();
+                Rule newRule = new Rule();
                 newRule.Key = diagnostic.Id;
                 newRule.InternalKey = diagnostic.Id;
+
                 newRule.Description = diagnostic.Description.ToString(System.Globalization.CultureInfo.InvariantCulture);
-
-
                 if (string.IsNullOrWhiteSpace(newRule.Description))
                 {
-                    newRule.Description = "{unspecified}";
+                    newRule.Description = NoDescription;
                 }
 
                 newRule.Name = diagnostic.Title.ToString(System.Globalization.CultureInfo.InvariantCulture);
                 newRule.Severity = GetSonarQubeSeverity(diagnostic.DefaultSeverity);
 
-                // TODO: check expect XML format in the rules file if there are multiple tags.
-                // It looks as if each tag is a separate element i.e.
-                //   <tag>tag1</tag>
-                //   <tag>tag2</tag>
-                // If so, it's likely the serialization will have to change to the use e.g.
-                // XmlTextWriter https://msdn.microsoft.com/en-us/library/system.xml.xmltextwriter.writestartdocument(v=vs.110).aspx
-                if (diagnostic.CustomTags.Any())
-                {
-                    newRule.Tag = diagnostic.CustomTags.First().ToLowerInvariant();
-                }
+                // SonarQube tags have to be lower-case
+                newRule.Tags = ExtractTags(diagnostic).Select(t => t.ToLowerInvariant()).ToArray();
 
                 // Rule XML properties that don't have an obvious Diagnostic equivalent:
-                newRule.Cardinality = "SINGLE";
-                newRule.Status = "READY";
+                newRule.Cardinality = Cardinality;
+                newRule.Status = Status;
 
                 // Diagnostic properties that don't have an obvious Rule xml equivalent:
                 //diagnostic.HelpLinkUri;
@@ -74,18 +75,30 @@ namespace Roslyn.SonarQube
                 //diagnostic.IsEnabledByDefault;
                 //diagnostic.MessageFormat;
 
-
-                if (rules.Any(r => r.Key.Equals(newRule.Key)))
-                {
-                    // TODO: Log duplicate rule
-                    Console.WriteLine("ERROR: duplicate rule id: {0}, {1} ", newRule.Key, newRule.Description);
-                }
-                else
-                {
-                    rules.Add(newRule);
-                }
+                rules.Add(newRule);
             }
             return rules;
+        }
+
+        private static ISet<string> ExtractTags(DiagnosticDescriptor diagnostic)
+        {
+            ISet<string> tagSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (diagnostic.CustomTags.Any())
+            {
+                foreach (string tag in diagnostic.CustomTags.Where(t => !String.IsNullOrWhiteSpace(t)))
+                {
+                    if (tagSet.Contains(tag))
+                    {
+                        Console.WriteLine(Resources.WARN_DuplicateTags);
+                    }
+                    else
+                    {
+                        tagSet.Add(tag);
+                    }
+                }
+            }
+
+            return tagSet;
         }
 
         private static string GetSonarQubeSeverity(DiagnosticSeverity diagnosticSeverity)
@@ -101,9 +114,11 @@ namespace Roslyn.SonarQube
                 case DiagnosticSeverity.Error:
                     sqSeverity = "MAJOR";
                     break;
+
                 case DiagnosticSeverity.Warning:
                     sqSeverity = "MINOR";
                     break;
+
                 case DiagnosticSeverity.Hidden:
                 case DiagnosticSeverity.Info:
                 default:
@@ -114,7 +129,6 @@ namespace Roslyn.SonarQube
             return sqSeverity;
         }
 
-        #endregion
-
+        #endregion Private methods
     }
 }

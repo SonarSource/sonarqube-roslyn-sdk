@@ -76,7 +76,7 @@ namespace ExampleAnalyzer1.Test
 
         protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
         {
-            return new ExampleAnalyzer1Analyzer();
+            return new ConfigurableAnalyzer();
         }
     }
 }
