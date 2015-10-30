@@ -185,13 +185,22 @@
   <data name="NG_ExtractingFile" xml:space="preserve">
     <value>Extracting file '{0}' to {1}</value>
   </data>
+  <data name="NG_IsLatestPackageVersionSuffix" xml:space="preserve">
+    <value>- latest version</value>
+  </data>
   <data name="NG_LocatingPackages" xml:space="preserve">
     <value>Attempting to locate package with id '{0}'</value>
   </data>
   <data name="NG_NumberOfPackagesLocated" xml:space="preserve">
     <value>Number of packages located: {0}</value>
   </data>
+  <data name="NG_PackageVersionListHeader" xml:space="preserve">
+    <value>Package versions:</value>
+  </data>
   <data name="NG_SelectedPackageVersion" xml:space="preserve">
     <value>Version was not specified. Using version {0}.</value>
+  </data>
+  <data name="NG_UsingLatestPackageVersion" xml:space="preserve">
+    <value>Using version marked as latest.</value>
   </data>
 </root>

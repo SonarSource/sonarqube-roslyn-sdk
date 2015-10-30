@@ -261,6 +261,15 @@ namespace Roslyn.SonarQube.AnalyzerPlugins {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to - latest version.
+        /// </summary>
+        internal static string NG_IsLatestPackageVersionSuffix {
+            get {
+                return ResourceManager.GetString("NG_IsLatestPackageVersionSuffix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Attempting to locate package with id &apos;{0}&apos;.
         /// </summary>
         internal static string NG_LocatingPackages {
@@ -279,11 +288,29 @@ namespace Roslyn.SonarQube.AnalyzerPlugins {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Package versions:.
+        /// </summary>
+        internal static string NG_PackageVersionListHeader {
+            get {
+                return ResourceManager.GetString("NG_PackageVersionListHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Version was not specified. Using version {0}..
         /// </summary>
         internal static string NG_SelectedPackageVersion {
             get {
                 return ResourceManager.GetString("NG_SelectedPackageVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Using version marked as latest..
+        /// </summary>
+        internal static string NG_UsingLatestPackageVersion {
+            get {
+                return ResourceManager.GetString("NG_UsingLatestPackageVersion", resourceCulture);
             }
         }
     }

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Roslyn.SonarQube.Common;
+using System.Text;
 
 namespace Roslyn.SonarQube.AnalyzerPlugins
 {
@@ -64,8 +65,8 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
 
             logger.LogInfo(UIResources.NG_LocatingPackages, packageId);
             IList<NuGet.IPackage> packages = NuGet.PackageRepositoryExtensions.FindPackagesById(repository, packageId).ToList();
+            this.ListPackages(packages);
 
-            logger.LogDebug(UIResources.NG_NumberOfPackagesLocated, packages.Count);
             if (packages.Count == 0)
             {
                 logger.LogError(UIResources.NG_ERROR_PackageNotFound, packageId);
@@ -74,13 +75,7 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
             {
                 if (packageVersion == null)
                 {
-                    package = packages.FirstOrDefault(p => p.IsLatestVersion);
-                    if (package == null)
-                    {
-                        package = packages.OrderBy(p => p.Version.Version).Last();
-                    }
-                    Debug.Assert(package != null, "Failed to select a package");
-                    logger.LogInfo(UIResources.NG_SelectedPackageVersion, package.Version);
+                    package = SelectLatestVersion(packages);
                 }
                 else
                 {
@@ -92,6 +87,46 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
                 }
             }
             
+            return package;
+        }
+
+        private void ListPackages(IList<NuGet.IPackage> packages)
+        {
+            logger.LogDebug(UIResources.NG_NumberOfPackagesLocated, packages.Count);
+
+            if (packages.Count > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine(UIResources.NG_PackageVersionListHeader);
+                foreach (NuGet.IPackage package in packages)
+                {
+                    sb.AppendFormat("  {0}", package.Version);
+                    if (package.IsLatestVersion)
+                    {
+                        sb.AppendFormat(" {0}", UIResources.NG_IsLatestPackageVersionSuffix);
+                    }
+
+                    sb.AppendLine();
+                }
+                this.logger.LogDebug(sb.ToString());
+            }
+        }
+
+        private NuGet.IPackage SelectLatestVersion(IList<NuGet.IPackage> packages)
+        {
+            NuGet.IPackage package = packages.FirstOrDefault(p => p.IsLatestVersion);
+
+            if (package == null)
+            {
+                package = packages.OrderBy(p => p.Version).Last();
+            }
+            else
+            {
+                this.logger.LogDebug(UIResources.NG_UsingLatestPackageVersion);
+            }
+            Debug.Assert(package != null, "Failed to select a package");
+            logger.LogInfo(UIResources.NG_SelectedPackageVersion, package.Version);
+
             return package;
         }
 
