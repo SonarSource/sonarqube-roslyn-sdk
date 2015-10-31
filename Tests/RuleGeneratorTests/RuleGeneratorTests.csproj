@@ -104,6 +104,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Common\Common.csproj">
+      <Project>{bb89698a-0807-44d2-87ec-6aa271200759}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\RuleGenerator\RuleGenerator.csproj">
       <Project>{b6ed3e87-10a9-4e99-b0e2-fc35c7d39cf4}</Project>
       <Name>RuleGenerator</Name>

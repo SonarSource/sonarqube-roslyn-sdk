@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis.Diagnostics;
+using Roslyn.SonarQube.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,6 +13,13 @@ namespace Roslyn.SonarQube
     /// </summary>
     public class DiagnosticAssemblyScanner
     {
+        ILogger logger;
+
+        public DiagnosticAssemblyScanner(ILogger logger)
+        {
+            this.logger = logger;
+        }
+
         /// <summary>
         /// Loads the given assembly and extracts information about existing types deriving from 
         /// <see cref="DiagnosticAnalyzer"/>
@@ -30,6 +38,23 @@ namespace Roslyn.SonarQube
             return analysers;
         }
 
+
+        private Assembly LoadAnalyzerAssembly(string assemblyPath)
+        {
+            Assembly analyzerAssembly = null;
+            try
+            {
+                analyzerAssembly = Assembly.LoadFrom(assemblyPath);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(Resources.AssemblyLoadError, assemblyPath, ex.Message);
+                return null;
+            }
+
+            return analyzerAssembly;
+        }
+
         private static IEnumerable<DiagnosticAnalyzer> FetchDiagnosticAnalysers(Assembly analyserAssembly)
         {
             Debug.Assert(analyserAssembly != null);
@@ -39,28 +64,12 @@ namespace Roslyn.SonarQube
             {
                 if (!type.IsAbstract && type.IsSubclassOf(typeof(DiagnosticAnalyzer)))
                 {
-                    DiagnosticAnalyzer analyser = (DiagnosticAnalyzer)Activator.CreateInstance(type) ;
+                    DiagnosticAnalyzer analyser = (DiagnosticAnalyzer)Activator.CreateInstance(type);
                     analysers.Add(analyser);
                 }
             }
 
             return analysers;
-        }
-
-        private static Assembly LoadAnalyzerAssembly(string assemblyPath)
-        {
-            Assembly analyzerAssembly = null;
-            try
-            {
-                analyzerAssembly = Assembly.LoadFrom(assemblyPath);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(Resources.AssemblyLoadError, assemblyPath, ex.Message);
-                return null;
-            }
-
-            return analyzerAssembly;
         }
     }
 }

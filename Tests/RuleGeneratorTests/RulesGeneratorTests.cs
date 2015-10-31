@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Roslyn.SonarQube;
 using System.Linq;
+using Tests.Common;
 
 namespace RuleGeneratorTests
 {
@@ -16,11 +17,12 @@ namespace RuleGeneratorTests
         public void RuleGen_SimpleRules()
         {
             // Arrange
+            TestLogger logger = new TestLogger();
             ConfigurableAnalyzer analyzer = new ConfigurableAnalyzer();
             var diagnostic1 = analyzer.RegisterDiagnostic(key: "DiagnosticID1", description: "Some description");
             var diagnostic2 = analyzer.RegisterDiagnostic(key: "Diagnostic2", description: "");
 
-            IRuleGenerator generator = new RuleGenerator();
+            IRuleGenerator generator = new RuleGenerator(logger);
 
             // Act
             Rules rules = generator.GenerateRules(new[] { analyzer });
@@ -42,6 +44,7 @@ namespace RuleGeneratorTests
         {
             // Arrange
             // single tag, multiple tags, null tags, empty tag array
+            TestLogger logger = new TestLogger();
             ConfigurableAnalyzer analyser = new ConfigurableAnalyzer();
             analyser.RegisterDiagnostic(tags: new[] { "tag1" }, key: "oneTag");
             analyser.RegisterDiagnostic(tags: new[] { "TAG1", "tag2" }, key: "twoTags");
@@ -49,7 +52,7 @@ namespace RuleGeneratorTests
             analyser.RegisterDiagnostic(tags: new[] { "" }, key: "emptyTag");
             analyser.RegisterDiagnostic(tags: new[] { "tagA", "tag", "TAG" }, key: "duplicateTags");
 
-            IRuleGenerator generator = new RuleGenerator();
+            IRuleGenerator generator = new RuleGenerator(logger);
 
             // Act
             Rules rules = generator.GenerateRules(new[] { analyser });
