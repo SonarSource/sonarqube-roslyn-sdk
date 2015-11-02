@@ -43,7 +43,7 @@ namespace RuleGeneratorTests
             string testDir = TestUtils.CreateTestDirectory(this.TestContext);
             string rulesFile = Path.Combine(testDir, "rules.xml");
 
-            rules.Save(rulesFile);
+            rules.Save(rulesFile, new TestLogger());
             this.TestContext.AddResultFile(rulesFile);
 
             Assert.IsTrue(File.Exists(rulesFile), "Expected rules file does not exist: {0}", rulesFile);

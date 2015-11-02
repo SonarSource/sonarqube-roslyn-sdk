@@ -1,12 +1,7 @@
 ﻿using ExampleAnalyzer1;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Roslyn.SonarQube;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tests.Common;
 
 namespace RuleGeneratorTests
@@ -19,7 +14,8 @@ namespace RuleGeneratorTests
         [TestMethod]
         public void ScanValidAssembly()
         {
-            DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner();
+            TestLogger logger = new TestLogger();
+            DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
             string validAnalyserAssemblyPath = typeof(SimpleAnalyzer).Assembly.Location;
 
             var diagnostics = scanner.ExtractDiagnosticsFromAssembly(validAnalyserAssemblyPath);
@@ -37,13 +33,12 @@ namespace RuleGeneratorTests
         [TestMethod]
         public void ScanNonAnalyzerAssembly()
         {
-            DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner();
+            TestLogger logger = new TestLogger();
+            DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
             string validAnalyserAssemblyPath = typeof(DiagnosticAssemblyScannerTests).Assembly.Location;
 
             var diagnostics = scanner.ExtractDiagnosticsFromAssembly(validAnalyserAssemblyPath);
             Assert.AreEqual(0, diagnostics.Count(), "No analsers should be detected");
-
-           
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using SonarQube.Common;
+﻿using Roslyn.SonarQube.Common;
+using SonarQube.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,7 +19,7 @@ namespace Roslyn.SonarQube
         /// <summary>
         /// Saves the project to the specified file as XML
         /// </summary>
-        public int Save(string fileName)
+        public int Save(string fileName, ILogger logger)
         {
             if (string.IsNullOrWhiteSpace(fileName))
             {
@@ -33,13 +34,13 @@ namespace Roslyn.SonarQube
             {
                 if (String.IsNullOrWhiteSpace(rule.Key))
                 {
-                    Console.WriteLine(Resources.WARN_EmptyKey);
+                    logger.LogWarning(Resources.WARN_EmptyKey);
                     continue;
                 }
 
                 if (rulesToSave.Any(r => String.Equals(r.Key, rule.Key, Rule.RuleKeyComparer)))
                 {
-                    Console.WriteLine(Resources.WARN_DuplicateKey, rule.Key);
+                    logger.LogWarning(Resources.WARN_DuplicateKey, rule.Key);
                     continue;
                 }
 

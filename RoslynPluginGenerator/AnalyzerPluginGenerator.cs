@@ -73,7 +73,7 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
 
             if (analyzers.Any())
             {
-                RuleGenerator ruleGen = new RuleGenerator();
+                RuleGenerator ruleGen = new RuleGenerator(this.logger);
                 Rules rules = ruleGen.GenerateRules(analyzers);
 
                 Debug.Assert(rules != null, "Not expecting the generated rules to be null");
@@ -82,7 +82,7 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
                 {
                     rulesFilePath = Path.Combine(tempDirectory, "rules.xml");
 
-                    rules.Save(rulesFilePath);
+                    rules.Save(rulesFilePath, logger);
                     this.logger.LogDebug(UIResources.APG_RulesGeneratedToFile, rules.Count, rulesFilePath);
                 }
             }

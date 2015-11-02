@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis.Diagnostics;
+using Roslyn.SonarQube.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,40 +11,41 @@ namespace Roslyn.SonarQube
     {
         private static void Main(string[] args)
         {
+            ILogger logger = new ConsoleLogger();
+
             if (args == null || args.Length != 1)
             {
-                PrintUsage();
+                PrintUsage(logger);
                 return;
             }
 
             string assemblyPath = args[0];
-
             if (!File.Exists(assemblyPath))
             {
-                Console.Error.WriteLine(Resources.ERR_ArgFileDoesNotExist, assemblyPath);
+                logger.LogError(Resources.ERR_ArgFileDoesNotExist, assemblyPath);
                 return;
             }
 
-            DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner();
+            DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
             IEnumerable<DiagnosticAnalyzer> diagnostics = scanner.ExtractDiagnosticsFromAssembly(assemblyPath);
 
             if (diagnostics.Any())
             {
-                IRuleGenerator ruleGenerator = new RuleGenerator();
+                IRuleGenerator ruleGenerator = new RuleGenerator(logger);
                 Rules rules = ruleGenerator.GenerateRules(diagnostics);
 
                 string outputFile = Path.ChangeExtension(assemblyPath, ".xml");
-                rules.Save(outputFile);
+                rules.Save(outputFile, logger);
             }
             else
             {
-                Console.Error.WriteLine(Resources.NoAnalysers);
+                logger.LogError(Resources.NoAnalysers);
             }
         }
 
-        private static void PrintUsage()
+        private static void PrintUsage(ILogger logger)
         {
-            Console.WriteLine(Resources.CommandLineUsage, System.AppDomain.CurrentDomain.FriendlyName);
+            logger.LogInfo(Resources.CommandLineUsage, AppDomain.CurrentDomain.FriendlyName);
         }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Roslyn.SonarQube.Common;
 
 namespace Roslyn.SonarQube
 {
@@ -14,6 +15,12 @@ namespace Roslyn.SonarQube
         public const string Cardinality = "SINGLE";
         public const string Status = "READY";
         public const string NoDescription = "No description";
+        private ILogger logger;
+
+        public RuleGenerator(ILogger logger)
+        {
+            this.logger = logger;
+        }
 
         #region IRuleGenerator
 
@@ -41,7 +48,7 @@ namespace Roslyn.SonarQube
 
         #region Private methods
 
-        private static Rules GetAnalyzerRules(DiagnosticAnalyzer analyzer)
+        private Rules GetAnalyzerRules(DiagnosticAnalyzer analyzer)
         {
             // For info on SonarQube rules see http://docs.sonarqube.org/display/SONAR/Rules
 
@@ -80,7 +87,7 @@ namespace Roslyn.SonarQube
             return rules;
         }
 
-        private static ISet<string> ExtractTags(DiagnosticDescriptor diagnostic)
+        private ISet<string> ExtractTags(DiagnosticDescriptor diagnostic)
         {
             ISet<string> tagSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             if (diagnostic.CustomTags.Any())
@@ -89,7 +96,7 @@ namespace Roslyn.SonarQube
                 {
                     if (tagSet.Contains(tag))
                     {
-                        Console.WriteLine(Resources.WARN_DuplicateTags);
+                        this.logger.LogWarning(Resources.WARN_DuplicateTags);
                     }
                     else
                     {
