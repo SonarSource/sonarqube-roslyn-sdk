@@ -126,8 +126,20 @@
   <data name="ERR_ArgFileDoesNotExist" xml:space="preserve">
     <value>File {0} does not exist. Provide the path to an existing assembly</value>
   </data>
+  <data name="EX_LowercaseTags" xml:space="preserve">
+    <value>Tags must be lowercase.</value>
+  </data>
+  <data name="ForMoreDetailsLink" xml:space="preserve">
+    <value>For more information visit &lt;a href="{0}" target="_blank"&gt;the rule's help page&lt;/a&gt;.</value>
+  </data>
+  <data name="MoreDetailsTitle" xml:space="preserve">
+    <value>More Details</value>
+  </data>
   <data name="NoAnalysers" xml:space="preserve">
-    <value>Could not load the analyzer assembly or no DiagnosticAnalyser subtypes were found</value>
+    <value>Could not load the analyzer assembly or no analyzers were found</value>
+  </data>
+  <data name="NoDescription" xml:space="preserve">
+    <value>No description was provided.</value>
   </data>
   <data name="SuccessStatus" xml:space="preserve">
     <value>Generation complete: {0} rules written to {1}</value>

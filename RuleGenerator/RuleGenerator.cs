@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Roslyn.SonarQube.Common;
+using System.Text;
+using System.Globalization;
 
 namespace Roslyn.SonarQube
 {
@@ -14,7 +16,6 @@ namespace Roslyn.SonarQube
     {
         public const string Cardinality = "SINGLE";
         public const string Status = "READY";
-        public const string NoDescription = "No description";
         private ILogger logger;
 
         public RuleGenerator(ILogger logger)
@@ -60,52 +61,66 @@ namespace Roslyn.SonarQube
                 newRule.Key = diagnostic.Id;
                 newRule.InternalKey = diagnostic.Id;
 
-                newRule.Description = diagnostic.Description.ToString(System.Globalization.CultureInfo.InvariantCulture);
-                if (string.IsNullOrWhiteSpace(newRule.Description))
-                {
-                    newRule.Description = NoDescription;
-                }
+                newRule.Description = GetDescriptionHtml(diagnostic);
 
-                newRule.Name = diagnostic.Title.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                newRule.Name = diagnostic.Title.ToString(CultureInfo.InvariantCulture);
                 newRule.Severity = GetSonarQubeSeverity(diagnostic.DefaultSeverity);
-
-                // SonarQube tags have to be lower-case
-                newRule.Tags = ExtractTags(diagnostic).Select(t => t.ToLowerInvariant()).ToArray();
 
                 // Rule XML properties that don't have an obvious Diagnostic equivalent:
                 newRule.Cardinality = Cardinality;
                 newRule.Status = Status;
 
                 // Diagnostic properties that don't have an obvious Rule xml equivalent:
-                //diagnostic.HelpLinkUri;
                 //diagnostic.Category;
                 //diagnostic.IsEnabledByDefault;
                 //diagnostic.MessageFormat;
+
+                /* Remark: Custom tags are used so that Visual Studio handles diagnostics and are not equivalent to SonarQube's tags
+                *
+                * http://stackoverflow.com/questions/24257222/relevance-of-new-parameters-for-diagnosticdescriptor-constructor
+                * customTags is a general way to mark that a diagnostic should be treated or displayed somewhat 
+                * different than normal diagnostics. The "unnecessary" tag means that in the IDE we fade out the span 
+                * that the diagnostic applies to: this is how we fade out unnecessary usings or casts or such in the IDE. 
+                * In some fancy scenarios you might want to define your own, but for the most part you'll either leave that empty 
+                * or pass Unnecessary if you want the different UI handling. 
+                * The EditAndContinue tag is for errors that are created if an edit-and-continue edit can't be applied 
+                * (which are also displayed somewhat differently)...that's just for us (n.b. Roslyn) to use.
+                */
 
                 rules.Add(newRule);
             }
             return rules;
         }
 
-        private ISet<string> ExtractTags(DiagnosticDescriptor diagnostic)
+        private static string GetDescriptionHtml(DiagnosticDescriptor diagnostic)
         {
-            ISet<string> tagSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            if (diagnostic.CustomTags.Any())
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("<![CDATA[");
+            bool hasDescription = false;
+
+            string details = diagnostic.Description.ToString(CultureInfo.CurrentCulture);
+            if (!String.IsNullOrWhiteSpace(details))
             {
-                foreach (string tag in diagnostic.CustomTags.Where(t => !String.IsNullOrWhiteSpace(t)))
-                {
-                    if (tagSet.Contains(tag))
-                    {
-                        this.logger.LogWarning(Resources.WARN_DuplicateTags);
-                    }
-                    else
-                    {
-                        tagSet.Add(tag);
-                    }
-                }
+                sb.AppendLine("<p>" + details + "</p>");
+                hasDescription = true;
             }
 
-            return tagSet;
+            if (!String.IsNullOrWhiteSpace(diagnostic.HelpLinkUri))
+            {
+                sb.AppendLine("<h2>" + Resources.MoreDetailsTitle + "</h2>");
+                sb.AppendLine(String.Format(Resources.ForMoreDetailsLink, diagnostic.HelpLinkUri));
+                hasDescription = true;
+            }
+
+            if (!hasDescription)
+            {
+                sb.AppendLine(Resources.NoDescription);
+            }
+
+            sb.AppendLine("]]"); // close the ![CDATA section
+
+            return sb.ToString();
+
         }
 
         private static string GetSonarQubeSeverity(DiagnosticSeverity diagnosticSeverity)

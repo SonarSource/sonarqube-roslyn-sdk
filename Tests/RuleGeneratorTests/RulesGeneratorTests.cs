@@ -19,7 +19,7 @@ namespace RuleGeneratorTests
             // Arrange
             TestLogger logger = new TestLogger();
             ConfigurableAnalyzer analyzer = new ConfigurableAnalyzer();
-            var diagnostic1 = analyzer.RegisterDiagnostic(key: "DiagnosticID1", description: "Some description");
+            var diagnostic1 = analyzer.RegisterDiagnostic(key: "DiagnosticID1", description: "Some description", helpLinkUri: "www.bing.com", tags: new[] { "unnecessary" });
             var diagnostic2 = analyzer.RegisterDiagnostic(key: "Diagnostic2", description: "");
 
             IRuleGenerator generator = new RuleGenerator(logger);
@@ -32,37 +32,14 @@ namespace RuleGeneratorTests
 
             Rule rule1 = rules.Single(r => r.Key == diagnostic1.Id);
             VerifyRule(diagnostic1, rule1);
-            Assert.AreEqual(diagnostic1.Description.ToString(), rule1.Description, "Invalid rule description");
+
+            Assert.IsTrue(rule1.Description.Contains(diagnostic1.Description.ToString()), "Invalid rule description");
+            Assert.IsTrue(rule1.Description.Contains(diagnostic1.HelpLinkUri), "Invalid rule description");
 
             Rule rule2 = rules.Single(r => r.Key == diagnostic2.Id);
             VerifyRule(diagnostic2, rule2);
-            Assert.AreEqual(RuleGenerator.NoDescription, rule2.Description, "Invalid rule description");
-        }
 
-        [TestMethod]
-        public void RuleGen_Tags()
-        {
-            // Arrange
-            // single tag, multiple tags, null tags, empty tag array
-            TestLogger logger = new TestLogger();
-            ConfigurableAnalyzer analyser = new ConfigurableAnalyzer();
-            analyser.RegisterDiagnostic(tags: new[] { "tag1" }, key: "oneTag");
-            analyser.RegisterDiagnostic(tags: new[] { "TAG1", "tag2" }, key: "twoTags");
-            analyser.RegisterDiagnostic(tags: new string[0], key: "noTags");
-            analyser.RegisterDiagnostic(tags: new[] { "" }, key: "emptyTag");
-            analyser.RegisterDiagnostic(tags: new[] { "tagA", "tag", "TAG" }, key: "duplicateTags");
-
-            IRuleGenerator generator = new RuleGenerator(logger);
-
-            // Act
-            Rules rules = generator.GenerateRules(new[] { analyser });
-
-            // Assert
-            ValidateRule(rules, "oneTag", new[] { "tag1" });
-            ValidateRule(rules, "twoTags", new[] { "tag1", "tag2" });
-            ValidateRule(rules, "noTags", new string[0]);
-            ValidateRule(rules, "emptyTag", new string[0]);
-            ValidateRule(rules, "duplicateTags", new[] { "taga", "tag" });
+            Assert.IsTrue(rule2.Description.Contains(Resources.NoDescription), "Invalid rule description");
         }
 
         #endregion Tests
@@ -90,6 +67,7 @@ namespace RuleGeneratorTests
             Assert.AreEqual(RuleGenerator.Status, rule.Status, "Invalid rule status");
 
             Assert.AreEqual(diagnostic.Title.ToString(), rule.Name, "Invalid rule name");
+            Assert.IsNull(rule.Tags, "No tags information should be derived from the diagnostics");
         }
 
         #endregion Checks

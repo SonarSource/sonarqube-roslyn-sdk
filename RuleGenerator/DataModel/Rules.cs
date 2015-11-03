@@ -2,7 +2,6 @@
 using SonarQube.Common;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Xml.Serialization;
 
@@ -44,10 +43,11 @@ namespace Roslyn.SonarQube
                     continue;
                 }
 
-                Debug.Assert(
-                    rule.Tags == null ||
-                    rule.Tags.All(t => String.Equals(t, t.ToLowerInvariant(), StringComparison.Ordinal)),
-                    "SonarQube tags have to be lower case ");
+                if (rule.Tags != null &&
+                   rule.Tags.Any(t => !String.Equals(t, t.ToLowerInvariant(), StringComparison.Ordinal)))
+                {
+                    throw new InvalidOperationException(Resources.EX_LowercaseTags);
+                }
 
                 rulesToSave.Add(rule);
             }

@@ -38,7 +38,7 @@ namespace Tests.Common
             }
             else
             {
-                 fullPath = Path.Combine(parentDirectory, fileName);
+                fullPath = Path.Combine(parentDirectory, fileName);
             }
             Assert.IsTrue(File.Exists(fullPath), "Expected file does not exist: {0}", fullPath);
 
@@ -50,6 +50,29 @@ namespace Tests.Common
             string fullPath = Path.Combine(directory, fileName);
             File.WriteAllText(fullPath, content ?? string.Empty);
             return fullPath;
+        }
+
+        /// <summary>
+        /// Executes the action and fails the test if the expected exception is not thrown.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
+        public static void AssertExceptionIsThrown<TException>(Action action)
+             where TException : Exception
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception thrownException)
+            {
+                if (thrownException is TException)
+                {
+                    return;
+                }
+                Assert.Fail("Exception of type " + typeof(TException).FullName + " was expected, but got " + thrownException.GetType().FullName + " instead.");
+            }
+
+            Assert.Fail("Exception of type " + typeof(TException).FullName + " was expected, but was not thrown");
         }
     }
 }
