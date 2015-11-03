@@ -26,7 +26,7 @@ namespace RuleGeneratorTests
                 Description= "description 1",
                 Severity = "CRITICAL",
                 Cardinality = "SINGLE",
-                Status = "READY",                
+                Status = "READY",
                 Tags = new[] { "t1", "t2" }  
             });
 

@@ -31,7 +31,10 @@ namespace Roslyn.SonarQube
                 XmlDocument doc = new XmlDocument();
                 return doc.CreateCDataSection(this.Description);
             }
-           
+            set
+            {
+                this.Description = value.Value;
+            }
         }
 
         [XmlElement(ElementName = "severity")]
@@ -42,7 +45,7 @@ namespace Roslyn.SonarQube
 
         [XmlElement(ElementName = "status")]
         public string Status { get; set; }
-
+        
         [XmlElement(ElementName = "tag")]
         public string[] Tags { get; set; }
 

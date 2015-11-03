@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.Diagnostics;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Roslyn.SonarQube.Common;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace Roslyn.SonarQube
     /// </summary>
     public class DiagnosticAssemblyScanner
     {
-        ILogger logger;
+        private ILogger logger;
 
         public DiagnosticAssemblyScanner(ILogger logger)
         {
@@ -21,23 +22,22 @@ namespace Roslyn.SonarQube
         }
 
         /// <summary>
-        /// Loads the given assembly and extracts information about existing types deriving from 
+        /// Loads the given assembly and extracts Roslyn diagnostics - i.e. existing types deriving from
         /// <see cref="DiagnosticAnalyzer"/>
         /// </summary>
         /// <returns>empty enumerable if no diagnostics were found</returns>
-        public IEnumerable<DiagnosticAnalyzer> ExtractDiagnosticsFromAssembly(string assemblyPath)
+        public IEnumerable<DiagnosticAnalyzer> ExtractDiagnosticsFromAssembly(string assemblyPath, string language)
         {
             Assembly analyserAssembly = LoadAnalyzerAssembly(assemblyPath);
             IEnumerable<DiagnosticAnalyzer> analysers = Enumerable.Empty<DiagnosticAnalyzer>();
 
             if (analyserAssembly != null)
             {
-                analysers = FetchDiagnosticAnalysers(analyserAssembly);
+                analysers = FetchDiagnosticAnalysers(analyserAssembly, language);
             }
 
             return analysers;
         }
-
 
         private Assembly LoadAnalyzerAssembly(string assemblyPath)
         {
@@ -55,14 +55,16 @@ namespace Roslyn.SonarQube
             return analyzerAssembly;
         }
 
-        private static IEnumerable<DiagnosticAnalyzer> FetchDiagnosticAnalysers(Assembly analyserAssembly)
+        private static IEnumerable<DiagnosticAnalyzer> FetchDiagnosticAnalysers(Assembly analyserAssembly, string language)
         {
             Debug.Assert(analyserAssembly != null);
             ICollection<DiagnosticAnalyzer> analysers = new List<DiagnosticAnalyzer>();
 
             foreach (Type type in analyserAssembly.GetExportedTypes())
             {
-                if (!type.IsAbstract && type.IsSubclassOf(typeof(DiagnosticAnalyzer)))
+                if (!type.IsAbstract &&
+                    type.IsSubclassOf(typeof(DiagnosticAnalyzer)) &&
+                    DiagnosticMatchesLanguage(type, language))
                 {
                     DiagnosticAnalyzer analyser = (DiagnosticAnalyzer)Activator.CreateInstance(type);
                     analysers.Add(analyser);
@@ -70,6 +72,14 @@ namespace Roslyn.SonarQube
             }
 
             return analysers;
+        }
+
+        private static bool DiagnosticMatchesLanguage(Type type, string language)
+        {
+            DiagnosticAnalyzerAttribute analyzerAttribute =
+                (DiagnosticAnalyzerAttribute)Attribute.GetCustomAttribute(type, typeof(DiagnosticAnalyzerAttribute));
+
+            return analyzerAttribute.Languages.Any(l => String.Equals(l, language, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
