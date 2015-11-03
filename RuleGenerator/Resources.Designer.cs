@@ -22,7 +22,7 @@ namespace Roslyn.SonarQube {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace Roslyn.SonarQube {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Roslyn.SonarQube.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace Roslyn.SonarQube {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace Roslyn.SonarQube {
         /// <summary>
         ///   Looks up a localized string similar to Could not load the assembly {0}. Error: {1}.
         /// </summary>
-        internal static string AssemblyLoadError {
+        public static string AssemblyLoadError {
             get {
                 return ResourceManager.GetString("AssemblyLoadError", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace Roslyn.SonarQube {
         /// <summary>
         ///   Looks up a localized string similar to Usage: {0} pathToAnalyzerAssembly.
         /// </summary>
-        internal static string CommandLineUsage {
+        public static string CommandLineUsage {
             get {
                 return ResourceManager.GetString("CommandLineUsage", resourceCulture);
             }
@@ -81,25 +81,61 @@ namespace Roslyn.SonarQube {
         /// <summary>
         ///   Looks up a localized string similar to File {0} does not exist. Provide the path to an existing assembly.
         /// </summary>
-        internal static string ERR_ArgFileDoesNotExist {
+        public static string ERR_ArgFileDoesNotExist {
             get {
                 return ResourceManager.GetString("ERR_ArgFileDoesNotExist", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not load the analyzer assembly or no DiagnosticAnalyser subtypes were found.
+        ///   Looks up a localized string similar to Tags must be lowercase..
         /// </summary>
-        internal static string NoAnalysers {
+        public static string EX_LowercaseTags {
+            get {
+                return ResourceManager.GetString("EX_LowercaseTags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to For more information visit &lt;a href=&quot;{0}&quot; target=&quot;_blank&quot;&gt;the rule&apos;s help page&lt;/a&gt;..
+        /// </summary>
+        public static string ForMoreDetailsLink {
+            get {
+                return ResourceManager.GetString("ForMoreDetailsLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to More Details.
+        /// </summary>
+        public static string MoreDetailsTitle {
+            get {
+                return ResourceManager.GetString("MoreDetailsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not load the analyzer assembly or no analyzers were found.
+        /// </summary>
+        public static string NoAnalysers {
             get {
                 return ResourceManager.GetString("NoAnalysers", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No description was provided..
+        /// </summary>
+        public static string NoDescription {
+            get {
+                return ResourceManager.GetString("NoDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Generation complete: {0} rules written to {1}.
         /// </summary>
-        internal static string SuccessStatus {
+        public static string SuccessStatus {
             get {
                 return ResourceManager.GetString("SuccessStatus", resourceCulture);
             }
@@ -108,7 +144,7 @@ namespace Roslyn.SonarQube {
         /// <summary>
         ///   Looks up a localized string similar to Duplicate key {0} found. One will be ignored.
         /// </summary>
-        internal static string WARN_DuplicateKey {
+        public static string WARN_DuplicateKey {
             get {
                 return ResourceManager.GetString("WARN_DuplicateKey", resourceCulture);
             }
@@ -117,7 +153,7 @@ namespace Roslyn.SonarQube {
         /// <summary>
         ///   Looks up a localized string similar to Duplicate tag {0} on analyzer {1}.
         /// </summary>
-        internal static string WARN_DuplicateTags {
+        public static string WARN_DuplicateTags {
             get {
                 return ResourceManager.GetString("WARN_DuplicateTags", resourceCulture);
             }
@@ -126,7 +162,7 @@ namespace Roslyn.SonarQube {
         /// <summary>
         ///   Looks up a localized string similar to Empty rule key found. The rule will be ignored..
         /// </summary>
-        internal static string WARN_EmptyKey {
+        public static string WARN_EmptyKey {
             get {
                 return ResourceManager.GetString("WARN_EmptyKey", resourceCulture);
             }

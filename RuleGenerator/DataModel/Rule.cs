@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace Roslyn.SonarQube
@@ -7,6 +7,13 @@ namespace Roslyn.SonarQube
     [XmlType(TypeName = "rule")]
     public class Rule
     {
+       
+        /// <summary>
+        /// Use this property to set the rule description. HTML formatting is supported.
+        /// </summary>
+        [XmlIgnore]
+        public string Description { get; set; }
+
         [XmlElement(ElementName = "key")]
         public string Key { get; set; }
 
@@ -16,8 +23,16 @@ namespace Roslyn.SonarQube
         [XmlElement(ElementName = "internalKey")]
         public string InternalKey { get; set; }
 
-        [XmlElement(ElementName = "description")]
-        public string Description { get; set; }
+        [XmlElement("description")]
+        public XmlCDataSection DescriptionCDATA
+        {
+            get
+            {
+                XmlDocument doc = new XmlDocument();
+                return doc.CreateCDataSection(this.Description);
+            }
+           
+        }
 
         [XmlElement(ElementName = "severity")]
         public string Severity { get; set; }
@@ -27,7 +42,7 @@ namespace Roslyn.SonarQube
 
         [XmlElement(ElementName = "status")]
         public string Status { get; set; }
-        
+
         [XmlElement(ElementName = "tag")]
         public string[] Tags { get; set; }
 

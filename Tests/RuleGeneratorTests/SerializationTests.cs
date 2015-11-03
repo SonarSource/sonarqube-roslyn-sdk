@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Roslyn.SonarQube;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,11 +23,11 @@ namespace RuleGeneratorTests
                 Key = "key1",
                 InternalKey = "internalKey1",
                 Name = "Rule1",
-                Description = "description 1",
+                Description= "description 1",
                 Severity = "CRITICAL",
                 Cardinality = "SINGLE",
-                Status = "READY",
-                Tags = new[] { "tag_1_a", "tag_1_b" } // tags cannot contain uppercase chars
+                Status = "READY",                
+                Tags = new[] { "t1", "t2" }  
             });
 
             rules.Add(new Rule()
@@ -34,7 +35,7 @@ namespace RuleGeneratorTests
                 Key = "key2",
                 InternalKey = "internalKey2",
                 Name = "Rule2",
-                Description = "description 2",
+                Description= @"<p>An Html <a href=""www.bing.com""> Description",
                 Severity = "MAJOR",
                 Cardinality = "SINGLE",
                 Status = "READY",
@@ -57,18 +58,18 @@ namespace RuleGeneratorTests
     <key>key1</key>
     <name>Rule1</name>
     <internalKey>internalKey1</internalKey>
-    <description>description 1</description>
+    <description><![CDATA[description 1]]></description>
     <severity>CRITICAL</severity>
     <cardinality>SINGLE</cardinality>
     <status>READY</status>
-    <tag>tag_1_a</tag>
-    <tag>tag_1_b</tag>
+    <tag>t1</tag>
+    <tag>t2</tag>
   </rule>
   <rule>
     <key>key2</key>
     <name>Rule2</name>
     <internalKey>internalKey2</internalKey>
-    <description>description 2</description>
+    <description><![CDATA[<p>An Html <a href=""www.bing.com""> Description]]></description>
     <severity>MAJOR</severity>
     <cardinality>SINGLE</cardinality>
     <status>READY</status>
@@ -79,6 +80,32 @@ namespace RuleGeneratorTests
 
             string actualXmlContent = File.ReadAllText(rulesFile);
             Assert.AreEqual(expectedXmlContent, actualXmlContent, "Unexpected XML content");
+        }
+
+        [TestMethod]
+        public void TagsMustBeLowercase()
+        {
+            // Arrange
+            Rules rules = new Rules();
+
+            rules.Add(new Rule()
+            {
+                Key = "key1",
+                InternalKey = "internalKey1",
+                Name = "Rule1",
+                Description = "description 1",
+                Severity = "CRITICAL",
+                Cardinality = "SINGLE",
+                Status = "READY",
+                Tags = new[] { "T1", "t2" }
+            });
+
+            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string rulesFile = Path.Combine(testDir, "rules.xml");
+
+            // Act & Assert
+            TestUtils.AssertExceptionIsThrown<InvalidOperationException>(
+                () => rules.Save(rulesFile, new TestLogger()));
         }
     }
 }
