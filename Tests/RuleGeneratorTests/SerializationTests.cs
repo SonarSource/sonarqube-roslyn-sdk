@@ -76,7 +76,9 @@ namespace RuleGeneratorTests
   </rule>
 </rules>";
 
-            File.WriteAllText(Path.ChangeExtension(rulesFile, ".xml2"), expectedXmlContent);
+            string expectedFilePath = Path.ChangeExtension(rulesFile, ".expected.txt");
+            File.WriteAllText(expectedFilePath, expectedXmlContent);
+            this.TestContext.AddResultFile(expectedFilePath);
 
             string actualXmlContent = File.ReadAllText(rulesFile);
             Assert.AreEqual(expectedXmlContent, actualXmlContent, "Unexpected XML content");
