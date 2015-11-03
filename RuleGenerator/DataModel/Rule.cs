@@ -49,6 +49,6 @@ namespace Roslyn.SonarQube
         /// <summary>
         /// Specified the culture and case when comparing rule keys
         /// </summary>
-        public static StringComparison RuleKeyComparer = StringComparison.OrdinalIgnoreCase;
+        public static readonly StringComparison RuleKeyComparer = StringComparison.OrdinalIgnoreCase;
     }
 }

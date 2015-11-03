@@ -23,7 +23,7 @@ namespace ExampleAnalyzer1
 
         #region Test interface
 
-        private List<DiagnosticDescriptor> registeredDiagnostics = new List<DiagnosticDescriptor>();
+        private readonly List<DiagnosticDescriptor> registeredDiagnostics = new List<DiagnosticDescriptor>();
 
         public DiagnosticDescriptor RegisterDiagnostic(
             string key,

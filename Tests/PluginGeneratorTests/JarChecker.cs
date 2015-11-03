@@ -7,7 +7,7 @@ namespace Roslyn.SonarQube.PluginGeneratorTests
 {
     internal class JarChecker
     {
-        private string unzippedDir;
+        private readonly string unzippedDir;
 
         public JarChecker(TestContext testContext, string fullJarPath)
         {

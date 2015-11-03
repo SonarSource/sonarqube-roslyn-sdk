@@ -10,7 +10,7 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
 {
     public class NuGetPackageHandler
     {
-        private ILogger logger;
+        private readonly ILogger logger;
 
         public NuGetPackageHandler(ILogger logger)
         {

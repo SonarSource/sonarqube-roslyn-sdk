@@ -13,7 +13,7 @@ namespace Roslyn.SonarQube
     /// </summary>
     public class DiagnosticAssemblyScanner
     {
-        ILogger logger;
+        private readonly ILogger logger;
 
         public DiagnosticAssemblyScanner(ILogger logger)
         {

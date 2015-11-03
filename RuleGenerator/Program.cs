@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Roslyn.SonarQube
 {
-    internal class Program
+    internal static class Program
     {
         private static void Main(string[] args)
         {

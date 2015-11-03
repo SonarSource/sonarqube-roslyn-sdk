@@ -13,7 +13,7 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
     {
         public const string NuGetPackageSource = "https://www.nuget.org/api/v2/";
 
-        private ILogger logger;
+        private readonly ILogger logger;
 
         public AnalyzerPluginGenerator(ILogger logger)
         {

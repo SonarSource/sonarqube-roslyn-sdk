@@ -16,7 +16,7 @@ namespace Roslyn.SonarQube
     {
         public const string Cardinality = "SINGLE";
         public const string Status = "READY";
-        private ILogger logger;
+        private readonly ILogger logger;
 
         public RuleGenerator(ILogger logger)
         {
