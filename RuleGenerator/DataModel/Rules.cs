@@ -49,6 +49,12 @@ namespace Roslyn.SonarQube
                     throw new InvalidOperationException(Resources.EX_LowercaseTags);
                 }
 
+                if (String.IsNullOrWhiteSpace(rule.Description))
+                {
+                    logger.LogWarning(Resources.WARN_EmptyDescription, rule.Key);
+                    rule.Description = Resources.PlaceholderDescription;
+                }
+
                 rulesToSave.Add(rule);
             }
 

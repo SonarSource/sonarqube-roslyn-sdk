@@ -61,6 +61,15 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Loaded: {0} analysers..
+        /// </summary>
+        public static string AnalysersLoadSuccess {
+            get {
+                return ResourceManager.GetString("AnalysersLoadSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not load the assembly {0}. Error: {1}.
         /// </summary>
         public static string AssemblyLoadError {
@@ -70,11 +79,29 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Loaded assembly: {0}.
+        /// </summary>
+        public static string AssemblyLoadSuccess {
+            get {
+                return ResourceManager.GetString("AssemblyLoadSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Usage: {0} pathToAnalyzerAssembly.
         /// </summary>
         public static string CommandLineUsage {
             get {
                 return ResourceManager.GetString("CommandLineUsage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loaded analyser: {0}.
+        /// </summary>
+        public static string DEBUG_AnalyserLoaded {
+            get {
+                return ResourceManager.GetString("DEBUG_AnalyserLoaded", resourceCulture);
             }
         }
         
@@ -133,7 +160,25 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Generation complete: {0} rules written to {1}.
+        ///   Looks up a localized string similar to This rule does not have a description..
+        /// </summary>
+        public static string PlaceholderDescription {
+            get {
+                return ResourceManager.GetString("PlaceholderDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} rules written to {1}.
+        /// </summary>
+        public static string SuccessOutputFile {
+            get {
+                return ResourceManager.GetString("SuccessOutputFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generation succeeded..
         /// </summary>
         public static string SuccessStatus {
             get {
@@ -156,6 +201,15 @@ namespace Roslyn.SonarQube {
         public static string WARN_DuplicateTags {
             get {
                 return ResourceManager.GetString("WARN_DuplicateTags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Empty description found for rule {0}. Placeholder description inserted..
+        /// </summary>
+        public static string WARN_EmptyDescription {
+            get {
+                return ResourceManager.GetString("WARN_EmptyDescription", resourceCulture);
             }
         }
         

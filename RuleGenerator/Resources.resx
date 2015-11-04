@@ -117,11 +117,20 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AnalysersLoadSuccess" xml:space="preserve">
+    <value>Loaded: {0} analysers.</value>
+  </data>
   <data name="AssemblyLoadError" xml:space="preserve">
     <value>Could not load the assembly {0}. Error: {1}</value>
   </data>
+  <data name="AssemblyLoadSuccess" xml:space="preserve">
+    <value>Loaded assembly: {0}</value>
+  </data>
   <data name="CommandLineUsage" xml:space="preserve">
     <value>Usage: {0} pathToAnalyzerAssembly</value>
+  </data>
+  <data name="DEBUG_AnalyserLoaded" xml:space="preserve">
+    <value>Loaded analyser: {0}</value>
   </data>
   <data name="ERR_ArgFileDoesNotExist" xml:space="preserve">
     <value>File {0} does not exist. Provide the path to an existing assembly</value>
@@ -141,14 +150,23 @@
   <data name="NoDescription" xml:space="preserve">
     <value>No description was provided.</value>
   </data>
+  <data name="PlaceholderDescription" xml:space="preserve">
+    <value>This rule does not have a description.</value>
+  </data>
+  <data name="SuccessOutputFile" xml:space="preserve">
+    <value>{0} rules written to {1}</value>
+  </data>
   <data name="SuccessStatus" xml:space="preserve">
-    <value>Generation complete: {0} rules written to {1}</value>
+    <value>Generation succeeded.</value>
   </data>
   <data name="WARN_DuplicateKey" xml:space="preserve">
     <value>Duplicate key {0} found. One will be ignored</value>
   </data>
   <data name="WARN_DuplicateTags" xml:space="preserve">
     <value>Duplicate tag {0} on analyzer {1}</value>
+  </data>
+  <data name="WARN_EmptyDescription" xml:space="preserve">
+    <value>Empty description found for rule {0}. Placeholder description inserted.</value>
   </data>
   <data name="WARN_EmptyKey" xml:space="preserve">
     <value>Empty rule key found. The rule will be ignored.</value>
