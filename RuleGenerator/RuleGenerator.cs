@@ -1,11 +1,10 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Roslyn.SonarQube.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Roslyn.SonarQube.Common;
-using System.Text;
 using System.Globalization;
+using System.Text;
 
 namespace Roslyn.SonarQube
 {
@@ -61,7 +60,7 @@ namespace Roslyn.SonarQube
                 newRule.Key = diagnostic.Id;
                 newRule.InternalKey = diagnostic.Id;
 
-                newRule.Description = GetDescriptionHtml(diagnostic);
+                newRule.Description = GetDescriptionAsRawHtml(diagnostic);
 
                 newRule.Name = diagnostic.Title.ToString(CultureInfo.InvariantCulture);
                 newRule.Severity = GetSonarQubeSeverity(diagnostic.DefaultSeverity);
@@ -92,10 +91,13 @@ namespace Roslyn.SonarQube
             return rules;
         }
 
-        private static string GetDescriptionHtml(DiagnosticDescriptor diagnostic)
+        /// <summary>
+        /// Returns the description as HTML
+        /// </summary>
+        /// <returns>Note: the description should be returned as the HTML that should be rendered i.e. there is no need enclose it in a CDATA section</returns>
+        private static string GetDescriptionAsRawHtml(DiagnosticDescriptor diagnostic)
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("<![CDATA[");
             bool hasDescription = false;
 
             string details = diagnostic.Description.ToString(CultureInfo.CurrentCulture);
@@ -116,8 +118,6 @@ namespace Roslyn.SonarQube
             {
                 sb.AppendLine(Resources.NoDescription);
             }
-
-            sb.AppendLine("]]"); // close the ![CDATA section
 
             return sb.ToString();
 

@@ -35,6 +35,7 @@ namespace RuleGeneratorTests
 
             Assert.IsTrue(rule1.Description.Contains(diagnostic1.Description.ToString()), "Invalid rule description");
             Assert.IsTrue(rule1.Description.Contains(diagnostic1.HelpLinkUri), "Invalid rule description");
+            Assert.IsFalse(rule1.Description.Trim().StartsWith("<![CDATA"), "Description should not be formatted as a CData section");
 
             Rule rule2 = rules.Single(r => r.Key == diagnostic2.Id);
             VerifyRule(diagnostic2, rule2);

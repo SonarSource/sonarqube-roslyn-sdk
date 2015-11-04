@@ -1,9 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Roslyn.SonarQube;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Tests.Common;
 
 namespace RuleGeneratorTests
@@ -35,7 +33,7 @@ namespace RuleGeneratorTests
                 Key = "key2",
                 InternalKey = "internalKey2",
                 Name = "Rule2",
-                Description= @"<p>An Html <a href=""www.bing.com""> Description",
+                Description = @"<p>An Html <a href=""www.bing.com""> Description",
                 Severity = "MAJOR",
                 Cardinality = "SINGLE",
                 Status = "READY",
@@ -49,8 +47,6 @@ namespace RuleGeneratorTests
 
             Assert.IsTrue(File.Exists(rulesFile), "Expected rules file does not exist: {0}", rulesFile);
             Rules reloaded = Rules.Load(rulesFile);
-
-            Assert.AreEqual(2, reloaded.Count, "Unexpected number of rules in reloaded rules file");
 
             string expectedXmlContent = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <rules xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
@@ -76,12 +72,17 @@ namespace RuleGeneratorTests
   </rule>
 </rules>";
 
-            string expectedFilePath = Path.ChangeExtension(rulesFile, ".expected.txt");
-            File.WriteAllText(expectedFilePath, expectedXmlContent);
+            // Save the expected XML to make comparisons using diff tools easier
+            string expectedFilePath = TestUtils.CreateTextFile("expected.xml", testDir, expectedXmlContent);
             this.TestContext.AddResultFile(expectedFilePath);
 
+            // Compare the serialized output
             string actualXmlContent = File.ReadAllText(rulesFile);
             Assert.AreEqual(expectedXmlContent, actualXmlContent, "Unexpected XML content");
+
+            // Check the rule descriptions were decoded correctly
+            Assert.AreEqual("description 1", reloaded[0].Description, "Description was not deserialized correctly");
+            Assert.AreEqual(@"<p>An Html <a href=""www.bing.com""> Description", reloaded[1].Description, "Description was not deserialized correctly");
         }
 
         [TestMethod]
