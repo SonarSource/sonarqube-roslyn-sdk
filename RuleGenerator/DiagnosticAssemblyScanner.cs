@@ -35,6 +35,11 @@ namespace Roslyn.SonarQube
                 analysers = FetchDiagnosticAnalysers(analyserAssembly);
             }
 
+            foreach (DiagnosticAnalyzer analyser in analysers)
+            {
+                logger.LogDebug(Resources.DEBUG_AnalyserLoaded, analyser.ToString());
+            }
+            logger.LogInfo(Resources.AnalysersLoadSuccess, analysers.Count());
             return analysers;
         }
 
@@ -52,6 +57,7 @@ namespace Roslyn.SonarQube
                 return null;
             }
 
+            logger.LogInfo(Resources.AnalysersLoadSuccess, analyzerAssembly.FullName);
             return analyzerAssembly;
         }
 

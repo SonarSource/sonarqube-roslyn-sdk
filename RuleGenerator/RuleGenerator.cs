@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.Diagnostics;
 using Roslyn.SonarQube.Common;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -38,9 +39,38 @@ namespace Roslyn.SonarQube
 
             foreach (DiagnosticAnalyzer analyzer in analyzers)
             {
-                rules.AddRange(GetAnalyzerRules(analyzer));
-            }
+                Rules analyserRules = GetAnalyzerRules(analyzer);
+                
+                foreach (Rule analyserRule in analyserRules)
+                {
+                    if (String.IsNullOrWhiteSpace(analyserRule.Key))
+                    {
+                        logger.LogWarning(Resources.WARN_EmptyKey);
+                        continue;
+                    }
 
+                    if (rules.Any(r => String.Equals(r.Key, analyserRule.Key, Rule.RuleKeyComparer)))
+                    {
+                        logger.LogWarning(Resources.WARN_DuplicateKey, analyserRule.Key);
+                        continue;
+                    }
+
+                    if (analyserRule.Tags != null &&
+                       analyserRule.Tags.Any(t => !String.Equals(t, t.ToLowerInvariant(), StringComparison.Ordinal)))
+                    {
+                        throw new InvalidOperationException(Resources.EX_LowercaseTags);
+                    }
+
+                    if (String.IsNullOrWhiteSpace(analyserRule.Description))
+                    {
+                        logger.LogWarning(Resources.WARN_EmptyDescription, analyserRule.Key);
+                        analyserRule.Description = Resources.PlaceholderDescription;
+                    }
+
+                    rules.Add(analyserRule);
+                }
+            }
+            
             return rules;
         }
 

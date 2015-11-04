@@ -18,7 +18,7 @@ namespace Roslyn.SonarQube
         /// <summary>
         /// Saves the project to the specified file as XML
         /// </summary>
-        public int Save(string fileName, ILogger logger)
+        public void Save(string fileName, ILogger logger)
         {
             if (string.IsNullOrWhiteSpace(fileName))
             {
@@ -27,40 +27,7 @@ namespace Roslyn.SonarQube
 
             this.FileName = fileName;
 
-            Rules rulesToSave = new Rules();
-
-            foreach (Rule rule in this)
-            {
-                if (String.IsNullOrWhiteSpace(rule.Key))
-                {
-                    logger.LogWarning(Resources.WARN_EmptyKey);
-                    continue;
-                }
-
-                if (rulesToSave.Any(r => String.Equals(r.Key, rule.Key, Rule.RuleKeyComparer)))
-                {
-                    logger.LogWarning(Resources.WARN_DuplicateKey, rule.Key);
-                    continue;
-                }
-
-                if (rule.Tags != null &&
-                   rule.Tags.Any(t => !String.Equals(t, t.ToLowerInvariant(), StringComparison.Ordinal)))
-                {
-                    throw new InvalidOperationException(Resources.EX_LowercaseTags);
-                }
-
-                if (String.IsNullOrWhiteSpace(rule.Description))
-                {
-                    logger.LogWarning(Resources.WARN_EmptyDescription, rule.Key);
-                    rule.Description = Resources.PlaceholderDescription;
-                }
-
-                rulesToSave.Add(rule);
-            }
-
-            Serializer.SaveModel(rulesToSave, fileName);
-
-            return rulesToSave.Count;
+            Serializer.SaveModel(this, fileName);
         }
 
         /// <summary>

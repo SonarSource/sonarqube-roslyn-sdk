@@ -1,6 +1,7 @@
 ﻿using ExampleAnalyzer1;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Roslyn.SonarQube;
+using System;
 using System.Linq;
 using Tests.Common;
 
@@ -43,6 +44,49 @@ namespace RuleGeneratorTests
             Assert.IsTrue(rule2.Description.Contains(Resources.NoDescription), "Invalid rule description");
         }
 
+        [TestMethod]
+        public void TagsMustBeLowercase()
+        {
+            // Arrange
+            TestLogger logger = new TestLogger();
+            ConfigurableAnalyzer analyzer = new ConfigurableAnalyzer();
+            var diagnostic1 = analyzer.RegisterDiagnostic(key: "DiagnosticID1", tags: new[] { "t1" });
+            var diagnostic2 = analyzer.RegisterDiagnostic(key: "DiagnosticID2", tags: new[] { "T2" });
+
+            IRuleGenerator generator = new RuleGenerator(logger);
+
+            // Act
+            Rules rules = generator.GenerateRules(new[] { analyzer });
+
+            // Assert
+            foreach (Rule rule in rules)
+            {
+                VerifyRuleValid(rule);
+            }
+        }
+
+        [TestMethod]
+        public void RulesMustHaveDescription()
+        {
+            // Arrange
+            TestLogger logger = new TestLogger();
+            ConfigurableAnalyzer analyzer = new ConfigurableAnalyzer();
+            var diagnostic1 = analyzer.RegisterDiagnostic(key: "DiagnosticID1", description: null);
+            var diagnostic2 = analyzer.RegisterDiagnostic(key: "DiagnosticID1", description: "");
+            var diagnostic3 = analyzer.RegisterDiagnostic(key: "DiagnosticID2", description: " ");
+
+            IRuleGenerator generator = new RuleGenerator(logger);
+
+            // Act
+            Rules rules = generator.GenerateRules(new[] { analyzer });
+
+            // Assert
+            foreach (Rule rule in rules)
+            {
+                VerifyRuleValid(rule);
+            }
+        }
+
         #endregion Tests
 
         #region Checks
@@ -69,6 +113,24 @@ namespace RuleGeneratorTests
 
             Assert.AreEqual(diagnostic.Title.ToString(), rule.Name, "Invalid rule name");
             Assert.IsNull(rule.Tags, "No tags information should be derived from the diagnostics");
+
+            VerifyRuleValid(rule);
+        }
+
+        /// <summary> 
+        /// Verifies that the rule will be accepted by SonarQube validation when rendered into XML.
+        /// </summary>
+        private static void VerifyRuleValid(Rule rule)
+        {
+            Assert.IsNotNull(rule.Key);
+            Assert.IsFalse(String.IsNullOrWhiteSpace(rule.Description));
+            if (rule.Tags != null)
+            {
+                foreach (String tag in rule.Tags)
+                {
+                    Assert.IsTrue(String.Equals(tag, tag.ToLower(), StringComparison.CurrentCulture));
+                }
+            }
         }
 
         #endregion Checks
