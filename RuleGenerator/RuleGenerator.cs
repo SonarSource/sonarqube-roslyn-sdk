@@ -135,7 +135,7 @@ namespace Roslyn.SonarQube
 
             if (!hasDescription)
             {
-                sb.AppendLine(Resources.NoDescription);
+                return Resources.NoDescription;
             }
 
             return sb.ToString();

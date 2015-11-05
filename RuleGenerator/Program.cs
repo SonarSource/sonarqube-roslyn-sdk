@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.Diagnostics;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Roslyn.SonarQube.Common;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,9 @@ namespace Roslyn.SonarQube
 {
     internal static class Program
     {
+        // TODO: multiple language support
+        private static readonly string language = LanguageNames.CSharp;
+
         private static void Main(string[] args)
         {
             ILogger logger = new ConsoleLogger();
@@ -27,7 +31,7 @@ namespace Roslyn.SonarQube
             }
 
             DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
-            IEnumerable<DiagnosticAnalyzer> diagnostics = scanner.ExtractDiagnosticsFromAssembly(assemblyPath);
+            IEnumerable<DiagnosticAnalyzer> diagnostics = scanner.InstantiateDiagnosticsFromAssembly(assemblyPath, language);
 
             if (diagnostics.Any())
             {

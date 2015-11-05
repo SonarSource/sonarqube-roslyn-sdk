@@ -9,7 +9,7 @@ namespace ExampleAnalyzer1
     /// Configurable analyser. Use the static methods before instantiating it. Note that loading the test assembly and reflecting
     /// over it will not produce any rules from this analyzer.
     /// </summary>
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    [DiagnosticAnalyzer(LanguageNames.CSharp, LanguageNames.VisualBasic, "Test#")]
     public class ConfigurableAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "ConfigurableAnalyzer";

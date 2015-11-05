@@ -32,6 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AbstractAnalyzer.cs" />
     <Compile Include="CodeFixProvider.cs" />
     <Compile Include="ConfigurableAnalyzer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -41,6 +42,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SimpleAnalyzer.cs" />
+    <Compile Include="VBAnalyzer.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">

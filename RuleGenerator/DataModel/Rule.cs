@@ -39,7 +39,7 @@ namespace Roslyn.SonarQube
             }
             set
             {
-                this.Description = value.InnerText;
+                this.Description = value.Value;
             }
         }
 
@@ -51,7 +51,7 @@ namespace Roslyn.SonarQube
 
         [XmlElement(ElementName = "status")]
         public string Status { get; set; }
-
+        
         [XmlElement(ElementName = "tag")]
         public string[] Tags { get; set; }
 
