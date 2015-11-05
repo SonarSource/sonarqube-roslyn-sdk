@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.Diagnostics;
 using Roslyn.SonarQube.Common;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -38,9 +39,20 @@ namespace Roslyn.SonarQube
 
             foreach (DiagnosticAnalyzer analyzer in analyzers)
             {
-                rules.AddRange(GetAnalyzerRules(analyzer));
-            }
+                Rules analyserRules = GetAnalyzerRules(analyzer);
+                
+                foreach (Rule analyserRule in analyserRules)
+                {
+                    if (rules.Any(r => String.Equals(r.Key, analyserRule.Key, Rule.RuleKeyComparer)))
+                    {
+                        logger.LogWarning(Resources.WARN_DuplicateKey, analyserRule.Key);
+                        continue;
+                    }
 
+                    rules.Add(analyserRule);
+                }
+            }
+            
             return rules;
         }
 
@@ -56,7 +68,14 @@ namespace Roslyn.SonarQube
 
             foreach (DiagnosticDescriptor diagnostic in analyzer.SupportedDiagnostics)
             {
+                if (String.IsNullOrWhiteSpace(diagnostic.Id))
+                {
+                    logger.LogWarning(Resources.WARN_EmptyKey, analyzer.ToString());
+                    continue;
+                }
+
                 Rule newRule = new Rule();
+                
                 newRule.Key = diagnostic.Id;
                 newRule.InternalKey = diagnostic.Id;
 

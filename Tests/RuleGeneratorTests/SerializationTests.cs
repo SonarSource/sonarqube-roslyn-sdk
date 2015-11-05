@@ -84,31 +84,5 @@ namespace RuleGeneratorTests
             Assert.AreEqual("description 1", reloaded[0].Description, "Description was not deserialized correctly");
             Assert.AreEqual(@"<p>An Html <a href=""www.bing.com""> Description", reloaded[1].Description, "Description was not deserialized correctly");
         }
-
-        [TestMethod]
-        public void TagsMustBeLowercase()
-        {
-            // Arrange
-            Rules rules = new Rules();
-
-            rules.Add(new Rule()
-            {
-                Key = "key1",
-                InternalKey = "internalKey1",
-                Name = "Rule1",
-                Description = "description 1",
-                Severity = "CRITICAL",
-                Cardinality = "SINGLE",
-                Status = "READY",
-                Tags = new[] { "T1", "t2" }
-            });
-
-            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
-            string rulesFile = Path.Combine(testDir, "rules.xml");
-
-            // Act & Assert
-            TestUtils.AssertExceptionIsThrown<InvalidOperationException>(
-                () => rules.Save(rulesFile, new TestLogger()));
-        }
     }
 }
