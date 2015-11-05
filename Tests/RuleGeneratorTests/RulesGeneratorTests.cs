@@ -45,7 +45,7 @@ namespace RuleGeneratorTests
         }
 
         [TestMethod]
-        public void TagsMustBeLowercase()
+        public void CheckNoTags()
         {
             // Arrange
             TestLogger logger = new TestLogger();
@@ -62,6 +62,8 @@ namespace RuleGeneratorTests
             foreach (Rule rule in rules)
             {
                 VerifyRuleValid(rule);
+                
+                Assert.IsNull(rule.Tags);
             }
         }
 
@@ -84,6 +86,8 @@ namespace RuleGeneratorTests
             foreach (Rule rule in rules)
             {
                 VerifyRuleValid(rule);
+
+                Assert.AreEqual(rule.Description, Resources.NoDescription);
             }
         }
 

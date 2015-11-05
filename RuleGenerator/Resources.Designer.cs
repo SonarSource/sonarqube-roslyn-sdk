@@ -115,15 +115,6 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Tags must be lowercase..
-        /// </summary>
-        public static string EX_LowercaseTags {
-            get {
-                return ResourceManager.GetString("EX_LowercaseTags", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to For more information visit &lt;a href=&quot;{0}&quot; target=&quot;_blank&quot;&gt;the rule&apos;s help page&lt;/a&gt;..
         /// </summary>
         public static string ForMoreDetailsLink {
@@ -160,15 +151,6 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This rule does not have a description..
-        /// </summary>
-        public static string PlaceholderDescription {
-            get {
-                return ResourceManager.GetString("PlaceholderDescription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to {0} rules written to {1}.
         /// </summary>
         public static string SuccessOutputFile {
@@ -187,7 +169,7 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Duplicate key {0} found. One will be ignored.
+        ///   Looks up a localized string similar to Skipping rule in analyzer {0}: Duplicate key..
         /// </summary>
         public static string WARN_DuplicateKey {
             get {
@@ -214,7 +196,7 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Empty rule key found. The rule will be ignored..
+        ///   Looks up a localized string similar to Skipping rule in analyzer {0}: No key found..
         /// </summary>
         public static string WARN_EmptyKey {
             get {

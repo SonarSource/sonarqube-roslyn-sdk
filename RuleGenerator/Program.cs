@@ -36,7 +36,7 @@ namespace Roslyn.SonarQube
 
                 string outputFile = Path.ChangeExtension(assemblyPath, ".xml");
                 rules.Save(outputFile, logger);
-                logger.LogInfo(Resources.SuccessOutputFile, new object[] { rules.Count, outputFile });
+                logger.LogInfo(Resources.SuccessOutputFile, rules.Count, outputFile);
                 logger.LogInfo(Resources.SuccessStatus);
             }
             else

@@ -43,28 +43,10 @@ namespace Roslyn.SonarQube
                 
                 foreach (Rule analyserRule in analyserRules)
                 {
-                    if (String.IsNullOrWhiteSpace(analyserRule.Key))
-                    {
-                        logger.LogWarning(Resources.WARN_EmptyKey);
-                        continue;
-                    }
-
                     if (rules.Any(r => String.Equals(r.Key, analyserRule.Key, Rule.RuleKeyComparer)))
                     {
                         logger.LogWarning(Resources.WARN_DuplicateKey, analyserRule.Key);
                         continue;
-                    }
-
-                    if (analyserRule.Tags != null &&
-                       analyserRule.Tags.Any(t => !String.Equals(t, t.ToLowerInvariant(), StringComparison.Ordinal)))
-                    {
-                        throw new InvalidOperationException(Resources.EX_LowercaseTags);
-                    }
-
-                    if (String.IsNullOrWhiteSpace(analyserRule.Description))
-                    {
-                        logger.LogWarning(Resources.WARN_EmptyDescription, analyserRule.Key);
-                        analyserRule.Description = Resources.PlaceholderDescription;
                     }
 
                     rules.Add(analyserRule);
@@ -86,7 +68,14 @@ namespace Roslyn.SonarQube
 
             foreach (DiagnosticDescriptor diagnostic in analyzer.SupportedDiagnostics)
             {
+                if (String.IsNullOrWhiteSpace(diagnostic.Id))
+                {
+                    logger.LogWarning(Resources.WARN_EmptyKey, analyzer.ToString());
+                    continue;
+                }
+
                 Rule newRule = new Rule();
+                
                 newRule.Key = diagnostic.Id;
                 newRule.InternalKey = diagnostic.Id;
 
