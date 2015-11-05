@@ -3,7 +3,6 @@ using Roslyn.SonarQube.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -15,12 +14,9 @@ namespace Roslyn.SonarQube
     public class DiagnosticAssemblyScanner
     {
         private readonly ILogger logger;
-        private AppDomain currentDomain = AppDomain.CurrentDomain;
-        private List<string> folderPaths = new List<string>();
 
         public DiagnosticAssemblyScanner(ILogger logger)
         {
-            currentDomain.AssemblyResolve += new ResolveEventHandler(LoadFromFolder);
             this.logger = logger;
         }
 
@@ -49,7 +45,6 @@ namespace Roslyn.SonarQube
             Assembly analyzerAssembly = null;
             try
             {
-
                 analyzerAssembly = Assembly.LoadFrom(assemblyPath);
             }
             catch (Exception ex)
@@ -79,30 +74,6 @@ namespace Roslyn.SonarQube
             }
 
             return analysers;
-        }
-
-        private Assembly LoadFromFolder(object sender, ResolveEventArgs args)
-        {
-            // Add the assembly's own location to the folders to search in
-            folderPaths.Add(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-
-            foreach (string folderPath in folderPaths)
-            {
-
-                string assemblyPath = Path.Combine(folderPath, new AssemblyName(args.Name).Name + ".dll");
-                if (File.Exists(assemblyPath) == false)
-                {
-                    continue;
-                }
-                Assembly assembly = Assembly.LoadFrom(assemblyPath);
-                if (assembly != null)
-                {
-                    return assembly;
-                }
-            }
-
-            // Default null
-            return null;
         }
     }
 }
