@@ -108,6 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnalyzerFinder.cs" />
+    <Compile Include="AssemblyResolver.cs" />
     <Compile Include="NuGetPackageHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
