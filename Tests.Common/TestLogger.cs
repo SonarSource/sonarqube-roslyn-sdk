@@ -14,7 +14,7 @@ namespace Tests.Common
             Error
         }
 
-        private IList<Tuple<MessageType, string>> messages; 
+        private readonly IList<Tuple<MessageType, string>> messages; 
 
         public TestLogger()
         {

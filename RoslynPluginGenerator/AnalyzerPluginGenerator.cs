@@ -1,11 +1,12 @@
 ﻿using Microsoft.CodeAnalysis.Diagnostics;
-using Roslyn.SonarQube.Common;
+using NuGet;
 using Roslyn.SonarQube.PluginGenerator;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace Roslyn.SonarQube.AnalyzerPlugins
 {
@@ -13,9 +14,9 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
     {
         public const string NuGetPackageSource = "https://www.nuget.org/api/v2/";
 
-        private ILogger logger;
+        private readonly Common.ILogger logger;
 
-        public AnalyzerPluginGenerator(ILogger logger)
+        public AnalyzerPluginGenerator(Common.ILogger logger)
         {
             if (logger == null)
             {
@@ -24,33 +25,44 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
             this.logger = logger;
         }
 
-        public bool Generate(string nuGetPackageId, NuGet.SemanticVersion nuGetPackageVersion)
+        public bool Generate(string nuGetPackageId, SemanticVersion nuGetPackageVersion)
         {
             if (string.IsNullOrWhiteSpace(nuGetPackageId))
             {
                 throw new ArgumentNullException("nuGetPackageId");
             }
 
-            string tempPath = Path.Combine(Path.GetTempPath(), "AnalyserPlugins", Guid.NewGuid().ToString());
+            string baseDirectory = Path.Combine(
+                Path.GetTempPath(),
+                Assembly.GetEntryAssembly().GetName().Name);
+
+            string nuGetDirectory = Path.Combine(baseDirectory, ".nuget");
 
             NuGetPackageHandler downloader = new NuGetPackageHandler(logger);
 
-            NuGet.IPackage package = downloader.FetchPackage(NuGetPackageSource, nuGetPackageId, nuGetPackageVersion, tempPath);
+            IPackage package = downloader.FetchPackage(NuGetPackageSource, nuGetPackageId, nuGetPackageVersion, nuGetDirectory);
 
             if (package != null)
             {
                 PluginDefinition pluginDefn = CreatePluginDefinition(package);
 
-                string rulesFilePath = TryGenerateRulesFile(tempPath);
+                string outputDirectory = Path.Combine(baseDirectory, ".output", Guid.NewGuid().ToString());
+                Directory.CreateDirectory(outputDirectory);
 
-                if (rulesFilePath != null)
+                string outputFilePath = Path.Combine(outputDirectory, "rules.xml");
+
+                string packageDirectory = Path.Combine(nuGetDirectory, package.Id + "." + package.Version.ToString());
+                Debug.Assert(Directory.Exists(packageDirectory), "Expected package directory does not exist: {0}", packageDirectory);
+                bool success = TryGenerateRulesFile(packageDirectory, nuGetDirectory, outputFilePath);
+
+                if (success)
                 {
                     this.logger.LogInfo(UIResources.APG_GeneratingPlugin);
 
                     string fullJarPath = Path.Combine(Directory.GetCurrentDirectory(), 
                         nuGetPackageId + "-plugin." + pluginDefn.Version + ".jar");
                     RulesPluginGenerator rulesPluginGen = new RulesPluginGenerator(logger);
-                    rulesPluginGen.GeneratePlugin(pluginDefn, rulesFilePath, fullJarPath);
+                    rulesPluginGen.GeneratePlugin(pluginDefn, outputFilePath, fullJarPath);
 
                     this.logger.LogInfo(UIResources.APG_PluginGenerated, fullJarPath);
                 }
@@ -59,15 +71,21 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
             return package != null;
         }
 
-        private string TryGenerateRulesFile(string tempDirectory)
+        /// <summary>
+        /// Attempts to generate a rules file for assemblies in the package directory.
+        /// Returns the path to the rules file.
+        /// </summary>
+        /// <param name="packageDirectory">Directory containing the analyzer assembly to generate rules for</param>
+        /// <param name="nuGetDirectory">Directory containing other NuGet packages that might be required i.e. analyzer dependencies</param>
+        private bool TryGenerateRulesFile(string packageDirectory, string nuGetDirectory, string outputFilePath)
         {
+            bool success = false;
             this.logger.LogInfo(UIResources.APG_GeneratingRules);
-            string rulesFilePath = null;
 
             this.logger.LogInfo(UIResources.APG_LocatingAnalyzers);
 
             AnalyzerFinder finder = new AnalyzerFinder(this.logger);
-            IEnumerable<DiagnosticAnalyzer> analyzers = finder.FindAnalyzers(tempDirectory);
+            IEnumerable<DiagnosticAnalyzer> analyzers = finder.FindAnalyzers(packageDirectory, nuGetDirectory);
 
             this.logger.LogInfo(UIResources.APG_AnalyzersLocated, analyzers.Count());
 
@@ -80,20 +98,19 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
 
                 if (rules != null)
                 {
-                    rulesFilePath = Path.Combine(tempDirectory, "rules.xml");
-
-                    rules.Save(rulesFilePath, logger);
-                    this.logger.LogDebug(UIResources.APG_RulesGeneratedToFile, rules.Count, rulesFilePath);
+                    rules.Save(outputFilePath, logger);
+                    this.logger.LogDebug(UIResources.APG_RulesGeneratedToFile, rules.Count, outputFilePath);
+                    success = true;
                 }
             }
             else
             {
                 this.logger.LogWarning(UIResources.APG_NoAnalyzersFound);
             }
-            return rulesFilePath;
+            return success;
         }
 
-        private static PluginDefinition CreatePluginDefinition(NuGet.IPackage package)
+        private static PluginDefinition CreatePluginDefinition(IPackage package)
         {
             PluginDefinition pluginDefn = new PluginDefinition();
 

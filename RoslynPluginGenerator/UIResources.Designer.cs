@@ -313,5 +313,41 @@ namespace Roslyn.SonarQube.AnalyzerPlugins {
                 return ResourceManager.GetString("NG_UsingLatestPackageVersion", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Assembly located: {0}.
+        /// </summary>
+        internal static string Resolver_AssemblyLocated {
+            get {
+                return ResourceManager.GetString("Resolver_AssemblyLocated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to resolve assembly..
+        /// </summary>
+        internal static string Resolver_FailedToResolveAssembly {
+            get {
+                return ResourceManager.GetString("Resolver_FailedToResolveAssembly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Assembly rejected: incorrect version &apos;{0}&apos;.
+        /// </summary>
+        internal static string Resolver_RejectedAssembly {
+            get {
+                return ResourceManager.GetString("Resolver_RejectedAssembly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Attempting to resolve assembly &apos;{0}&apos;, requested by &apos;{1}&apos;.
+        /// </summary>
+        internal static string Resolver_ResolvingAssembly {
+            get {
+                return ResourceManager.GetString("Resolver_ResolvingAssembly", resourceCulture);
+            }
+        }
     }
 }

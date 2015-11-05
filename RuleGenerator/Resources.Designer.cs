@@ -61,11 +61,29 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Loaded: {0} analysers..
+        /// </summary>
+        public static string AnalysersLoadSuccess {
+            get {
+                return ResourceManager.GetString("AnalysersLoadSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not load the assembly {0}. Error: {1}.
         /// </summary>
         public static string AssemblyLoadError {
             get {
                 return ResourceManager.GetString("AssemblyLoadError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loaded assembly: {0}.
+        /// </summary>
+        public static string AssemblyLoadSuccess {
+            get {
+                return ResourceManager.GetString("AssemblyLoadSuccess", resourceCulture);
             }
         }
         
@@ -79,20 +97,20 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Loaded analyser: {0}.
+        /// </summary>
+        public static string DEBUG_AnalyserLoaded {
+            get {
+                return ResourceManager.GetString("DEBUG_AnalyserLoaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File {0} does not exist. Provide the path to an existing assembly.
         /// </summary>
         public static string ERR_ArgFileDoesNotExist {
             get {
                 return ResourceManager.GetString("ERR_ArgFileDoesNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Tags must be lowercase..
-        /// </summary>
-        public static string EX_LowercaseTags {
-            get {
-                return ResourceManager.GetString("EX_LowercaseTags", resourceCulture);
             }
         }
         
@@ -133,7 +151,16 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Generation complete: {0} rules written to {1}.
+        ///   Looks up a localized string similar to {0} rules written to {1}.
+        /// </summary>
+        public static string SuccessOutputFile {
+            get {
+                return ResourceManager.GetString("SuccessOutputFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generation succeeded..
         /// </summary>
         public static string SuccessStatus {
             get {
@@ -142,7 +169,7 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Duplicate key {0} found. One will be ignored.
+        ///   Looks up a localized string similar to Skipping rule in analyzer {0}: Duplicate key..
         /// </summary>
         public static string WARN_DuplicateKey {
             get {
@@ -160,7 +187,16 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Empty rule key found. The rule will be ignored..
+        ///   Looks up a localized string similar to Empty description found for rule {0}. Placeholder description inserted..
+        /// </summary>
+        public static string WARN_EmptyDescription {
+            get {
+                return ResourceManager.GetString("WARN_EmptyDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Skipping rule in analyzer {0}: No key found..
         /// </summary>
         public static string WARN_EmptyKey {
             get {

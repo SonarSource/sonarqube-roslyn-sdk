@@ -1,11 +1,11 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Roslyn.SonarQube.Common;
-using System.Text;
+using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 
 namespace Roslyn.SonarQube
 {
@@ -16,7 +16,7 @@ namespace Roslyn.SonarQube
     {
         public const string Cardinality = "SINGLE";
         public const string Status = "READY";
-        private ILogger logger;
+        private readonly ILogger logger;
 
         public RuleGenerator(ILogger logger)
         {
@@ -39,9 +39,20 @@ namespace Roslyn.SonarQube
 
             foreach (DiagnosticAnalyzer analyzer in analyzers)
             {
-                rules.AddRange(GetAnalyzerRules(analyzer));
-            }
+                Rules analyserRules = GetAnalyzerRules(analyzer);
+                
+                foreach (Rule analyserRule in analyserRules)
+                {
+                    if (rules.Any(r => String.Equals(r.Key, analyserRule.Key, Rule.RuleKeyComparer)))
+                    {
+                        logger.LogWarning(Resources.WARN_DuplicateKey, analyserRule.Key);
+                        continue;
+                    }
 
+                    rules.Add(analyserRule);
+                }
+            }
+            
             return rules;
         }
 
@@ -57,11 +68,18 @@ namespace Roslyn.SonarQube
 
             foreach (DiagnosticDescriptor diagnostic in analyzer.SupportedDiagnostics)
             {
+                if (String.IsNullOrWhiteSpace(diagnostic.Id))
+                {
+                    logger.LogWarning(Resources.WARN_EmptyKey, analyzer.ToString());
+                    continue;
+                }
+
                 Rule newRule = new Rule();
+                
                 newRule.Key = diagnostic.Id;
                 newRule.InternalKey = diagnostic.Id;
 
-                newRule.Description = GetDescriptionHtml(diagnostic);
+                newRule.Description = GetDescriptionAsRawHtml(diagnostic);
 
                 newRule.Name = diagnostic.Title.ToString(CultureInfo.InvariantCulture);
                 newRule.Severity = GetSonarQubeSeverity(diagnostic.DefaultSeverity);
@@ -92,10 +110,13 @@ namespace Roslyn.SonarQube
             return rules;
         }
 
-        private static string GetDescriptionHtml(DiagnosticDescriptor diagnostic)
+        /// <summary>
+        /// Returns the description as HTML
+        /// </summary>
+        /// <returns>Note: the description should be returned as the HTML that should be rendered i.e. there is no need enclose it in a CDATA section</returns>
+        private static string GetDescriptionAsRawHtml(DiagnosticDescriptor diagnostic)
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("<![CDATA[");
             bool hasDescription = false;
 
             string details = diagnostic.Description.ToString(CultureInfo.CurrentCulture);
@@ -116,8 +137,6 @@ namespace Roslyn.SonarQube
             {
                 sb.AppendLine(Resources.NoDescription);
             }
-
-            sb.AppendLine("]]"); // close the ![CDATA section
 
             return sb.ToString();
 

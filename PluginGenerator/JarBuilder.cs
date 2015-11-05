@@ -136,7 +136,7 @@ namespace Roslyn.SonarQube.PluginGenerator
                 throw new InvalidOperationException(UIResources.JarB_JDK_NotInstalled);
             }
 
-            string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            string tempPath = Path.Combine(Path.GetTempPath(), ".jarBuilder", Guid.NewGuid().ToString());
 
             JarFolders folders = new JarFolders(tempPath);
             this.LayoutFiles(tempPath);

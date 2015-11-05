@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Roslyn.SonarQube
 {
-    internal class Program
+    internal static class Program
     {
         // TODO: multiple language support
         private static readonly string language = LanguageNames.CSharp;
@@ -40,6 +40,8 @@ namespace Roslyn.SonarQube
 
                 string outputFile = Path.ChangeExtension(assemblyPath, ".xml");
                 rules.Save(outputFile, logger);
+                logger.LogInfo(Resources.SuccessOutputFile, rules.Count, outputFile);
+                logger.LogInfo(Resources.SuccessStatus);
             }
             else
             {

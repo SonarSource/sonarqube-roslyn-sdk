@@ -23,8 +23,14 @@ namespace Roslyn.SonarQube
         [XmlElement(ElementName = "internalKey")]
         public string InternalKey { get; set; }
 
+        /// <summary>
+        /// Returns the description formatted as an HTML CData section for serialization purposes.
+        /// </summary>
+        /// <remarks>It is expected that the description will contain HTML formatting. This is serialized in
+        /// a CData section to preserve the formatting.
+        /// Note: the XMLSerializer requires a public getter and setter to be able to serialize a property.</remarks>
         [XmlElement("description")]
-        public XmlCDataSection DescriptionCDATA
+        public XmlCDataSection DescriptionAsCDATA
         {
             get
             {
@@ -52,6 +58,6 @@ namespace Roslyn.SonarQube
         /// <summary>
         /// Specified the culture and case when comparing rule keys
         /// </summary>
-        public static StringComparison RuleKeyComparer = StringComparison.OrdinalIgnoreCase;
+        public static readonly StringComparison RuleKeyComparer = StringComparison.OrdinalIgnoreCase;
     }
 }

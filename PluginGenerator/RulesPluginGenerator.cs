@@ -58,7 +58,7 @@ namespace Roslyn.SonarQube.PluginGenerator
             ValidateDefinition(definition);
 
             // Temp folder which resources will be unpacked into
-            string tempWorkingDir = Path.Combine(Path.GetTempPath(), "plugins", Guid.NewGuid().ToString());
+            string tempWorkingDir = Path.Combine(Path.GetTempPath(), ".plugins", Guid.NewGuid().ToString());
             Directory.CreateDirectory(tempWorkingDir);
 
             BuildPlugin(definition, rulesFilePath, fullJarFilePath, tempWorkingDir);

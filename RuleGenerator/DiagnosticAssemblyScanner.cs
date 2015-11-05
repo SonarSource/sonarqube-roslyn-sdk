@@ -4,6 +4,7 @@ using Roslyn.SonarQube.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -14,7 +15,9 @@ namespace Roslyn.SonarQube
     /// </summary>
     public class DiagnosticAssemblyScanner
     {
-        private ILogger logger;
+        private readonly ILogger logger;
+        private AppDomain currentDomain = AppDomain.CurrentDomain;
+        private List<string> folderPaths = new List<string>();
 
         public DiagnosticAssemblyScanner(ILogger logger)
         {
@@ -36,6 +39,7 @@ namespace Roslyn.SonarQube
                 analysers = FetchDiagnosticAnalysers(analyserAssembly, language);
             }
 
+            logger.LogInfo(Resources.AnalysersLoadSuccess, analysers.Count());
             return analysers;
         }
 
@@ -52,6 +56,7 @@ namespace Roslyn.SonarQube
                 return null;
             }
 
+            logger.LogInfo(Resources.AnalysersLoadSuccess, analyzerAssembly.FullName);
             return analyzerAssembly;
         }
 
@@ -68,6 +73,8 @@ namespace Roslyn.SonarQube
                 {
                     DiagnosticAnalyzer analyser = (DiagnosticAnalyzer)Activator.CreateInstance(type);
                     analysers.Add(analyser);
+
+                    logger.LogDebug(Resources.DEBUG_AnalyserLoaded, analyser.ToString());
                 }
             }
 
