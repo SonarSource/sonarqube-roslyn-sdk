@@ -4,7 +4,6 @@ using Roslyn.SonarQube.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -16,8 +15,6 @@ namespace Roslyn.SonarQube
     public class DiagnosticAssemblyScanner
     {
         private readonly ILogger logger;
-        private AppDomain currentDomain = AppDomain.CurrentDomain;
-        private List<string> folderPaths = new List<string>();
 
         public DiagnosticAssemblyScanner(ILogger logger)
         {
