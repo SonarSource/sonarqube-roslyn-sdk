@@ -31,7 +31,7 @@ namespace Roslyn.SonarQube
             }
 
             DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
-            IEnumerable<DiagnosticAnalyzer> diagnostics = scanner.ExtractDiagnosticsFromAssembly(assemblyPath, language);
+            IEnumerable<DiagnosticAnalyzer> diagnostics = scanner.InstantiateDiagnosticsFromAssembly(assemblyPath, language);
 
             if (diagnostics.Any())
             {

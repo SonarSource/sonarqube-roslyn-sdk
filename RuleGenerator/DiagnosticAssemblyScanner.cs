@@ -22,18 +22,21 @@ namespace Roslyn.SonarQube
         }
 
         /// <summary>
-        /// Loads the given assembly and extracts Roslyn diagnostics - i.e. existing types deriving from
+        /// Loads the given assembly and instantiates Roslyn diagnostic objects - i.e. existing types deriving from
         /// <see cref="DiagnosticAnalyzer"/>
         /// </summary>
         /// <returns>empty enumerable if no diagnostics were found</returns>
-        public IEnumerable<DiagnosticAnalyzer> ExtractDiagnosticsFromAssembly(string assemblyPath, string language)
+        public IEnumerable<DiagnosticAnalyzer> InstantiateDiagnosticsFromAssembly(string assemblyPath, string language)
         {
             Assembly analyserAssembly = LoadAnalyzerAssembly(assemblyPath);
             IEnumerable<DiagnosticAnalyzer> analysers = Enumerable.Empty<DiagnosticAnalyzer>();
 
+            Debug.Assert(String.Equals(language, LanguageNames.CSharp, StringComparison.CurrentCulture) 
+                || String.Equals(language, LanguageNames.VisualBasic, StringComparison.CurrentCulture));
+
             if (analyserAssembly != null)
             {
-                analysers = FetchDiagnosticAnalysers(analyserAssembly, language);
+                analysers = InstantiateDiagnosticAnalyzers(analyserAssembly, language);
             }
 
             logger.LogInfo(Resources.AnalysersLoadSuccess, analysers.Count());
@@ -57,11 +60,10 @@ namespace Roslyn.SonarQube
             return analyzerAssembly;
         }
 
-        private static IEnumerable<DiagnosticAnalyzer> FetchDiagnosticAnalysers(Assembly analyserAssembly, string language)
+        private IEnumerable<DiagnosticAnalyzer> InstantiateDiagnosticAnalyzers(Assembly analyserAssembly, string language)
         {
             Debug.Assert(analyserAssembly != null);
             ICollection<DiagnosticAnalyzer> analysers = new List<DiagnosticAnalyzer>();
-
             foreach (Type type in analyserAssembly.GetExportedTypes())
             {
                 if (!type.IsAbstract &&
