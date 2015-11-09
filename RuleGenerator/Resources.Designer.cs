@@ -63,9 +63,9 @@ namespace Roslyn.SonarQube {
         /// <summary>
         ///   Looks up a localized string similar to Loaded: {0} analysers..
         /// </summary>
-        public static string AnalysersLoadSuccess {
+        public static string AnalyzersLoadSuccess {
             get {
-                return ResourceManager.GetString("AnalysersLoadSuccess", resourceCulture);
+                return ResourceManager.GetString("AnalyzersLoadSuccess", resourceCulture);
             }
         }
         
@@ -133,7 +133,7 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not load the analyzer assembly or no analyzers were found.
+        ///   Looks up a localized string similar to No analyzers found in assembly..
         /// </summary>
         public static string NoAnalysers {
             get {

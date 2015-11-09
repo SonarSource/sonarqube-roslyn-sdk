@@ -117,7 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AnalysersLoadSuccess" xml:space="preserve">
+  <data name="AnalyzersLoadSuccess" xml:space="preserve">
     <value>Loaded: {0} analysers.</value>
   </data>
   <data name="AssemblyLoadError" xml:space="preserve">
@@ -142,7 +142,7 @@
     <value>More Details</value>
   </data>
   <data name="NoAnalysers" xml:space="preserve">
-    <value>Could not load the analyzer assembly or no analyzers were found</value>
+    <value>No analyzers found in assembly.</value>
   </data>
   <data name="NoDescription" xml:space="preserve">
     <value>No description was provided.</value>
