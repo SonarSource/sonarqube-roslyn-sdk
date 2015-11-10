@@ -121,7 +121,9 @@
     <value>Loaded: {0} analysers.</value>
   </data>
   <data name="AssemblyLoadError" xml:space="preserve">
-    <value>Could not load the assembly {0}. Error: {1}</value>
+    <value>Could not load the assembly '{0}'. 
+
+Error: {1}</value>
   </data>
   <data name="AssemblyLoadSuccess" xml:space="preserve">
     <value>Loaded assembly: {0}</value>

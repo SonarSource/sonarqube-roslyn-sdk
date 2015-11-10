@@ -33,7 +33,7 @@ namespace Roslyn.SonarQube
             DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
             IEnumerable<DiagnosticAnalyzer> diagnostics = scanner.InstantiateDiagnosticsFromAssembly(assemblyPath, language);
 
-            if (diagnostics.Any())
+            if (diagnostics != null && diagnostics.Any())
             {
                 IRuleGenerator ruleGenerator = new RuleGenerator(logger);
                 Rules rules = ruleGenerator.GenerateRules(diagnostics);
@@ -42,10 +42,6 @@ namespace Roslyn.SonarQube
                 rules.Save(outputFile, logger);
                 logger.LogInfo(Resources.SuccessOutputFile, rules.Count, outputFile);
                 logger.LogInfo(Resources.SuccessStatus);
-            }
-            else
-            {
-                logger.LogError(Resources.NoAnalysers);
             }
         }
 

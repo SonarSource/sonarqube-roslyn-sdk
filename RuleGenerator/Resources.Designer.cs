@@ -70,7 +70,9 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not load the assembly {0}. Error: {1}.
+        ///   Looks up a localized string similar to Could not load the assembly &apos;{0}&apos;. 
+        ///
+        ///Error: {1}.
         /// </summary>
         public static string AssemblyLoadError {
             get {
