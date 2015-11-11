@@ -140,6 +140,9 @@ Error: {1}</value>
   <data name="ForMoreDetailsLink" xml:space="preserve">
     <value>For more information visit &lt;a href="{0}" target="_blank"&gt;the rule's help page&lt;/a&gt;.</value>
   </data>
+  <data name="INFO_AdditionalDependencySearchFoldersFound" xml:space="preserve">
+    <value>Using {0} additional assembly dependency search folders.</value>
+  </data>
   <data name="MoreDetailsTitle" xml:space="preserve">
     <value>More Details</value>
   </data>
@@ -149,11 +152,11 @@ Error: {1}</value>
   <data name="NoDescription" xml:space="preserve">
     <value>No description was provided.</value>
   </data>
+  <data name="RuleGenerationSuccess" xml:space="preserve">
+    <value>Generation succeeded.</value>
+  </data>
   <data name="SuccessOutputFile" xml:space="preserve">
     <value>{0} rules written to {1}</value>
-  </data>
-  <data name="SuccessStatus" xml:space="preserve">
-    <value>Generation succeeded.</value>
   </data>
   <data name="WARN_DuplicateKey" xml:space="preserve">
     <value>Skipping rule in analyzer {0}: Duplicate key.</value>
@@ -166,5 +169,8 @@ Error: {1}</value>
   </data>
   <data name="WARN_EmptyKey" xml:space="preserve">
     <value>Skipping rule in analyzer {0}: No key found.</value>
+  </data>
+  <data name="WARN_NoValidAdditionalDependencySearchFolders" xml:space="preserve">
+    <value>Additional assembly dependency search folders were configured, but none were valid.</value>
   </data>
 </root>

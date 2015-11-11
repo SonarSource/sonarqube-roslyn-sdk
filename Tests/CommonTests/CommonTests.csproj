@@ -62,10 +62,6 @@
       <Project>{f60478ff-1eea-4fb4-9bf4-50d11f94fa57}</Project>
       <Name>Tests.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ExampleAssemblies\ExampleAssembly\ExampleAssembly.csproj">
-      <Project>{6e2a8b74-a020-4e84-bf3a-bab401676130}</Project>
-      <Name>ExampleAssembly</Name>
-    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

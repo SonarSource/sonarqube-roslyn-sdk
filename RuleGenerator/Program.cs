@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Roslyn.SonarQube.Common;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -30,10 +31,37 @@ namespace Roslyn.SonarQube
                 return;
             }
 
-            DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
+            // Retrieve optional user-specified additional assembly search directories
+            string additionalSearchFolderRawString = ProgramSettings.Default.AdditionalDependencySearchFolders;
+            DiagnosticAssemblyScanner scanner = null;
+
+            if (!String.IsNullOrWhiteSpace(additionalSearchFolderRawString))
+            {
+                IEnumerable<string> additionalSearchFolders = new List<string>(additionalSearchFolderRawString.Split(','));
+
+                additionalSearchFolders = from folder in additionalSearchFolders
+                                          where Directory.Exists(folder) == true
+                                          select folder;
+                if (additionalSearchFolders.Any())
+                {
+                    logger.LogInfo(Resources.INFO_AdditionalDependencySearchFoldersFound, additionalSearchFolders.Count());
+                    scanner = new DiagnosticAssemblyScanner(additionalSearchFolders, logger);
+                } else
+                {
+                    logger.LogWarning(Resources.WARN_NoValidAdditionalDependencySearchFolders);
+                }
+            }
+
+            // If no additional valid search directories were specified, use default constructor
+            if (scanner == null)
+            {
+                scanner = new DiagnosticAssemblyScanner(logger);
+            }
+
             IEnumerable<DiagnosticAnalyzer> diagnostics = scanner.InstantiateDiagnosticsFromAssembly(assemblyPath, language);
 
-            if (diagnostics != null && diagnostics.Any())
+            Debug.Assert(diagnostics != null);
+            if (diagnostics.Any())
             {
                 IRuleGenerator ruleGenerator = new RuleGenerator(logger);
                 Rules rules = ruleGenerator.GenerateRules(diagnostics);
@@ -41,7 +69,7 @@ namespace Roslyn.SonarQube
                 string outputFile = Path.ChangeExtension(assemblyPath, ".xml");
                 rules.Save(outputFile, logger);
                 logger.LogInfo(Resources.SuccessOutputFile, rules.Count, outputFile);
-                logger.LogInfo(Resources.SuccessStatus);
+                logger.LogInfo(Resources.RuleGenerationSuccess);
             }
         }
 

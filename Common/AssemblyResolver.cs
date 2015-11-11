@@ -1,17 +1,30 @@
 ﻿using Roslyn.SonarQube.Common;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
 namespace Roslyn.SonarQube.AnalyzerPlugins
 {
+
+    /// <summary>
+    /// Adds additional search directories for assembly resolution
+    /// </summary>
     public sealed class AssemblyResolver : IDisposable
     {
         private readonly string[] rootSearchPaths;
         private readonly ILogger logger;
 
+        /// <summary>
+        /// Constructor specifying a single additional search directory.
+        /// </summary>
+        /// <param name="rootSearchPath">The search path</param>
         public AssemblyResolver(string rootSearchPath, ILogger logger) : this(new string[1] { rootSearchPath }, logger) { }
 
+        /// <summary>
+        /// Constructor specifying multiple additional search directories.
+        /// </summary>
+        /// <param name="rootSearchPaths">Additional search paths</param>
         public AssemblyResolver(string[] rootSearchPaths, ILogger logger)
         {
             foreach (string rootSearchPath in rootSearchPaths)
@@ -34,6 +47,7 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
             this.logger = logger;
 
             // This line required to resolve the Resources object before additional assembly resolution is added
+            // Do not remove this line, otherwise CurrentDomain_AssemblyResolve will throw a StackOverflowException
             this.logger.LogDebug(Resources.Resolver_Initialize);
 
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
@@ -41,13 +55,11 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
 
         public Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args) // set to public for test purposes
         {
-            // This line fails unless Resources has already been resolved previously
+            // This line causes a StackOverflowException unless Resources has already been called upon previously
             this.logger.LogDebug(Resources.Resolver_ResolvingAssembly, args.Name, args.RequestingAssembly.FullName);
             Assembly asm = null;
 
-            // TODO
-            string[] parts = args.Name.Split(new char[] { ' ' });
-            string fileName = parts[0].Substring(0, parts[0].Length - 1) + ".dll";
+            string fileName = CreateFileNameFromAssemblyName(args.Name);
 
             foreach (string rootSearchPath in rootSearchPaths)
             {
@@ -68,6 +80,21 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
             }
             this.logger.LogDebug(Resources.Resolver_FailedToResolveAssembly);
             return null;
+        }
+
+        /// <summary>
+        /// Attempts to create the name of the file associated with a given assembly name.
+        /// </summary>
+        public static string CreateFileNameFromAssemblyName(string input) // Public for testing purposes
+        {
+            Debug.Assert(input != null);
+            Debug.Assert(input.Length > 0);
+            Debug.Assert(!input.EndsWith(".dll"));
+
+            // TODO ???
+            string[] parts = input.Split(new char[] { ' ' });
+
+            return parts[0].Substring(0, parts[0].Length - 1) + ".dll";
         }
 
         #region IDisposable Support

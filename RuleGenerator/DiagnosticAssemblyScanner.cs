@@ -17,10 +17,14 @@ namespace Roslyn.SonarQube
     public class DiagnosticAssemblyScanner
     {
         private readonly ILogger logger;
+        private readonly IEnumerable<string> additionalSearchFolders;
 
-        public DiagnosticAssemblyScanner(ILogger logger)
+        public DiagnosticAssemblyScanner(ILogger logger) : this(Enumerable.Empty<string>(), logger) { }
+
+        public DiagnosticAssemblyScanner(IEnumerable<string> additionalSearchFolders, ILogger logger)
         {
             this.logger = logger;
+            this.additionalSearchFolders = additionalSearchFolders;
         }
 
         /// <summary>
@@ -61,22 +65,16 @@ namespace Roslyn.SonarQube
             return analysers ?? Enumerable.Empty<DiagnosticAnalyzer>();
         }
 
+        /// <summary>
+        /// Load the assembly at the given path into memory, with the given additional assembly search directories.
+        /// </summary>
         private Assembly LoadAnalyzerAssembly(string assemblyPath)
         {
-            string additionalSearchFolderRawString = ProgramSettings.Default.AdditionalDependencySearchFolders;
+            // If there were any additional assembly search directories specified in the constructor, use them
             AssemblyResolver additionalAssemblyResolver = null;
-            if (!String.IsNullOrWhiteSpace(additionalSearchFolderRawString))
+            if (additionalSearchFolders.Any())
             {
-                IEnumerable<string> additionalSearchFolders = new List<string>(additionalSearchFolderRawString.Split(','));
-                
-                additionalSearchFolders = from folder in additionalSearchFolders
-                    where Directory.Exists(folder) == true
-                    select folder;
-
-                if (additionalSearchFolders.Any())
-                {
-                    additionalAssemblyResolver = new AssemblyResolver(additionalSearchFolders.ToArray(), logger);
-                }
+                additionalAssemblyResolver = new AssemblyResolver(additionalSearchFolders.ToArray(), logger);
             }
 
             Assembly analyzerAssembly = null;
@@ -86,6 +84,7 @@ namespace Roslyn.SonarQube
             }
             finally
             {
+                // Dispose of the AssemblyResolver instance, if applicable
                 if (additionalAssemblyResolver != null)
                 {
                     additionalAssemblyResolver.Dispose();

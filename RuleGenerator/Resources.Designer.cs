@@ -126,6 +126,15 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Using {0} additional assembly dependency search folders..
+        /// </summary>
+        public static string INFO_AdditionalDependencySearchFoldersFound {
+            get {
+                return ResourceManager.GetString("INFO_AdditionalDependencySearchFoldersFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to More Details.
         /// </summary>
         public static string MoreDetailsTitle {
@@ -153,20 +162,20 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Generation succeeded..
+        /// </summary>
+        public static string RuleGenerationSuccess {
+            get {
+                return ResourceManager.GetString("RuleGenerationSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} rules written to {1}.
         /// </summary>
         public static string SuccessOutputFile {
             get {
                 return ResourceManager.GetString("SuccessOutputFile", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Generation succeeded..
-        /// </summary>
-        public static string SuccessStatus {
-            get {
-                return ResourceManager.GetString("SuccessStatus", resourceCulture);
             }
         }
         
@@ -203,6 +212,15 @@ namespace Roslyn.SonarQube {
         public static string WARN_EmptyKey {
             get {
                 return ResourceManager.GetString("WARN_EmptyKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Additional assembly dependency search folders were configured, but none were valid..
+        /// </summary>
+        public static string WARN_NoValidAdditionalDependencySearchFolders {
+            get {
+                return ResourceManager.GetString("WARN_NoValidAdditionalDependencySearchFolders", resourceCulture);
             }
         }
     }

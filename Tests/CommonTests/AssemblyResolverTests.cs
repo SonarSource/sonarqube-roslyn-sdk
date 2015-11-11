@@ -1,11 +1,12 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ExampleAssembly;
 using Roslyn.SonarQube.AnalyzerPlugins;
 using System.IO;
 using Tests.Common;
-using System.Collections.Generic;
 using System.Reflection;
+using Roslyn.SonarQube.Common;
+using Microsoft.CSharp;
+using System.CodeDom.Compiler;
 
 namespace CommonTests
 {
@@ -15,6 +16,60 @@ namespace CommonTests
         public TestContext TestContext { get; set; }
 
         /// <summary>
+        /// Compiles the supplied code into a new assembly
+        /// </summary>
+        private static Assembly CompileAssembly(string code, string outputFilePath, ILogger logger)
+        {
+            CSharpCodeProvider provider = new CSharpCodeProvider();
+
+            CompilerParameters options = new CompilerParameters();
+            options.OutputAssembly = outputFilePath;
+            options.GenerateExecutable = true;
+            options.GenerateInMemory = false;
+
+            CompilerResults result = provider.CompileAssemblyFromSource(options, code);
+
+            if (result.Errors.Count > 0)
+            {
+                foreach (string item in result.Output)
+                {
+                    logger.LogInfo(item);
+                }
+                Assert.Fail("Test setup error: failed to create dynamic assembly. See the test output for compiler output");
+            }
+
+            return result.CompiledAssembly;
+        }
+
+        private static Assembly CompileSimpleAssembly(string outputFilePath, ILogger logger)
+        {
+            return CompileAssembly(@"public class SimpleProgram {
+              public static void Main(string[] args) {
+                System.Console.WriteLine(""Hello World"");
+              }
+            }", outputFilePath, logger);
+        }
+
+        /// <summary>
+        /// Tests that method for creating file names from assembly names is correct.
+        /// </summary>
+        [TestMethod]
+        public void TestAssemblyNameFileNameAssociation()
+        {
+            // Arrange
+            TestLogger logger = new TestLogger();
+            Assembly assembly = typeof(AssemblyResolver).Assembly;
+            string assemblyName = assembly.FullName;
+            string actualFileName = Path.GetFileName(assembly.Location);
+
+            // Act
+            string testFileName = AssemblyResolver.CreateFileNameFromAssemblyName(assemblyName);
+
+            // Assert
+            Assert.AreEqual<string>(actualFileName, testFileName);
+        }
+
+        /// <summary>
         /// Tests the loading of an assembly with a single type and no dependencies. This should succeed even without AssemblyResolver.
         /// </summary>
         [TestMethod]
@@ -22,35 +77,33 @@ namespace CommonTests
         {
             // Arrange
             TestLogger logger = new TestLogger();
+            string testFolder = TestUtils.CreateTestDirectory(this.TestContext);
+            string simpleAssemblyPath = Path.Combine(testFolder, "SimpleAssembly.dll");
+            Assembly simpleAssembly = CompileSimpleAssembly(simpleAssemblyPath, logger);
 
-            string simpleAssemblyPath = typeof(SimpleProgram).Assembly.Location;
-            string simpleAssemblyFolder = Path.GetDirectoryName(simpleAssemblyPath);
-            SimpleProgram simpleProgram = null;
-            Type simpleProgramType = null;
+            object simpleObject = null;
 
             // Act
-            using (new AssemblyResolver(simpleAssemblyFolder, logger))
+            using (new AssemblyResolver(testFolder, logger))
             {
-                // Look in every assembly under the supplied directory to see if
-                // we can find and create any analyzers
-                foreach (string assemblyPath in Directory.GetFiles(simpleAssemblyFolder, "*.dll", SearchOption.AllDirectories))
+                // Look in every assembly under the supplied directory
+                foreach (string assemblyPath in Directory.GetFiles(testFolder, "*.dll", SearchOption.AllDirectories))
                 {
                     Assembly assembly = Assembly.LoadFile(assemblyPath);
                     
                     foreach (Type type in assembly.GetExportedTypes())
                     {
-                        if (!type.IsAbstract && type == typeof(SimpleProgram))
+                        if (!type.IsAbstract)
                         {
-                            simpleProgram = (SimpleProgram)Activator.CreateInstance(type);
-                            simpleProgramType = type;
+                            simpleObject = Activator.CreateInstance(type);
                         }
                     }
                 }
             }
 
             // Assert
-            Assert.IsNotNull(simpleProgram);
-            Assert.AreEqual<Type>(simpleProgramType, typeof(SimpleProgram));
+            Assert.IsNotNull(simpleObject);
+            Assert.AreEqual<string>("SimpleProgram", simpleObject.GetType().ToString());
         }
 
         /// <summary>
@@ -84,23 +137,21 @@ namespace CommonTests
             // Arrange
             TestLogger logger = new TestLogger();
             string testFolder = TestUtils.CreateTestDirectory(this.TestContext);
-
-            Assembly sourceAssembly = typeof(SimpleProgram).Assembly;
-            string sourceAssemblyPath = sourceAssembly.Location;
-            string destinationAssemblyPath = Path.Combine(testFolder, Path.GetFileName(sourceAssemblyPath));
-            File.Copy(sourceAssemblyPath, destinationAssemblyPath);
-
+            String simpleAssemblyPath = Path.Combine(testFolder, "SimpleAssembly.dll");
+            Assembly simpleAssembly = CompileSimpleAssembly(simpleAssemblyPath, logger);
+            
             // Act
             Assembly resolveResult;
             using (AssemblyResolver assemblyResolver = new AssemblyResolver(testFolder, logger))
             {
-                ResolveEventArgs resolveEventArgs = new ResolveEventArgs(sourceAssembly.FullName, this.GetType().Assembly);
+                ResolveEventArgs resolveEventArgs = new ResolveEventArgs(simpleAssembly.FullName, this.GetType().Assembly);
                 resolveResult = assemblyResolver.CurrentDomain_AssemblyResolve(this, resolveEventArgs);
             }
 
             // Assert
             Assert.IsNotNull(resolveResult);
-            Assert.AreEqual<string>(sourceAssembly.ToString(), resolveResult.ToString());
+            Assert.AreEqual<string>(simpleAssembly.ToString(), resolveResult.ToString());
+            Assert.AreEqual<string>(simpleAssemblyPath, resolveResult.Location);
         }
     }
 }
