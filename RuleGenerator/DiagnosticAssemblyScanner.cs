@@ -31,27 +31,34 @@ namespace Roslyn.SonarQube
         public IEnumerable<DiagnosticAnalyzer> InstantiateDiagnosticsFromAssembly(string assemblyPath, string language)
         {
             Assembly analyserAssembly = LoadAnalyzerAssembly(assemblyPath);
-            IEnumerable<DiagnosticAnalyzer> analysers = Enumerable.Empty<DiagnosticAnalyzer>();
+            IEnumerable<DiagnosticAnalyzer> analysers = null;
 
             Debug.Assert(String.Equals(language, LanguageNames.CSharp, StringComparison.CurrentCulture) 
                 || String.Equals(language, LanguageNames.VisualBasic, StringComparison.CurrentCulture));
 
             if (analyserAssembly != null)
             {
-                analysers = InstantiateDiagnosticAnalyzers(analyserAssembly, language);
-            }
+                try
+                {
+                    analysers = InstantiateDiagnosticAnalyzers(analyserAssembly, language);
 
-            if (analysers != null)
-            {
-                if (analysers.Any())
+                    Debug.Assert(analysers != null);
+                    if (analysers.Any())
+                    {
+                        logger.LogInfo(Resources.AnalyzersLoadSuccess, analysers.Count());
+                    }
+                    else
+                    {
+                        logger.LogError(Resources.NoAnalysers);
+                    }
+                }
+                catch (Exception ex)
                 {
-                    logger.LogInfo(Resources.AnalyzersLoadSuccess, analysers.Count());
-                } else
-                {
-                    logger.LogError(Resources.NoAnalysers);
+                    this.logger.LogError(Resources.ERR_AnalyzerInstantiationFail, analyserAssembly.FullName, ex.Message);
                 }
             }
-            return analysers;
+
+            return analysers ?? Enumerable.Empty<DiagnosticAnalyzer>();
         }
 
         private Assembly LoadAnalyzerAssembly(string assemblyPath)
@@ -60,20 +67,15 @@ namespace Roslyn.SonarQube
             AssemblyResolver additionalAssemblyResolver = null;
             if (!String.IsNullOrWhiteSpace(additionalSearchFolderRawString))
             {
-                string[] additionalSearchFolders = additionalSearchFolderRawString.Split(',');
+                IEnumerable<string> additionalSearchFolders = new List<string>(additionalSearchFolderRawString.Split(','));
+                
+                additionalSearchFolders = from folder in additionalSearchFolders
+                    where Directory.Exists(folder) == true
+                    select folder;
 
-                List<string> foldersToSearch = new List<string>(additionalSearchFolders.Length);
-                foreach (string additionalSearchFolder in additionalSearchFolders)
+                if (additionalSearchFolders.Any())
                 {
-                    if (Directory.Exists(additionalSearchFolder))
-                    {
-                        foldersToSearch.Add(additionalSearchFolder);
-                    }
-                }
-
-                if (foldersToSearch != null && foldersToSearch.Any())
-                {
-                    additionalAssemblyResolver = new AssemblyResolver(foldersToSearch.ToArray(), logger);
+                    additionalAssemblyResolver = new AssemblyResolver(additionalSearchFolders.ToArray(), logger);
                 }
             }
 
@@ -90,7 +92,7 @@ namespace Roslyn.SonarQube
                 }
             }
 
-            logger.LogInfo(Resources.AnalyzersLoadSuccess, analyzerAssembly.FullName);
+            logger.LogInfo(Resources.AssemblyLoadSuccess, analyzerAssembly.FullName);
             return analyzerAssembly;
         }
 
@@ -99,17 +101,8 @@ namespace Roslyn.SonarQube
             Debug.Assert(analyserAssembly != null);
 
             ICollection<DiagnosticAnalyzer> analysers = new List<DiagnosticAnalyzer>();
-            Type[] assemblyTypes = null;
-            try
-            {
-                assemblyTypes = analyserAssembly.GetExportedTypes();
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(Resources.AssemblyLoadError, analyserAssembly.FullName, ex.Message);
-                return null;
-            }
 
+            // It is assumed that analyserAssembly is valid. FileNotFoundException will be thrown if dependency resolution fails.
             foreach (Type type in analyserAssembly.GetExportedTypes())
             {
                 if (!type.IsAbstract &&

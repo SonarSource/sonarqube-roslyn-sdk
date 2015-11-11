@@ -70,17 +70,6 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not load the assembly &apos;{0}&apos;. 
-        ///
-        ///Error: {1}.
-        /// </summary>
-        public static string AssemblyLoadError {
-            get {
-                return ResourceManager.GetString("AssemblyLoadError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Loaded assembly: {0}.
         /// </summary>
         public static string AssemblyLoadSuccess {
@@ -104,6 +93,17 @@ namespace Roslyn.SonarQube {
         public static string DEBUG_AnalyserLoaded {
             get {
                 return ResourceManager.GetString("DEBUG_AnalyserLoaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not instantiate analyzers from &apos;{0}&apos;. 
+        ///
+        ///Error: {1}.
+        /// </summary>
+        public static string ERR_AnalyzerInstantiationFail {
+            get {
+                return ResourceManager.GetString("ERR_AnalyzerInstantiationFail", resourceCulture);
             }
         }
         

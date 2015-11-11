@@ -117,54 +117,19 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AnalyzersLoadSuccess" xml:space="preserve">
-    <value>Loaded: {0} analysers.</value>
+  <data name="Resolver_AssemblyLocated" xml:space="preserve">
+    <value>Assembly located: {0}</value>
   </data>
-  <data name="AssemblyLoadSuccess" xml:space="preserve">
-    <value>Loaded assembly: {0}</value>
+  <data name="Resolver_FailedToResolveAssembly" xml:space="preserve">
+    <value>Failed to resolve assembly.</value>
   </data>
-  <data name="CommandLineUsage" xml:space="preserve">
-    <value>Usage: {0} pathToAnalyzerAssembly</value>
+  <data name="Resolver_Initialize" xml:space="preserve">
+    <value>Adding AssemblyResolver to current AppDomain assembly resolution.</value>
   </data>
-  <data name="DEBUG_AnalyserLoaded" xml:space="preserve">
-    <value>Loaded analyser: {0}</value>
+  <data name="Resolver_RejectedAssembly" xml:space="preserve">
+    <value>Assembly rejected: incorrect version '{0}'</value>
   </data>
-  <data name="ERR_AnalyzerInstantiationFail" xml:space="preserve">
-    <value>Could not instantiate analyzers from '{0}'. 
-
-Error: {1}</value>
-  </data>
-  <data name="ERR_ArgFileDoesNotExist" xml:space="preserve">
-    <value>File {0} does not exist. Provide the path to an existing assembly</value>
-  </data>
-  <data name="ForMoreDetailsLink" xml:space="preserve">
-    <value>For more information visit &lt;a href="{0}" target="_blank"&gt;the rule's help page&lt;/a&gt;.</value>
-  </data>
-  <data name="MoreDetailsTitle" xml:space="preserve">
-    <value>More Details</value>
-  </data>
-  <data name="NoAnalysers" xml:space="preserve">
-    <value>No analyzers found in assembly.</value>
-  </data>
-  <data name="NoDescription" xml:space="preserve">
-    <value>No description was provided.</value>
-  </data>
-  <data name="SuccessOutputFile" xml:space="preserve">
-    <value>{0} rules written to {1}</value>
-  </data>
-  <data name="SuccessStatus" xml:space="preserve">
-    <value>Generation succeeded.</value>
-  </data>
-  <data name="WARN_DuplicateKey" xml:space="preserve">
-    <value>Skipping rule in analyzer {0}: Duplicate key.</value>
-  </data>
-  <data name="WARN_DuplicateTags" xml:space="preserve">
-    <value>Duplicate tag {0} on analyzer {1}</value>
-  </data>
-  <data name="WARN_EmptyDescription" xml:space="preserve">
-    <value>Empty description found for rule {0}. Placeholder description inserted.</value>
-  </data>
-  <data name="WARN_EmptyKey" xml:space="preserve">
-    <value>Skipping rule in analyzer {0}: No key found.</value>
+  <data name="Resolver_ResolvingAssembly" xml:space="preserve">
+    <value>Attempting to resolve assembly '{0}', requested by '{1}'</value>
   </data>
 </root>
