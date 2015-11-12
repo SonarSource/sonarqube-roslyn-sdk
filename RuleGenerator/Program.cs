@@ -25,7 +25,7 @@ namespace Roslyn.SonarQube
             if (validSearchPaths.Any())
             {
                 logger.LogInfo(Resources.INFO_AdditionalDependencySearchFoldersFound, validSearchPaths.Count());
-                scanner = new DiagnosticAssemblyScanner(validSearchPaths, logger);
+                scanner = new DiagnosticAssemblyScanner(logger, validSearchPaths.ToArray());
             }
             else
             {

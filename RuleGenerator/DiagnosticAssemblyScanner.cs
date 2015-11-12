@@ -19,12 +19,10 @@ namespace Roslyn.SonarQube
         private readonly ILogger logger;
         private readonly IEnumerable<string> additionalSearchFolders;
 
-        public DiagnosticAssemblyScanner(ILogger logger) : this(Enumerable.Empty<string>(), logger) { }
-
-        public DiagnosticAssemblyScanner(IEnumerable<string> additionalSearchFolders, ILogger logger)
+        public DiagnosticAssemblyScanner(ILogger logger, params string[] additionalSearchFolders)
         {
             this.logger = logger;
-            this.additionalSearchFolders = additionalSearchFolders;
+            this.additionalSearchFolders = additionalSearchFolders ?? Enumerable.Empty<string>();
         }
 
         /// <summary>
