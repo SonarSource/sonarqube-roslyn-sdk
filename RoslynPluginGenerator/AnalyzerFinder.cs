@@ -34,7 +34,7 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
 
             IList<DiagnosticAnalyzer> analyzers = new List<DiagnosticAnalyzer>();
 
-            using (new AssemblyResolver(nuGetDirectory, this.logger))
+            using (new AssemblyResolver(logger, nuGetDirectory))
             {
                 // Look in every assembly under the supplied directory to see if
                 // we can find and create any analyzers

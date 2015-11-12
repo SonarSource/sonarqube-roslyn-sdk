@@ -1,9 +1,11 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Roslyn.SonarQube.AnalyzerPlugins;
 using Roslyn.SonarQube.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -15,10 +17,12 @@ namespace Roslyn.SonarQube
     public class DiagnosticAssemblyScanner
     {
         private readonly ILogger logger;
+        private readonly IEnumerable<string> additionalSearchFolders;
 
-        public DiagnosticAssemblyScanner(ILogger logger)
+        public DiagnosticAssemblyScanner(ILogger logger, params string[] additionalSearchFolders)
         {
             this.logger = logger;
+            this.additionalSearchFolders = additionalSearchFolders ?? Enumerable.Empty<string>();
         }
 
         /// <summary>
@@ -29,41 +33,73 @@ namespace Roslyn.SonarQube
         public IEnumerable<DiagnosticAnalyzer> InstantiateDiagnosticsFromAssembly(string assemblyPath, string language)
         {
             Assembly analyserAssembly = LoadAnalyzerAssembly(assemblyPath);
-            IEnumerable<DiagnosticAnalyzer> analysers = Enumerable.Empty<DiagnosticAnalyzer>();
+            IEnumerable<DiagnosticAnalyzer> analysers = null;
 
             Debug.Assert(String.Equals(language, LanguageNames.CSharp, StringComparison.CurrentCulture) 
                 || String.Equals(language, LanguageNames.VisualBasic, StringComparison.CurrentCulture));
 
             if (analyserAssembly != null)
             {
-                analysers = InstantiateDiagnosticAnalyzers(analyserAssembly, language);
+                try
+                {
+                    analysers = InstantiateDiagnosticAnalyzers(analyserAssembly, language);
+
+                    Debug.Assert(analysers != null);
+                    if (analysers.Any())
+                    {
+                        logger.LogInfo(Resources.AnalyzersLoadSuccess, analysers.Count());
+                    }
+                    else
+                    {
+                        logger.LogError(Resources.NoAnalysers);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(Resources.ERR_AnalyzerInstantiationFail, analyserAssembly.FullName, ex.Message);
+                }
             }
 
-            logger.LogInfo(Resources.AnalysersLoadSuccess, analysers.Count());
-            return analysers;
+            return analysers ?? Enumerable.Empty<DiagnosticAnalyzer>();
         }
 
+        /// <summary>
+        /// Load the assembly at the given path into memory, with the given additional assembly search directories.
+        /// </summary>
         private Assembly LoadAnalyzerAssembly(string assemblyPath)
         {
+            // If there were any additional assembly search directories specified in the constructor, use them
+            AssemblyResolver additionalAssemblyResolver = null;
+            if (additionalSearchFolders.Any())
+            {
+                additionalAssemblyResolver = new AssemblyResolver(logger, additionalSearchFolders.ToArray());
+            }
+
             Assembly analyzerAssembly = null;
             try
             {
                 analyzerAssembly = Assembly.LoadFrom(assemblyPath);
             }
-            catch (Exception ex)
+            finally
             {
-                this.logger.LogError(Resources.AssemblyLoadError, assemblyPath, ex.Message);
-                return null;
+                // Dispose of the AssemblyResolver instance, if applicable
+                if (additionalAssemblyResolver != null)
+                {
+                    additionalAssemblyResolver.Dispose();
+                }
             }
 
-            logger.LogInfo(Resources.AnalysersLoadSuccess, analyzerAssembly.FullName);
+            logger.LogInfo(Resources.AssemblyLoadSuccess, analyzerAssembly.FullName);
             return analyzerAssembly;
         }
 
         private IEnumerable<DiagnosticAnalyzer> InstantiateDiagnosticAnalyzers(Assembly analyserAssembly, string language)
         {
             Debug.Assert(analyserAssembly != null);
+
             ICollection<DiagnosticAnalyzer> analysers = new List<DiagnosticAnalyzer>();
+
+            // It is assumed that analyserAssembly is valid. FileNotFoundException will be thrown if dependency resolution fails.
             foreach (Type type in analyserAssembly.GetExportedTypes())
             {
                 if (!type.IsAbstract &&

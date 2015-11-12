@@ -63,18 +63,9 @@ namespace Roslyn.SonarQube {
         /// <summary>
         ///   Looks up a localized string similar to Loaded: {0} analysers..
         /// </summary>
-        public static string AnalysersLoadSuccess {
+        public static string AnalyzersLoadSuccess {
             get {
-                return ResourceManager.GetString("AnalysersLoadSuccess", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not load the assembly {0}. Error: {1}.
-        /// </summary>
-        public static string AssemblyLoadError {
-            get {
-                return ResourceManager.GetString("AssemblyLoadError", resourceCulture);
+                return ResourceManager.GetString("AnalyzersLoadSuccess", resourceCulture);
             }
         }
         
@@ -106,6 +97,17 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not instantiate analyzers from &apos;{0}&apos;. 
+        ///
+        ///Error: {1}.
+        /// </summary>
+        public static string ERR_AnalyzerInstantiationFail {
+            get {
+                return ResourceManager.GetString("ERR_AnalyzerInstantiationFail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File {0} does not exist. Provide the path to an existing assembly.
         /// </summary>
         public static string ERR_ArgFileDoesNotExist {
@@ -124,6 +126,15 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Using {0} additional assembly dependency search folders..
+        /// </summary>
+        public static string INFO_AdditionalDependencySearchFoldersFound {
+            get {
+                return ResourceManager.GetString("INFO_AdditionalDependencySearchFoldersFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to More Details.
         /// </summary>
         public static string MoreDetailsTitle {
@@ -133,7 +144,7 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not load the analyzer assembly or no analyzers were found.
+        ///   Looks up a localized string similar to No analyzers found in assembly..
         /// </summary>
         public static string NoAnalysers {
             get {
@@ -151,20 +162,20 @@ namespace Roslyn.SonarQube {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Generation succeeded..
+        /// </summary>
+        public static string RuleGenerationSuccess {
+            get {
+                return ResourceManager.GetString("RuleGenerationSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} rules written to {1}.
         /// </summary>
         public static string SuccessOutputFile {
             get {
                 return ResourceManager.GetString("SuccessOutputFile", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Generation succeeded..
-        /// </summary>
-        public static string SuccessStatus {
-            get {
-                return ResourceManager.GetString("SuccessStatus", resourceCulture);
             }
         }
         
@@ -201,6 +212,15 @@ namespace Roslyn.SonarQube {
         public static string WARN_EmptyKey {
             get {
                 return ResourceManager.GetString("WARN_EmptyKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Additional assembly dependency search folders were configured, but none were valid..
+        /// </summary>
+        public static string WARN_NoValidAdditionalDependencySearchFolders {
+            get {
+                return ResourceManager.GetString("WARN_NoValidAdditionalDependencySearchFolders", resourceCulture);
             }
         }
     }
