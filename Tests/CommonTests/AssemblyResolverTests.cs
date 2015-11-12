@@ -50,6 +50,8 @@ namespace CommonTests
             }", outputFilePath, logger);
         }
 
+        #region tests
+
         /// <summary>
         /// Tests that method for creating file names from assembly names is correct.
         /// </summary>
@@ -73,7 +75,7 @@ namespace CommonTests
         /// Tests the loading of an assembly with a single type and no dependencies. This should succeed even without AssemblyResolver.
         /// </summary>
         [TestMethod]
-        public void TestGeneralAssemblyLoad()
+        public void TestNoImpactOnDefaultResolution()
         {
             // Arrange
             TestLogger logger = new TestLogger();
@@ -84,7 +86,7 @@ namespace CommonTests
             object simpleObject = null;
 
             // Act
-            using (new AssemblyResolver(testFolder, logger))
+            using (new AssemblyResolver(logger, testFolder))
             {
                 // Look in every assembly under the supplied directory
                 foreach (string assemblyPath in Directory.GetFiles(testFolder, "*.dll", SearchOption.AllDirectories))
@@ -118,7 +120,7 @@ namespace CommonTests
 
             // Act
             Assembly resolveResult;
-            using (AssemblyResolver assemblyResolver = new AssemblyResolver(testFolder, logger))
+            using (AssemblyResolver assemblyResolver = new AssemblyResolver(logger, testFolder))
             {
                 ResolveEventArgs resolveEventArgs = new ResolveEventArgs("nonexistent library", this.GetType().Assembly);
                 resolveResult = assemblyResolver.CurrentDomain_AssemblyResolve(this, resolveEventArgs);
@@ -142,7 +144,7 @@ namespace CommonTests
             
             // Act
             Assembly resolveResult;
-            using (AssemblyResolver assemblyResolver = new AssemblyResolver(testFolder, logger))
+            using (AssemblyResolver assemblyResolver = new AssemblyResolver(logger, testFolder))
             {
                 ResolveEventArgs resolveEventArgs = new ResolveEventArgs(simpleAssembly.FullName, this.GetType().Assembly);
                 resolveResult = assemblyResolver.CurrentDomain_AssemblyResolve(this, resolveEventArgs);
@@ -153,5 +155,7 @@ namespace CommonTests
             Assert.AreEqual<string>(simpleAssembly.ToString(), resolveResult.ToString());
             Assert.AreEqual<string>(simpleAssemblyPath, resolveResult.Location);
         }
+
+        #endregion
     }
 }

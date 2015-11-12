@@ -16,31 +16,17 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
         private readonly ILogger logger;
 
         /// <summary>
-        /// Constructor specifying a single additional search directory.
+        /// Create a new AssemblyResolver that will search in the given directories (recursively) for dependencies.
         /// </summary>
-        /// <param name="rootSearchPath">The search path</param>
-        public AssemblyResolver(string rootSearchPath, ILogger logger) : this(new string[1] { rootSearchPath }, logger) { }
-
-        /// <summary>
-        /// Constructor specifying multiple additional search directories.
-        /// </summary>
-        /// <param name="rootSearchPaths">Additional search paths</param>
-        public AssemblyResolver(string[] rootSearchPaths, ILogger logger)
+        /// <param name="rootSearchPaths">Additional search paths, assumed to be valid system directories</param>
+        public AssemblyResolver(ILogger logger, params string[] rootSearchPaths)
         {
-            foreach (string rootSearchPath in rootSearchPaths)
+            if (logger == null)
             {
-                if (string.IsNullOrWhiteSpace(rootSearchPath))
-                {
-                    throw new ArgumentNullException("rootSearchPath");
-                }
-                if (logger == null)
-                {
-                    throw new ArgumentNullException("logger");
-                }
-            }
-            if (rootSearchPaths.Length < 1)
+                throw new ArgumentNullException("logger");
+            } else if (rootSearchPaths == null || rootSearchPaths.Length < 1)
             {
-                throw new ArgumentNullException("rootSearchPaths");
+                throw new ArgumentException(Resources.Resolver_ConstructorNoPaths);
             }
 
             this.rootSearchPaths = rootSearchPaths;            
@@ -67,7 +53,7 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
                 {
                     asm = Assembly.LoadFile(file);
 
-                    if (string.Equals(args.Name, asm.FullName))
+                    if (string.Equals(args.Name, asm.FullName, StringComparison.CurrentCultureIgnoreCase))
                     {
                         this.logger.LogDebug(Resources.Resolver_AssemblyLocated, file);
                         return asm;
@@ -89,12 +75,22 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
         {
             Debug.Assert(input != null);
             Debug.Assert(input.Length > 0);
-            Debug.Assert(!input.EndsWith(".dll"));
 
-            // TODO ???
-            string[] parts = input.Split(new char[] { ' ' });
+            if (input.EndsWith(".dll"))
+            {
+                return input;
+            }
 
-            return parts[0].Substring(0, parts[0].Length - 1) + ".dll";
+            string result = input;
+            if (input.Contains(" "))
+            {
+                // If the assembly name has multiple words (seperated by spaces), use only the first word
+                // (e.g. "foo bar" -> "foo")
+                string[] parts = input.Split(new char[] { ' ' });
+                result = parts[0].Substring(0, parts[0].Length - 1);
+            }
+
+            return  result + ".dll";
         }
 
         #region IDisposable Support

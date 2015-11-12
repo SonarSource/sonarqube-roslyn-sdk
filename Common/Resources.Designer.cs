@@ -70,6 +70,15 @@ namespace Roslyn.SonarQube.Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No search paths were supplied..
+        /// </summary>
+        internal static string Resolver_ConstructorNoPaths {
+            get {
+                return ResourceManager.GetString("Resolver_ConstructorNoPaths", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to resolve assembly..
         /// </summary>
         internal static string Resolver_FailedToResolveAssembly {

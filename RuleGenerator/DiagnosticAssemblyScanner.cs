@@ -74,7 +74,7 @@ namespace Roslyn.SonarQube
             AssemblyResolver additionalAssemblyResolver = null;
             if (additionalSearchFolders.Any())
             {
-                additionalAssemblyResolver = new AssemblyResolver(additionalSearchFolders.ToArray(), logger);
+                additionalAssemblyResolver = new AssemblyResolver(logger, additionalSearchFolders.ToArray());
             }
 
             Assembly analyzerAssembly = null;

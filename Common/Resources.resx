@@ -120,6 +120,9 @@
   <data name="Resolver_AssemblyLocated" xml:space="preserve">
     <value>Assembly located: {0}</value>
   </data>
+  <data name="Resolver_ConstructorNoPaths" xml:space="preserve">
+    <value>No search paths were supplied.</value>
+  </data>
   <data name="Resolver_FailedToResolveAssembly" xml:space="preserve">
     <value>Failed to resolve assembly.</value>
   </data>
