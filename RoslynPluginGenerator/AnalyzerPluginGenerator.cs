@@ -14,6 +14,11 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
     {
         public const string NuGetPackageSource = "https://www.nuget.org/api/v2/";
 
+        /// <summary>
+        /// The SARIF plugin must be able to distinguish the plugins generating SARIF style issues - a suffix convention is used
+        /// </summary>
+        private const string PluginKeySuffix = "_sarif";
+
         private readonly Common.ILogger logger;
 
         public AnalyzerPluginGenerator(Common.ILogger logger)
@@ -118,7 +123,7 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
             pluginDefn.Developers = GetValidManifestString(ListToString(package.Authors));
 
             pluginDefn.Homepage = GetValidManifestString(package.ProjectUrl?.ToString());
-            pluginDefn.Key = GetValidManifestString(package.Id);
+            pluginDefn.Key = GetValidManifestString(package.Id) + PluginKeySuffix;
 
             // TODO: hard-coded to C#
             pluginDefn.Language = "cs";
