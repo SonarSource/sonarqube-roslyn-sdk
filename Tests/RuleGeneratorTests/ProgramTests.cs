@@ -5,6 +5,7 @@ using System.Linq;
 using Tests.Common;
 using System.IO;
 using System.Collections.Generic;
+using TestUtilities;
 
 namespace RuleGeneratorTests
 {

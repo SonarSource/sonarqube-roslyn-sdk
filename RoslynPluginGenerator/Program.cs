@@ -1,4 +1,5 @@
-﻿using Roslyn.SonarQube.Common;
+﻿using Roslyn.SonarQube.AnalyzerPlugins.CommandLine;
+using Roslyn.SonarQube.Common;
 
 namespace Roslyn.SonarQube.AnalyzerPlugins
 {
@@ -15,31 +16,14 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
             ConsoleLogger logger = new ConsoleLogger();
             Common.Utilities.LogAssemblyVersion(typeof(Program).Assembly, UIResources.AssemblyDescription, logger);
             
-            string packageId;
-            NuGet.SemanticVersion packageVersion;
-            switch (args.Length)
+            ProcessedArgs processedArgs = ArgumentProcessor.TryProcessArguments(args, logger);
+
+            bool success = false;
+            if (processedArgs != null)
             {
-                case 2:
-                    packageId = args[0];
-
-                    if (!NuGet.SemanticVersion.TryParse(args[1], out packageVersion))
-                    {
-                        logger.LogError(UIResources.CmdLine_ERROR_InvalidVersion, args[1]);
-                        return ERROR_CODE;
-                    }
-                    break;
-                case 1:
-                    packageId = args[0];
-                    packageVersion = null;
-                    break;
-                default:
-                    logger.LogError(UIResources.CmdLine_ERROR_InvalidArgumentCount);
-                    return ERROR_CODE;
+                AnalyzerPluginGenerator generator = new AnalyzerPluginGenerator(logger);
+                success = generator.Generate(processedArgs.AnalyzerRef);
             }
-
-            AnalyzerPluginGenerator generator = new AnalyzerPluginGenerator(logger);
-
-            bool success = generator.Generate(packageId, packageVersion);
 
             return success ? SUCCESS_CODE : ERROR_CODE;
         }

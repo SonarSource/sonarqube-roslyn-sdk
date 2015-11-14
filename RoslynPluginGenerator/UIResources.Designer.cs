@@ -198,15 +198,6 @@ namespace Roslyn.SonarQube.AnalyzerPlugins {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid NuGet package version: {0}.
-        /// </summary>
-        internal static string CmdLine_ERROR_InvalidVersion {
-            get {
-                return ResourceManager.GetString("CmdLine_ERROR_InvalidVersion", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Creating NuGet repository: {0}.
         /// </summary>
         internal static string NG_CreatingRepository {

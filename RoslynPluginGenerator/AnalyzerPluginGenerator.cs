@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.Diagnostics;
 using NuGet;
+using Roslyn.SonarQube.AnalyzerPlugins.CommandLine;
 using Roslyn.SonarQube.PluginGenerator;
 using System;
 using System.Collections.Generic;
@@ -30,11 +31,11 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
             this.logger = logger;
         }
 
-        public bool Generate(string nuGetPackageId, SemanticVersion nuGetPackageVersion)
+        public bool Generate(NuGetReference analyzeRef)
         {
-            if (string.IsNullOrWhiteSpace(nuGetPackageId))
+            if (analyzeRef == null)
             {
-                throw new ArgumentNullException("nuGetPackageId");
+                throw new ArgumentNullException("analyzeRef");
             }
 
             string baseDirectory = Path.Combine(
@@ -45,7 +46,7 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
 
             NuGetPackageHandler downloader = new NuGetPackageHandler(logger);
 
-            IPackage package = downloader.FetchPackage(NuGetPackageSource, nuGetPackageId, nuGetPackageVersion, nuGetDirectory);
+            IPackage package = downloader.FetchPackage(NuGetPackageSource, analyzeRef.PackageId, analyzeRef.Version, nuGetDirectory);
 
             if (package != null)
             {
@@ -65,7 +66,7 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
                     this.logger.LogInfo(UIResources.APG_GeneratingPlugin);
 
                     string fullJarPath = Path.Combine(Directory.GetCurrentDirectory(), 
-                        nuGetPackageId + "-plugin." + pluginDefn.Version + ".jar");
+                        analyzeRef.PackageId + "-plugin." + pluginDefn.Version + ".jar");
                     RulesPluginGenerator rulesPluginGen = new RulesPluginGenerator(logger);
                     rulesPluginGen.GeneratePlugin(pluginDefn, outputFilePath, fullJarPath);
 

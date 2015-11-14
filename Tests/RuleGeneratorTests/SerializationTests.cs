@@ -3,6 +3,7 @@ using Roslyn.SonarQube;
 using System;
 using System.IO;
 using Tests.Common;
+using TestUtilities;
 
 namespace RuleGeneratorTests
 {

@@ -2,6 +2,7 @@
 using Roslyn.SonarQube.PluginGenerator;
 using System.IO;
 using Tests.Common;
+using TestUtilities;
 
 namespace Roslyn.SonarQube.PluginGeneratorTests
 {

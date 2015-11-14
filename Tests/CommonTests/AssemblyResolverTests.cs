@@ -7,6 +7,7 @@ using System.Reflection;
 using Roslyn.SonarQube.Common;
 using Microsoft.CSharp;
 using System.CodeDom.Compiler;
+using TestUtilities;
 
 namespace CommonTests
 {
