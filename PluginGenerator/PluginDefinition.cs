@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
 
@@ -6,6 +7,13 @@ namespace Roslyn.SonarQube.PluginGenerator
 {
     public class PluginDefinition
     {
+        private readonly IDictionary<string, string> relativePathToFileMap;
+
+        public PluginDefinition()
+        {
+            this.relativePathToFileMap = new Dictionary<string, string>();
+        }
+
         public string Language { get; set; }
 
         public string Key { get; set; }
@@ -22,6 +30,13 @@ namespace Roslyn.SonarQube.PluginGenerator
         public string IssueTrackerUrl { get; set; }
         public string TermsConditionsUrl { get; set; }
         public string Organization { get; set; }
+
+        /// <summary>
+        /// Returns additional files that should be added to the jar.
+        /// Key: relative path in jar
+        /// Value: the full path to the source file
+        /// </summary>
+        public IDictionary<string, string> AdditionalFileMap { get { return this.relativePathToFileMap; } }
 
         #region Serialization
 

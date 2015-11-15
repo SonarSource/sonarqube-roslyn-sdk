@@ -70,11 +70,29 @@ namespace Roslyn.SonarQube.AnalyzerPlugins.CommandLine {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to /s:[path to sqale xml file].
+        /// </summary>
+        internal static string ArgDescription_SqaleXmlFile {
+            get {
+                return ResourceManager.GetString("ArgDescription_SqaleXmlFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Parsed NuGet reference. Id: {0}, version: {1}.
         /// </summary>
         internal static string DEBUG_ParsedReference {
             get {
                 return ResourceManager.GetString("DEBUG_ParsedReference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Using SQALE file &apos;{0}&apos;.
+        /// </summary>
+        internal static string DEBUG_UsingSqaleFile {
+            get {
+                return ResourceManager.GetString("DEBUG_UsingSqaleFile", resourceCulture);
             }
         }
         
@@ -93,6 +111,15 @@ namespace Roslyn.SonarQube.AnalyzerPlugins.CommandLine {
         internal static string ERROR_MissingPackageId {
             get {
                 return ResourceManager.GetString("ERROR_MissingPackageId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The specified SQALE file could not found:{0}.
+        /// </summary>
+        internal static string ERROR_SqaleFileNotFound {
+            get {
+                return ResourceManager.GetString("ERROR_SqaleFileNotFound", resourceCulture);
             }
         }
     }

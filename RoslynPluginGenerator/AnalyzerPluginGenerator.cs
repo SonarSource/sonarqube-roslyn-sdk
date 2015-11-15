@@ -31,8 +31,9 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
             this.logger = logger;
         }
 
-        public bool Generate(NuGetReference analyzeRef)
+        public bool Generate(NuGetReference analyzeRef, string sqaleFilePath)
         {
+            // sqale file path is optional
             if (analyzeRef == null)
             {
                 throw new ArgumentNullException("analyzeRef");
@@ -50,7 +51,7 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
 
             if (package != null)
             {
-                PluginDefinition pluginDefn = CreatePluginDefinition(package);
+                PluginDefinition pluginDefn = CreatePluginDefinition(package, sqaleFilePath);
 
                 string outputDirectory = Path.Combine(baseDirectory, ".output", Guid.NewGuid().ToString());
                 Directory.CreateDirectory(outputDirectory);
@@ -116,7 +117,7 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
             return success;
         }
 
-        private static PluginDefinition CreatePluginDefinition(IPackage package)
+        private static PluginDefinition CreatePluginDefinition(IPackage package, string sqaleFilePath)
         {
             PluginDefinition pluginDefn = new PluginDefinition();
 
@@ -137,6 +138,10 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
             //pluginDefn.SourcesUrl;
             //pluginDefn.TermsConditionsUrl;
 
+            if (!string.IsNullOrWhiteSpace(sqaleFilePath))
+            {
+                pluginDefn.AdditionalFileMap["resources/sqale.xml"] = sqaleFilePath;
+            }
             return pluginDefn;
         }
 

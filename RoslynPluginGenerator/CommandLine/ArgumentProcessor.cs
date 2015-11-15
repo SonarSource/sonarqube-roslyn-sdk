@@ -3,6 +3,7 @@ using SonarQube.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 
 namespace Roslyn.SonarQube.AnalyzerPlugins.CommandLine
@@ -17,6 +18,7 @@ namespace Roslyn.SonarQube.AnalyzerPlugins.CommandLine
         private static class KeywordIds
         {
             public const string AnalyzerRef = "analyzer.ref";
+            public const string SqaleXmlFile = "sqale.xml";
         }
 
         private static IList<ArgumentDescriptor> Descriptors;
@@ -29,6 +31,8 @@ namespace Roslyn.SonarQube.AnalyzerPlugins.CommandLine
 
             Descriptors.Add(new ArgumentDescriptor(
                 id: KeywordIds.AnalyzerRef, prefixes: new string[] { "/analyzer:", "/a:" }, required: true, allowMultiple: false, description: CmdLineResources.ArgDescription_AnalzyerRef));
+            Descriptors.Add(new ArgumentDescriptor(
+                id: KeywordIds.SqaleXmlFile, prefixes: new string[] { "/sqale:", "/s:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_SqaleXmlFile));
 
             Debug.Assert(Descriptors.All(d => d.Prefixes != null && d.Prefixes.Any()), "All descriptors must provide at least one prefix");
             Debug.Assert(Descriptors.Select(d => d.Id).Distinct().Count() == Descriptors.Count, "All descriptors must have a unique id");
@@ -66,10 +70,13 @@ namespace Roslyn.SonarQube.AnalyzerPlugins.CommandLine
             NuGetReference analyzerRef;
             parsedOk &= TryParseAnalyzerRef(arguments, out analyzerRef);
 
+            string sqaleFilePath;
+            parsedOk &= TryParseSqaleFile(arguments, out sqaleFilePath);
+
             if (parsedOk)
             {
                 Debug.Assert(analyzerRef != null, "Expecting to have a valid analyzer reference");
-                processed = new ProcessedArgs(analyzerRef);
+                processed = new ProcessedArgs(analyzerRef, sqaleFilePath);
             }
 
             return processed;
@@ -122,5 +129,26 @@ namespace Roslyn.SonarQube.AnalyzerPlugins.CommandLine
 
             return new NuGetReference(packageId, packageVersion);
         }
+
+        private bool TryParseSqaleFile(IEnumerable<ArgumentInstance> arguments, out string sqaleFilePath)
+        {
+            sqaleFilePath = null;
+            ArgumentInstance arg = arguments.SingleOrDefault(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.SqaleXmlFile, a.Descriptor.Id));
+
+            if (arg != null)
+            {
+                if (File.Exists(arg.Value))
+                {
+                    sqaleFilePath = arg.Value;
+                    this.logger.LogDebug(CmdLineResources.DEBUG_UsingSqaleFile, sqaleFilePath);
+                }
+                else
+                {
+                    this.logger.LogError(CmdLineResources.ERROR_SqaleFileNotFound, arg.Value);
+                }
+            }
+            return sqaleFilePath != null;
+        }
+
     }
 }

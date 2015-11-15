@@ -22,7 +22,7 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
             if (processedArgs != null)
             {
                 AnalyzerPluginGenerator generator = new AnalyzerPluginGenerator(logger);
-                success = generator.Generate(processedArgs.AnalyzerRef);
+                success = generator.Generate(processedArgs.AnalyzerRef, processedArgs.SqaleFilePath);
             }
 
             return success ? SUCCESS_CODE : ERROR_CODE;

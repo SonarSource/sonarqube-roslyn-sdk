@@ -86,8 +86,6 @@ namespace Roslyn.SonarQube.PluginGenerator
         {
             PluginBuilder builder = new PluginBuilder(this.jdkWrapper, this.logger);
 
-            // No additional jar files apart from the SonarQube API jar are required for this source
-
             // Generate the source files
             Dictionary<string, string> replacementMap = new Dictionary<string, string>();
             PopulateSourceFileReplacements(definition, replacementMap);
@@ -97,6 +95,12 @@ namespace Roslyn.SonarQube.PluginGenerator
             foreach (string sourceFile in Directory.GetFiles(workingFolder, "*.java", SearchOption.AllDirectories))
             {
                 builder.AddSourceFile(sourceFile);
+            }
+
+            // Add any additional files to the jar
+            foreach(KeyValuePair<string, string> kvp in definition.AdditionalFileMap)
+            {
+                builder.AddResourceFile(kvp.Value, kvp.Key);
             }
 
             // Add the rules file as a resource
