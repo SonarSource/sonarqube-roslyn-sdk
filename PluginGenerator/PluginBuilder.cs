@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using System.Linq;
 
 namespace Roslyn.SonarQube.PluginGenerator
 {
@@ -19,6 +21,16 @@ namespace Roslyn.SonarQube.PluginGenerator
         private readonly IDictionary<string, string> fileToRelativePathMap;
 
         private string outputJarFilePath;
+
+        /// <summary>
+        /// List of jar files that are available at runtime and so do not
+        /// need to be embedded in the jar file
+        /// </summary>
+        private static readonly string[] availableJarFiles = new string[]
+        {
+            "sonar-plugin-api-4.5.2.jar",
+            "slf4j-api-1.7.5.jar" // available in the sonar-plugin-api
+        };
 
         public PluginBuilder(IJdkWrapper jdkWrapper, ILogger logger)
         {
@@ -128,6 +140,13 @@ namespace Roslyn.SonarQube.PluginGenerator
             string tempWorkingDir = Path.Combine(Path.GetTempPath(), "plugins",  Guid.NewGuid().ToString());
             Directory.CreateDirectory(tempWorkingDir);
 
+            // Unpack and reference the required jar files
+            SourceGenerator.UnpackReferencedJarFiles(typeof(RulesPluginGenerator).Assembly, "Roslyn.SonarQube.PluginGenerator.Resources", tempWorkingDir);
+            foreach (string jarFile in Directory.GetFiles(tempWorkingDir, "*.jar"))
+            {
+                this.AddReferencedJar(jarFile);
+            }
+
             // Compile sources
             CompileJavaFiles(tempWorkingDir);
 
@@ -140,13 +159,6 @@ namespace Roslyn.SonarQube.PluginGenerator
         private void CompileJavaFiles(string workingDirectory)
         {
             JavaCompilationBuilder compiler = new JavaCompilationBuilder(this.jdkWrapper);
-
-            // Unpack and reference the required jar files
-            SourceGenerator.UnpackReferencedJarFiles(typeof(RulesPluginGenerator).Assembly, "Roslyn.SonarQube.PluginGenerator.Resources", workingDirectory);
-            foreach (string jarFile in Directory.GetFiles(workingDirectory, "*.jar"))
-            {
-                compiler.AddClassPath(jarFile);
-            }
 
             foreach (string jarFile in this.referencedJars)
             {
@@ -196,9 +208,33 @@ namespace Roslyn.SonarQube.PluginGenerator
                 jarBuilder.AddFile(pathToFilePair.Key, pathToFilePair.Value);
             }
 
+            // Embed all referenced jars into the jar
+            // NB not all jars need to be added
+            StringBuilder sb = new StringBuilder();
+            foreach (string refJar in this.referencedJars)
+            {
+                if (IsJarAvailable(refJar))
+                {
+                    continue;
+                }
+
+                string jarName = "META-INF/lib/" + Path.GetFileName(refJar);
+                jarBuilder.AddFile(refJar, jarName);
+
+                sb.Append(jarName);
+                sb.Append(" ");
+            }
+            jarBuilder.SetManifestPropety("Plugin-Dependencies", sb.ToString());
+
+            
+
             return jarBuilder.Build(this.outputJarFilePath);
         }
 
+        private static bool IsJarAvailable(string resourceName)
+        {
+            return availableJarFiles.Any(j => resourceName.EndsWith(j));
+        }
 
         #endregion
     }

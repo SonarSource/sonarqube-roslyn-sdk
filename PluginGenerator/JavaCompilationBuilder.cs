@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Roslyn.SonarQube.PluginGenerator
 {
@@ -67,11 +68,15 @@ namespace Roslyn.SonarQube.PluginGenerator
 
             IList<string> args = new List<string>();
 
+            StringBuilder sb = new StringBuilder();
+            sb.Append("-cp " );
             foreach (string classPath in this.classPaths)
             {
-                args.Add(string.Format(CultureInfo.CurrentCulture, " -cp {0}", GetQuotedArg(classPath)));
+                sb.Append(GetQuotedArg(classPath));
+                sb.Append(";");
             }
-
+            args.Add(sb.ToString());
+            
             args.Add(string.Format(CultureInfo.CurrentCulture, " -d {0}", GetQuotedArg(outputDirectory)));
 
             args.Add(string.Format(CultureInfo.CurrentCulture, " -s {0}", GetQuotedArg(sourcesDirectory)));

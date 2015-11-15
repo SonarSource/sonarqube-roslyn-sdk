@@ -91,6 +91,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Plugin.java" />
     <EmbeddedResource Include="Resources\PluginRulesDefinition.java" />
+    <EmbeddedResource Include="Resources\sslr-squid-bridge-2.6.jar" />
+    <EmbeddedResource Include="Resources\slf4j-simple-1.7.12.jar" />
+    <EmbeddedResource Include="Resources\slf4j-api-1.7.5.jar" />
     <Content Include="SonarQube\License.txt" />
   </ItemGroup>
   <ItemGroup>

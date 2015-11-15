@@ -183,7 +183,7 @@ namespace Roslyn.SonarQube.PluginGenerator
                     throw new FileNotFoundException(UIResources.JarB_Error_FileNotFound, sourceToPathEntry.Key);
                 }
 
-                string fullOutputPath = Path.Combine(outputDirectory, sourceToPathEntry.Value);
+                string fullOutputPath = Path.GetFullPath(Path.Combine(outputDirectory, sourceToPathEntry.Value));
                 Directory.CreateDirectory(Path.GetDirectoryName(fullOutputPath));
                 File.Copy(sourceToPathEntry.Key, fullOutputPath);
             }
