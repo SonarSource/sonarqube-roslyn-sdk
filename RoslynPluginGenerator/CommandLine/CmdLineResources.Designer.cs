@@ -115,7 +115,7 @@ namespace Roslyn.SonarQube.AnalyzerPlugins.CommandLine {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The specified SQALE file could not found:{0}.
+        ///   Looks up a localized string similar to The specified SQALE file could not found: {0}.
         /// </summary>
         internal static string ERROR_SqaleFileNotFound {
             get {

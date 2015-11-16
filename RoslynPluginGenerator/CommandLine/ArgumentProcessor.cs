@@ -132,6 +132,7 @@ namespace Roslyn.SonarQube.AnalyzerPlugins.CommandLine
 
         private bool TryParseSqaleFile(IEnumerable<ArgumentInstance> arguments, out string sqaleFilePath)
         {
+            bool sucess = true;
             sqaleFilePath = null;
             ArgumentInstance arg = arguments.SingleOrDefault(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.SqaleXmlFile, a.Descriptor.Id));
 
@@ -144,10 +145,11 @@ namespace Roslyn.SonarQube.AnalyzerPlugins.CommandLine
                 }
                 else
                 {
+                    sucess = false;
                     this.logger.LogError(CmdLineResources.ERROR_SqaleFileNotFound, arg.Value);
                 }
             }
-            return sqaleFilePath != null;
+            return sucess;
         }
 
     }

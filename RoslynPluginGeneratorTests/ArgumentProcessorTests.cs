@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Roslyn.SonarQube.AnalyzerPlugins.CommandLine;
+using System.IO;
+using Tests.Common;
 using TestUtilities;
 
 namespace Roslyn.SonarQube.RoslynPluginGeneratorTests
@@ -7,6 +9,8 @@ namespace Roslyn.SonarQube.RoslynPluginGeneratorTests
     [TestClass]
     public class ArgumentProcessorTests
     {
+        public TestContext TestContext { get; set; }
+
         #region Tests
 
         [TestMethod]
@@ -73,21 +77,56 @@ namespace Roslyn.SonarQube.RoslynPluginGeneratorTests
             rawArgs = new string[] { "/a:testing.id.no.version" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
-            AssertArgumentsProcessed(actualArgs, logger, "testing.id.no.version", null);
+            AssertArgumentsProcessed(actualArgs, logger, "testing.id.no.version", null, null);
 
             // 2. Id and version
             logger = new TestLogger();
             rawArgs = new string[] { "/analyzer:testing.id.with.version:1.0.0-rc1" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
-            AssertArgumentsProcessed(actualArgs, logger, "testing.id.with.version", "1.0.0-rc1");
+            AssertArgumentsProcessed(actualArgs, logger, "testing.id.with.version", "1.0.0-rc1", null);
 
             // 3. Id containing a colon, with version
             logger = new TestLogger();
             rawArgs = new string[] { "/analyzer:id.with:colon:2.1.0" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
-            AssertArgumentsProcessed(actualArgs, logger, "id.with:colon", "2.1.0");
+            AssertArgumentsProcessed(actualArgs, logger, "id.with:colon", "2.1.0", null);
+        }
+
+
+        [TestMethod]
+        public void ArgProc_SqaleFile()
+        {
+            // 0. Setup
+            TestLogger logger;
+            string[] rawArgs;
+            ProcessedArgs actualArgs;
+
+            // 1. No sqale file value -> valid
+            logger = new TestLogger();
+            rawArgs = new string[] { "/a:validId" };
+            actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
+
+            AssertArgumentsProcessed(actualArgs, logger, "validId", null, null);
+
+            // 2. Missing sqale file
+            logger = new TestLogger();
+            rawArgs = new string[] { "/s:missingFile.txt", "/a:validId" };
+            actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
+
+            AssertArgumentsNotProcessed(actualArgs, logger);
+            logger.AssertSingleErrorExists("missingFile.txt"); // should be an error containing the missing file name
+
+            // 3. Existing sqale file
+            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string filePath = TestUtils.CreateTextFile("valid.sqale.txt", testDir, "sqale file contents");
+            
+            logger = new TestLogger();
+            rawArgs = new string[] { "/s:" + filePath,  "/a:valid:1.0" };
+            actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
+
+            AssertArgumentsProcessed(actualArgs, logger, "valid", "1.0", filePath);
         }
 
         #endregion
@@ -100,7 +139,7 @@ namespace Roslyn.SonarQube.RoslynPluginGeneratorTests
             logger.AssertErrorsLogged();
         }
 
-        private static void AssertArgumentsProcessed(ProcessedArgs actualArgs, TestLogger logger, string expectedId, string expectedVersion)
+        private static void AssertArgumentsProcessed(ProcessedArgs actualArgs, TestLogger logger, string expectedId, string expectedVersion, string expectedSqale)
         {
             Assert.IsNotNull(actualArgs, "Expecting the arguments to have been processed successfully");
 
@@ -116,6 +155,12 @@ namespace Roslyn.SonarQube.RoslynPluginGeneratorTests
             {
                 Assert.IsNotNull(actualRef.Version, "Not expecting the version to be null");
                 Assert.AreEqual(expectedVersion, actualRef.Version.ToString());
+            }
+
+            Assert.AreEqual(expectedSqale, actualArgs.SqaleFilePath, "Unexpected sqale file path");
+            if (expectedSqale != null)
+            {
+                Assert.IsTrue(File.Exists(expectedSqale), "Specified sqale file should exist: {0}", expectedSqale);
             }
 
             logger.AssertErrorsLogged(0);

@@ -136,6 +136,6 @@
     <value>NuGet package id must be specified</value>
   </data>
   <data name="ERROR_SqaleFileNotFound" xml:space="preserve">
-    <value>The specified SQALE file could not found:{0}</value>
+    <value>The specified SQALE file could not found: {0}</value>
   </data>
 </root>
