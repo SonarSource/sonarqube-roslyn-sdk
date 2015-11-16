@@ -70,7 +70,10 @@ namespace Roslyn.SonarQube.PluginGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expecting two arguments: the name of the plugin definition file, and the rules xml file..
+        ///   Looks up a localized string similar to Invalid number of arguments. Expecting at least two arguments: 
+        ///(1) the name of the plugin definition file - required
+        ///(2) the rules xml file - required
+        ///(3) a SQALE xml file - optional..
         /// </summary>
         internal static string Cmd_Error_IncorrectArguments {
             get {

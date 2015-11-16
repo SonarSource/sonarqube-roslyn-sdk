@@ -118,7 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Cmd_Error_IncorrectArguments" xml:space="preserve">
-    <value>Expecting two arguments: the name of the plugin definition file, and the rules xml file.</value>
+    <value>Invalid number of arguments. Expecting at least two arguments: 
+(1) the name of the plugin definition file - required
+(2) the rules xml file - required
+(3) a SQALE xml file - optional.</value>
   </data>
   <data name="JarB_Error_FileAlreadySpecified" xml:space="preserve">
     <value>This file has already been added to the jar: {0}</value>

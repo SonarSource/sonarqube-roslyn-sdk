@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<PluginDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Language>cs</Language>
+  <Key>sdl.rules.plugin_sarif</Key>
+  <Version>0.1</Version>
+  <Name>SDL rules plugin</Name>
+  <Description>Defines rules for SDL tools</Description>
+
+<!--
+  <License>license</License>
+  <OrganizationUrl>organizationurl</OrganizationUrl>
+  <Homepage>homepage</Homepage>
+  <Class>class</Class>
+  <SourcesUrl>sources</SourcesUrl>
+  <Developers>developers</Developers>
+  <IssueTrackerUrl>issuetracker</IssueTrackerUrl>
+  <TermsConditionsUrl>terms</TermsConditionsUrl>
+  <Organization>organization</Organization>
+-->
+</PluginDefinition>
