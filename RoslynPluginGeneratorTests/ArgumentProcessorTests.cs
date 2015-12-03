@@ -1,4 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+//-----------------------------------------------------------------------
+// <copyright file="ArgumentProcessorTests.cs" company="SonarSource SA and Microsoft Corporation">
+//   Copyright (c) SonarSource SA and Microsoft Corporation.  All rights reserved.
+//   Licensed under the MIT License. See License.txt in the project root for license information.
+// </copyright>
+//-----------------------------------------------------------------------
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Roslyn.SonarQube.AnalyzerPlugins.CommandLine;
 using System.IO;
 using Tests.Common;

@@ -1,4 +1,10 @@
-﻿using System.Collections.Immutable;
+//-----------------------------------------------------------------------
+// <copyright file="CodeFixProvider.cs" company="SonarSource SA and Microsoft Corporation">
+//   Copyright (c) SonarSource SA and Microsoft Corporation.  All rights reserved.
+//   Licensed under the MIT License. See License.txt in the project root for license information.
+// </copyright>
+//-----------------------------------------------------------------------
+using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Threading;
