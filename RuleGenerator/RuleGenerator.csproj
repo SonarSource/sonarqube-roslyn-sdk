@@ -7,8 +7,8 @@
     <ProjectGuid>{B6ED3E87-10A9-4E99-B0E2-FC35C7D39CF4}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Roslyn.SonarQube</RootNamespace>
-    <AssemblyName>Roslyn.SonarQube.RuleGenerator</AssemblyName>
+    <RootNamespace>SonarQube.Plugins.Roslyn</RootNamespace>
+    <AssemblyName>SonarQube.Plugins.Roslyn.RuleGenerator</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------
 using System;
 
-namespace Roslyn.SonarQube.PluginGenerator
+namespace SonarQube.Plugins
 {
     /// <summary>
     /// Extensions to simplify building plugins

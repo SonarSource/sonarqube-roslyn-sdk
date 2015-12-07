@@ -7,7 +7,7 @@
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Generic;
 
-namespace Roslyn.SonarQube
+namespace SonarQube.Plugins.Roslyn
 {
     /// <summary>
     /// Generates SonarQube rules from a Roslyn analyser

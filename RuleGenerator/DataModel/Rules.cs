@@ -3,15 +3,15 @@
 //   Copyright (c) SonarSource SA and Microsoft Corporation.  All rights reserved.
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
-//-----------------------------------------------------------------------?using Roslyn.SonarQube.Common;
-using Roslyn.SonarQube.Common;
+//-----------------------------------------------------------------------?using SonarQube.Plugins.Common;
+using SonarQube.Plugins.Common;
 using SonarQube.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
 
-namespace Roslyn.SonarQube
+namespace SonarQube.Plugins.Roslyn
 {
     [XmlRoot(ElementName = "rules")]
     public class Rules : List<Rule>

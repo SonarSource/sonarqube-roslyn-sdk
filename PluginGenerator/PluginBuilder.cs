@@ -4,14 +4,14 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
-using Roslyn.SonarQube.Common;
+using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Linq;
 
-namespace Roslyn.SonarQube.PluginGenerator
+namespace SonarQube.Plugins
 {
     public class PluginBuilder
     {
@@ -147,7 +147,7 @@ namespace Roslyn.SonarQube.PluginGenerator
             Directory.CreateDirectory(tempWorkingDir);
 
             // Unpack and reference the required jar files
-            SourceGenerator.UnpackReferencedJarFiles(typeof(RulesPluginGenerator).Assembly, "Roslyn.SonarQube.PluginGenerator.Resources", tempWorkingDir);
+            SourceGenerator.UnpackReferencedJarFiles(typeof(RulesPluginGenerator).Assembly, "SonarQube.Plugins.Resources", tempWorkingDir);
             foreach (string jarFile in Directory.GetFiles(tempWorkingDir, "*.jar"))
             {
                 this.AddReferencedJar(jarFile);

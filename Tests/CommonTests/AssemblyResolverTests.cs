@@ -1,10 +1,9 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Roslyn.SonarQube.AnalyzerPlugins;
 using System.IO;
 using Tests.Common;
 using System.Reflection;
-using Roslyn.SonarQube.Common;
+using SonarQube.Plugins.Common;
 using Microsoft.CSharp;
 using System.CodeDom.Compiler;
 using TestUtilities;

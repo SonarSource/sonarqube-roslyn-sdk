@@ -4,12 +4,12 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
-using Roslyn.SonarQube.Common;
+using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Roslyn.SonarQube.PluginGenerator
+namespace SonarQube.Plugins
 {
     public class RulesPluginGenerator
     {
@@ -95,7 +95,7 @@ namespace Roslyn.SonarQube.PluginGenerator
             // Generate the source files
             Dictionary<string, string> replacementMap = new Dictionary<string, string>();
             PopulateSourceFileReplacements(definition, replacementMap);
-            SourceGenerator.CreateSourceFiles(typeof(RulesPluginGenerator).Assembly, "Roslyn.SonarQube.PluginGenerator.Resources.", workingFolder, replacementMap);
+            SourceGenerator.CreateSourceFiles(typeof(RulesPluginGenerator).Assembly, "SonarQube.Plugins.Resources.", workingFolder, replacementMap);
 
             // Add the source files
             foreach (string sourceFile in Directory.GetFiles(workingFolder, "*.java", SearchOption.AllDirectories))

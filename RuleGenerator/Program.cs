@@ -6,14 +6,14 @@
 //-----------------------------------------------------------------------
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Roslyn.SonarQube.Common;
+using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-namespace Roslyn.SonarQube
+namespace SonarQube.Plugins.Roslyn
 {
     public class Program
     {

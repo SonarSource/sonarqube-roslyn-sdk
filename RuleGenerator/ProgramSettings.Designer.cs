@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Roslyn.SonarQube {
+namespace SonarQube.Plugins.Roslyn {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

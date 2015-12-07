@@ -5,11 +5,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Roslyn.SonarQube.PluginGenerator;
+using SonarQube.Plugins;
 using System.IO;
 using Tests.Common;
 
-namespace Roslyn.SonarQube.PluginGeneratorTests
+namespace SonarQube.Plugins.PluginGeneratorTests
 {
     [TestClass]
     public class PluginDefinitionTests

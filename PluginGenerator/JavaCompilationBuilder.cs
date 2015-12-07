@@ -4,7 +4,7 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
-using Roslyn.SonarQube.Common;
+using SonarQube.Plugins.Common;
 using SonarQube.Common;
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Roslyn.SonarQube.PluginGenerator
+namespace SonarQube.Plugins
 {
     public class JavaCompilationBuilder
     {

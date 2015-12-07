@@ -6,14 +6,14 @@
 //-----------------------------------------------------------------------
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Roslyn.SonarQube.Common;
+using SonarQube.Plugins.Common;
 using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-namespace Roslyn.SonarQube
+namespace SonarQube.Plugins.Roslyn
 {
     /// <summary>
     /// Responsible for transforming Roslyn analyzer rule definitions to SonarQube rules format

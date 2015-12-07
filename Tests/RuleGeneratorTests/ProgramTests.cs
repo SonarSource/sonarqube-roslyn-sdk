@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Roslyn.SonarQube;
+using SonarQube.Plugins.Roslyn;
 using System.Linq;
 using Tests.Common;
 using System.IO;

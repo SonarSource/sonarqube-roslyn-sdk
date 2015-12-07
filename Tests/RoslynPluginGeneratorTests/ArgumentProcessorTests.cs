@@ -5,12 +5,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Roslyn.SonarQube.AnalyzerPlugins.CommandLine;
+using SonarQube.Plugins.Roslyn.CommandLine;
 using System.IO;
 using Tests.Common;
 using TestUtilities;
 
-namespace Roslyn.SonarQube.RoslynPluginGeneratorTests
+namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
 {
     [TestClass]
     public class ArgumentProcessorTests

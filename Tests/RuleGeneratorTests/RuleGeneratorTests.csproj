@@ -114,7 +114,7 @@
       <Project>{b6ed3e87-10a9-4e99-b0e2-fc35c7d39cf4}</Project>
       <Name>RuleGenerator</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Tests.Common\Tests.Common.csproj">
+    <ProjectReference Include="..\Common\Tests.Common.csproj">
       <Project>{f60478ff-1eea-4fb4-9bf4-50d11f94fa57}</Project>
       <Name>Tests.Common</Name>
     </ProjectReference>

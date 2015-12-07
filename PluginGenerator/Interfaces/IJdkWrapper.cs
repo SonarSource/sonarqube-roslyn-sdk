@@ -4,10 +4,10 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
-using Roslyn.SonarQube.Common;
+using SonarQube.Plugins.Common;
 using System.Collections.Generic;
 
-namespace Roslyn.SonarQube.PluginGenerator
+namespace SonarQube.Plugins
 {
     /// <summary>
     /// Encapsulates the interactions with the JDK components

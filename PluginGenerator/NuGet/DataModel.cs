@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Roslyn.SonarQube.PluginGenerator.NuGet
+namespace SonarQube.Plugins
 {
     [XmlRoot("package", Namespace = XmlNamespace)]
     public class NuGetPackage

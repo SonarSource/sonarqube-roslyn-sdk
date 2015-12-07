@@ -5,12 +5,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Roslyn.SonarQube.PluginGenerator.NuGet;
+using SonarQube.Plugins;
 using System.Collections.Generic;
 using System.IO;
 using Tests.Common;
 
-namespace Roslyn.SonarQube.PluginGeneratorTests
+namespace SonarQube.Plugins.PluginGeneratorTests
 {
     [TestClass]
     public class NuGetDataModelTests

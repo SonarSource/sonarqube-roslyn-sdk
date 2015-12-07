@@ -6,7 +6,7 @@
     <ProjectGuid>{AAE84E64-5977-44D7-8959-80F59FA2B0C1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Roslyn.SonarQube.RoslynPluginGeneratorTests</RootNamespace>
+    <RootNamespace>SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests</RootNamespace>
     <AssemblyName>RoslynPluginGeneratorTests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -62,15 +62,15 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Common\Common.csproj">
+    <ProjectReference Include="..\..\Common\Common.csproj">
       <Project>{bb89698a-0807-44d2-87ec-6aa271200759}</Project>
       <Name>Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\RoslynPluginGenerator\RoslynPluginGenerator.csproj">
+    <ProjectReference Include="..\..\RoslynPluginGenerator\RoslynPluginGenerator.csproj">
       <Project>{ff1a3253-1888-412c-a870-922c08b29a1a}</Project>
       <Name>RoslynPluginGenerator</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Tests.Common\Tests.Common.csproj">
+    <ProjectReference Include="..\Common\Tests.Common.csproj">
       <Project>{f60478ff-1eea-4fb4-9bf4-50d11f94fa57}</Project>
       <Name>Tests.Common</Name>
     </ProjectReference>

@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------
 using System;
 
-namespace Roslyn.SonarQube.AnalyzerPlugins.CommandLine
+namespace SonarQube.Plugins.Roslyn.CommandLine
 {
     public class NuGetReference
     {

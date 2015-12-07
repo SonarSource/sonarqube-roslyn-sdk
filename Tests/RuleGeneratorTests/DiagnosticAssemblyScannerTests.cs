@@ -8,7 +8,7 @@ using ExampleAnalyzer1;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Roslyn.SonarQube;
+using SonarQube.Plugins.Roslyn;
 using System.Collections.Generic;
 using System.Linq;
 using Tests.Common;

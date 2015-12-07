@@ -5,14 +5,14 @@
 // </copyright>
 //-----------------------------------------------------------------------
 using Microsoft.CodeAnalysis.Diagnostics;
-using Roslyn.SonarQube.Common;
+using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Roslyn.SonarQube.AnalyzerPlugins
+namespace SonarQube.Plugins.Roslyn
 {
     public class AnalyzerFinder
     {

@@ -4,7 +4,7 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
-
+using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -59,7 +59,7 @@ namespace SonarQube.Common
         /// Parses the supplied arguments. Logs errors for unrecognized, duplicate or missing arguments.
         /// </summary>
         /// <param name="argumentInstances">A list of argument instances that have been recognized</param>
-        public bool ParseArguments(string[] commandLineArgs, Roslyn.SonarQube.Common.ILogger logger, out IEnumerable<ArgumentInstance> argumentInstances)
+        public bool ParseArguments(string[] commandLineArgs, ILogger logger, out IEnumerable<ArgumentInstance> argumentInstances)
         {
             if (commandLineArgs == null)
             {
@@ -176,7 +176,7 @@ namespace SonarQube.Common
         /// <summary>
         /// Checks whether any required arguments are missing and logs error messages for them.
         /// </summary>
-        private bool CheckRequiredArgumentsSupplied(IEnumerable<ArgumentInstance> arguments, Roslyn.SonarQube.Common.ILogger logger)
+        private bool CheckRequiredArgumentsSupplied(IEnumerable<ArgumentInstance> arguments, ILogger logger)
         {
             bool allExist = true;
             foreach (ArgumentDescriptor desc in this.descriptors.Where(d => d.Required))

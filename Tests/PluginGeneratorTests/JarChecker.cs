@@ -9,7 +9,7 @@ using System.IO;
 using System.IO.Compression;
 using Tests.Common;
 
-namespace Roslyn.SonarQube.PluginGeneratorTests
+namespace SonarQube.Plugins.PluginGeneratorTests
 {
     internal class JarChecker
     {

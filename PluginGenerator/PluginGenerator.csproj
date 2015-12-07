@@ -7,8 +7,8 @@
     <ProjectGuid>{DB16CCFA-B97F-4C5E-A99A-A6062ECF5D98}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Roslyn.SonarQube.PluginGenerator</RootNamespace>
-    <AssemblyName>rpg</AssemblyName>
+    <RootNamespace>SonarQube.Plugins</RootNamespace>
+    <AssemblyName>SonarQube.Plugins.PluginGenerator</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

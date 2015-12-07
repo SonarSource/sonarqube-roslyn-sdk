@@ -7,7 +7,7 @@
 using SonarQube.Common;
 using System;
 
-namespace Roslyn.SonarQube.Common
+namespace SonarQube.Plugins.Common
 {
     public class ConsoleLogger : ILogger
     {

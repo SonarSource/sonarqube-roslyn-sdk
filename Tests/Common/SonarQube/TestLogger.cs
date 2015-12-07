@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace TestUtilities
 {
-    public class TestLogger : Roslyn.SonarQube.Common.ILogger
+    public class TestLogger : SonarQube.Plugins.Common.ILogger
     {
         public List<string> DebugMessages { get; private set; }
         public List<string> InfoMessages { get; private set; }

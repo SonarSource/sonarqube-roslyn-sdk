@@ -58,7 +58,7 @@
       <Project>{bb89698a-0807-44d2-87ec-6aa271200759}</Project>
       <Name>Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Tests.Common\Tests.Common.csproj">
+    <ProjectReference Include="..\Common\Tests.Common.csproj">
       <Project>{f60478ff-1eea-4fb4-9bf4-50d11f94fa57}</Project>
       <Name>Tests.Common</Name>
     </ProjectReference>

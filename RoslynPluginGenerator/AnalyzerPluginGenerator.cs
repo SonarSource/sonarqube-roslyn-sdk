@@ -6,8 +6,8 @@
 //-----------------------------------------------------------------------
 using Microsoft.CodeAnalysis.Diagnostics;
 using NuGet;
-using Roslyn.SonarQube.AnalyzerPlugins.CommandLine;
-using Roslyn.SonarQube.PluginGenerator;
+using SonarQube.Plugins.Roslyn.CommandLine;
+using SonarQube.Plugins.Roslyn;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,7 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Roslyn.SonarQube.AnalyzerPlugins
+namespace SonarQube.Plugins.Roslyn
 {
     public class AnalyzerPluginGenerator
     {
@@ -26,9 +26,9 @@ namespace Roslyn.SonarQube.AnalyzerPlugins
         /// </summary>
         private const string PluginKeySuffix = "_sarif";
 
-        private readonly Common.ILogger logger;
+        private readonly SonarQube.Plugins.Common.ILogger logger;
 
-        public AnalyzerPluginGenerator(Common.ILogger logger)
+        public AnalyzerPluginGenerator(SonarQube.Plugins.Common.ILogger logger)
         {
             if (logger == null)
             {

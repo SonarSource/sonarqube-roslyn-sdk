@@ -4,12 +4,12 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
-using Roslyn.SonarQube.Common;
-using Roslyn.SonarQube.PluginGenerator;
+using SonarQube.Plugins.Common;
+using SonarQube.Plugins;
 using System;
 using System.Collections.Generic;
 
-namespace Roslyn.SonarQube.PluginGeneratorTests
+namespace SonarQube.Plugins.PluginGeneratorTests
 {
     internal class MockJdkWrapper : IJdkWrapper
     {

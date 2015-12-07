@@ -4,7 +4,7 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
-namespace Roslyn.SonarQube.PluginGenerator
+namespace SonarQube.Plugins
 {
     /// <summary>
     /// Constants for well-known plugin properties that can

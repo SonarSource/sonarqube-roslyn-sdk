@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Roslyn.SonarQube.PluginGenerator.NuGet
+namespace SonarQube.Plugins
 {
     public class NuGetSpecReader
     {

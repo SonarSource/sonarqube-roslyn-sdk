@@ -12,7 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Roslyn.SonarQube.AnalyzerPlugins
+namespace SonarQube.Plugins.Roslyn
 {
     public class NuGetPackageHandler
     {

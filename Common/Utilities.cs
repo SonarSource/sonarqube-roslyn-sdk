@@ -7,7 +7,7 @@
 using System;
 using System.Reflection;
 
-namespace Roslyn.SonarQube.Common
+namespace SonarQube.Plugins.Common
 {
     public static class Utilities
     {

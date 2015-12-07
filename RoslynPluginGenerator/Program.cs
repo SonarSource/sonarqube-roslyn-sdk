@@ -4,10 +4,10 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
-using Roslyn.SonarQube.AnalyzerPlugins.CommandLine;
-using Roslyn.SonarQube.Common;
+using SonarQube.Plugins.Roslyn.CommandLine;
+using SonarQube.Plugins.Common;
 
-namespace Roslyn.SonarQube.AnalyzerPlugins
+namespace SonarQube.Plugins.Roslyn
 {
     /// <summary>
     /// Generates SonarQube plugins for Roslyn analyzers

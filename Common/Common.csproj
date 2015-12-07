@@ -7,8 +7,8 @@
     <ProjectGuid>{BB89698A-0807-44D2-87EC-6AA271200759}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Roslyn.SonarQube.Common</RootNamespace>
-    <AssemblyName>Roslyn.SonarQube.Common</AssemblyName>
+    <RootNamespace>SonarQube.Plugins.Common</RootNamespace>
+    <AssemblyName>SonarQube.Plugins.Common</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

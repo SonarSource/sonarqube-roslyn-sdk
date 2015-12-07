@@ -4,13 +4,13 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
-using Roslyn.SonarQube.Common;
+using SonarQube.Plugins.Common;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
-namespace Roslyn.SonarQube.AnalyzerPlugins
+namespace SonarQube.Plugins.Common
 {
 
     /// <summary>

@@ -8,7 +8,7 @@ using System;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace Roslyn.SonarQube
+namespace SonarQube.Plugins.Roslyn
 {
     [XmlType(TypeName = "rule")]
     public class Rule

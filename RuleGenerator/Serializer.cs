@@ -10,7 +10,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace SonarQube.Common
+namespace SonarQube.Plugins.Roslyn
 {
     /// <summary>
     /// Helper class to serialize objects to and from XML

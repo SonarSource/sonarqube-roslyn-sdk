@@ -6,8 +6,8 @@
 //-----------------------------------------------------------------------
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Roslyn.SonarQube.AnalyzerPlugins;
-using Roslyn.SonarQube.Common;
+using SonarQube.Plugins.Roslyn;
+using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,7 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Roslyn.SonarQube
+namespace SonarQube.Plugins.Roslyn
 {
     /// <summary>
     /// Generates SQ specific rule metadata from a Roslyn analyser assembly
