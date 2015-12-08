@@ -7,8 +7,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Roslyn.CommandLine;
 using System.IO;
-using Tests.Common;
-using TestUtilities;
+using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
 {

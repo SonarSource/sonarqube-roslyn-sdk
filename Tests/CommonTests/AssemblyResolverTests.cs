@@ -1,14 +1,13 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
-using Tests.Common;
+using SonarQube.Plugins.Test.Common;
 using System.Reflection;
 using SonarQube.Plugins.Common;
 using Microsoft.CSharp;
 using System.CodeDom.Compiler;
-using TestUtilities;
 
-namespace CommonTests
+namespace SonarQube.Plugins.CommonTests
 {
     [TestClass]
     public class AssemblyResolverTests

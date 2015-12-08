@@ -9,7 +9,7 @@ using SonarQube.Plugins;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Tests.Common;
+using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.PluginGeneratorTests
 {

@@ -1,13 +1,12 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuleGenerator", "RuleGenerator\RuleGenerator.csproj", "{B6ED3E87-10A9-4E99-B0E2-FC35C7D39CF4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonarQube.Plugins.Roslyn.RuleGenerator", "RuleGenerator\SonarQube.Plugins.Roslyn.RuleGenerator.csproj", "{B6ED3E87-10A9-4E99-B0E2-FC35C7D39CF4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{AEB50389-D3DD-4EF3-9974-109BC5F20646}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuleGeneratorTests", "Tests\RuleGeneratorTests\RuleGeneratorTests.csproj", "{A4B797F9-1166-418D-B4B4-AB302A0FF0D7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonarQube.Plugins.Roslyn.RuleGeneratorTests", "Tests\RuleGeneratorTests\SonarQube.Plugins.Roslyn.RuleGeneratorTests.csproj", "{A4B797F9-1166-418D-B4B4-AB302A0FF0D7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExampleAnalyzers", "ExampleAnalyzers", "{A0234F11-305B-4409-AEA9-1982C397C395}"
 EndProject
@@ -21,24 +20,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Diagnostic.nuspec = Diagnostic.nuspec
 		MANIFEST.MF = MANIFEST.MF
 		PluginDefinition.xml = PluginDefinition.xml
+		README.md = README.md
 		rules.xml = rules.xml
 		SampleDefinition.xml = SampleDefinition.xml
 		test1.jar = test1.jar
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginGenerator", "PluginGenerator\PluginGenerator.csproj", "{DB16CCFA-B97F-4C5E-A99A-A6062ECF5D98}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonarQube.Plugins.PluginGenerator", "PluginGenerator\SonarQube.Plugins.PluginGenerator.csproj", "{DB16CCFA-B97F-4C5E-A99A-A6062ECF5D98}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginGeneratorTests", "Tests\PluginGeneratorTests\PluginGeneratorTests.csproj", "{F6C01441-DD3F-465B-8E24-BCEB239819F5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonarQube.Plugins.PluginGeneratorTests", "Tests\PluginGeneratorTests\SonarQube.Plugins.PluginGeneratorTests.csproj", "{F6C01441-DD3F-465B-8E24-BCEB239819F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{BB89698A-0807-44D2-87EC-6AA271200759}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonarQube.Plugins.Common", "Common\SonarQube.Plugins.Common.csproj", "{BB89698A-0807-44D2-87EC-6AA271200759}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoslynPluginGenerator", "RoslynPluginGenerator\RoslynPluginGenerator.csproj", "{FF1A3253-1888-412C-A870-922C08B29A1A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonarQube.Plugins.Roslyn.PluginGenerator", "RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj", "{FF1A3253-1888-412C-A870-922C08B29A1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonTests", "Tests\CommonTests\CommonTests.csproj", "{2532FD2D-76A6-484D-86AE-732C41554885}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonarQube.Plugins.CommonTests", "Tests\CommonTests\SonarQube.Plugins.CommonTests.csproj", "{2532FD2D-76A6-484D-86AE-732C41554885}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Common", "Tests\Common\Tests.Common.csproj", "{F60478FF-1EEA-4FB4-9BF4-50D11F94FA57}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonarQube.Plugins.Test.Common", "Tests\Common\SonarQube.Plugins.Test.Common.csproj", "{F60478FF-1EEA-4FB4-9BF4-50D11F94FA57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoslynPluginGeneratorTests", "Tests\RoslynPluginGeneratorTests\RoslynPluginGeneratorTests.csproj", "{AAE84E64-5977-44D7-8959-80F59FA2B0C1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests", "Tests\RoslynPluginGeneratorTests\SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests.csproj", "{AAE84E64-5977-44D7-8959-80F59FA2B0C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

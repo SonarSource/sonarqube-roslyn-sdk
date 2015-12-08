@@ -8,12 +8,11 @@ using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Roslyn;
 using System.Linq;
-using Tests.Common;
+using SonarQube.Plugins.Test.Common;
 using System.IO;
 using System.Collections.Generic;
-using TestUtilities;
 
-namespace RuleGeneratorTests
+namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
 {
     [TestClass]
     public class ProgramTests

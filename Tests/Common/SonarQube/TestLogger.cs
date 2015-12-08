@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TestUtilities
+namespace SonarQube.Plugins.Test.Common
 {
     public class TestLogger : SonarQube.Plugins.Common.ILogger
     {

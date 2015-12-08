@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Tests.Common
+namespace SonarQube.Plugins.Test.Common
 {
     public static class TestUtils
     {

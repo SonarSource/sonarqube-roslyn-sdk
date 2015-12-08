@@ -7,8 +7,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins;
 using System.IO;
-using Tests.Common;
-using TestUtilities;
+using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.PluginGeneratorTests
 {

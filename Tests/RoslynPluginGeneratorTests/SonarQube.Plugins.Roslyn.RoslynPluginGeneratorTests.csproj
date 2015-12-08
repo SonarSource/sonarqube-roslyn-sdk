@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests</RootNamespace>
-    <AssemblyName>RoslynPluginGeneratorTests</AssemblyName>
+    <AssemblyName>SonarQube.Plugins.Roslyn.PluginGeneratorTests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -62,17 +62,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\Common.csproj">
+    <ProjectReference Include="..\..\Common\SonarQube.Plugins.Common.csproj">
       <Project>{bb89698a-0807-44d2-87ec-6aa271200759}</Project>
-      <Name>Common</Name>
+      <Name>SonarQube.Plugins.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\RoslynPluginGenerator\RoslynPluginGenerator.csproj">
+    <ProjectReference Include="..\..\RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj">
       <Project>{ff1a3253-1888-412c-a870-922c08b29a1a}</Project>
-      <Name>RoslynPluginGenerator</Name>
+      <Name>SonarQube.Plugins.Roslyn.PluginGenerator</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Common\Tests.Common.csproj">
+    <ProjectReference Include="..\Common\SonarQube.Plugins.Test.Common.csproj">
       <Project>{f60478ff-1eea-4fb4-9bf4-50d11f94fa57}</Project>
-      <Name>Tests.Common</Name>
+      <Name>SonarQube.Plugins.Test.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

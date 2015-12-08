@@ -7,7 +7,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
-namespace Tests.Common
+namespace SonarQube.Plugins.Test.Common
 {
     public static class AssertException
     {

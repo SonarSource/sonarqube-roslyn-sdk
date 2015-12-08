@@ -8,10 +8,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Roslyn;
 using System;
 using System.IO;
-using Tests.Common;
-using TestUtilities;
+using SonarQube.Plugins.Test.Common;
 
-namespace RuleGeneratorTests
+namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
 {
     [TestClass]
     public class SerializationTests
