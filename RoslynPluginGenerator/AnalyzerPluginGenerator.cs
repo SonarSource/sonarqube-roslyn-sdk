@@ -14,11 +14,15 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.CodeAnalysis;
 
 namespace SonarQube.Plugins.Roslyn
 {
     public class AnalyzerPluginGenerator
     {
+        // TODO: multiple language support
+        private static readonly string language = LanguageNames.CSharp;
+
         public const string NuGetPackageSource = "https://www.nuget.org/api/v2/";
 
         /// <summary>
@@ -97,8 +101,8 @@ namespace SonarQube.Plugins.Roslyn
 
             this.logger.LogInfo(UIResources.APG_LocatingAnalyzers);
 
-            AnalyzerFinder finder = new AnalyzerFinder(this.logger);
-            IEnumerable<DiagnosticAnalyzer> analyzers = finder.FindAnalyzers(packageDirectory, nuGetDirectory);
+            DiagnosticAssemblyScanner diagnosticAssemblyScanner = new DiagnosticAssemblyScanner(this.logger, nuGetDirectory);
+            IEnumerable<DiagnosticAnalyzer> analyzers = diagnosticAssemblyScanner.InstantiateDiagnosticsFromDirectory(packageDirectory, language);
 
             this.logger.LogInfo(UIResources.APG_AnalyzersLocated, analyzers.Count());
 
