@@ -141,15 +141,15 @@
 Error: {1}</value>
   </data>
   <data name="Scanner_AnalyzerLoaded" xml:space="preserve">
-    <value>Loaded analyser: {0}</value>
+    <value>Loaded analyzer: {0}</value>
   </data>
   <data name="Scanner_AnalyzersLoadSuccess" xml:space="preserve">
-    <value>Loaded: {0} analysers.</value>
+    <value>Loaded: {0} analyzers.</value>
   </data>
   <data name="Scanner_AssemblyLoadSuccess" xml:space="preserve">
     <value>Loaded assembly: {0}</value>
   </data>
-  <data name="Scanner_NoAnalysers" xml:space="preserve">
+  <data name="Scanner_NoAnalyzers" xml:space="preserve">
     <value>No analyzers found in assembly.</value>
   </data>
 </root>

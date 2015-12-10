@@ -45,17 +45,17 @@ namespace SonarQube.Plugins.Roslyn
 
             foreach (DiagnosticAnalyzer analyzer in analyzers)
             {
-                Rules analyserRules = GetAnalyzerRules(analyzer);
+                Rules analyzerRules = GetAnalyzerRules(analyzer);
                 
-                foreach (Rule analyserRule in analyserRules)
+                foreach (Rule analyzerRule in analyzerRules)
                 {
-                    if (rules.Any(r => String.Equals(r.Key, analyserRule.Key, Rule.RuleKeyComparer)))
+                    if (rules.Any(r => String.Equals(r.Key, analyzerRule.Key, Rule.RuleKeyComparer)))
                     {
-                        logger.LogWarning(Resources.WARN_DuplicateKey, analyserRule.Key);
+                        logger.LogWarning(Resources.WARN_DuplicateKey, analyzerRule.Key);
                         continue;
                     }
 
-                    rules.Add(analyserRule);
+                    rules.Add(analyzerRule);
                 }
             }
             

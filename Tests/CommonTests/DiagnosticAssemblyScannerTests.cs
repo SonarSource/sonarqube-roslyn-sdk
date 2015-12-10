@@ -28,10 +28,10 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             TestLogger logger = new TestLogger();
             DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
 
-            string noAnalyserAssemblyPath = typeof(DiagnosticAssemblyScannerTests).Assembly.Location;
+            string noAnalyzerAssemblyPath = typeof(DiagnosticAssemblyScannerTests).Assembly.Location;
             string testDirectoryPath = TestUtils.CreateTestDirectory(this.TestContext);
-            string testAssemblyPath = Path.Combine(testDirectoryPath, Path.GetFileName(noAnalyserAssemblyPath));
-            File.Copy(noAnalyserAssemblyPath, testAssemblyPath);
+            string testAssemblyPath = Path.Combine(testDirectoryPath, Path.GetFileName(noAnalyzerAssemblyPath));
+            File.Copy(noAnalyzerAssemblyPath, testAssemblyPath);
 
             // Act
             IEnumerable<DiagnosticAnalyzer> csharpDiagnostics = scanner.InstantiateDiagnostics(testDirectoryPath, LanguageNames.CSharp);
@@ -48,11 +48,11 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             // Arrange
             TestLogger logger = new TestLogger();
             DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
-            string validAnalyserAssemblyPath = typeof(SimpleAnalyzer).Assembly.Location;
+            string validAnalyzerAssemblyPath = typeof(SimpleAnalyzer).Assembly.Location;
 
             // Act
-            IEnumerable<DiagnosticAnalyzer> csharpDiagnostics = scanner.InstantiateDiagnosticsFromAssembly(validAnalyserAssemblyPath, LanguageNames.CSharp);
-            IEnumerable<DiagnosticAnalyzer> vbDiagnostics = scanner.InstantiateDiagnosticsFromAssembly(validAnalyserAssemblyPath, LanguageNames.VisualBasic);
+            IEnumerable<DiagnosticAnalyzer> csharpDiagnostics = scanner.InstantiateDiagnosticsFromAssembly(validAnalyzerAssemblyPath, LanguageNames.CSharp);
+            IEnumerable<DiagnosticAnalyzer> vbDiagnostics = scanner.InstantiateDiagnosticsFromAssembly(validAnalyzerAssemblyPath, LanguageNames.VisualBasic);
 
             //Assert
             // ConfigurableAnalyzer is both C# and VB, so should appear in both
@@ -82,11 +82,11 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             // Arrange
             TestLogger logger = new TestLogger();
             DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
-            string noAnalyserAssemblyPath = typeof(DiagnosticAssemblyScannerTests).Assembly.Location;
+            string noAnalyzerAssemblyPath = typeof(DiagnosticAssemblyScannerTests).Assembly.Location;
 
             // Act
-            IEnumerable<DiagnosticAnalyzer> csharpDiagnostics = scanner.InstantiateDiagnosticsFromAssembly(noAnalyserAssemblyPath, LanguageNames.CSharp);
-            IEnumerable<DiagnosticAnalyzer> vbDiagnostics = scanner.InstantiateDiagnosticsFromAssembly(noAnalyserAssemblyPath, LanguageNames.VisualBasic);
+            IEnumerable<DiagnosticAnalyzer> csharpDiagnostics = scanner.InstantiateDiagnosticsFromAssembly(noAnalyzerAssemblyPath, LanguageNames.CSharp);
+            IEnumerable<DiagnosticAnalyzer> vbDiagnostics = scanner.InstantiateDiagnosticsFromAssembly(noAnalyzerAssemblyPath, LanguageNames.VisualBasic);
 
             // Assert
             Assert.AreEqual(0, csharpDiagnostics.Count(), "No analyzers should have been detected");

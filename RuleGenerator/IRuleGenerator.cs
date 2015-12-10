@@ -10,7 +10,7 @@ using System.Collections.Generic;
 namespace SonarQube.Plugins.Roslyn
 {
     /// <summary>
-    /// Generates SonarQube rules from a Roslyn analyser
+    /// Generates SonarQube rules from a Roslyn analyzer
     /// </summary>
     public interface IRuleGenerator
     {

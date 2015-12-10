@@ -12,7 +12,7 @@ using System.Collections.Immutable;
 namespace ExampleAnalyzer1
 {
     /// <summary>
-    /// Configurable analyser. Use the static methods before instantiating it. Note that loading the test assembly and reflecting
+    /// Configurable analyzer. Use the static methods before instantiating it. Note that loading the test assembly and reflecting
     /// over it will not produce any rules from this analyzer.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp, LanguageNames.VisualBasic, "Test#")]
