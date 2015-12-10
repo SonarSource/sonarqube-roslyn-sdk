@@ -20,9 +20,6 @@ namespace SonarQube.Plugins.Roslyn
 {
     public class AnalyzerPluginGenerator
     {
-        // TODO: multiple language support
-        private static readonly string language = LanguageNames.CSharp;
-
         public const string NuGetPackageSource = "https://www.nuget.org/api/v2/";
 
         /// <summary>
@@ -102,7 +99,7 @@ namespace SonarQube.Plugins.Roslyn
             this.logger.LogInfo(UIResources.APG_LocatingAnalyzers);
 
             DiagnosticAssemblyScanner diagnosticAssemblyScanner = new DiagnosticAssemblyScanner(this.logger, nuGetDirectory);
-            IEnumerable<DiagnosticAnalyzer> analyzers = diagnosticAssemblyScanner.InstantiateDiagnosticsFromDirectory(packageDirectory, language);
+            IEnumerable<DiagnosticAnalyzer> analyzers = diagnosticAssemblyScanner.InstantiateDiagnostics(packageDirectory, LanguageNames.CSharp);
 
             this.logger.LogInfo(UIResources.APG_AnalyzersLocated, analyzers.Count());
 

@@ -35,8 +35,8 @@ namespace SonarQube.Plugins.Roslyn
         /// Loads all assemblies in the given directory and instantiates Roslyn diagnostic objects - i.e. existing types deriving from
         /// <see cref="DiagnosticAnalyzer"/>
         /// </summary>
-        /// <returns>empty enumerable if no diagnostics were found</returns>
-        public IEnumerable<DiagnosticAnalyzer> InstantiateDiagnosticsFromDirectory(string directoryPath, string language)
+        /// <returns>Enumerable with instances of DiagnosticAnalyzer from discovered assemblies</returns>
+        public IEnumerable<DiagnosticAnalyzer> InstantiateDiagnostics(string directoryPath, string language)
         {
             List<DiagnosticAnalyzer> analyzers = new List<DiagnosticAnalyzer>();
 
@@ -44,12 +44,8 @@ namespace SonarQube.Plugins.Roslyn
             {
                 analyzers.AddRange(InstantiateDiagnosticsFromAssembly(assemblyPath, language));
             }
-            
-            if (analyzers.Any())
-            {
-                return analyzers;
-            }
-            return Enumerable.Empty<DiagnosticAnalyzer>();
+
+            return analyzers;
         }
 
         /// <summary>
@@ -57,7 +53,7 @@ namespace SonarQube.Plugins.Roslyn
         /// <see cref="DiagnosticAnalyzer"/>
         /// </summary>
         /// <returns>empty enumerable if no diagnostics were found</returns>
-        public IEnumerable<DiagnosticAnalyzer> InstantiateDiagnosticsFromAssembly(string assemblyPath, string language)
+        public /* for test */ IEnumerable<DiagnosticAnalyzer> InstantiateDiagnosticsFromAssembly(string assemblyPath, string language)
         {
             Assembly analyzerAssembly = LoadAnalyzerAssembly(assemblyPath);
             IEnumerable<DiagnosticAnalyzer> analyzers = null;
@@ -74,11 +70,11 @@ namespace SonarQube.Plugins.Roslyn
                     Debug.Assert(analyzers != null);
                     if (analyzers.Any())
                     {
-                        logger.LogInfo(Resources.Scanner_AnalyzersLoadSuccess, analyzers.Count());
+                        this.logger.LogInfo(Resources.Scanner_AnalyzersLoadSuccess, analyzers.Count());
                     }
                     else
                     {
-                        logger.LogError(Resources.Scanner_NoAnalysers);
+                        this.logger.LogError(Resources.Scanner_NoAnalysers);
                     }
                 }
                 catch (Exception ex)
@@ -99,7 +95,7 @@ namespace SonarQube.Plugins.Roslyn
             AssemblyResolver additionalAssemblyResolver = null;
             if (additionalSearchFolders.Any())
             {
-                additionalAssemblyResolver = new AssemblyResolver(logger, additionalSearchFolders.ToArray());
+                additionalAssemblyResolver = new AssemblyResolver(this.logger, additionalSearchFolders.ToArray());
             }
 
             Assembly analyzerAssembly = null;
@@ -116,7 +112,7 @@ namespace SonarQube.Plugins.Roslyn
                 }
             }
 
-            logger.LogInfo(Resources.Scanner_AssemblyLoadSuccess, analyzerAssembly.FullName);
+            this.logger.LogInfo(Resources.Scanner_AssemblyLoadSuccess, analyzerAssembly.FullName);
             return analyzerAssembly;
         }
 
@@ -136,7 +132,7 @@ namespace SonarQube.Plugins.Roslyn
                     DiagnosticAnalyzer analyzer = (DiagnosticAnalyzer)Activator.CreateInstance(type);
                     analyzers.Add(analyzer);
 
-                    logger.LogDebug(Resources.Scanner_AnalyserLoaded, analyzer.ToString());
+                    this.logger.LogDebug(Resources.Scanner_AnalyzerLoaded, analyzer.ToString());
                 }
             }
 

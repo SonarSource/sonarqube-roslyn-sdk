@@ -34,8 +34,8 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             File.Copy(noAnalyserAssemblyPath, testAssemblyPath);
 
             // Act
-            IEnumerable<DiagnosticAnalyzer> csharpDiagnostics = scanner.InstantiateDiagnosticsFromDirectory(testDirectoryPath, LanguageNames.CSharp);
-            IEnumerable<DiagnosticAnalyzer> vbDiagnostics = scanner.InstantiateDiagnosticsFromDirectory(testDirectoryPath, LanguageNames.VisualBasic);
+            IEnumerable<DiagnosticAnalyzer> csharpDiagnostics = scanner.InstantiateDiagnostics(testDirectoryPath, LanguageNames.CSharp);
+            IEnumerable<DiagnosticAnalyzer> vbDiagnostics = scanner.InstantiateDiagnostics(testDirectoryPath, LanguageNames.VisualBasic);
 
             // Assert
             Assert.AreEqual(0, csharpDiagnostics.Count(), "No analyzers should have been detected");
