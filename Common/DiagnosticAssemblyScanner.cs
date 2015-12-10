@@ -32,41 +32,58 @@ namespace SonarQube.Plugins.Roslyn
         }
 
         /// <summary>
+        /// Loads all assemblies in the given directory and instantiates Roslyn diagnostic objects - i.e. existing types deriving from
+        /// <see cref="DiagnosticAnalyzer"/>
+        /// </summary>
+        /// <returns>Enumerable with instances of DiagnosticAnalyzer from discovered assemblies</returns>
+        public IEnumerable<DiagnosticAnalyzer> InstantiateDiagnostics(string directoryPath, string language)
+        {
+            List<DiagnosticAnalyzer> analyzers = new List<DiagnosticAnalyzer>();
+
+            foreach (string assemblyPath in Directory.GetFiles(directoryPath, "*.dll", SearchOption.AllDirectories))
+            {
+                analyzers.AddRange(InstantiateDiagnosticsFromAssembly(assemblyPath, language));
+            }
+
+            return analyzers;
+        }
+
+        /// <summary>
         /// Loads the given assembly and instantiates Roslyn diagnostic objects - i.e. existing types deriving from
         /// <see cref="DiagnosticAnalyzer"/>
         /// </summary>
         /// <returns>empty enumerable if no diagnostics were found</returns>
-        public IEnumerable<DiagnosticAnalyzer> InstantiateDiagnosticsFromAssembly(string assemblyPath, string language)
+        public /* for test */ IEnumerable<DiagnosticAnalyzer> InstantiateDiagnosticsFromAssembly(string assemblyPath, string language)
         {
-            Assembly analyserAssembly = LoadAnalyzerAssembly(assemblyPath);
-            IEnumerable<DiagnosticAnalyzer> analysers = null;
+            Assembly analyzerAssembly = LoadAnalyzerAssembly(assemblyPath);
+            IEnumerable<DiagnosticAnalyzer> analyzers = null;
 
             Debug.Assert(String.Equals(language, LanguageNames.CSharp, StringComparison.CurrentCulture) 
                 || String.Equals(language, LanguageNames.VisualBasic, StringComparison.CurrentCulture));
 
-            if (analyserAssembly != null)
+            if (analyzerAssembly != null)
             {
                 try
                 {
-                    analysers = InstantiateDiagnosticAnalyzers(analyserAssembly, language);
+                    analyzers = InstantiateDiagnosticAnalyzers(analyzerAssembly, language);
 
-                    Debug.Assert(analysers != null);
-                    if (analysers.Any())
+                    Debug.Assert(analyzers != null);
+                    if (analyzers.Any())
                     {
-                        logger.LogInfo(Resources.AnalyzersLoadSuccess, analysers.Count());
+                        this.logger.LogInfo(Resources.Scanner_AnalyzersLoadSuccess, analyzers.Count());
                     }
                     else
                     {
-                        logger.LogError(Resources.NoAnalysers);
+                        this.logger.LogError(Resources.Scanner_NoAnalysers);
                     }
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogError(Resources.ERR_AnalyzerInstantiationFail, analyserAssembly.FullName, ex.Message);
+                    this.logger.LogError(Resources.Scanner_AnalyzerInstantiationFail, analyzerAssembly.FullName, ex.Message);
                 }
             }
 
-            return analysers ?? Enumerable.Empty<DiagnosticAnalyzer>();
+            return analyzers ?? Enumerable.Empty<DiagnosticAnalyzer>();
         }
 
         /// <summary>
@@ -78,7 +95,7 @@ namespace SonarQube.Plugins.Roslyn
             AssemblyResolver additionalAssemblyResolver = null;
             if (additionalSearchFolders.Any())
             {
-                additionalAssemblyResolver = new AssemblyResolver(logger, additionalSearchFolders.ToArray());
+                additionalAssemblyResolver = new AssemblyResolver(this.logger, additionalSearchFolders.ToArray());
             }
 
             Assembly analyzerAssembly = null;
@@ -95,7 +112,7 @@ namespace SonarQube.Plugins.Roslyn
                 }
             }
 
-            logger.LogInfo(Resources.AssemblyLoadSuccess, analyzerAssembly.FullName);
+            this.logger.LogInfo(Resources.Scanner_AssemblyLoadSuccess, analyzerAssembly.FullName);
             return analyzerAssembly;
         }
 
@@ -103,7 +120,7 @@ namespace SonarQube.Plugins.Roslyn
         {
             Debug.Assert(analyserAssembly != null);
 
-            ICollection<DiagnosticAnalyzer> analysers = new List<DiagnosticAnalyzer>();
+            List<DiagnosticAnalyzer> analyzers = new List<DiagnosticAnalyzer>();
 
             // It is assumed that analyserAssembly is valid. FileNotFoundException will be thrown if dependency resolution fails.
             foreach (Type type in analyserAssembly.GetExportedTypes())
@@ -112,14 +129,14 @@ namespace SonarQube.Plugins.Roslyn
                     type.IsSubclassOf(typeof(DiagnosticAnalyzer)) &&
                     DiagnosticMatchesLanguage(type, language))
                 {
-                    DiagnosticAnalyzer analyser = (DiagnosticAnalyzer)Activator.CreateInstance(type);
-                    analysers.Add(analyser);
+                    DiagnosticAnalyzer analyzer = (DiagnosticAnalyzer)Activator.CreateInstance(type);
+                    analyzers.Add(analyzer);
 
-                    logger.LogDebug(Resources.DEBUG_AnalyserLoaded, analyser.ToString());
+                    this.logger.LogDebug(Resources.Scanner_AnalyzerLoaded, analyzer.ToString());
                 }
             }
 
-            return analysers;
+            return analyzers;
         }
 
         private static bool DiagnosticMatchesLanguage(Type type, string language)

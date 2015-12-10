@@ -12,6 +12,7 @@ using SonarQube.Plugins.Roslyn;
 using System.Collections.Generic;
 using System.Linq;
 using SonarQube.Plugins.Test.Common;
+using System.IO;
 
 namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
 {
@@ -19,6 +20,27 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
     public class DiagnosticAssemblyScannerTests
     {
         public TestContext TestContext { get; set; }
+
+        [TestMethod]
+        public void ScanDirectoryWithNoAnalyzerAssemblies()
+        {
+            // Arrange
+            TestLogger logger = new TestLogger();
+            DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
+
+            string noAnalyserAssemblyPath = typeof(DiagnosticAssemblyScannerTests).Assembly.Location;
+            string testDirectoryPath = TestUtils.CreateTestDirectory(this.TestContext);
+            string testAssemblyPath = Path.Combine(testDirectoryPath, Path.GetFileName(noAnalyserAssemblyPath));
+            File.Copy(noAnalyserAssemblyPath, testAssemblyPath);
+
+            // Act
+            IEnumerable<DiagnosticAnalyzer> csharpDiagnostics = scanner.InstantiateDiagnostics(testDirectoryPath, LanguageNames.CSharp);
+            IEnumerable<DiagnosticAnalyzer> vbDiagnostics = scanner.InstantiateDiagnostics(testDirectoryPath, LanguageNames.VisualBasic);
+
+            // Assert
+            Assert.AreEqual(0, csharpDiagnostics.Count(), "No analyzers should have been detected");
+            Assert.AreEqual(0, vbDiagnostics.Count(), "No analyzers should have been detected");
+        }
 
         [TestMethod]
         public void ScanValidAssembly()
@@ -57,12 +79,18 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
         [TestMethod]
         public void ScanNonAnalyzerAssembly()
         {
+            // Arrange
             TestLogger logger = new TestLogger();
             DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
-            string validAnalyserAssemblyPath = typeof(DiagnosticAssemblyScannerTests).Assembly.Location;
+            string noAnalyserAssemblyPath = typeof(DiagnosticAssemblyScannerTests).Assembly.Location;
 
-            var diagnostics = scanner.InstantiateDiagnosticsFromAssembly(validAnalyserAssemblyPath, LanguageNames.CSharp);
-            Assert.AreEqual(0, diagnostics.Count(), "No analyzers should have been detected");
+            // Act
+            IEnumerable<DiagnosticAnalyzer> csharpDiagnostics = scanner.InstantiateDiagnosticsFromAssembly(noAnalyserAssemblyPath, LanguageNames.CSharp);
+            IEnumerable<DiagnosticAnalyzer> vbDiagnostics = scanner.InstantiateDiagnosticsFromAssembly(noAnalyserAssemblyPath, LanguageNames.VisualBasic);
+
+            // Assert
+            Assert.AreEqual(0, csharpDiagnostics.Count(), "No analyzers should have been detected");
+            Assert.AreEqual(0, vbDiagnostics.Count(), "No analyzers should have been detected");
         }
     }
 }

@@ -61,60 +61,6 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Created analyzer: {0}.
-        /// </summary>
-        internal static string AF_CreatedAnalyzer {
-            get {
-                return ResourceManager.GetString("AF_CreatedAnalyzer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Processed assembly. Analyzers located: {0}.
-        /// </summary>
-        internal static string AF_ProcessedAssembly {
-            get {
-                return ResourceManager.GetString("AF_ProcessedAssembly", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Processing assembly: {0}.
-        /// </summary>
-        internal static string AF_ProcessingAssembly {
-            get {
-                return ResourceManager.GetString("AF_ProcessingAssembly", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Exception occurred creating analyzer of type &apos;{0}&apos;. Message: {1}.
-        /// </summary>
-        internal static string AF_WARN_ExceptionCreatingAnalyzer {
-            get {
-                return ResourceManager.GetString("AF_WARN_ExceptionCreatingAnalyzer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Exception occurred fetching types. Message: {0}.
-        /// </summary>
-        internal static string AF_WARN_ExceptionFetchingTypes {
-            get {
-                return ResourceManager.GetString("AF_WARN_ExceptionFetchingTypes", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Exception occurred loading assembly {0}. Message: {1}.
-        /// </summary>
-        internal static string AF_WARN_ExceptionLoadingAssembly {
-            get {
-                return ResourceManager.GetString("AF_WARN_ExceptionLoadingAssembly", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Number of analyzers located in package: {0}.
         /// </summary>
         internal static string APG_AnalyzersLocated {

@@ -117,24 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AF_CreatedAnalyzer" xml:space="preserve">
-    <value>Created analyzer: {0}</value>
-  </data>
-  <data name="AF_ProcessedAssembly" xml:space="preserve">
-    <value>Processed assembly. Analyzers located: {0}</value>
-  </data>
-  <data name="AF_ProcessingAssembly" xml:space="preserve">
-    <value>Processing assembly: {0}</value>
-  </data>
-  <data name="AF_WARN_ExceptionCreatingAnalyzer" xml:space="preserve">
-    <value>Exception occurred creating analyzer of type '{0}'. Message: {1}</value>
-  </data>
-  <data name="AF_WARN_ExceptionFetchingTypes" xml:space="preserve">
-    <value>Exception occurred fetching types. Message: {0}</value>
-  </data>
-  <data name="AF_WARN_ExceptionLoadingAssembly" xml:space="preserve">
-    <value>Exception occurred loading assembly {0}. Message: {1}</value>
-  </data>
   <data name="APG_AnalyzersLocated" xml:space="preserve">
     <value>Number of analyzers located in package: {0}</value>
   </data>

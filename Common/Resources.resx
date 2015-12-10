@@ -135,4 +135,21 @@
   <data name="Resolver_ResolvingAssembly" xml:space="preserve">
     <value>Attempting to resolve assembly '{0}', requested by '{1}'</value>
   </data>
+  <data name="Scanner_AnalyzerInstantiationFail" xml:space="preserve">
+    <value>Could not instantiate analyzers from '{0}'. 
+
+Error: {1}</value>
+  </data>
+  <data name="Scanner_AnalyzerLoaded" xml:space="preserve">
+    <value>Loaded analyser: {0}</value>
+  </data>
+  <data name="Scanner_AnalyzersLoadSuccess" xml:space="preserve">
+    <value>Loaded: {0} analysers.</value>
+  </data>
+  <data name="Scanner_AssemblyLoadSuccess" xml:space="preserve">
+    <value>Loaded assembly: {0}</value>
+  </data>
+  <data name="Scanner_NoAnalysers" xml:space="preserve">
+    <value>No analyzers found in assembly.</value>
+  </data>
 </root>

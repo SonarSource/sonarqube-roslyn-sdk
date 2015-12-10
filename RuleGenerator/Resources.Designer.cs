@@ -61,76 +61,11 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Loaded: {0} analysers..
-        /// </summary>
-        public static string AnalyzersLoadSuccess {
-            get {
-                return ResourceManager.GetString("AnalyzersLoadSuccess", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Loaded assembly: {0}.
-        /// </summary>
-        public static string AssemblyLoadSuccess {
-            get {
-                return ResourceManager.GetString("AssemblyLoadSuccess", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Usage: {0} pathToAnalyzerAssembly.
-        /// </summary>
-        public static string CommandLineUsage {
-            get {
-                return ResourceManager.GetString("CommandLineUsage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Loaded analyser: {0}.
-        /// </summary>
-        public static string DEBUG_AnalyserLoaded {
-            get {
-                return ResourceManager.GetString("DEBUG_AnalyserLoaded", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not instantiate analyzers from &apos;{0}&apos;. 
-        ///
-        ///Error: {1}.
-        /// </summary>
-        public static string ERR_AnalyzerInstantiationFail {
-            get {
-                return ResourceManager.GetString("ERR_AnalyzerInstantiationFail", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to File {0} does not exist. Provide the path to an existing assembly.
-        /// </summary>
-        public static string ERR_ArgFileDoesNotExist {
-            get {
-                return ResourceManager.GetString("ERR_ArgFileDoesNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to For more information visit &lt;a href=&quot;{0}&quot; target=&quot;_blank&quot;&gt;the rule&apos;s help page&lt;/a&gt;..
         /// </summary>
         public static string ForMoreDetailsLink {
             get {
                 return ResourceManager.GetString("ForMoreDetailsLink", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Using {0} additional assembly dependency search folders..
-        /// </summary>
-        public static string INFO_AdditionalDependencySearchFoldersFound {
-            get {
-                return ResourceManager.GetString("INFO_AdditionalDependencySearchFoldersFound", resourceCulture);
             }
         }
         
@@ -144,38 +79,11 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No analyzers found in assembly..
-        /// </summary>
-        public static string NoAnalysers {
-            get {
-                return ResourceManager.GetString("NoAnalysers", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to No description was provided..
         /// </summary>
         public static string NoDescription {
             get {
                 return ResourceManager.GetString("NoDescription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Generation succeeded..
-        /// </summary>
-        public static string RuleGenerationSuccess {
-            get {
-                return ResourceManager.GetString("RuleGenerationSuccess", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} rules written to {1}.
-        /// </summary>
-        public static string SuccessOutputFile {
-            get {
-                return ResourceManager.GetString("SuccessOutputFile", resourceCulture);
             }
         }
         
@@ -189,38 +97,11 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Duplicate tag {0} on analyzer {1}.
-        /// </summary>
-        public static string WARN_DuplicateTags {
-            get {
-                return ResourceManager.GetString("WARN_DuplicateTags", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Empty description found for rule {0}. Placeholder description inserted..
-        /// </summary>
-        public static string WARN_EmptyDescription {
-            get {
-                return ResourceManager.GetString("WARN_EmptyDescription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Skipping rule in analyzer {0}: No key found..
         /// </summary>
         public static string WARN_EmptyKey {
             get {
                 return ResourceManager.GetString("WARN_EmptyKey", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Additional assembly dependency search folders were configured, but none were valid..
-        /// </summary>
-        public static string WARN_NoValidAdditionalDependencySearchFolders {
-            get {
-                return ResourceManager.GetString("WARN_NoValidAdditionalDependencySearchFolders", resourceCulture);
             }
         }
     }

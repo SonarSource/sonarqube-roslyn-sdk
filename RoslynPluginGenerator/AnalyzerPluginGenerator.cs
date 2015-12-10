@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.CodeAnalysis;
 
 namespace SonarQube.Plugins.Roslyn
 {
@@ -97,8 +98,8 @@ namespace SonarQube.Plugins.Roslyn
 
             this.logger.LogInfo(UIResources.APG_LocatingAnalyzers);
 
-            AnalyzerFinder finder = new AnalyzerFinder(this.logger);
-            IEnumerable<DiagnosticAnalyzer> analyzers = finder.FindAnalyzers(packageDirectory, nuGetDirectory);
+            DiagnosticAssemblyScanner diagnosticAssemblyScanner = new DiagnosticAssemblyScanner(this.logger, nuGetDirectory);
+            IEnumerable<DiagnosticAnalyzer> analyzers = diagnosticAssemblyScanner.InstantiateDiagnostics(packageDirectory, LanguageNames.CSharp);
 
             this.logger.LogInfo(UIResources.APG_AnalyzersLocated, analyzers.Count());
 
