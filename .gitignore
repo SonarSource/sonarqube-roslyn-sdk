@@ -210,3 +210,9 @@ FakesAssemblies/
 GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
+
+# IntelliJ IDEA
+*.iws
+*.iml
+*.ipr
+.idea/
