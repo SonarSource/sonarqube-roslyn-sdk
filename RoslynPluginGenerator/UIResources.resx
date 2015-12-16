@@ -182,4 +182,36 @@
   <data name="NG_UsingLatestPackageVersion" xml:space="preserve">
     <value>Using version marked as latest.</value>
   </data>
+  <data name="RuleGen_DuplicateKey" xml:space="preserve">
+    <value>Skipping rule in analyzer {0}: Duplicate key.</value>
+  </data>
+  <data name="RuleGen_EmptyKey" xml:space="preserve">
+    <value>Skipping rule in analyzer {0}: No key found.</value>
+  </data>
+  <data name="RuleGen_ForMoreDetailsLink" xml:space="preserve">
+    <value>For more information visit &lt;a href="{0}" target="_blank"&gt;the rule's help page&lt;/a&gt;.</value>
+  </data>
+  <data name="RuleGen_MoreDetailsTitle" xml:space="preserve">
+    <value>More Details</value>
+  </data>
+  <data name="RuleGen_NoDescription" xml:space="preserve">
+    <value>No description was provided.</value>
+  </data>
+  <data name="Scanner_AnalyzerInstantiationFail" xml:space="preserve">
+    <value>Could not instantiate analyzers from '{0}'. 
+
+Error: {1}</value>
+  </data>
+  <data name="Scanner_AnalyzerLoaded" xml:space="preserve">
+    <value>Loaded analyzer: {0}</value>
+  </data>
+  <data name="Scanner_AnalyzersLoadSuccess" xml:space="preserve">
+    <value>Loaded: {0} analyzers.</value>
+  </data>
+  <data name="Scanner_AssemblyLoadSuccess" xml:space="preserve">
+    <value>Loaded assembly: {0}</value>
+  </data>
+  <data name="Scanner_NoAnalyzers" xml:space="preserve">
+    <value>No analyzers found in assembly.</value>
+  </data>
 </root>

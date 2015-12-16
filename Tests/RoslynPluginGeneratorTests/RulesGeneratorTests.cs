@@ -6,7 +6,6 @@
 //-----------------------------------------------------------------------
 using ExampleAnalyzer1;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SonarQube.Plugins.Roslyn;
 using System;
 using System.Linq;
 using SonarQube.Plugins.Test.Common;
@@ -47,7 +46,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             Rule rule2 = rules.Single(r => r.Key == diagnostic2.Id);
             VerifyRule(diagnostic2, rule2);
 
-            Assert.IsTrue(rule2.Description.Contains(Resources.NoDescription), "Invalid rule description");
+            Assert.IsTrue(rule2.Description.Contains(UIResources.RuleGen_NoDescription), "Invalid rule description");
         }
 
         [TestMethod]
@@ -93,7 +92,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             {
                 VerifyRuleValid(rule);
 
-                Assert.AreEqual(rule.Description, Resources.NoDescription);
+                Assert.AreEqual(rule.Description, UIResources.RuleGen_NoDescription);
             }
         }
 

@@ -18,7 +18,7 @@ using System.Reflection;
 namespace SonarQube.Plugins.Roslyn
 {
     /// <summary>
-    /// Generates SQ specific rule metadata from a Roslyn analyser assembly
+    /// Searches for and instantiates Roslyn analyzers in unknown
     /// </summary>
     public class DiagnosticAssemblyScanner
     {
@@ -53,7 +53,7 @@ namespace SonarQube.Plugins.Roslyn
         /// <see cref="DiagnosticAnalyzer"/>
         /// </summary>
         /// <returns>empty enumerable if no diagnostics were found</returns>
-        private IEnumerable<DiagnosticAnalyzer> InstantiateDiagnosticsFromAssembly(string assemblyPath, string language)
+        public IEnumerable<DiagnosticAnalyzer> InstantiateDiagnosticsFromAssembly(string assemblyPath, string language)
         {
             Assembly analyzerAssembly = LoadAnalyzerAssembly(assemblyPath);
             IEnumerable<DiagnosticAnalyzer> analyzers = null;
@@ -70,16 +70,16 @@ namespace SonarQube.Plugins.Roslyn
                     Debug.Assert(analyzers != null);
                     if (analyzers.Any())
                     {
-                        this.logger.LogInfo(Resources.Scanner_AnalyzersLoadSuccess, analyzers.Count());
+                        this.logger.LogInfo(UIResources.Scanner_AnalyzersLoadSuccess, analyzers.Count());
                     }
                     else
                     {
-                        this.logger.LogError(Resources.Scanner_NoAnalyzers);
+                        this.logger.LogError(UIResources.Scanner_NoAnalyzers);
                     }
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogError(Resources.Scanner_AnalyzerInstantiationFail, analyzerAssembly.FullName, ex.Message);
+                    this.logger.LogError(UIResources.Scanner_AnalyzerInstantiationFail, analyzerAssembly.FullName, ex.Message);
                 }
             }
 
@@ -112,7 +112,7 @@ namespace SonarQube.Plugins.Roslyn
                 }
             }
 
-            this.logger.LogInfo(Resources.Scanner_AssemblyLoadSuccess, analyzerAssembly.FullName);
+            this.logger.LogInfo(UIResources.Scanner_AssemblyLoadSuccess, analyzerAssembly.FullName);
             return analyzerAssembly;
         }
 
@@ -132,7 +132,7 @@ namespace SonarQube.Plugins.Roslyn
                     DiagnosticAnalyzer analyzer = (DiagnosticAnalyzer)Activator.CreateInstance(type);
                     analyzers.Add(analyzer);
 
-                    this.logger.LogDebug(Resources.Scanner_AnalyzerLoaded, analyzer.ToString());
+                    this.logger.LogDebug(UIResources.Scanner_AnalyzerLoaded, analyzer.ToString());
                 }
             }
 

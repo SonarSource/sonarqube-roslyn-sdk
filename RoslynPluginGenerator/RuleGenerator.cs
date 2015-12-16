@@ -51,7 +51,7 @@ namespace SonarQube.Plugins.Roslyn
                 {
                     if (rules.Any(r => String.Equals(r.Key, analyzerRule.Key, Rule.RuleKeyComparer)))
                     {
-                        logger.LogWarning(Resources.WARN_DuplicateKey, analyzerRule.Key);
+                        logger.LogWarning(UIResources.RuleGen_DuplicateKey, analyzerRule.Key);
                         continue;
                     }
 
@@ -76,7 +76,7 @@ namespace SonarQube.Plugins.Roslyn
             {
                 if (String.IsNullOrWhiteSpace(diagnostic.Id))
                 {
-                    logger.LogWarning(Resources.WARN_EmptyKey, analyzer.ToString());
+                    logger.LogWarning(UIResources.RuleGen_EmptyKey, analyzer.ToString());
                     continue;
                 }
 
@@ -134,14 +134,14 @@ namespace SonarQube.Plugins.Roslyn
 
             if (!String.IsNullOrWhiteSpace(diagnostic.HelpLinkUri))
             {
-                sb.AppendLine("<h2>" + Resources.MoreDetailsTitle + "</h2>");
-                sb.AppendLine(String.Format(Resources.ForMoreDetailsLink, diagnostic.HelpLinkUri));
+                sb.AppendLine("<h2>" + UIResources.RuleGen_MoreDetailsTitle + "</h2>");
+                sb.AppendLine(String.Format(UIResources.RuleGen_ForMoreDetailsLink, diagnostic.HelpLinkUri));
                 hasDescription = true;
             }
 
             if (!hasDescription)
             {
-                return Resources.NoDescription;
+                return UIResources.RuleGen_NoDescription;
             }
 
             return sb.ToString();

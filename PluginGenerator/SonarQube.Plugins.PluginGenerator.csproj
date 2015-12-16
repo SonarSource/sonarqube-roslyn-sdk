@@ -43,6 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataModel\Rule.cs" />
+    <Compile Include="DataModel\Rules.cs" />
     <Compile Include="Exceptions\CompilerException.cs" />
     <Compile Include="Interfaces\IJdkWrapper.cs" />
     <Compile Include="NuGet\DataModel.cs" />

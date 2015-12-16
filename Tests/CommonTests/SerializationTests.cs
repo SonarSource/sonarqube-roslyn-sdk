@@ -5,8 +5,6 @@
 // </copyright>
 //-----------------------------------------------------------------------
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SonarQube.Plugins.Roslyn;
-using System;
 using System.IO;
 using SonarQube.Plugins.Test.Common;
 

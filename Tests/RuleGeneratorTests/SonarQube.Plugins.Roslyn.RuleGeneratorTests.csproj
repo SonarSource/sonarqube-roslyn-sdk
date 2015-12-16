@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -99,18 +99,12 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="RulesGeneratorTests.cs" />
-    <Compile Include="SerializationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\SonarQube.Plugins.Common.csproj">
       <Project>{bb89698a-0807-44d2-87ec-6aa271200759}</Project>
       <Name>SonarQube.Plugins.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\RuleGenerator\SonarQube.Plugins.Roslyn.RuleGenerator.csproj">
-      <Project>{b6ed3e87-10a9-4e99-b0e2-fc35c7d39cf4}</Project>
-      <Name>SonarQube.Plugins.Roslyn.RuleGenerator</Name>
     </ProjectReference>
     <ProjectReference Include="..\Common\SonarQube.Plugins.Test.Common.csproj">
       <Project>{f60478ff-1eea-4fb4-9bf4-50d11f94fa57}</Project>
