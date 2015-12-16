@@ -4,8 +4,6 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
@@ -17,10 +15,12 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Rename;
-using Microsoft.CodeAnalysis.Text;
 
 namespace ExampleAnalyzer2
 {
+    /// <summary>
+    /// Code fix provider for testing purposes only.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ExampleAnalyzer2CodeFixProvider)), Shared]
     public class ExampleAnalyzer2CodeFixProvider : CodeFixProvider
     {
@@ -28,7 +28,7 @@ namespace ExampleAnalyzer2
 
         public sealed override ImmutableArray<string> FixableDiagnosticIds
         {
-            get { return ImmutableArray.Create(ExampleAnalyzer.DiagnosticId); }
+            get { return ImmutableArray.Create(ExampleAnalyzer2.DiagnosticId); }
         }
 
         public sealed override FixAllProvider GetFixAllProvider()

@@ -41,7 +41,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SimpleAnalyzer.cs" />
+    <Compile Include="CSharpAnalyzer.cs" />
     <Compile Include="VBAnalyzer.cs" />
   </ItemGroup>
   <ItemGroup>

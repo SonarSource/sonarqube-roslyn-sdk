@@ -4,12 +4,9 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
-using ExampleAnalyzer1;
-using ExampleAnalyzer2;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SonarQube.Plugins.Roslyn;
 using System.Collections.Generic;
 using System.Linq;
 using SonarQube.Plugins.Test.Common;
@@ -46,25 +43,13 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
 
             // Using name comparison because type comparison fails if the types are from assemblies with different paths (even if copied)
             // Loaded from ExampleAnalyzer1.dll
-            Assert.IsNotNull(
-                csharpDiagnostics.SingleOrDefault(d => d.GetType().FullName == typeof(SimpleAnalyzer).FullName),
-                "Expected a SimpleAnalyzer");
+            Assert_AnalyzerIsPresent(csharpDiagnostics, "ExampleAnalyzer1.CSharpAnalyzer");
+            Assert_AnalyzerIsPresent(csharpDiagnostics, "ExampleAnalyzer1.ConfigurableAnalyzer");
+            Assert_AnalyzerNotPresent(csharpDiagnostics, "ExampleAnalyzer1.AbstractAnalyzer");
 
-            Assert.IsNotNull(
-                csharpDiagnostics.SingleOrDefault(d => d.GetType().FullName == typeof(ConfigurableAnalyzer).FullName),
-                "Expected a ConfigurableAnalyzer");
-            
-            Assert.IsNotNull(
-                vbDiagnostics.SingleOrDefault(d => d.GetType().FullName == typeof(VBAnalyzer).FullName),
-                "Expected a VBAnalyzer");
-
-            Assert.IsNotNull(
-                vbDiagnostics.SingleOrDefault(d => d.GetType().FullName == typeof(ConfigurableAnalyzer).FullName),
-                "Expected a ConfigurableAnalyzer");
-
-            Assert.IsNull(
-                vbDiagnostics.SingleOrDefault(d => d.GetType().FullName == typeof(AbstractAnalyzer).FullName),
-                "Expected no abstract analyzers");
+            Assert_AnalyzerIsPresent(vbDiagnostics, "ExampleAnalyzer1.VBAnalyzer");
+            Assert_AnalyzerIsPresent(vbDiagnostics, "ExampleAnalyzer1.ConfigurableAnalyzer");
+            Assert_AnalyzerNotPresent(vbDiagnostics, "ExampleAnalyzer1.AbstractAnalyzer");
         }
 
         [TestMethod]
@@ -95,30 +80,16 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
 
             // Using name comparison because type comparison fails if the types are from assemblies with different paths (even if copied)
             // Loaded from ExampleAnalyzer1.dll
-            Assert.IsNotNull(
-                csharpDiagnostics.SingleOrDefault(d => d.GetType().FullName == typeof(SimpleAnalyzer).FullName),
-                "Expected a SimpleAnalyzer");
+            Assert_AnalyzerIsPresent(csharpDiagnostics, "ExampleAnalyzer1.CSharpAnalyzer");
+            Assert_AnalyzerIsPresent(csharpDiagnostics, "ExampleAnalyzer1.ConfigurableAnalyzer");
+            Assert_AnalyzerNotPresent(csharpDiagnostics, "ExampleAnalyzer1.AbstractAnalyzer");
 
-            Assert.IsNotNull(
-                csharpDiagnostics.SingleOrDefault(d => d.GetType().FullName == typeof(ConfigurableAnalyzer).FullName),
-                "Expected a ConfigurableAnalyzer");
-
-            Assert.IsNotNull(
-                vbDiagnostics.SingleOrDefault(d => d.GetType().FullName == typeof(VBAnalyzer).FullName),
-                "Expected a VBAnalyzer");
-
-            Assert.IsNotNull(
-                vbDiagnostics.SingleOrDefault(d => d.GetType().FullName == typeof(ConfigurableAnalyzer).FullName),
-                "Expected a ConfigurableAnalyzer");
-
-            Assert.IsNull(
-                vbDiagnostics.SingleOrDefault(d => d.GetType().FullName == typeof(AbstractAnalyzer).FullName),
-                "Expected no abstract analyzers");
+            Assert_AnalyzerIsPresent(vbDiagnostics, "ExampleAnalyzer1.VBAnalyzer");
+            Assert_AnalyzerIsPresent(vbDiagnostics, "ExampleAnalyzer1.ConfigurableAnalyzer");
+            Assert_AnalyzerNotPresent(vbDiagnostics, "ExampleAnalyzer1.AbstractAnalyzer");
 
             // Loaded from ExampleAnalyzer2.dll
-            Assert.IsNotNull(
-                csharpDiagnostics.SingleOrDefault(d => d.GetType().FullName == typeof(ExampleAnalyzer).FullName),
-                "Expected an ExampleAnalyzer");
+            Assert_AnalyzerIsPresent(csharpDiagnostics, "ExampleAnalyzer2.ExampleAnalyzer2");
         }
 
         [TestMethod]
@@ -142,5 +113,22 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             Assert.AreEqual(0, csharpDiagnostics.Count(), "No analyzers should have been detected");
             Assert.AreEqual(0, vbDiagnostics.Count(), "No analyzers should have been detected");
         }
+
+        #region Private Methods
+
+        private void Assert_AnalyzerIsPresent(IEnumerable<DiagnosticAnalyzer> analyzers, string analyzerName)
+        {
+            Assert.IsNotNull(
+                analyzers.SingleOrDefault(d => d.GetType().FullName == analyzerName),
+                "Expected an analyzer with name: " + analyzerName);
+        }
+        private void Assert_AnalyzerNotPresent(IEnumerable<DiagnosticAnalyzer> analyzers, string analyzerName)
+        {
+            Assert.IsNull(
+                analyzers.SingleOrDefault(d => d.GetType().FullName == analyzerName),
+                "Expected no analyzers with name: " + analyzerName);
+        }
+
+        #endregion
     }
 }
