@@ -155,6 +155,9 @@
   <data name="NG_DownloadingPackage" xml:space="preserve">
     <value>Downloading package...</value>
   </data>
+  <data name="NG_ERROR_NoReleasedVersionsFound" xml:space="preserve">
+    <value>No released versions of this package were found.</value>
+  </data>
   <data name="NG_ERROR_PackageNotFound" xml:space="preserve">
     <value>No packages with the specified id were found: {0}</value>
   </data>
