@@ -22,7 +22,7 @@ namespace SonarQube.Plugins.Roslyn {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class UIResources {
+    public class UIResources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace SonarQube.Plugins.Roslyn {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SonarQube.Plugins.Roslyn.UIResources", typeof(UIResources).Assembly);
@@ -51,7 +51,7 @@ namespace SonarQube.Plugins.Roslyn {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to Number of analyzers located in package: {0}.
         /// </summary>
-        internal static string APG_AnalyzersLocated {
+        public static string APG_AnalyzersLocated {
             get {
                 return ResourceManager.GetString("APG_AnalyzersLocated", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to Generating plugin....
         /// </summary>
-        internal static string APG_GeneratingPlugin {
+        public static string APG_GeneratingPlugin {
             get {
                 return ResourceManager.GetString("APG_GeneratingPlugin", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to Generating rules....
         /// </summary>
-        internal static string APG_GeneratingRules {
+        public static string APG_GeneratingRules {
             get {
                 return ResourceManager.GetString("APG_GeneratingRules", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to Looking for analyzers in the package....
         /// </summary>
-        internal static string APG_LocatingAnalyzers {
+        public static string APG_LocatingAnalyzers {
             get {
                 return ResourceManager.GetString("APG_LocatingAnalyzers", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to No analyzers were found in the specified package.
         /// </summary>
-        internal static string APG_NoAnalyzersFound {
+        public static string APG_NoAnalyzersFound {
             get {
                 return ResourceManager.GetString("APG_NoAnalyzersFound", resourceCulture);
             }
@@ -108,7 +108,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to Plugin generated: {0}.
         /// </summary>
-        internal static string APG_PluginGenerated {
+        public static string APG_PluginGenerated {
             get {
                 return ResourceManager.GetString("APG_PluginGenerated", resourceCulture);
             }
@@ -117,7 +117,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to {0} rules generated to {1}.
         /// </summary>
-        internal static string APG_RulesGeneratedToFile {
+        public static string APG_RulesGeneratedToFile {
             get {
                 return ResourceManager.GetString("APG_RulesGeneratedToFile", resourceCulture);
             }
@@ -126,7 +126,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to Roslyn Analyzer Plugin Generator for SonarQube.
         /// </summary>
-        internal static string AssemblyDescription {
+        public static string AssemblyDescription {
             get {
                 return ResourceManager.GetString("AssemblyDescription", resourceCulture);
             }
@@ -137,7 +137,7 @@ namespace SonarQube.Plugins.Roslyn {
         ///* NuGet package Id (mandatory), and
         ///* NuGet package version (optional).
         /// </summary>
-        internal static string CmdLine_ERROR_InvalidArgumentCount {
+        public static string CmdLine_ERROR_InvalidArgumentCount {
             get {
                 return ResourceManager.GetString("CmdLine_ERROR_InvalidArgumentCount", resourceCulture);
             }
@@ -146,7 +146,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to Creating NuGet repository: {0}.
         /// </summary>
-        internal static string NG_CreatingRepository {
+        public static string NG_CreatingRepository {
             get {
                 return ResourceManager.GetString("NG_CreatingRepository", resourceCulture);
             }
@@ -155,7 +155,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to ... downloaded ({0} files).
         /// </summary>
-        internal static string NG_DownloadedPackage {
+        public static string NG_DownloadedPackage {
             get {
                 return ResourceManager.GetString("NG_DownloadedPackage", resourceCulture);
             }
@@ -164,7 +164,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to Downloading package....
         /// </summary>
-        internal static string NG_DownloadingPackage {
+        public static string NG_DownloadingPackage {
             get {
                 return ResourceManager.GetString("NG_DownloadingPackage", resourceCulture);
             }
@@ -174,7 +174,7 @@ namespace SonarQube.Plugins.Roslyn {
         ///   Looks up a localized string similar to Failed to install package: {0}
         ///Check that there are released versions of the package, or specify a pre-release version identifier..
         /// </summary>
-        internal static string NG_ERROR_PackageInstallFail {
+        public static string NG_ERROR_PackageInstallFail {
             get {
                 return ResourceManager.GetString("NG_ERROR_PackageInstallFail", resourceCulture);
             }
@@ -183,7 +183,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to No packages with the specified id were found: {0}.
         /// </summary>
-        internal static string NG_ERROR_PackageNotFound {
+        public static string NG_ERROR_PackageNotFound {
             get {
                 return ResourceManager.GetString("NG_ERROR_PackageNotFound", resourceCulture);
             }
@@ -192,7 +192,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to Package version was not found: {0}.
         /// </summary>
-        internal static string NG_ERROR_PackageVersionNotFound {
+        public static string NG_ERROR_PackageVersionNotFound {
             get {
                 return ResourceManager.GetString("NG_ERROR_PackageVersionNotFound", resourceCulture);
             }
@@ -201,7 +201,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to Extracting file &apos;{0}&apos; to {1}.
         /// </summary>
-        internal static string NG_ExtractingFile {
+        public static string NG_ExtractingFile {
             get {
                 return ResourceManager.GetString("NG_ExtractingFile", resourceCulture);
             }
@@ -210,7 +210,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to - latest version.
         /// </summary>
-        internal static string NG_IsLatestPackageVersionSuffix {
+        public static string NG_IsLatestPackageVersionSuffix {
             get {
                 return ResourceManager.GetString("NG_IsLatestPackageVersionSuffix", resourceCulture);
             }
@@ -219,7 +219,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to Attempting to locate package with id &apos;{0}&apos;.
         /// </summary>
-        internal static string NG_LocatingPackages {
+        public static string NG_LocatingPackages {
             get {
                 return ResourceManager.GetString("NG_LocatingPackages", resourceCulture);
             }
@@ -228,7 +228,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to Number of packages located: {0}.
         /// </summary>
-        internal static string NG_NumberOfPackagesLocated {
+        public static string NG_NumberOfPackagesLocated {
             get {
                 return ResourceManager.GetString("NG_NumberOfPackagesLocated", resourceCulture);
             }
@@ -237,7 +237,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to Package versions:.
         /// </summary>
-        internal static string NG_PackageVersionListHeader {
+        public static string NG_PackageVersionListHeader {
             get {
                 return ResourceManager.GetString("NG_PackageVersionListHeader", resourceCulture);
             }
@@ -246,7 +246,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to Version was not specified. Using version {0}..
         /// </summary>
-        internal static string NG_SelectedPackageVersion {
+        public static string NG_SelectedPackageVersion {
             get {
                 return ResourceManager.GetString("NG_SelectedPackageVersion", resourceCulture);
             }
@@ -255,7 +255,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to Using version marked as latest..
         /// </summary>
-        internal static string NG_UsingLatestPackageVersion {
+        public static string NG_UsingLatestPackageVersion {
             get {
                 return ResourceManager.GetString("NG_UsingLatestPackageVersion", resourceCulture);
             }
@@ -264,7 +264,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to Skipping rule in analyzer {0}: Duplicate key..
         /// </summary>
-        internal static string RuleGen_DuplicateKey {
+        public static string RuleGen_DuplicateKey {
             get {
                 return ResourceManager.GetString("RuleGen_DuplicateKey", resourceCulture);
             }
@@ -273,7 +273,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to Skipping rule in analyzer {0}: No key found..
         /// </summary>
-        internal static string RuleGen_EmptyKey {
+        public static string RuleGen_EmptyKey {
             get {
                 return ResourceManager.GetString("RuleGen_EmptyKey", resourceCulture);
             }
@@ -282,7 +282,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to For more information visit &lt;a href=&quot;{0}&quot; target=&quot;_blank&quot;&gt;the rule&apos;s help page&lt;/a&gt;..
         /// </summary>
-        internal static string RuleGen_ForMoreDetailsLink {
+        public static string RuleGen_ForMoreDetailsLink {
             get {
                 return ResourceManager.GetString("RuleGen_ForMoreDetailsLink", resourceCulture);
             }
@@ -291,7 +291,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to More Details.
         /// </summary>
-        internal static string RuleGen_MoreDetailsTitle {
+        public static string RuleGen_MoreDetailsTitle {
             get {
                 return ResourceManager.GetString("RuleGen_MoreDetailsTitle", resourceCulture);
             }
@@ -300,7 +300,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to No description was provided..
         /// </summary>
-        internal static string RuleGen_NoDescription {
+        public static string RuleGen_NoDescription {
             get {
                 return ResourceManager.GetString("RuleGen_NoDescription", resourceCulture);
             }
@@ -311,7 +311,7 @@ namespace SonarQube.Plugins.Roslyn {
         ///
         ///Error: {1}.
         /// </summary>
-        internal static string Scanner_AnalyzerInstantiationFail {
+        public static string Scanner_AnalyzerInstantiationFail {
             get {
                 return ResourceManager.GetString("Scanner_AnalyzerInstantiationFail", resourceCulture);
             }
@@ -320,7 +320,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to Loaded analyzer: {0}.
         /// </summary>
-        internal static string Scanner_AnalyzerLoaded {
+        public static string Scanner_AnalyzerLoaded {
             get {
                 return ResourceManager.GetString("Scanner_AnalyzerLoaded", resourceCulture);
             }
@@ -329,7 +329,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to Loaded: {0} analyzers..
         /// </summary>
-        internal static string Scanner_AnalyzersLoadSuccess {
+        public static string Scanner_AnalyzersLoadSuccess {
             get {
                 return ResourceManager.GetString("Scanner_AnalyzersLoadSuccess", resourceCulture);
             }
@@ -338,7 +338,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to Loaded assembly: {0}.
         /// </summary>
-        internal static string Scanner_AssemblyLoadSuccess {
+        public static string Scanner_AssemblyLoadSuccess {
             get {
                 return ResourceManager.GetString("Scanner_AssemblyLoadSuccess", resourceCulture);
             }
@@ -347,7 +347,7 @@ namespace SonarQube.Plugins.Roslyn {
         /// <summary>
         ///   Looks up a localized string similar to No analyzers found in assembly..
         /// </summary>
-        internal static string Scanner_NoAnalyzers {
+        public static string Scanner_NoAnalyzers {
             get {
                 return ResourceManager.GetString("Scanner_NoAnalyzers", resourceCulture);
             }
