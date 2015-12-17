@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Test.Common;
 using System.IO;
+using NuGet;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
@@ -11,7 +12,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public TestContext TestContext { get; set; }
 
         [TestMethod]
-        public void TestDependencyResolutionFailure()
+        public void NuGet_TestDependencyResolutionFailure()
         {
             // Arrange
             string testDir = TestUtils.CreateTestDirectory(this.TestContext);
@@ -20,11 +21,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // Act
             // Fetch a package that should fail due to pre-release dependencies
-            handler.FetchPackage(AnalyzerPluginGenerator.NuGetPackageSource, "codeCracker", null, testDir);
+            IPackage package = handler.FetchPackage(AnalyzerPluginGenerator.NuGetPackageSource, "codeCracker", null, testDir);
 
             // Assert
             // No files should have been downloaded
             Assert.IsTrue(Directory.GetFiles(testDir).Length == 0);
+            Assert.IsNull(package);
         }
     }
 }

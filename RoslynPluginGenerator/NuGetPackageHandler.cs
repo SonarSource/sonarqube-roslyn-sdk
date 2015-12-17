@@ -101,7 +101,8 @@ namespace SonarQube.Plugins.Roslyn
                 IPackageManager manager = new PackageManager(repository, downloadDirectory);
                 manager.Logger = new NuGetLoggerAdapter(this.logger);
 
-                try {
+                try
+                {
                     manager.InstallPackage(package, false, false, false);
                 } catch (InvalidOperationException e)
                 {

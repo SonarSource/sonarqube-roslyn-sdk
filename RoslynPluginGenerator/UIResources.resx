@@ -156,7 +156,8 @@
     <value>Downloading package...</value>
   </data>
   <data name="NG_ERROR_PackageInstallFail" xml:space="preserve">
-    <value>Failed to install package: {0}</value>
+    <value>Failed to install package: {0}
+Check that there are released versions of the package, or specify a pre-release version identifier.</value>
   </data>
   <data name="NG_ERROR_PackageNotFound" xml:space="preserve">
     <value>No packages with the specified id were found: {0}</value>
