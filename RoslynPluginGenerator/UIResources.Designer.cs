@@ -171,6 +171,15 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to install package: {0}.
+        /// </summary>
+        internal static string NG_ERROR_PackageInstallFail {
+            get {
+                return ResourceManager.GetString("NG_ERROR_PackageInstallFail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No packages with the specified id were found: {0}.
         /// </summary>
         public static string NG_ERROR_PackageNotFound {

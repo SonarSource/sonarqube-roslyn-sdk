@@ -101,7 +101,13 @@ namespace SonarQube.Plugins.Roslyn
                 IPackageManager manager = new PackageManager(repository, downloadDirectory);
                 manager.Logger = new NuGetLoggerAdapter(this.logger);
 
-                manager.InstallPackage(package, false, false, false);
+                try {
+                    manager.InstallPackage(package, false, false, false);
+                } catch (InvalidOperationException e)
+                {
+                    logger.LogError(UIResources.NG_ERROR_PackageInstallFail, e.Message);
+                    return null;
+                }
             }
 
             return package;
