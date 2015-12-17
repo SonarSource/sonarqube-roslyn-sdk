@@ -42,6 +42,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests", "Tests\RoslynPluginGeneratorTests\SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests.csproj", "{AAE84E64-5977-44D7-8959-80F59FA2B0C1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleAnalyzer2", "Tests\ExampleAnalyzers\ExampleAnalyzer2\ExampleAnalyzer2\ExampleAnalyzer2.csproj", "{AAAFF8DB-1438-4066-BE44-353B09CF6518}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonarLint.Metadata", "SonarLint.Metadata\SonarLint.Metadata.csproj", "{FD1E676B-A621-494B-9E2F-083940100415}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -95,6 +96,10 @@ Global
 		{AAAFF8DB-1438-4066-BE44-353B09CF6518}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAAFF8DB-1438-4066-BE44-353B09CF6518}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAAFF8DB-1438-4066-BE44-353B09CF6518}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD1E676B-A621-494B-9E2F-083940100415}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD1E676B-A621-494B-9E2F-083940100415}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD1E676B-A621-494B-9E2F-083940100415}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD1E676B-A621-494B-9E2F-083940100415}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
