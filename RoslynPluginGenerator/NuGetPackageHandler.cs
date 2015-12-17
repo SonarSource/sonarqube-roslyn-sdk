@@ -166,7 +166,16 @@ namespace SonarQube.Plugins.Roslyn
 
             if (package == null)
             {
-                package = packages.OrderBy(p => p.Version).Last();
+                IEnumerable<NuGet.IPackage> releasedPackages = packages.Where(p => p.IsReleaseVersion());
+
+                // If no release versions (i.e. only prereleases) are available, fail
+                if (releasedPackages.IsEmpty())
+                { 
+                    logger.LogError(UIResources.NG_ERROR_NoReleasedVersionsFound);
+                    return null;
+                }
+
+                package = releasedPackages.OrderBy(p => p.Version).LastOrDefault();
             }
             else
             {
