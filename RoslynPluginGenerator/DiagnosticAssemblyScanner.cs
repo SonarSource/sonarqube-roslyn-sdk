@@ -18,7 +18,7 @@ using System.Reflection;
 namespace SonarQube.Plugins.Roslyn
 {
     /// <summary>
-    /// Searches for and instantiates Roslyn analyzers in unknown
+    /// Searches for and instantiates Roslyn analyzers in unknown folders and/or assemblies.
     /// </summary>
     public class DiagnosticAssemblyScanner
     {
@@ -53,7 +53,7 @@ namespace SonarQube.Plugins.Roslyn
         /// <see cref="DiagnosticAnalyzer"/>
         /// </summary>
         /// <returns>empty enumerable if no diagnostics were found</returns>
-        public IEnumerable<DiagnosticAnalyzer> InstantiateDiagnosticsFromAssembly(string assemblyPath, string language)
+        private IEnumerable<DiagnosticAnalyzer> InstantiateDiagnosticsFromAssembly(string assemblyPath, string language)
         {
             Assembly analyzerAssembly = LoadAnalyzerAssembly(assemblyPath);
             IEnumerable<DiagnosticAnalyzer> analyzers = null;
