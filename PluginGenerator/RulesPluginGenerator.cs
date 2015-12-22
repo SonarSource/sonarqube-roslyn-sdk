@@ -8,11 +8,14 @@ using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace SonarQube.Plugins
 {
     public class RulesPluginGenerator
     {
+        private const string RulesExtensionClassName = "PluginRulesDefinition.class";
+
         private readonly IJdkWrapper jdkWrapper;
         private readonly ILogger logger;
 
@@ -95,10 +98,18 @@ namespace SonarQube.Plugins
             // Generate the source files
             Dictionary<string, string> replacementMap = new Dictionary<string, string>();
             PopulateSourceFileReplacements(definition, replacementMap);
-            SourceGenerator.CreateSourceFiles(typeof(RulesPluginGenerator).Assembly, "SonarQube.Plugins.Resources.", workingFolder, replacementMap);
+            SourceGenerator.CreateSourceFiles(typeof(RulesPluginGenerator).Assembly, "SonarQube.Plugins.Resources.Rules", workingFolder, replacementMap);
 
             // Add the source files
             foreach (string sourceFile in Directory.GetFiles(workingFolder, "*.java", SearchOption.AllDirectories))
+            {
+                builder.AddSourceFile(sourceFile);
+            }
+
+            builder.AddExtension(RulesExtensionClassName);
+
+            // Add any user-specified source files
+            foreach(string sourceFile in definition.AdditionalSourceFiles ?? Enumerable.Empty<string>())
             {
                 builder.AddSourceFile(sourceFile);
             }

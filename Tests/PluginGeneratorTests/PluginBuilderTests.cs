@@ -60,6 +60,8 @@ public final class Program
             PluginBuilder builder = new PluginBuilder(new TestLogger());
 
             builder
+                .SetPluginKey("invalid.plugin")
+                .AddExtension("dummyExtension")
                 .AddSourceFile(source1)
                 .SetJarFilePath(pluginFilePath)
                 .SetProperty("Property1", "prop 1 value");

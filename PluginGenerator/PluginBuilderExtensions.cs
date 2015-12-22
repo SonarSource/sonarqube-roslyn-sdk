@@ -109,7 +109,7 @@ namespace SonarQube.Plugins
 
             return builder;
         }
-
+        
         private static void SetNonNullManifestProperty(string property, string value, PluginBuilder pluginBuilder)
         {
             if (!string.IsNullOrWhiteSpace(value))

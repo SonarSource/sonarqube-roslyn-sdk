@@ -23,7 +23,10 @@ namespace SonarQube.Plugins.Test.Common
             }
             catch(Exception ex)
             {
-                Assert.IsTrue(typeof(T).IsAssignableFrom(ex.GetType()), "Thrown exception is not of the expected type");
+                Assert.IsTrue(typeof(T).IsAssignableFrom(ex.GetType()),
+                    "Thrown exception is not of the expected type. Expected: {0}, actual: {1}",
+                    typeof(T).FullName,
+                    ex.GetType().FullName);
                 actual = ex;
             }
 

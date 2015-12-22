@@ -162,4 +162,10 @@
   <data name="Gen_ExistingJarWillBeOvewritten" xml:space="preserve">
     <value>The existing jar file will be overwritten</value>
   </data>
+  <data name="CoreBuilder_MustSpecifyAnExtensionClass" xml:space="preserve">
+    <value>At least one extension class must be specified</value>
+  </data>
+  <data name="CoreBuilder_PluginKeyIsRequired" xml:space="preserve">
+    <value>The plugin key must be specified</value>
+  </data>
 </root>

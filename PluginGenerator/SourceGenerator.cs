@@ -88,7 +88,7 @@ namespace SonarQube.Plugins
         public static void UnpackReferencedJarFiles(Assembly resourceAssembly, string rootResourceName, string outputDir)
         {
             // Unpack the embedded jar files into the output directory
-            foreach (string resourceName in resourceAssembly.GetManifestResourceNames().Where(n => n.EndsWith(".jar")))
+            foreach (string resourceName in resourceAssembly.GetManifestResourceNames().Where(n => n.StartsWith(rootResourceName) && n.EndsWith(".jar")))
             {
                 string fullJarPath = Path.Combine(outputDir, CalculateJarFileName(rootResourceName, resourceName));
 

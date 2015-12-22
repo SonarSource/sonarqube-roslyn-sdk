@@ -82,6 +82,24 @@ namespace SonarQube.Plugins {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to At least one extension class must be specified.
+        /// </summary>
+        internal static string CoreBuilder_MustSpecifyAnExtensionClass {
+            get {
+                return ResourceManager.GetString("CoreBuilder_MustSpecifyAnExtensionClass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The plugin key must be specified.
+        /// </summary>
+        internal static string CoreBuilder_PluginKeyIsRequired {
+            get {
+                return ResourceManager.GetString("CoreBuilder_PluginKeyIsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Required plugin definition property is missing: {0}.
         /// </summary>
         internal static string Error_MissingProperty {

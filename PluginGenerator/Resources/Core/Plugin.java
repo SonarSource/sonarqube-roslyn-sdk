@@ -22,7 +22,7 @@ public final class Plugin extends SonarPlugin {
 
     return Arrays.asList(
       // Definitions
-      PluginRulesDefinition.class
+      [CORE_EXTENSION_CLASS_LIST]
     );
   }
 }
