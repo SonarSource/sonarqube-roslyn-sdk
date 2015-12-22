@@ -1,4 +1,4 @@
-﻿package myorg.[PLUGIN_KEY];
+﻿package [PLUGIN_PACKAGE];
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -18,7 +18,7 @@ public final class PluginRulesDefinition implements RulesDefinition {
   protected static final String KEY = "[PLUGIN_KEY]";
   protected static final String NAME = "[PLUGIN_NAME]";
 
-  protected static final List<String> LANGUAGE_KEYS = Arrays.asList("[LANGUAGE]");
+  protected static final List<String> LANGUAGE_KEYS = Arrays.asList("[RULE_LANGUAGE]");
 
   public PluginRulesDefinition() {
   }

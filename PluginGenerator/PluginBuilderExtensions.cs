@@ -41,48 +41,6 @@ namespace SonarQube.Plugins
             return builder;
         }
 
-        public static PluginBuilder SetDescription(this PluginBuilder builder, string description)
-        {
-            if (builder == null)
-            {
-                throw new ArgumentNullException("builder");
-            }
-            if (string.IsNullOrWhiteSpace(description))
-            {
-                throw new ArgumentNullException("description");
-            }
-            builder.SetProperty(WellKnownPluginProperties.Description, description);
-            return builder;
-        }
-
-        public static PluginBuilder SetVersion(this PluginBuilder builder, string version)
-        {
-            if (builder == null)
-            {
-                throw new ArgumentNullException("builder");
-            }
-            if (string.IsNullOrWhiteSpace(version))
-            {
-                throw new ArgumentNullException("version");
-            }
-            builder.SetProperty(WellKnownPluginProperties.Description, version);
-            return builder;
-        }
-
-        public static PluginBuilder SetClass(this PluginBuilder builder, string qualifiedClassName)
-        {
-            if (builder == null)
-            {
-                throw new ArgumentNullException("builder");
-            }
-            if (string.IsNullOrWhiteSpace(qualifiedClassName))
-            {
-                throw new ArgumentNullException("qualifiedClassName");
-            }
-            builder.SetProperty(WellKnownPluginProperties.Class, qualifiedClassName);
-            return builder;
-        }
-
         public static PluginBuilder SetProperties(this PluginBuilder builder, PluginDefinition definition)
         {
             if (builder == null)

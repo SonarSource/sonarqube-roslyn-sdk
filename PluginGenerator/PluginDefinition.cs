@@ -45,15 +45,10 @@ namespace SonarQube.Plugins
         public IDictionary<string, string> AdditionalFileMap { get { return this.relativePathToFileMap; } }
 
         /// <summary>
-        /// Additional source files that should be compiled as part of the jar
-        /// </summary>
-        public IList<string> AdditionalSourceFiles { get; set; }
-
-        /// <summary>
-        /// The fully-qualified names of any additional compied classes that should
+        /// The fully-qualified names of any classes that should
         /// be exported as SonarQube extensions
         /// </summary>
-        public IList<string> AdditionalExtensions { get; set; }
+        public List<string> Extensions { get; set; }
 
         #region Serialization
 

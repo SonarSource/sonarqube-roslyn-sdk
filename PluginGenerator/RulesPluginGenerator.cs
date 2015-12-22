@@ -8,13 +8,13 @@ using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace SonarQube.Plugins
 {
     public class RulesPluginGenerator
     {
         private const string RulesExtensionClassName = "PluginRulesDefinition.class";
+        private const string RulesResourcesRoot = "SonarQube.Plugins.Resources.Rules.";
 
         private readonly IJdkWrapper jdkWrapper;
         private readonly ILogger logger;
@@ -95,24 +95,11 @@ namespace SonarQube.Plugins
         {
             PluginBuilder builder = new PluginBuilder(this.jdkWrapper, this.logger);
 
-            // Generate the source files
-            Dictionary<string, string> replacementMap = new Dictionary<string, string>();
-            PopulateSourceFileReplacements(definition, replacementMap);
-            SourceGenerator.CreateSourceFiles(typeof(RulesPluginGenerator).Assembly, "SonarQube.Plugins.Resources.Rules", workingFolder, replacementMap);
-
-            // Add the source files
-            foreach (string sourceFile in Directory.GetFiles(workingFolder, "*.java", SearchOption.AllDirectories))
-            {
-                builder.AddSourceFile(sourceFile);
-            }
-
+            AddRuleSources(workingFolder, builder);
+            ConfigureSourceFileReplacements(definition, builder);
             builder.AddExtension(RulesExtensionClassName);
 
-            // Add any user-specified source files
-            foreach(string sourceFile in definition.AdditionalSourceFiles ?? Enumerable.Empty<string>())
-            {
-                builder.AddSourceFile(sourceFile);
-            }
+            AddRuleJars(workingFolder, builder);
 
             // Add any additional files to the jar
             foreach(KeyValuePair<string, string> kvp in definition.AdditionalFileMap)
@@ -124,16 +111,33 @@ namespace SonarQube.Plugins
             builder.AddResourceFile(rulesFilePath, "resources/rules.xml");
             builder.SetProperties(definition);
             builder.SetJarFilePath(fullJarPath);
-            builder.SetProperty(WellKnownPluginProperties.Class, "myorg." + definition.Key + ".Plugin");
 
             builder.Build();
         }
 
-        private static void PopulateSourceFileReplacements(PluginDefinition definition, IDictionary<string, string> replacementMap)
+        private void AddRuleSources(string workingDirectory, PluginBuilder builder)
         {
-            replacementMap.Add("[LANGUAGE]", definition.Language);
-            replacementMap.Add("[PLUGIN_KEY]", definition.Key);
-            replacementMap.Add("[PLUGIN_NAME]", definition.Name);
+            SourceGenerator.CreateSourceFiles(typeof(RulesPluginGenerator).Assembly, RulesResourcesRoot, workingDirectory, new Dictionary<string, string>());
+
+            foreach (string sourceFile in Directory.GetFiles(workingDirectory, "*.java", SearchOption.AllDirectories))
+            {
+                builder.AddSourceFile(sourceFile);
+            }
+        }
+
+        private static void ConfigureSourceFileReplacements(PluginDefinition definition, PluginBuilder builder)
+        {
+            builder.SetSourceCodeTokenReplacement(WellKnownSourceCodeTokens.Rule_Language, definition.Language);
+        }
+
+        private void AddRuleJars(string workingDirectory, PluginBuilder builder)
+        {
+            // Unpack and reference the required jar files
+            SourceGenerator.UnpackReferencedJarFiles(typeof(RulesPluginGenerator).Assembly, RulesResourcesRoot, workingDirectory);
+            foreach (string jarFile in Directory.GetFiles(workingDirectory, "*.jar"))
+            {
+                builder.AddReferencedJar(jarFile);
+            }
         }
 
     }

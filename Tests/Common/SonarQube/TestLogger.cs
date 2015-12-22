@@ -210,7 +210,12 @@ namespace SonarQube.Plugins.Test.Common
 
         private static string GetFormattedMessage(string message, params object[] args)
         {
-            return string.Format(System.Globalization.CultureInfo.CurrentCulture, message, args);
+            string formatted = message;
+            if (args.Any())
+            {
+                formatted = string.Format(System.Globalization.CultureInfo.CurrentCulture, message, args);
+            }
+            return formatted;
         }
 
         #endregion

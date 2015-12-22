@@ -57,7 +57,7 @@
     <Compile Include="NuGetDataModelTests.cs" />
     <Compile Include="PluginBuilderTests.cs" />
     <Compile Include="PluginDefinitionTests.cs" />
-    <Compile Include="RulePluginGeneratorTests.cs" />
+    <Compile Include="RulesPluginGeneratorTests.cs" />
     <Compile Include="SourceGeneratorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

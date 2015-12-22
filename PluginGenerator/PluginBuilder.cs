@@ -17,7 +17,23 @@ namespace SonarQube.Plugins
     {
         public const string SONARQUBE_API_VERSION = "4.5.2";
 
-        private const string ExtensionListReplacementKey = "CORE_EXTENSION_CLASS_LIST";
+        /// <summary>
+        /// The name of the package in which the plugin will be created
+        /// </summary>
+        private const string CorePluginPackageNameTemplate = "org.sonarqube.plugin.sdk.[PLUGIN_KEY]";
+
+        /// <summary>
+        /// The name of the class that SonarQube should load to discover the
+        /// extensions offered by the plugin
+        /// </summary>
+        private const string CorePluginEntryClassTemplate = "[PLUGIN_PACKGE].Plugin";
+
+        /// <summary>
+        /// Token that should be replaced with a list of the classes that exposed by
+        /// the plugin as a extensions.
+        /// Sample value: "org.sonarqube.plugin.sdk.MyRulesDefinition.class, myorg.otherExtension.class"
+        /// </summary>
+        private const string ExtensionListToken = "[CORE_EXTENSION_CLASS_LIST]";
 
         private readonly IJdkWrapper jdkWrapper;
         private readonly ILogger logger;
@@ -41,6 +57,8 @@ namespace SonarQube.Plugins
             "sonar-plugin-api-4.5.2.jar",
             "slf4j-api-1.7.5.jar" // available in the sonar-plugin-api
         };
+
+        #region Public methods
 
         public PluginBuilder(IJdkWrapper jdkWrapper, ILogger logger)
         {
@@ -108,6 +126,20 @@ namespace SonarQube.Plugins
         }
 
         /// <summary>
+        /// Specifies a value to replace a source code token with before compiling
+        /// </summary>
+        public PluginBuilder SetSourceCodeTokenReplacement(string token, string value)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentNullException("token");
+            }
+
+            this.sourceFileReplacements[token] = value;
+            return this;
+        }
+
+        /// <summary>
         /// Adds a reference to a jar file that is required to compile the source
         /// </summary>
         public PluginBuilder AddReferencedJar(string fullJarFilePath)
@@ -120,13 +152,17 @@ namespace SonarQube.Plugins
             return this;
         }
 
-        public PluginBuilder AddExtension(string fullExtensionClassPath)
+        public PluginBuilder AddExtension(string fullExtensionClassName)
         {
-            if (string.IsNullOrWhiteSpace(fullExtensionClassPath))
+            if (string.IsNullOrWhiteSpace(fullExtensionClassName))
             {
                 throw new ArgumentNullException("fullExtensionClassPath");
             }
-            this.extensionClasses.Add(fullExtensionClassPath);
+
+            string resolvedClassName = (fullExtensionClassName.EndsWith(".class", StringComparison.InvariantCulture))
+                ? fullExtensionClassName : fullExtensionClassName + ".class";
+
+            this.extensionClasses.Add(resolvedClassName);
             return this;
         }
 
@@ -156,7 +192,7 @@ namespace SonarQube.Plugins
                 throw new InvalidOperationException(UIResources.JarB_JDK_NotInstalled);
             }
 
-            Validate();
+            this.Validate();
 
             // Temp working folder
             string tempWorkingDir = Path.Combine(Path.GetTempPath(), "plugins",  Guid.NewGuid().ToString());
@@ -165,7 +201,6 @@ namespace SonarQube.Plugins
             AddCoreJars(tempWorkingDir);
             AddCoreSources(tempWorkingDir);
             ConfigureSourceFileReplacements(); // Calculate the complete list of extensions to be exported
-
             FixUpSourceFiles();
 
             // Compile sources
@@ -174,6 +209,10 @@ namespace SonarQube.Plugins
             // Build jar
             BuildJar(tempWorkingDir);
         }
+
+        public string JarFilePath { get { return this.outputJarFilePath; } }
+
+        #endregion
 
         #region Private methods
 
@@ -189,6 +228,11 @@ namespace SonarQube.Plugins
             {
                 throw new InvalidOperationException(UIResources.CoreBuilder_PluginKeyIsRequired);
             }
+
+            if (string.IsNullOrWhiteSpace(this.FindPluginName()))
+            {
+                throw new InvalidOperationException(UIResources.CoreBuilder_PluginNameIsRequired);
+            }
         }
 
         private string FindPluginKey()
@@ -196,6 +240,40 @@ namespace SonarQube.Plugins
             string pluginKey;
             this.properties.TryGetValue(WellKnownPluginProperties.Key, out pluginKey);
             return pluginKey;
+        }
+
+        private string FindPluginName()
+        {
+            string pluginName;
+            this.properties.TryGetValue(WellKnownPluginProperties.PluginName, out pluginName);
+            return pluginName;
+        }
+
+        private void AddCoreSources(string workingDirectory)
+        {
+            SourceGenerator.CreateSourceFiles(typeof(RulesPluginGenerator).Assembly, "SonarQube.Plugins.Resources.Core.", workingDirectory, new Dictionary<string, string>());
+
+            foreach (string sourceFile in Directory.GetFiles(workingDirectory, "*.java", SearchOption.AllDirectories))
+            {
+                this.AddSourceFile(sourceFile);
+            }
+        }
+
+        private void ConfigureSourceFileReplacements()
+        {
+            string pluginKey = this.FindPluginKey();
+            string packageName = CorePluginPackageNameTemplate.Replace(WellKnownSourceCodeTokens.Core_PluginKey, pluginKey);
+            string fullPluginClassName = CorePluginEntryClassTemplate.Replace(WellKnownSourceCodeTokens.Core_PluginPackage, packageName);
+
+            this.sourceFileReplacements.Add(WellKnownSourceCodeTokens.Core_PluginPackage, packageName);
+            this.sourceFileReplacements.Add(WellKnownSourceCodeTokens.Core_PluginKey, pluginKey);
+            this.sourceFileReplacements.Add(WellKnownSourceCodeTokens.Core_PluginName, this.FindPluginName());
+
+            this.SetProperty(WellKnownPluginProperties.Class, fullPluginClassName);
+
+            // Build and set the list of extensions to be exported
+            string javaList = string.Join(", " + Environment.NewLine, this.extensionClasses);
+            this.sourceFileReplacements.Add(ExtensionListToken, javaList);
         }
 
         private void AddCoreJars(string workingDirectory)
@@ -208,21 +286,9 @@ namespace SonarQube.Plugins
             }
         }
 
-        private void AddCoreSources(string workingDirectory)
-        {
-            SourceGenerator.CreateSourceFiles(typeof(RulesPluginGenerator).Assembly, "SonarQube.Plugins.Resources.Core.", workingDirectory, new Dictionary<string, string>());
-        }
-
-        private void ConfigureSourceFileReplacements()
-        {
-            // Ensure the plugin key is set
-            this.SetPluginKey(this.FindPluginKey());
-
-            // Build and set the list of extensions to be exported
-            string javaList = string.Join(", " + Environment.NewLine, this.extensionClasses);
-            this.sourceFileReplacements.Add(ExtensionListReplacementKey, javaList);
-        }
-
+        /// <summary>
+        /// Perform token-based substitution into the supplied source files prior to compiling
+        /// </summary>
         private void FixUpSourceFiles()
         {
             foreach (string sourceFile in this.sourceFiles)
@@ -262,7 +328,7 @@ namespace SonarQube.Plugins
             else
             {
                 logger.LogError(UIResources.JComp_SourceCompilationFailed);
-                throw new CompilerException(UIResources.JComp_CompliationFailed);
+                throw new JavaCompilerException(UIResources.JComp_CompliationFailed);
             }
         }
 

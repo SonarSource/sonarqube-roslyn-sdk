@@ -168,4 +168,7 @@
   <data name="CoreBuilder_PluginKeyIsRequired" xml:space="preserve">
     <value>The plugin key must be specified</value>
   </data>
+  <data name="CoreBuilder_PluginNameIsRequired" xml:space="preserve">
+    <value>The plugin name must be specified</value>
+  </data>
 </root>

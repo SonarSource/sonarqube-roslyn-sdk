@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------
-// <copyright file="RulePluginGeneratorTests.cs" company="SonarSource SA and Microsoft Corporation">
+// <copyright file="RulesPluginGeneratorTests.cs" company="SonarSource SA and Microsoft Corporation">
 //   Copyright (c) SonarSource SA and Microsoft Corporation.  All rights reserved.
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
@@ -12,12 +12,12 @@ using SonarQube.Plugins.Test.Common;
 namespace SonarQube.Plugins.PluginGeneratorTests
 {
     [TestClass]
-    public class RulePluginGeneratorTests
+    public class RulesPluginGeneratorTests
     {
         public TestContext TestContext { get; set; }
 
         [TestMethod]
-        public void PluginGen_Simple()
+        public void RulePluginGen_Simple()
         {
             string inputDir = TestUtils.CreateTestDirectory(this.TestContext, "input");
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, "output");
@@ -49,9 +49,8 @@ namespace SonarQube.Plugins.PluginGeneratorTests
             new JarChecker(this.TestContext, fullJarFilePath)
                 .JarContainsFiles(
                     "resources\\rules.xml",
-                    "myorg\\MyPlugin\\Plugin.class",
-                    "myorg\\MyPlugin\\PluginRulesDefinition.class");
+                    "org\\sonarqube\\plugin\\sdk\\MyPlugin\\Plugin.class",
+                    "org\\sonarqube\\plugin\\sdk\\MyPlugin\\PluginRulesDefinition.class");
         }
-
     }
 }

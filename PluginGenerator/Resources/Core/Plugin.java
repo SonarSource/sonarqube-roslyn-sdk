@@ -1,4 +1,4 @@
-﻿package myorg.[PLUGIN_KEY];
+﻿package [PLUGIN_PACKAGE];
 
 import java.util.Arrays;
 import java.util.List;

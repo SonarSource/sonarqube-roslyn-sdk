@@ -100,6 +100,15 @@ namespace SonarQube.Plugins {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The plugin name must be specified.
+        /// </summary>
+        internal static string CoreBuilder_PluginNameIsRequired {
+            get {
+                return ResourceManager.GetString("CoreBuilder_PluginNameIsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Required plugin definition property is missing: {0}.
         /// </summary>
         internal static string Error_MissingProperty {
