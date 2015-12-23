@@ -200,8 +200,8 @@ namespace SonarQube.Plugins
 
             AddCoreJars(tempWorkingDir);
             AddCoreSources(tempWorkingDir);
-            ConfigureSourceFileReplacements(); // Calculate the complete list of extensions to be exported
-            FixUpSourceFiles();
+            ConfigureSourceFileReplacements();
+            ReplaceTokensInSources();
 
             // Compile sources
             CompileJavaFiles(tempWorkingDir);
@@ -289,7 +289,7 @@ namespace SonarQube.Plugins
         /// <summary>
         /// Perform token-based substitution into the supplied source files prior to compiling
         /// </summary>
-        private void FixUpSourceFiles()
+        private void ReplaceTokensInSources()
         {
             foreach (string sourceFile in this.sourceFiles)
             {
