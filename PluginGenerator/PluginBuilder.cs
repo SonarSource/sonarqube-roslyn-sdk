@@ -26,7 +26,7 @@ namespace SonarQube.Plugins
         /// The name of the class that SonarQube should load to discover the
         /// extensions offered by the plugin
         /// </summary>
-        private const string CorePluginEntryClassTemplate = "[PLUGIN_PACKGE].Plugin";
+        private const string CorePluginEntryClassTemplate = "[PLUGIN_PACKAGE].Plugin";
 
         /// <summary>
         /// Token that should be replaced with a list of the classes that exposed by
