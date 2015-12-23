@@ -251,7 +251,7 @@ namespace SonarQube.Plugins
 
         private void AddCoreSources(string workingDirectory)
         {
-            SourceGenerator.CreateSourceFiles(typeof(RulesPluginGenerator).Assembly, "SonarQube.Plugins.Resources.Core.", workingDirectory, new Dictionary<string, string>());
+            SourceGenerator.CreateSourceFiles(typeof(RulesPluginBuilder).Assembly, "SonarQube.Plugins.Resources.Core.", workingDirectory, new Dictionary<string, string>());
 
             foreach (string sourceFile in Directory.GetFiles(workingDirectory, "*.java", SearchOption.AllDirectories))
             {
@@ -279,7 +279,7 @@ namespace SonarQube.Plugins
         private void AddCoreJars(string workingDirectory)
         {
             // Unpack and reference the required jar files
-            SourceGenerator.UnpackReferencedJarFiles(typeof(RulesPluginGenerator).Assembly, "SonarQube.Plugins.Resources.Core.", workingDirectory);
+            SourceGenerator.UnpackReferencedJarFiles(typeof(RulesPluginBuilder).Assembly, "SonarQube.Plugins.Resources.Core.", workingDirectory);
             foreach (string jarFile in Directory.GetFiles(workingDirectory, "*.jar"))
             {
                 this.AddReferencedJar(jarFile);

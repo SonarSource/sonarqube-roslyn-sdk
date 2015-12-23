@@ -127,6 +127,15 @@ namespace SonarQube.Plugins {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The specified sqale file does not exist: {0}.
+        /// </summary>
+        internal static string Gen_Error_SqaleFileDoesNotExists {
+            get {
+                return ResourceManager.GetString("Gen_Error_SqaleFileDoesNotExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The existing jar file will be overwritten.
         /// </summary>
         internal static string Gen_ExistingJarWillBeOvewritten {

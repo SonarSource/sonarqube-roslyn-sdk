@@ -171,4 +171,7 @@
   <data name="CoreBuilder_PluginNameIsRequired" xml:space="preserve">
     <value>The plugin name must be specified</value>
   </data>
+  <data name="Gen_Error_SqaleFileDoesNotExists" xml:space="preserve">
+    <value>The specified sqale file does not exist: {0}</value>
+  </data>
 </root>

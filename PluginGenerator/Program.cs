@@ -5,12 +5,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 using SonarQube.Plugins.Common;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SonarQube.Plugins.PluginGenerator
 {
@@ -38,14 +33,15 @@ namespace SonarQube.Plugins.PluginGenerator
             string fullNewJarFilePath = Path.Combine(Directory.GetCurrentDirectory(),
                 Path.GetFileNameWithoutExtension(pluginDefnFilePath) + ".jar");
 
+            string sqaleFilePath = null;
             if (args.Length == 3)
             {
-                string sqaleFilePath = args[2];
-                defn.AdditionalFileMap["resources/sqale.xml"] = sqaleFilePath;
+                sqaleFilePath = args[2];
             }
 
-            RulesPluginGenerator generator = new RulesPluginGenerator(new JdkWrapper(), logger);
-            generator.GeneratePlugin(defn, rulesFilePath, fullNewJarFilePath);
+            PluginBuilder builder = new PluginBuilder(logger);
+            RulesPluginBuilder.ConfigureBuilder(builder, defn, rulesFilePath, sqaleFilePath);
+            builder.Build();
 
             return SUCCESS_CODE;
         }

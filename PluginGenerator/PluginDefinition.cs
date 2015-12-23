@@ -38,13 +38,6 @@ namespace SonarQube.Plugins
         public string Organization { get; set; }
 
         /// <summary>
-        /// Returns additional files that should be added to the jar.
-        /// Key: relative path in jar
-        /// Value: the full path to the source file
-        /// </summary>
-        public IDictionary<string, string> AdditionalFileMap { get { return this.relativePathToFileMap; } }
-
-        /// <summary>
         /// The fully-qualified names of any classes that should
         /// be exported as SonarQube extensions
         /// </summary>

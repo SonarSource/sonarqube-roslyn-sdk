@@ -26,7 +26,7 @@ namespace SonarQube.Plugins.PluginGeneratorTests
             string rulesXmlFilePath = TestUtils.CreateTextFile("rules.xml", inputDir, "<xml Rules />");
 
             IJdkWrapper jdkWrapper = new JdkWrapper();
-            RulesPluginGenerator generator = new RulesPluginGenerator(jdkWrapper, new TestLogger());
+            RulesPluginBuilder generator = new RulesPluginBuilder(jdkWrapper, new TestLogger());
 
             PluginDefinition defn = new PluginDefinition()
             {
@@ -37,7 +37,7 @@ namespace SonarQube.Plugins.PluginGeneratorTests
                 Version = "0.1-SNAPSHOT",
                 Organization = "ACME Software Ltd",
                 License = "Commercial",
-                Developers = typeof(RulesPluginGenerator).FullName
+                Developers = typeof(RulesPluginBuilder).FullName
             };
 
             generator.GeneratePlugin(defn, rulesXmlFilePath, fullJarFilePath);

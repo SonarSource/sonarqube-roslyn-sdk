@@ -4,17 +4,16 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using NuGet;
 using SonarQube.Plugins.Roslyn.CommandLine;
-using SonarQube.Plugins.Roslyn;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Microsoft.CodeAnalysis;
 
 namespace SonarQube.Plugins.Roslyn
 {
@@ -63,11 +62,11 @@ namespace SonarQube.Plugins.Roslyn
                 string outputDirectory = Path.Combine(baseDirectory, ".output", Guid.NewGuid().ToString());
                 Directory.CreateDirectory(outputDirectory);
 
-                string outputFilePath = Path.Combine(outputDirectory, "rules.xml");
+                string rulesFilePath = Path.Combine(outputDirectory, "rules.xml");
 
                 string packageDirectory = Path.Combine(nuGetDirectory, package.Id + "." + package.Version.ToString());
                 Debug.Assert(Directory.Exists(packageDirectory), "Expected package directory does not exist: {0}", packageDirectory);
-                bool success = TryGenerateRulesFile(packageDirectory, nuGetDirectory, outputFilePath);
+                bool success = TryGenerateRulesFile(packageDirectory, nuGetDirectory, rulesFilePath);
 
                 if (success)
                 {
@@ -75,9 +74,13 @@ namespace SonarQube.Plugins.Roslyn
 
                     string fullJarPath = Path.Combine(Directory.GetCurrentDirectory(), 
                         analyzeRef.PackageId + "-plugin." + pluginDefn.Version + ".jar");
-                    RulesPluginGenerator rulesPluginGen = new RulesPluginGenerator(logger);
-                    rulesPluginGen.GeneratePlugin(pluginDefn, outputFilePath, fullJarPath);
 
+                    PluginBuilder builder = new PluginBuilder(logger);
+                    RulesPluginBuilder.ConfigureBuilder(builder, pluginDefn, rulesFilePath, null);
+
+                    builder.SetJarFilePath(fullJarPath);
+                    builder.Build();
+                    
                     this.logger.LogInfo(UIResources.APG_PluginGenerated, fullJarPath);
                 }
             }
@@ -145,10 +148,6 @@ namespace SonarQube.Plugins.Roslyn
             //pluginDefn.SourcesUrl;
             //pluginDefn.TermsConditionsUrl;
 
-            if (!string.IsNullOrWhiteSpace(sqaleFilePath))
-            {
-                pluginDefn.AdditionalFileMap["resources/sqale.xml"] = sqaleFilePath;
-            }
             return pluginDefn;
         }
 

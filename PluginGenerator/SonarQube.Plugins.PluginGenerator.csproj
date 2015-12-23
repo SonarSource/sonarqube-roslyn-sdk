@@ -49,7 +49,7 @@
     <Compile Include="Interfaces\IJdkWrapper.cs" />
     <Compile Include="NuGet\DataModel.cs" />
     <Compile Include="NuGet\NuGetSpecReader.cs" />
-    <Compile Include="RulesPluginGenerator.cs" />
+    <Compile Include="RulesPluginBuilder.cs" />
     <Compile Include="JarBuilder.cs" />
     <Compile Include="JavaCompilationBuilder.cs" />
     <Compile Include="JdkWrapper.cs" />
