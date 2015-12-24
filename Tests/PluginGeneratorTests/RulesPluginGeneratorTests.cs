@@ -5,9 +5,8 @@
 // </copyright>
 //-----------------------------------------------------------------------
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SonarQube.Plugins;
-using System.IO;
 using SonarQube.Plugins.Test.Common;
+using System.IO;
 
 namespace SonarQube.Plugins.PluginGeneratorTests
 {
@@ -23,16 +22,16 @@ namespace SonarQube.Plugins.PluginGeneratorTests
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, "output");
             string fullJarFilePath = Path.Combine(outputDir, "myPlugin.jar");
 
+            string language = "xx";
             string rulesXmlFilePath = TestUtils.CreateTextFile("rules.xml", inputDir, "<xml Rules />");
 
             IJdkWrapper jdkWrapper = new JdkWrapper();
             RulesPluginBuilder generator = new RulesPluginBuilder(jdkWrapper, new TestLogger());
 
-            PluginDefinition defn = new PluginDefinition()
+            PluginManifest defn = new PluginManifest()
             {
                 Key = "MyPlugin",
                 Name = "My Plugin",
-                Language = "java",
                 Description = "Generated plugin",
                 Version = "0.1-SNAPSHOT",
                 Organization = "ACME Software Ltd",
@@ -40,7 +39,7 @@ namespace SonarQube.Plugins.PluginGeneratorTests
                 Developers = typeof(RulesPluginBuilder).FullName
             };
 
-            generator.GeneratePlugin(defn, rulesXmlFilePath, fullJarFilePath);
+            generator.GeneratePlugin(defn, language, rulesXmlFilePath, fullJarFilePath);
             if (File.Exists(fullJarFilePath))
             {
                 this.TestContext.AddResultFile(fullJarFilePath);

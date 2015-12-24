@@ -35,7 +35,8 @@ namespace SonarQube.Plugins
             this.logger = logger;
         }
 
-        public void GeneratePlugin(PluginDefinition definition, string rulesFilePath, string fullJarFilePath)
+        //TODO: remove once the tests have been refactored to test "ConfigureBuilder"
+        public void GeneratePlugin(PluginManifest definition, string language, string rulesFilePath, string fullJarFilePath)
         {
             if (definition == null)
             {
@@ -65,23 +66,37 @@ namespace SonarQube.Plugins
             }
 
             PluginBuilder builder = new PluginBuilder(jdkWrapper, logger);
-            ConfigureBuilder(builder, definition, rulesFilePath, null);
+            ConfigureBuilder(builder, definition, language, rulesFilePath, null);
 
 
             builder.SetJarFilePath(fullJarFilePath);
             builder.Build();
         }
 
-        public static void ConfigureBuilder(PluginBuilder builder, PluginDefinition definition, string rulesFilePath, string sqaleFilePath)
+        /// <summary>
+        /// Configures the supplied builder to add a new repository with the specified
+        /// rules and (optionally) SQALE information
+        /// </summary>
+        /// <param name="builder">The builder to configure</param>
+        /// <param name="pluginManifest">Manifest that describes the plugin to SonarQube</param>
+        /// <param name="language">The language for the rules</param>
+        /// <param name="rulesFilePath">Path to the file containing the rule definitions</param>
+        /// <param name="sqaleFilePath">(Optional) path to the file containing SQALE information for the new rules</param>
+        public static void ConfigureBuilder(PluginBuilder builder, PluginManifest pluginManifest, string language, string rulesFilePath, string sqaleFilePath)
         {
             if (builder == null)
             {
                 throw new ArgumentNullException("builder");
             }
-            if (definition == null)
+            if (pluginManifest == null)
             {
-                throw new ArgumentNullException("definition");
+                throw new ArgumentNullException("pluginManifest");
             }
+            if (string.IsNullOrWhiteSpace(language))
+            {
+                throw new ArgumentNullException("language");
+            }
+
             if (string.IsNullOrWhiteSpace(rulesFilePath))
             {
                 throw new ArgumentNullException("rulesFilePath");
@@ -97,21 +112,19 @@ namespace SonarQube.Plugins
                 throw new FileNotFoundException(UIResources.Gen_Error_SqaleFileDoesNotExists, sqaleFilePath);
             }
 
-            // TODO: consider moving; not specific to rules plugins
-            ValidateDefinition(definition);
+            // TODO: move - not specific to rules plugins
+            ValidateManifest(pluginManifest);
 
             // Temp folder which resources will be unpacked into
             string tempWorkingDir = Path.Combine(Path.GetTempPath(), ".plugins", Guid.NewGuid().ToString());
             Directory.CreateDirectory(tempWorkingDir);
 
-            DoConfigureBuilder(builder, definition, rulesFilePath, sqaleFilePath, tempWorkingDir);
+            DoConfigureBuilder(builder, pluginManifest, language, rulesFilePath, sqaleFilePath, tempWorkingDir);
         }
 
-        private static void ValidateDefinition(PluginDefinition definition)
+        private static void ValidateManifest(PluginManifest definition)
         {
             // TODO
-            CheckPropertyIsSet(definition.Language, "Language");
-
             CheckPropertyIsSet(definition.Key, "Key");
             CheckPropertyIsSet(definition.Name, "Name");
         }
@@ -125,10 +138,10 @@ namespace SonarQube.Plugins
             }
         }
 
-        private static void DoConfigureBuilder(PluginBuilder builder, PluginDefinition definition, string rulesFilePath, string sqaleFilePath, string workingFolder)
+        private static void DoConfigureBuilder(PluginBuilder builder, PluginManifest definition, string language, string rulesFilePath, string sqaleFilePath, string workingFolder)
         {
             AddRuleSources(workingFolder, builder);
-            ConfigureSourceFileReplacements(definition, builder);
+            ConfigureSourceFileReplacements(language, builder);
             builder.AddExtension(RulesExtensionClassName);
 
             AddRuleJars(workingFolder, builder);
@@ -155,9 +168,9 @@ namespace SonarQube.Plugins
             }
         }
 
-        private static void ConfigureSourceFileReplacements(PluginDefinition definition, PluginBuilder builder)
+        private static void ConfigureSourceFileReplacements(string language, PluginBuilder builder)
         {
-            builder.SetSourceCodeTokenReplacement(WellKnownSourceCodeTokens.Rule_Language, definition.Language);
+            builder.SetSourceCodeTokenReplacement(WellKnownSourceCodeTokens.Rule_Language, language);
         }
 
         private static void AddRuleJars(string workingDirectory, PluginBuilder builder)

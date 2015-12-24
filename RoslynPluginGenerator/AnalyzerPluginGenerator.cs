@@ -57,7 +57,9 @@ namespace SonarQube.Plugins.Roslyn
 
             if (package != null)
             {
-                PluginDefinition pluginDefn = CreatePluginDefinition(package, sqaleFilePath);
+                // TODO: support multiple languages
+                string language = SupportedLanguages.CSharp;
+                PluginManifest pluginDefn = CreatePluginDefinition(package);
 
                 string outputDirectory = Path.Combine(baseDirectory, ".output", Guid.NewGuid().ToString());
                 Directory.CreateDirectory(outputDirectory);
@@ -76,7 +78,7 @@ namespace SonarQube.Plugins.Roslyn
                         analyzeRef.PackageId + "-plugin." + pluginDefn.Version + ".jar");
 
                     PluginBuilder builder = new PluginBuilder(logger);
-                    RulesPluginBuilder.ConfigureBuilder(builder, pluginDefn, rulesFilePath, null);
+                    RulesPluginBuilder.ConfigureBuilder(builder, pluginDefn, language, rulesFilePath, sqaleFilePath);
 
                     builder.SetJarFilePath(fullJarPath);
                     builder.Build();
@@ -127,9 +129,9 @@ namespace SonarQube.Plugins.Roslyn
             return success;
         }
 
-        private static PluginDefinition CreatePluginDefinition(IPackage package, string sqaleFilePath)
+        private static PluginManifest CreatePluginDefinition(IPackage package)
         {
-            PluginDefinition pluginDefn = new PluginDefinition();
+            PluginManifest pluginDefn = new PluginManifest();
 
             pluginDefn.Description = GetValidManifestString(package.Description);
             pluginDefn.Developers = GetValidManifestString(ListToString(package.Authors));
@@ -137,8 +139,6 @@ namespace SonarQube.Plugins.Roslyn
             pluginDefn.Homepage = GetValidManifestString(package.ProjectUrl?.ToString());
             pluginDefn.Key = GetValidManifestString(package.Id) + PluginKeySuffix;
 
-            // TODO: hard-coded to C#
-            pluginDefn.Language = "cs";
             pluginDefn.Name = GetValidManifestString(package.Title) ?? pluginDefn.Key;
             pluginDefn.Organization = GetValidManifestString(ListToString(package.Owners));
             pluginDefn.Version = GetValidManifestString(package.Version.ToNormalizedString());

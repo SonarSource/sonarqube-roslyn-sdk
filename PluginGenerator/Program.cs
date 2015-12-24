@@ -29,7 +29,7 @@ namespace SonarQube.Plugins.PluginGenerator
             string pluginDefnFilePath = args[0];
             string rulesFilePath = args[1];
                         
-            PluginDefinition defn = PluginDefinition.Load(pluginDefnFilePath);
+            PluginManifest defn = PluginManifest.Load(pluginDefnFilePath);
             string fullNewJarFilePath = Path.Combine(Directory.GetCurrentDirectory(),
                 Path.GetFileNameWithoutExtension(pluginDefnFilePath) + ".jar");
 
@@ -39,8 +39,12 @@ namespace SonarQube.Plugins.PluginGenerator
                 sqaleFilePath = args[2];
             }
 
+            //TODO: support multiple languages
+            string language = "cs";
+
             PluginBuilder builder = new PluginBuilder(logger);
-            RulesPluginBuilder.ConfigureBuilder(builder, defn, rulesFilePath, sqaleFilePath);
+            RulesPluginBuilder.ConfigureBuilder(builder, defn, language, rulesFilePath, sqaleFilePath);
+            builder.SetJarFilePath(fullNewJarFilePath);
             builder.Build();
 
             return SUCCESS_CODE;

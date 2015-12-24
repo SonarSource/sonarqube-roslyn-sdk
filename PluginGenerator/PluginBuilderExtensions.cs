@@ -41,7 +41,7 @@ namespace SonarQube.Plugins
             return builder;
         }
 
-        public static PluginBuilder SetProperties(this PluginBuilder builder, PluginDefinition definition)
+        public static PluginBuilder SetProperties(this PluginBuilder builder, PluginManifest definition)
         {
             if (builder == null)
             {

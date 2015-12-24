@@ -22,7 +22,7 @@ namespace SonarQube.Plugins.PluginGeneratorTests
             string testDir = TestUtils.CreateTestDirectory(this.TestContext);
             string filePath = Path.Combine(testDir, "defn1.txt");
 
-            PluginDefinition originalDefn = new PluginDefinition()
+            PluginManifest originalDefn = new PluginManifest()
             {
                 Name = "name",
                 Class = "class",
@@ -31,7 +31,6 @@ namespace SonarQube.Plugins.PluginGeneratorTests
                 Developers = "developers",
                 Homepage = "homepage",
                 IssueTrackerUrl = "issuetracker",
-                Language = "language",
                 License ="license",
                 Organization = "organization",
                 OrganizationUrl = "organizationurl",
@@ -43,7 +42,7 @@ namespace SonarQube.Plugins.PluginGeneratorTests
             originalDefn.Save(filePath);
             Assert.IsTrue(File.Exists(filePath), "File was not created: {0}", filePath);
 
-            PluginDefinition reloadedDefn = PluginDefinition.Load(filePath);
+            PluginManifest reloadedDefn = PluginManifest.Load(filePath);
 
             Assert.IsNotNull(reloadedDefn, "Reloaded object should not be null");
             Assert.AreEqual("name", reloadedDefn.Name, "Unexpected name");
@@ -55,7 +54,6 @@ namespace SonarQube.Plugins.PluginGeneratorTests
             Assert.AreEqual("license", reloadedDefn.License, "Unexpected license");
             Assert.AreEqual("developers", reloadedDefn.Developers, "Unexpected developers");
             Assert.AreEqual("homepage", reloadedDefn.Homepage, "Unexpected homepage");
-            Assert.AreEqual("language", reloadedDefn.Language, "Unexpected language");
             Assert.AreEqual("organization", reloadedDefn.Organization, "Unexpected organization");
             Assert.AreEqual("organizationurl", reloadedDefn.OrganizationUrl, "Unexpected organization url");
             Assert.AreEqual("sources", reloadedDefn.SourcesUrl, "Unexpected sources");
