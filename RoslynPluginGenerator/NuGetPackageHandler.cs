@@ -104,7 +104,8 @@ namespace SonarQube.Plugins.Roslyn
                 try
                 {
                     manager.InstallPackage(package, false, false, false);
-                } catch (InvalidOperationException e)
+                }
+                catch (InvalidOperationException e)
                 {
                     logger.LogError(UIResources.NG_ERROR_PackageInstallFail, e.Message);
                     return null;

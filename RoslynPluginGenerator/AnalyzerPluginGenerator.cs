@@ -21,6 +21,24 @@ namespace SonarQube.Plugins.Roslyn
     {
         public const string NuGetPackageSource = "https://www.nuget.org/api/v2/";
 
+        private const string RoslynResourcesRoot = "SonarQube.Plugins.Roslyn.Resources.";
+
+        /// <summary>
+        /// List of extensions (property definitions) that are added in the Java source code
+        /// </summary>
+        private static readonly string[] Extensions = new string[]
+        {
+            "RoslynProperties.AnalyzerId",
+            "RoslynProperties.RuleNamespace",
+            "RoslynProperties.NuGetPackageId",
+            "RoslynProperties.NuGetPackageVersion"
+        };
+
+        private const string AnalyzerId_Token = "[ROSLYN_ANALYZER_ID]";
+        private const string RuleNamespace_Token = "[ROSLYN_RULE_NAMESPACE]";
+        private const string PackageId_Token = "[ROSLYN_NUGET_PACKAGE_ID]";
+        private const string PackageVersion_Token = "[ROSLYN_NUGET_PACKAGE_VERSION]";
+
         /// <summary>
         /// The SARIF plugin must be able to distinguish the plugins generating SARIF style issues - a suffix convention is used
         /// </summary>
@@ -66,24 +84,16 @@ namespace SonarQube.Plugins.Roslyn
 
                 string rulesFilePath = Path.Combine(outputDirectory, "rules.xml");
 
+                // TODO: we shouldn't try to work out where the content files have been installed by NuGet.
+                // Instead, we should use the methods on IPackage to locate the assemblies e.g. Package.GetFiles()
                 string packageDirectory = Path.Combine(nuGetDirectory, package.Id + "." + package.Version.ToString());
                 Debug.Assert(Directory.Exists(packageDirectory), "Expected package directory does not exist: {0}", packageDirectory);
+
                 bool success = TryGenerateRulesFile(packageDirectory, nuGetDirectory, rulesFilePath);
 
                 if (success)
                 {
-                    this.logger.LogInfo(UIResources.APG_GeneratingPlugin);
-
-                    string fullJarPath = Path.Combine(Directory.GetCurrentDirectory(), 
-                        analyzeRef.PackageId + "-plugin." + pluginDefn.Version + ".jar");
-
-                    PluginBuilder builder = new PluginBuilder(logger);
-                    RulesPluginBuilder.ConfigureBuilder(builder, pluginDefn, language, rulesFilePath, sqaleFilePath);
-
-                    builder.SetJarFilePath(fullJarPath);
-                    builder.Build();
-                    
-                    this.logger.LogInfo(UIResources.APG_PluginGenerated, fullJarPath);
+                    BuildPlugin(analyzeRef, sqaleFilePath, language, pluginDefn, rulesFilePath, outputDirectory, package);
                 }
             }
 
@@ -170,6 +180,47 @@ namespace SonarQube.Plugins.Roslyn
                 return null;
             }
             return string.Join(",", args);
+        }
+
+        private void BuildPlugin(NuGetReference analyzeRef, string sqaleFilePath, string language, PluginManifest pluginDefn, string rulesFilePath, string tempDirectory, IPackage package)
+        {
+            this.logger.LogInfo(UIResources.APG_GeneratingPlugin);
+
+            string fullJarPath = Path.Combine(Directory.GetCurrentDirectory(),
+                analyzeRef.PackageId + "-plugin." + pluginDefn.Version + ".jar");
+
+            PluginBuilder builder = new PluginBuilder(logger);
+            RulesPluginBuilder.ConfigureBuilder(builder, pluginDefn, language, rulesFilePath, sqaleFilePath);
+
+            AddRoslynMetadata(tempDirectory, builder, package);
+            
+            builder.SetJarFilePath(fullJarPath);
+            builder.Build();
+
+            this.logger.LogInfo(UIResources.APG_PluginGenerated, fullJarPath);
+        }
+
+        private static void AddRoslynMetadata(string tempDirectory, PluginBuilder builder, IPackage package)
+        {
+            SourceGenerator.CreateSourceFiles(typeof(AnalyzerPluginGenerator).Assembly, RoslynResourcesRoot, tempDirectory, new Dictionary<string, string>());
+
+            string[] sourceFiles = Directory.GetFiles(tempDirectory, "*.java", SearchOption.AllDirectories);
+            Debug.Assert(sourceFiles.Any(), "Failed to correctly unpack the Roslyn analyzer specific source files");
+
+            foreach (string sourceFile in sourceFiles)
+            {
+                builder.AddSourceFile(sourceFile);
+            }
+
+            builder.SetSourceCodeTokenReplacement(PackageId_Token, package.Id);
+            builder.SetSourceCodeTokenReplacement(PackageVersion_Token, package.Version.ToString());
+            builder.SetSourceCodeTokenReplacement(AnalyzerId_Token, package.Id);
+            builder.SetSourceCodeTokenReplacement(RuleNamespace_Token, package.Id);
+
+            foreach (string extension in Extensions)
+            {
+                builder.AddExtension(extension);
+            }
         }
     }
 }

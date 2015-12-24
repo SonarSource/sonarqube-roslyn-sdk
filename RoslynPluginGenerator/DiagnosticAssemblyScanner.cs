@@ -6,7 +6,6 @@
 //-----------------------------------------------------------------------
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using SonarQube.Plugins.Roslyn;
 using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;

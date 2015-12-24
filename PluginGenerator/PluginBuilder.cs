@@ -152,17 +152,21 @@ namespace SonarQube.Plugins
             return this;
         }
 
-        public PluginBuilder AddExtension(string fullExtensionClassName)
+        /// <summary>
+        /// Registers an extension that will be exported to SonarQube
+        /// </summary>
+        /// <param name="extension"></param>
+        /// <remarks>The extension could be an instance of a class (such as a PropertyDefinition), or it could
+        /// be a type that SonarQube should instantiate (e.g. a subclass of RulesDefinition). If the extension is
+        /// a type then it should end with ".class".</remarks>
+        public PluginBuilder AddExtension(string extension)
         {
-            if (string.IsNullOrWhiteSpace(fullExtensionClassName))
+            if (string.IsNullOrWhiteSpace(extension))
             {
-                throw new ArgumentNullException("fullExtensionClassPath");
+                throw new ArgumentNullException("extension");
             }
 
-            string resolvedClassName = (fullExtensionClassName.EndsWith(".class", StringComparison.InvariantCulture))
-                ? fullExtensionClassName : fullExtensionClassName + ".class";
-
-            this.extensionClasses.Add(resolvedClassName);
+            this.extensionClasses.Add(extension);
             return this;
         }
 

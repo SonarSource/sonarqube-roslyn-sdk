@@ -101,7 +101,7 @@ public final class Program {}
 @"package myPackage1;
 public class MyClass2{}");
             builder.AddSourceFile(secondValidSource);
-            builder.AddExtension("myPackage1.MyClass2");
+            builder.AddExtension("myPackage1.MyClass2.class");
 
             // Act and assert
             BuildAndCheckSucceeds(builder, logger);
@@ -172,7 +172,7 @@ public final class MyExtensionClass
                 .AddSourceFile(source1)
                 .SetJarFilePath(pluginFilePath)
                 .SetProperty("Property1", "prop 1 value")
-                .AddExtension("myorg.app1.MyExtensionClass")
+                .AddExtension("myorg.app1.MyExtensionClass.class")
                 .SetPluginKey("dummy.key")
                 .SetPluginName("plugin name");
 
