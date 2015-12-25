@@ -23,15 +23,15 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // Arrange
             string testDir = TestUtils.CreateTestDirectory(this.TestContext);
             TestLogger logger = new TestLogger();
-            NuGetPackageHandler handler = new NuGetPackageHandler(logger);
+            NuGetPackageHandler handler = new NuGetPackageHandler(testDir, logger);
 
             // Act
             // Fetch a package that should fail due to pre-release dependencies
-            IPackage package = handler.FetchPackage(AnalyzerPluginGenerator.NuGetPackageSource, "codeCracker", null, testDir);
+            IPackage package = handler.FetchPackage("codeCracker", null, testDir);
 
             // Assert
             // No files should have been downloaded
-            Assert.IsTrue(Directory.GetFiles(testDir).Length == 0);
+            Assert.IsTrue(Directory.GetFiles(testDir, "*.*", SearchOption.AllDirectories).Length == 0);
             Assert.IsNull(package);
         }
     }

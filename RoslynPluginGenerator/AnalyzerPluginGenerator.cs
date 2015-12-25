@@ -19,8 +19,6 @@ namespace SonarQube.Plugins.Roslyn
 {
     public class AnalyzerPluginGenerator
     {
-        public const string NuGetPackageSource = "https://www.nuget.org/api/v2/";
-
         private const string RoslynResourcesRoot = "SonarQube.Plugins.Roslyn.Resources.";
 
         /// <summary>
@@ -44,14 +42,20 @@ namespace SonarQube.Plugins.Roslyn
         /// </summary>
         private const string PluginKeySuffix = "_sarif";
 
+        private readonly INuGetPackagetHandler packageHandler;
         private readonly SonarQube.Plugins.Common.ILogger logger;
 
-        public AnalyzerPluginGenerator(SonarQube.Plugins.Common.ILogger logger)
+        public AnalyzerPluginGenerator(INuGetPackagetHandler packageHandler, SonarQube.Plugins.Common.ILogger logger)
         {
+            if (packageHandler == null)
+            {
+                throw new ArgumentNullException("packageHandler");
+            }
             if (logger == null)
             {
                 throw new ArgumentNullException("logger");
             }
+            this.packageHandler = packageHandler;
             this.logger = logger;
         }
 
@@ -69,9 +73,7 @@ namespace SonarQube.Plugins.Roslyn
 
             string nuGetDirectory = Path.Combine(baseDirectory, ".nuget");
 
-            NuGetPackageHandler downloader = new NuGetPackageHandler(logger);
-
-            IPackage package = downloader.FetchPackage(NuGetPackageSource, analyzeRef.PackageId, analyzeRef.Version, nuGetDirectory);
+            IPackage package = this.packageHandler.FetchPackage(analyzeRef.PackageId, analyzeRef.Version, nuGetDirectory);
 
             if (package != null)
             {

@@ -14,8 +14,9 @@ using System.Text;
 
 namespace SonarQube.Plugins.Roslyn
 {
-    public class NuGetPackageHandler
+    public class NuGetPackageHandler : INuGetPackagetHandler
     {
+        private readonly string packageSource;
         private readonly Common.ILogger logger;
 
         private class NuGetLoggerAdapter : NuGet.ILogger
@@ -57,12 +58,17 @@ namespace SonarQube.Plugins.Roslyn
             }
         }
 
-        public NuGetPackageHandler(Common.ILogger logger)
+        public NuGetPackageHandler(string packageSource, Common.ILogger logger)
         {
+            if (string.IsNullOrWhiteSpace(packageSource))
+            {
+                throw new ArgumentNullException("packageSource");
+            }
             if (logger == null)
             {
                 throw new ArgumentNullException("logger");
             }
+            this.packageSource = packageSource;
             this.logger = logger;
         }
 
@@ -70,35 +76,31 @@ namespace SonarQube.Plugins.Roslyn
         /// Attempts to download a NuGet package with the specified id and optional version
         /// to the specified directory
         /// </summary>
-        public NuGet.IPackage FetchPackage(string packageSource, string packageId, SemanticVersion version, string downloadDirectory)
+        public IPackage FetchPackage(string packageId, SemanticVersion version, string localNuGetPath)
         {
-            if (string.IsNullOrWhiteSpace(packageSource))
-            {
-                throw new ArgumentNullException("url");
-            }
             if (string.IsNullOrWhiteSpace(packageId))
             {
                 throw new ArgumentNullException("packageId");
             }
-            if (string.IsNullOrWhiteSpace(downloadDirectory))
+            if (string.IsNullOrWhiteSpace(localNuGetPath))
             {
-                throw new ArgumentNullException("downloadDirectory");
+                throw new ArgumentNullException("localNuGetPath");
             }
             if (logger == null)
             {
                 throw new ArgumentNullException("logger");
             }
 
-            logger.LogDebug(UIResources.NG_CreatingRepository, packageSource);
+            logger.LogDebug(UIResources.NG_CreatingRepository, this.packageSource);
             IPackageRepository repository = PackageRepositoryFactory.Default.CreateRepository(packageSource);
 
             IPackage package = TryGetPackage(repository, packageId, version);
 
             if (package != null)
             {
-                Directory.CreateDirectory(downloadDirectory);
+                Directory.CreateDirectory(localNuGetPath);
 
-                IPackageManager manager = new PackageManager(repository, downloadDirectory);
+                IPackageManager manager = new PackageManager(repository, localNuGetPath);
                 manager.Logger = new NuGetLoggerAdapter(this.logger);
 
                 try
@@ -146,7 +148,7 @@ namespace SonarQube.Plugins.Roslyn
             return package;
         }
 
-        private void ListPackages(IList<NuGet.IPackage> packages)
+        private void ListPackages(IList<IPackage> packages)
         {
             logger.LogDebug(UIResources.NG_NumberOfPackagesLocated, packages.Count);
 
@@ -154,7 +156,7 @@ namespace SonarQube.Plugins.Roslyn
             {
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine(UIResources.NG_PackageVersionListHeader);
-                foreach (NuGet.IPackage package in packages)
+                foreach (IPackage package in packages)
                 {
                     sb.AppendFormat("  {0}", package.Version);
                     if (package.IsLatestVersion)
@@ -168,9 +170,9 @@ namespace SonarQube.Plugins.Roslyn
             }
         }
 
-        private NuGet.IPackage SelectLatestVersion(IList<NuGet.IPackage> packages)
+        private IPackage SelectLatestVersion(IList<IPackage> packages)
         {
-            NuGet.IPackage package = packages.FirstOrDefault(p => p.IsLatestVersion);
+            IPackage package = packages.FirstOrDefault(p => p.IsLatestVersion);
 
             if (package == null)
             {

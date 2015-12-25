@@ -109,7 +109,8 @@
   <ItemGroup>
     <Compile Include="CommandLine\ArgumentProcessor.cs" />
     <Compile Include="DiagnosticAssemblyScanner.cs" />
-    <Compile Include="IRuleGenerator.cs" />
+    <Compile Include="Interfaces\INuGetPackagetHandler.cs" />
+    <Compile Include="Interfaces\IRuleGenerator.cs" />
     <Compile Include="NuGetReference.cs" />
     <Compile Include="CommandLine\ProcessedArgs.cs" />
     <Compile Include="CommandLine\CmdLineResources.Designer.cs">
