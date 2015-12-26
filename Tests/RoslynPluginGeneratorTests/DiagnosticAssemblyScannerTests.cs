@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SonarQube.Plugins.Test.Common;
 using System.IO;
+using System;
 
 namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
 {
@@ -20,110 +21,119 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
         public TestContext TestContext { get; set; }
 
         [TestMethod]
-        [DeploymentItem("ExampleAnalyzer1.dll", "./oneAnalyzer")]
-        public void ScanDirectory_OneAnalyzerAssembly()
+        public void InstantiateDiags_CSharp_NoFiles()
         {
             // Arrange
             TestLogger logger = new TestLogger();
             DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
 
-            string testDirectoryPath = Path.Combine(TestContext.DeploymentDirectory, "oneAnalyzer");
-
-            string exampleAnalyzer1Path = Path.Combine(testDirectoryPath, "ExampleAnalyzer1.dll");
-            Assert.IsTrue(File.Exists(exampleAnalyzer1Path), "Test setup error: expected assembly does not exist: {0}", exampleAnalyzer1Path);
-
             // Act
-            IEnumerable<DiagnosticAnalyzer> csharpDiagnostics = scanner.InstantiateDiagnostics(testDirectoryPath, LanguageNames.CSharp);
-            IEnumerable<DiagnosticAnalyzer> vbDiagnostics = scanner.InstantiateDiagnostics(testDirectoryPath, LanguageNames.VisualBasic);
+            IEnumerable<DiagnosticAnalyzer> result = scanner.InstantiateDiagnostics(LanguageNames.CSharp /* no files */);
 
             // Assert
-            // ConfigurableAnalyzer is both C# and VB, so should appear in both
-            Assert.AreEqual(2, csharpDiagnostics.Count(), "Expecting 2 C# analyzers");
-            Assert.AreEqual(2, vbDiagnostics.Count(), "Expecting 2 VB analyzers");
-
-            // Using name comparison because type comparison fails if the types are from assemblies with different paths (even if copied)
-            // Loaded from ExampleAnalyzer1.dll
-            Assert_AnalyzerIsPresent(csharpDiagnostics, "ExampleAnalyzer1.CSharpAnalyzer");
-            Assert_AnalyzerIsPresent(csharpDiagnostics, "ExampleAnalyzer1.ConfigurableAnalyzer");
-            Assert_AnalyzerNotPresent(csharpDiagnostics, "ExampleAnalyzer1.AbstractAnalyzer");
-
-            Assert_AnalyzerIsPresent(vbDiagnostics, "ExampleAnalyzer1.VBAnalyzer");
-            Assert_AnalyzerIsPresent(vbDiagnostics, "ExampleAnalyzer1.ConfigurableAnalyzer");
-            Assert_AnalyzerNotPresent(vbDiagnostics, "ExampleAnalyzer1.AbstractAnalyzer");
+            Assert.IsNotNull(result, "Not expecting InstantiateDiagnostics to return null");
+            Assert.IsFalse(result.Any(), "Not expecting any diagnostics to have been found");
         }
 
         [TestMethod]
-        [DeploymentItem("ExampleAnalyzer1.dll", "./twoAnalyzers")]
-        [DeploymentItem("ExampleAnalyzer2.dll", "./twoAnalyzers")]
-        public void ScanDirectory_MultipleAnalyzerAssemblies()
+        public void InstantiateDiags_VB_NoAnalyzers()
         {
             // Arrange
             TestLogger logger = new TestLogger();
             DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
 
-            string testDirectoryPath = Path.Combine(TestContext.DeploymentDirectory, "twoAnalyzers");
-
-            string exampleAnalyzer1Path = Path.Combine(testDirectoryPath, "ExampleAnalyzer1.dll");
-            Assert.IsTrue(File.Exists(exampleAnalyzer1Path), "Test setup error: expected assembly does not exist: {0}", exampleAnalyzer1Path);
-            string exampleAnalyzer2Path = Path.Combine(testDirectoryPath, "ExampleAnalyzer2.dll");
-            Assert.IsTrue(File.Exists(exampleAnalyzer2Path), "Test setup error: expected assembly does not exist: {0}", exampleAnalyzer2Path);
-
+            string corLibDllPath = typeof(object).Assembly.Location;
+            string thisDllPath = this.GetType().Assembly.Location;
 
             // Act
-            IEnumerable<DiagnosticAnalyzer> csharpDiagnostics = scanner.InstantiateDiagnostics(testDirectoryPath, LanguageNames.CSharp);
-            IEnumerable<DiagnosticAnalyzer> vbDiagnostics = scanner.InstantiateDiagnostics(testDirectoryPath, LanguageNames.VisualBasic);
+            IEnumerable<DiagnosticAnalyzer> result = scanner.InstantiateDiagnostics(LanguageNames.VisualBasic,
+                corLibDllPath,
+                thisDllPath);
 
             // Assert
-            // ConfigurableAnalyzer is both C# and VB, so should appear in both
-            Assert.AreEqual(3, csharpDiagnostics.Count(), "Expecting 3 C# analyzers");
-            Assert.AreEqual(2, vbDiagnostics.Count(), "Expecting 2 VB analyzers");
-
-            // Using name comparison because type comparison fails if the types are from assemblies with different paths (even if copied)
-            // Loaded from ExampleAnalyzer1.dll
-            Assert_AnalyzerIsPresent(csharpDiagnostics, "ExampleAnalyzer1.CSharpAnalyzer");
-            Assert_AnalyzerIsPresent(csharpDiagnostics, "ExampleAnalyzer1.ConfigurableAnalyzer");
-            Assert_AnalyzerNotPresent(csharpDiagnostics, "ExampleAnalyzer1.AbstractAnalyzer");
-
-            Assert_AnalyzerIsPresent(vbDiagnostics, "ExampleAnalyzer1.VBAnalyzer");
-            Assert_AnalyzerIsPresent(vbDiagnostics, "ExampleAnalyzer1.ConfigurableAnalyzer");
-            Assert_AnalyzerNotPresent(vbDiagnostics, "ExampleAnalyzer1.AbstractAnalyzer");
-
-            // Loaded from ExampleAnalyzer2.dll
-            Assert_AnalyzerIsPresent(csharpDiagnostics, "ExampleAnalyzer2.ExampleAnalyzer2");
+            Assert.IsNotNull(result, "Not expecting InstantiateDiagnostics to return null");
+            Assert.IsFalse(result.Any(), "Not expecting any diagnostics to have been found");
         }
 
         [TestMethod]
-        public void ScanDirectoryWithNoAnalyzerAssemblies()
+        public void InstantiateDiags_CSharp_AnalyzersFound()
         {
             // Arrange
             TestLogger logger = new TestLogger();
             DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
 
-            // place a single assembly in the test directory, that does not have any analyzers in it
-            string noAnalyzerAssemblyPath = typeof(DiagnosticAssemblyScannerTests).Assembly.Location;
-            string testDirectoryPath = TestUtils.CreateTestDirectory(this.TestContext);
-            string testAssemblyPath = Path.Combine(testDirectoryPath, Path.GetFileName(noAnalyzerAssemblyPath));
-            File.Copy(noAnalyzerAssemblyPath, testAssemblyPath);
+            string exampleAnalyzer1DllPath = typeof(ExampleAnalyzer1.CSharpAnalyzer).Assembly.Location;
 
             // Act
-            IEnumerable<DiagnosticAnalyzer> csharpDiagnostics = scanner.InstantiateDiagnostics(testDirectoryPath, LanguageNames.CSharp);
-            IEnumerable<DiagnosticAnalyzer> vbDiagnostics = scanner.InstantiateDiagnostics(testDirectoryPath, LanguageNames.VisualBasic);
+            IEnumerable<DiagnosticAnalyzer> result = scanner.InstantiateDiagnostics(LanguageNames.CSharp, exampleAnalyzer1DllPath);
 
             // Assert
-            Assert.AreEqual(0, csharpDiagnostics.Count(), "No analyzers should have been detected");
-            Assert.AreEqual(0, vbDiagnostics.Count(), "No analyzers should have been detected");
+            Assert_AnalyzerIsPresent(result, typeof(ExampleAnalyzer1.CSharpAnalyzer));
+            Assert_AnalyzerIsPresent(result, typeof(ExampleAnalyzer1.ConfigurableAnalyzer));
+            Assert_AnalyzerNotPresent(result, typeof(ExampleAnalyzer1.AbstractAnalyzer)); // not expecting abstract analyzers
+
+            Assert.AreEqual(2, result.Count(), "Expecting 2 C# analyzers");
+        }
+
+        [TestMethod]
+        public void InstantiateDiags_VB_AnalyzersFound()
+        {
+            // Arrange
+            TestLogger logger = new TestLogger();
+            DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
+
+            string exampleAnalyzer1DllPath = typeof(ExampleAnalyzer1.CSharpAnalyzer).Assembly.Location;
+
+            // Act
+            IEnumerable<DiagnosticAnalyzer> result = scanner.InstantiateDiagnostics(LanguageNames.VisualBasic, exampleAnalyzer1DllPath);
+
+            // Assert
+            Assert_AnalyzerIsPresent(result, typeof(ExampleAnalyzer1.VBAnalyzer));
+            Assert_AnalyzerIsPresent(result, typeof(ExampleAnalyzer1.ConfigurableAnalyzer));
+            Assert_AnalyzerNotPresent(result, typeof(ExampleAnalyzer1.AbstractAnalyzer)); // not expecting abstract analyzers
+
+            Assert.AreEqual(2, result.Count(), "Expecting 2 VB analyzers");
+        }
+
+        [TestMethod]
+        public void InstantiateDiags_MultipleAssemblies_AnalyzersFound()
+        {
+            // Arrange
+            TestLogger logger = new TestLogger();
+            DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
+
+            string exampleAnalyzer1DllPath = typeof(ExampleAnalyzer1.CSharpAnalyzer).Assembly.Location;
+            string nonAnalyzerAssemblyPath = this.GetType().Assembly.Location;
+            string exampleAnalyzer2DllPath = typeof(ExampleAnalyzer2.ExampleAnalyzer2).Assembly.Location;
+
+            // Act
+            IEnumerable<DiagnosticAnalyzer> result = scanner.InstantiateDiagnostics(LanguageNames.CSharp,
+                exampleAnalyzer1DllPath,
+                nonAnalyzerAssemblyPath,
+                exampleAnalyzer2DllPath);
+
+            // Assert
+            Assert_AnalyzerIsPresent(result, typeof(ExampleAnalyzer1.CSharpAnalyzer));
+            Assert_AnalyzerIsPresent(result, typeof(ExampleAnalyzer1.ConfigurableAnalyzer));
+            Assert_AnalyzerNotPresent(result, typeof(ExampleAnalyzer1.AbstractAnalyzer)); // not expecting abstract analyzers
+
+            Assert_AnalyzerIsPresent(result, typeof(ExampleAnalyzer2.ExampleAnalyzer2));
+
+            Assert.AreEqual(3, result.Count(), "Unexpected number of C# analyzers returned");
         }
 
         #region Private Methods
 
-        private void Assert_AnalyzerIsPresent(IEnumerable<DiagnosticAnalyzer> analyzers, string analyzerName)
+        private void Assert_AnalyzerIsPresent(IEnumerable<DiagnosticAnalyzer> analyzers, Type expected)
         {
+            string analyzerName = expected.FullName;
             Assert.IsNotNull(
                 analyzers.SingleOrDefault(d => d.GetType().FullName == analyzerName),
                 "Expected an analyzer with name: " + analyzerName);
         }
-        private void Assert_AnalyzerNotPresent(IEnumerable<DiagnosticAnalyzer> analyzers, string analyzerName)
+        private void Assert_AnalyzerNotPresent(IEnumerable<DiagnosticAnalyzer> analyzers, Type expected)
         {
+            string analyzerName = expected.FullName;
             Assert.IsNull(
                 analyzers.SingleOrDefault(d => d.GetType().FullName == analyzerName),
                 "Expected no analyzers with name: " + analyzerName);

@@ -12,19 +12,25 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
     {
         private readonly NuGetReference analyzerRef;
         private readonly string sqaleFilePath;
+        private readonly string language;
 
-        public ProcessedArgs(NuGetReference analyzerRef, string sqaleFilePath)
+        public ProcessedArgs(NuGetReference analyzerRef, string sqaleFilePath, string language)
         {
             if (analyzerRef == null)
             {
                 throw new ArgumentNullException("analyzerRef");
             }
+            SupportedLanguages.ThrowIfNotSupported(language);
+
             this.analyzerRef = analyzerRef;
             this.sqaleFilePath = sqaleFilePath; // can be null
+            this.language = language;
         }
 
         public NuGetReference AnalyzerRef { get { return this.analyzerRef; } }
 
         public string SqaleFilePath {  get { return this.sqaleFilePath; } }
+
+        public string Language { get { return this.language; } }
     }
 }

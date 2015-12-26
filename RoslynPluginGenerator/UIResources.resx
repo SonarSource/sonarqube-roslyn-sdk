@@ -120,6 +120,15 @@
   <data name="APG_AnalyzersLocated" xml:space="preserve">
     <value>Number of analyzers located in package: {0}</value>
   </data>
+  <data name="APG_CreatedTempWorkingDir" xml:space="preserve">
+    <value>Temporary working folder for this run: {0}</value>
+  </data>
+  <data name="APG_CreatingRoslynSources" xml:space="preserve">
+    <value>Creating Roslyn plugin specific sources in {0}</value>
+  </data>
+  <data name="APG_ExtractingPackageFiles" xml:space="preserve">
+    <value>Extracting files from the package to {0}</value>
+  </data>
   <data name="APG_GeneratingPlugin" xml:space="preserve">
     <value>Generating plugin...</value>
   </data>
@@ -129,6 +138,9 @@
   <data name="APG_LocatingAnalyzers" xml:space="preserve">
     <value>Looking for analyzers in the package...</value>
   </data>
+  <data name="APG_LogAnalyzerLanguage" xml:space="preserve">
+    <value>Looking for {0} analyzers</value>
+  </data>
   <data name="APG_NoAnalyzersFound" xml:space="preserve">
     <value>No analyzers were found in the specified package</value>
   </data>
@@ -137,6 +149,9 @@
   </data>
   <data name="APG_RulesGeneratedToFile" xml:space="preserve">
     <value>{0} rules generated to {1}</value>
+  </data>
+  <data name="APG_UnsupportedLanguage" xml:space="preserve">
+    <value>The language '{0}' is not supported. Valid options are 'cs' or 'vb'.</value>
   </data>
   <data name="AssemblyDescription" xml:space="preserve">
     <value>Roslyn Analyzer Plugin Generator for SonarQube</value>

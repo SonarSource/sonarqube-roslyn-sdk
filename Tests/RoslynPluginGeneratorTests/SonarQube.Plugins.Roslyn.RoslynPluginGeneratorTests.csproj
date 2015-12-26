@@ -111,6 +111,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RulesGeneratorTests.cs" />
     <Compile Include="NuGetPackageHandlerTests.cs" />
+    <Compile Include="SupportedLanguagesTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\SonarQube.Plugins.Common.csproj">

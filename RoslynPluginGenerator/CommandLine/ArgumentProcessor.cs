@@ -82,7 +82,10 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             if (parsedOk)
             {
                 Debug.Assert(analyzerRef != null, "Expecting to have a valid analyzer reference");
-                processed = new ProcessedArgs(analyzerRef, sqaleFilePath);
+                processed = new ProcessedArgs(analyzerRef,
+                    sqaleFilePath,
+                    SupportedLanguages.CSharp /* TODO: support multiple languages */
+                    );
             }
 
             return processed;

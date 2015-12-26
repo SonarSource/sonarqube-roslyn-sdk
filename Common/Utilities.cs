@@ -5,6 +5,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 using System;
+using System.IO;
 using System.Reflection;
 
 namespace SonarQube.Plugins.Common
@@ -23,6 +24,14 @@ namespace SonarQube.Plugins.Common
             }
 
             logger.LogInfo("{0} {1}", description, assembly.GetName().Version);
+        }
+
+        public static string CreateTempDirectory(string dirName)
+        {
+            string newPath = Path.GetTempPath();
+            newPath = Path.Combine(newPath, ".sqsdk", dirName);
+            Directory.CreateDirectory(newPath);
+            return newPath;
         }
     }
 }
