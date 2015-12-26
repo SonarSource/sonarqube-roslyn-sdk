@@ -14,7 +14,7 @@ using System.Text;
 
 namespace SonarQube.Plugins.Roslyn
 {
-    public class NuGetPackageHandler : INuGetPackagetHandler
+    public class NuGetPackageHandler : INuGetPackageHandler
     {
         private readonly string packageSource;
         private readonly Common.ILogger logger;
@@ -172,11 +172,13 @@ namespace SonarQube.Plugins.Roslyn
 
         private IPackage SelectLatestVersion(IList<IPackage> packages)
         {
-            IPackage package = packages.FirstOrDefault(p => p.IsLatestVersion);
+            IPackage[] orderedPackages = packages.OrderBy(p => p.Version).ToArray();
+
+            IPackage package = orderedPackages.LastOrDefault(p => p.IsLatestVersion);
 
             if (package == null)
             {
-                package = packages.OrderBy(p => p.Version).Last();
+                package = packages.Last();
             }
             else
             {

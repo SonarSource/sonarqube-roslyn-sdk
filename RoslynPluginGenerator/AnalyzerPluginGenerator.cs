@@ -43,10 +43,10 @@ namespace SonarQube.Plugins.Roslyn
         /// </summary>
         private const string PluginKeySuffix = "_sarif";
 
-        private readonly INuGetPackagetHandler packageHandler;
+        private readonly INuGetPackageHandler packageHandler;
         private readonly SonarQube.Plugins.Common.ILogger logger;
 
-        public AnalyzerPluginGenerator(INuGetPackagetHandler packageHandler, SonarQube.Plugins.Common.ILogger logger)
+        public AnalyzerPluginGenerator(INuGetPackageHandler packageHandler, SonarQube.Plugins.Common.ILogger logger)
         {
             if (packageHandler == null)
             {
