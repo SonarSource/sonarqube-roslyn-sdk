@@ -215,8 +215,10 @@ namespace SonarQube.Plugins.Roslyn
         {
             this.logger.LogInfo(UIResources.APG_GeneratingPlugin);
 
+            // Make the .jar name match the format [artefactid]-[version].jar
+            // i.e. the format expected by Maven
             string fullJarPath = Path.Combine(Directory.GetCurrentDirectory(),
-                package.Id + "-plugin." + pluginDefn.Version + ".jar");
+                package.Id + "-plugin-" + pluginDefn.Version + ".jar");
 
             PluginBuilder builder = new PluginBuilder(logger);
             RulesPluginBuilder.ConfigureBuilder(builder, pluginDefn, language, rulesFilePath, sqaleFilePath);

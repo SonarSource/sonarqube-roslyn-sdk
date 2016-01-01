@@ -140,18 +140,25 @@ namespace SonarQube.Plugins
 
         private static void DoConfigureBuilder(PluginBuilder builder, PluginManifest definition, string language, string rulesFilePath, string sqaleFilePath, string workingFolder)
         {
+            string uniqueId = Guid.NewGuid().ToString();
+
             AddRuleSources(workingFolder, builder);
             ConfigureSourceFileReplacements(language, builder);
+            builder.SetSourceCodeTokenReplacement("[RESOURCE_ID]", uniqueId);
             builder.AddExtension(RulesExtensionClassName);
 
             AddRuleJars(workingFolder, builder);
 
             // Add the rules and sqale files as resources
-            builder.AddResourceFile(rulesFilePath, "resources/rules.xml");
+            // The files are uniquely named to avoid issues with multiple resources
+            // of the same name in different jars on the classpath. This shouldn't be
+            // an issue with SonarQube as plugins should be loaded in isolation from each other
+            // but it simplifies testing.
+            builder.AddResourceFile(rulesFilePath, "resources/" + uniqueId + ".rules.xml");
 
             if (!string.IsNullOrEmpty(sqaleFilePath))
             {
-                builder.AddResourceFile(rulesFilePath, "resources/sqale.xml");
+                builder.AddResourceFile(rulesFilePath, "resources/" + uniqueId + ".sqale.xml");
             }
 
             // TODO: consider moving - not specific to the rules plugin

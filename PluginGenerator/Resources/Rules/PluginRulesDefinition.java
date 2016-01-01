@@ -24,11 +24,11 @@ public final class PluginRulesDefinition implements RulesDefinition {
   }
 
   protected String rulesDefinitionFilePath() {
-    return "/resources/rules.xml";
+    return "/resources/[RESOURCE_ID].rules.xml";
   }
 
   protected String sqaleDefinitionFilePath() {
-    return "/resources/sqale.xml";
+    return "/resources/[RESOURCE_ID].sqale.xml";
   }
 
   private void defineRulesForLanguage(Context context, String repositoryKey, String repositoryName, String languageKey) {

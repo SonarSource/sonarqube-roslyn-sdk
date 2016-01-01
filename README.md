@@ -41,8 +41,8 @@ These limitations will be addressed at some point in the future.
 It is possible to specify an optional package version
 e.g. */a:Wintellect.Analyzers:1.0.5.0*
 
-The tool will create a .jar file called *[package id]-plugin.[package version].jar* in the current directory
-e.g. Wintellect.Analyzers-plugin.1.0.5.jar
+The tool will create a .jar file called *[package id]-plugin-[package version].jar* in the current directory
+e.g. Wintellect.Analyzers-plugin-1.0.5.jar
 
 The generated jar can be installed to SonarQube as normal (e.g. by dropping it in the SonarQube server *extensions\plugins* folder and restarting the SonarQube server).
 You will see a new repository containing all of the rules defined by the analyzer. The rules can be added to Quality Profiles just like any other SonarQube rule.
