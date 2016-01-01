@@ -7,6 +7,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.PluginGeneratorTests
@@ -27,7 +28,11 @@ namespace SonarQube.Plugins.PluginGeneratorTests
         {
             foreach (string relativePath in expectedRelativePaths)
             {
-                string fullFilePath = Path.Combine(this.unzippedDir, relativePath);
+                string[] matchingFiles = Directory.GetFiles(this.unzippedDir, relativePath, SearchOption.TopDirectoryOnly);
+
+                Assert.IsTrue(matchingFiles.Length < 2, "Test error: supplied relative path should not match multiple files");
+                string fullFilePath = matchingFiles.FirstOrDefault();
+
                 Assert.IsTrue(File.Exists(fullFilePath), "Jar does not contain expected file: {0}", relativePath);
             }
         }

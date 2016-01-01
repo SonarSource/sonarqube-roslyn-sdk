@@ -47,7 +47,7 @@ namespace SonarQube.Plugins.PluginGeneratorTests
 
             new JarChecker(this.TestContext, fullJarFilePath)
                 .JarContainsFiles(
-                    "resources\\rules.xml",
+                    "resources\\*rules.xml",
                     "org\\sonarqube\\plugin\\sdk\\MyPlugin\\Plugin.class",
                     "org\\sonarqube\\plugin\\sdk\\MyPlugin\\PluginRulesDefinition.class");
         }
