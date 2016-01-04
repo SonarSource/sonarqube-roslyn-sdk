@@ -117,120 +117,59 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="APG_AnalyzersLocated" xml:space="preserve">
-    <value>Number of analyzers located in package: {0}</value>
+  <data name="ERROR_FailedToDownloadDependency" xml:space="preserve">
+    <value>Failed to download the Maven dependency from {0}. The HTTP status code was {1} and the reason \"{2}\""</value>
   </data>
-  <data name="APG_CreatedTempWorkingDir" xml:space="preserve">
-    <value>Temporary working folder for this run: {0}</value>
+  <data name="MSG_AddingDependenciesForPOM" xml:space="preserve">
+    <value>Adding dependencies for {0}</value>
   </data>
-  <data name="APG_CreatingRoslynSources" xml:space="preserve">
-    <value>Creating Roslyn plugin specific sources in {0}</value>
+  <data name="MSG_AttemptingToResolveFromParentPOM" xml:space="preserve">
+    <value>Attempting to resolve dependency from parent POM: {0}</value>
   </data>
-  <data name="APG_ExtractingPackageFiles" xml:space="preserve">
-    <value>Extracting files from the package to {0}</value>
+  <data name="MSG_DependencyAlreadyVisited" xml:space="preserve">
+    <value>Dependency has already been visited: {0}</value>
   </data>
-  <data name="APG_GeneratingPlugin" xml:space="preserve">
-    <value>Generating plugin...</value>
+  <data name="MSG_DownloadingFile" xml:space="preserve">
+    <value>Downloading file from {0}...</value>
   </data>
-  <data name="APG_GeneratingRules" xml:space="preserve">
-    <value>Generating rules...</value>
+  <data name="MSG_ExpandedProjectVariable" xml:space="preserve">
+    <value>Expanded project variable: {0}</value>
+    <comment>Note: double up to { and } characters that we want to appear in the output string</comment>
   </data>
-  <data name="APG_LocatingAnalyzers" xml:space="preserve">
-    <value>Looking for analyzers in the package...</value>
+  <data name="MSG_FileDownloaded" xml:space="preserve">
+    <value>File downloaded to {0}</value>
   </data>
-  <data name="APG_LogAnalyzerLanguage" xml:space="preserve">
-    <value>Looking for {0} analyzers</value>
+  <data name="MSG_POMDoesNotContainAJar" xml:space="preserve">
+    <value>POM does not contain a jar. POM: {0}, Packaging: {1}</value>
   </data>
-  <data name="APG_NoAnalyzersFound" xml:space="preserve">
-    <value>No analyzers were found in the specified package</value>
+  <data name="MSG_ProcessingDependency" xml:space="preserve">
+    <value>Processing Maven dependency {0}</value>
   </data>
-  <data name="APG_PluginGenerated" xml:space="preserve">
-    <value>Plugin generated: {0}</value>
+  <data name="MSG_ResolvedVersionFromDependencyManagement" xml:space="preserve">
+    <value>Resolved version from &lt;dependencyManagement&gt;: {0}</value>
   </data>
-  <data name="APG_RulesGeneratedToFile" xml:space="preserve">
-    <value>{0} rules generated to {1}</value>
+  <data name="MSG_ResolvedVersionInPom" xml:space="preserve">
+    <value>Resolved dependency using info in parent POM {0}</value>
   </data>
-  <data name="APG_UnsupportedLanguage" xml:space="preserve">
-    <value>The language '{0}' is not supported. Valid options are 'cs' or 'vb'.</value>
+  <data name="MSG_SkippingInheritedDependency" xml:space="preserve">
+    <value>Skipping inherited dependency: {0}</value>
   </data>
-  <data name="AssemblyDescription" xml:space="preserve">
-    <value>Roslyn Analyzer Plugin Generator for SonarQube</value>
+  <data name="MSG_SkippingScopedDependency" xml:space="preserve">
+    <value>Skipping dependency {0}. Scope: {1}</value>
   </data>
-  <data name="CmdLine_ERROR_InvalidArgumentCount" xml:space="preserve">
-    <value>Expecting one or two arguments:
-* NuGet package Id (mandatory), and
-* NuGet package version (optional)</value>
+  <data name="MSG_UsingCachedFile" xml:space="preserve">
+    <value>Using cached copy of {0}</value>
   </data>
-  <data name="NG_CreatingRepository" xml:space="preserve">
-    <value>Creating NuGet repository: {0}</value>
+  <data name="WARN_DependencyWasNotFound" xml:space="preserve">
+    <value>Maven dependency was not found. Url: {0}.</value>
   </data>
-  <data name="NG_DownloadedPackage" xml:space="preserve">
-    <value>... downloaded ({0} files)</value>
+  <data name="WARN_FailedToResolveDependency" xml:space="preserve">
+    <value>Failed to resolved dependency: {0}</value>
   </data>
-  <data name="NG_DownloadingPackage" xml:space="preserve">
-    <value>Downloading package...</value>
+  <data name="WARN_JarAddedByAnotherDependency" xml:space="preserve">
+    <value>The jar has already been added by another dependency. Current coordinate: {0}. Local path: {1}</value>
   </data>
-  <data name="NG_ERROR_PackageInstallFail" xml:space="preserve">
-    <value>Failed to install package: {0}
-Check that there are released versions of the package, or specify a pre-release version identifier.</value>
-  </data>
-  <data name="NG_ERROR_PackageNotFound" xml:space="preserve">
-    <value>No packages with the specified id were found: {0}</value>
-  </data>
-  <data name="NG_ERROR_PackageVersionNotFound" xml:space="preserve">
-    <value>Package version was not found: {0}</value>
-  </data>
-  <data name="NG_ExtractingFile" xml:space="preserve">
-    <value>Extracting file '{0}' to {1}</value>
-  </data>
-  <data name="NG_IsLatestPackageVersionSuffix" xml:space="preserve">
-    <value>- latest version</value>
-  </data>
-  <data name="NG_LocatingPackages" xml:space="preserve">
-    <value>Attempting to locate package with id '{0}'</value>
-  </data>
-  <data name="NG_NumberOfPackagesLocated" xml:space="preserve">
-    <value>Number of packages located: {0}</value>
-  </data>
-  <data name="NG_PackageVersionListHeader" xml:space="preserve">
-    <value>Package versions:</value>
-  </data>
-  <data name="NG_SelectedPackageVersion" xml:space="preserve">
-    <value>Version was not specified. Using version {0}.</value>
-  </data>
-  <data name="NG_UsingLatestPackageVersion" xml:space="preserve">
-    <value>Using version marked as latest.</value>
-  </data>
-  <data name="RuleGen_DuplicateKey" xml:space="preserve">
-    <value>Skipping rule in analyzer {0}: Duplicate key.</value>
-  </data>
-  <data name="RuleGen_EmptyKey" xml:space="preserve">
-    <value>Skipping rule in analyzer {0}: No key found.</value>
-  </data>
-  <data name="RuleGen_ForMoreDetailsLink" xml:space="preserve">
-    <value>For more information visit &lt;a href="{0}" target="_blank"&gt;the rule's help page&lt;/a&gt;.</value>
-  </data>
-  <data name="RuleGen_MoreDetailsTitle" xml:space="preserve">
-    <value>More Details</value>
-  </data>
-  <data name="RuleGen_NoDescription" xml:space="preserve">
-    <value>No description was provided.</value>
-  </data>
-  <data name="Scanner_AnalyzerInstantiationFail" xml:space="preserve">
-    <value>Could not instantiate analyzers from '{0}'. 
-
-Error: {1}</value>
-  </data>
-  <data name="Scanner_AnalyzerLoaded" xml:space="preserve">
-    <value>Loaded analyzer: {0}</value>
-  </data>
-  <data name="Scanner_AnalyzersLoadSuccess" xml:space="preserve">
-    <value>Loaded: {0} analyzers.</value>
-  </data>
-  <data name="Scanner_AssemblyLoadSuccess" xml:space="preserve">
-    <value>Loaded assembly: {0}</value>
-  </data>
-  <data name="Scanner_NoAnalyzers" xml:space="preserve">
-    <value>No analyzers found in assembly.</value>
+  <data name="WARN_UnrecognizedProjectVariable" xml:space="preserve">
+    <value>Unrecognized project variable: {0}</value>
   </data>
 </root>

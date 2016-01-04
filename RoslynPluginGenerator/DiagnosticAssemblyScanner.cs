@@ -10,7 +10,6 @@ using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -31,15 +30,14 @@ namespace SonarQube.Plugins.Roslyn
         }
 
         /// <summary>
-        /// Loads all assemblies in the given directory and instantiates Roslyn diagnostic objects - i.e. existing types deriving from
+        /// Loads all of the given assemblies and instantiates Roslyn diagnostic objects - i.e. existing types deriving from
         /// <see cref="DiagnosticAnalyzer"/>
         /// </summary>
         /// <returns>Enumerable with instances of DiagnosticAnalyzer from discovered assemblies</returns>
-        public IEnumerable<DiagnosticAnalyzer> InstantiateDiagnostics(string directoryPath, string language)
+        public IEnumerable<DiagnosticAnalyzer> InstantiateDiagnostics(string language, params string[] files)
         {
             List<DiagnosticAnalyzer> analyzers = new List<DiagnosticAnalyzer>();
-
-            foreach (string assemblyPath in Directory.GetFiles(directoryPath, "*.dll", SearchOption.AllDirectories))
+            foreach (string assemblyPath in files)
             {
                 analyzers.AddRange(InstantiateDiagnosticsFromAssembly(assemblyPath, language));
             }

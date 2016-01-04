@@ -47,6 +47,18 @@
     <Compile Include="DataModel\Rules.cs" />
     <Compile Include="Exceptions\JavaCompilerException.cs" />
     <Compile Include="Interfaces\IJdkWrapper.cs" />
+    <Compile Include="Interfaces\IMavenDependencyHandler.cs" />
+    <Compile Include="Maven\MavenDependencyManagement.cs" />
+    <Compile Include="Maven\MavenDependencyHandler.cs" />
+    <Compile Include="Maven\MavenDependency.cs" />
+    <Compile Include="Maven\MavenProperties.cs" />
+    <Compile Include="Maven\MavenCoordinate.cs" />
+    <Compile Include="Maven\MavenPartialPOM.cs" />
+    <Compile Include="Maven\MavenResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MavenResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="NuGet\DataModel.cs" />
     <Compile Include="NuGet\NuGetSpecReader.cs" />
     <Compile Include="RulesPluginBuilder.cs" />
@@ -80,6 +92,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Maven\MavenResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>MavenResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Core\sonar-plugin-api-4.5.2.jar" />
     <EmbeddedResource Include="SonarQube\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

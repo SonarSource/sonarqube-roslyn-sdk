@@ -70,6 +70,33 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Temporary working folder for this run: {0}.
+        /// </summary>
+        public static string APG_CreatedTempWorkingDir {
+            get {
+                return ResourceManager.GetString("APG_CreatedTempWorkingDir", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Creating Roslyn plugin specific sources in {0}.
+        /// </summary>
+        public static string APG_CreatingRoslynSources {
+            get {
+                return ResourceManager.GetString("APG_CreatingRoslynSources", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Extracting files from the package to {0}.
+        /// </summary>
+        public static string APG_ExtractingPackageFiles {
+            get {
+                return ResourceManager.GetString("APG_ExtractingPackageFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Generating plugin....
         /// </summary>
         public static string APG_GeneratingPlugin {
@@ -97,6 +124,15 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Looking for {0} analyzers.
+        /// </summary>
+        public static string APG_LogAnalyzerLanguage {
+            get {
+                return ResourceManager.GetString("APG_LogAnalyzerLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No analyzers were found in the specified package.
         /// </summary>
         public static string APG_NoAnalyzersFound {
@@ -120,6 +156,15 @@ namespace SonarQube.Plugins.Roslyn {
         public static string APG_RulesGeneratedToFile {
             get {
                 return ResourceManager.GetString("APG_RulesGeneratedToFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The language &apos;{0}&apos; is not supported. Valid options are &apos;cs&apos; or &apos;vb&apos;..
+        /// </summary>
+        public static string APG_UnsupportedLanguage {
+            get {
+                return ResourceManager.GetString("APG_UnsupportedLanguage", resourceCulture);
             }
         }
         

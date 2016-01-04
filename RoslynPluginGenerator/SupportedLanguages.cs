@@ -15,5 +15,34 @@ namespace SonarQube.Plugins.Roslyn
     {
         public const string CSharp = "cs";
         public const string VisualBasic = "vb";
+
+        public static bool IsSupported(string language)
+        {
+            bool supported = string.Equals(language, CSharp, System.StringComparison.Ordinal) ||
+                string.Equals(language, VisualBasic, System.StringComparison.Ordinal);
+
+            return supported;
+        }
+
+        public static string GetRoslynLanguageName(string language)
+        {
+            ThrowIfNotSupported(language);
+
+            if (string.Equals(language, CSharp, System.StringComparison.OrdinalIgnoreCase))
+            {
+                return Microsoft.CodeAnalysis.LanguageNames.CSharp;
+            }
+            return Microsoft.CodeAnalysis.LanguageNames.VisualBasic;
+        }
+
+        public static void ThrowIfNotSupported(string language)
+        {
+            if (!SupportedLanguages.IsSupported(language))
+            {
+                throw new System.ArgumentOutOfRangeException(
+                    string.Format(System.Globalization.CultureInfo.CurrentCulture,
+                    UIResources.APG_UnsupportedLanguage, language), "language");
+            }
+        }
     }
 }

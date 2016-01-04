@@ -7,6 +7,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using NuGet;
+using SonarQube.Plugins.Common;
 using SonarQube.Plugins.Roslyn.CommandLine;
 using System;
 using System.Collections.Generic;
@@ -19,8 +20,6 @@ namespace SonarQube.Plugins.Roslyn
 {
     public class AnalyzerPluginGenerator
     {
-        public const string NuGetPackageSource = "https://www.nuget.org/api/v2/";
-
         private const string RoslynResourcesRoot = "SonarQube.Plugins.Roslyn.Resources.";
 
         /// <summary>
@@ -44,77 +43,88 @@ namespace SonarQube.Plugins.Roslyn
         /// </summary>
         private const string PluginKeySuffix = "_sarif";
 
+        private readonly INuGetPackageHandler packageHandler;
         private readonly SonarQube.Plugins.Common.ILogger logger;
 
-        public AnalyzerPluginGenerator(SonarQube.Plugins.Common.ILogger logger)
+        public AnalyzerPluginGenerator(INuGetPackageHandler packageHandler, SonarQube.Plugins.Common.ILogger logger)
         {
+            if (packageHandler == null)
+            {
+                throw new ArgumentNullException("packageHandler");
+            }
             if (logger == null)
             {
                 throw new ArgumentNullException("logger");
             }
+            this.packageHandler = packageHandler;
             this.logger = logger;
         }
 
-        public bool Generate(NuGetReference analyzeRef, string sqaleFilePath)
+        public bool Generate(NuGetReference analyzeRef, string language, string sqaleFilePath)
         {
             // sqale file path is optional
             if (analyzeRef == null)
             {
                 throw new ArgumentNullException("analyzeRef");
             }
+            if (string.IsNullOrWhiteSpace(language))
+            {
+                throw new ArgumentNullException("language");
+            }
+            SupportedLanguages.ThrowIfNotSupported(language);
 
-            string baseDirectory = Path.Combine(
-                Path.GetTempPath(),
-                Assembly.GetEntryAssembly().GetName().Name);
-
-            string nuGetDirectory = Path.Combine(baseDirectory, ".nuget");
-
-            NuGetPackageHandler downloader = new NuGetPackageHandler(logger);
-
-            IPackage package = downloader.FetchPackage(NuGetPackageSource, analyzeRef.PackageId, analyzeRef.Version, nuGetDirectory);
+            string nuGetDirectory = Utilities.CreateTempDirectory(".nuget");
+            IPackage package = this.packageHandler.FetchPackage(analyzeRef.PackageId, analyzeRef.Version, nuGetDirectory);
 
             if (package != null)
             {
-                // TODO: support multiple languages
-                string language = SupportedLanguages.CSharp;
+                // Create a uniquely-named temp directory for this generation run
+                string baseDirectory = Utilities.CreateTempDirectory(".gen");
+                baseDirectory = CreateSubDirectory(baseDirectory, Guid.NewGuid().ToString());
+                this.logger.LogDebug(UIResources.APG_CreatedTempWorkingDir, baseDirectory);
+
                 PluginManifest pluginDefn = CreatePluginDefinition(package);
 
-                string outputDirectory = Path.Combine(baseDirectory, ".output", Guid.NewGuid().ToString());
-                Directory.CreateDirectory(outputDirectory);
+                string rulesFilePath = Path.Combine(baseDirectory, "rules.xml");
 
-                string rulesFilePath = Path.Combine(outputDirectory, "rules.xml");
-
-                // TODO: we shouldn't try to work out where the content files have been installed by NuGet.
-                // Instead, we should use the methods on IPackage to locate the assemblies e.g. Package.GetFiles()
-                string packageDirectory = Path.Combine(nuGetDirectory, package.Id + "." + package.Version.ToString());
-                Debug.Assert(Directory.Exists(packageDirectory), "Expected package directory does not exist: {0}", packageDirectory);
-
-                bool success = TryGenerateRulesFile(packageDirectory, nuGetDirectory, rulesFilePath);
+                bool success = TryGenerateRulesFile(package, nuGetDirectory, baseDirectory, rulesFilePath, language);
 
                 if (success)
                 {
-                    BuildPlugin(analyzeRef, sqaleFilePath, language, pluginDefn, rulesFilePath, outputDirectory, package);
+                    BuildPlugin(package, language, rulesFilePath, sqaleFilePath, pluginDefn, baseDirectory);
                 }
             }
 
             return package != null;
         }
 
+        private static string CreateSubDirectory(string parent, string child)
+        {
+            string newDir = Path.Combine(parent, child);
+            Directory.CreateDirectory(newDir);
+            return newDir;
+        }
+
         /// <summary>
-        /// Attempts to generate a rules file for assemblies in the package directory.
-        /// Returns the path to the rules file.
+        /// Attempts to generate a rules file for assemblies in the specified package.
         /// </summary>
-        /// <param name="packageDirectory">Directory containing the analyzer assembly to generate rules for</param>
-        /// <param name="nuGetDirectory">Directory containing other NuGet packages that might be required i.e. analyzer dependencies</param>
-        private bool TryGenerateRulesFile(string packageDirectory, string nuGetDirectory, string outputFilePath)
+        /// <param name="additionalSearchFolder">Root directory to search when looking for analyzer dependencies</param>
+        /// <param name="baseTempDir">Base temporary working directory for this generation run</param>
+        /// <param name="rulesFilePath">Full name of the file to create</param>
+        private bool TryGenerateRulesFile(IPackage package, string additionalSearchFolder, string baseTempDir, string rulesFilePath, string language)
         {
             bool success = false;
             this.logger.LogInfo(UIResources.APG_GeneratingRules);
 
             this.logger.LogInfo(UIResources.APG_LocatingAnalyzers);
 
-            DiagnosticAssemblyScanner diagnosticAssemblyScanner = new DiagnosticAssemblyScanner(this.logger, nuGetDirectory);
-            IEnumerable<DiagnosticAnalyzer> analyzers = diagnosticAssemblyScanner.InstantiateDiagnostics(packageDirectory, LanguageNames.CSharp);
+            string[] files = GetAssembliesFromPackage(package, baseTempDir).ToArray();
+
+            string roslynLanguageName = SupportedLanguages.GetRoslynLanguageName(language);
+            this.logger.LogDebug(UIResources.APG_LogAnalyzerLanguage, roslynLanguageName);
+
+            DiagnosticAssemblyScanner diagnosticAssemblyScanner = new DiagnosticAssemblyScanner(this.logger, additionalSearchFolder);
+            IEnumerable<DiagnosticAnalyzer> analyzers = diagnosticAssemblyScanner.InstantiateDiagnostics(roslynLanguageName, files.ToArray());
 
             this.logger.LogInfo(UIResources.APG_AnalyzersLocated, analyzers.Count());
 
@@ -127,8 +137,8 @@ namespace SonarQube.Plugins.Roslyn
 
                 if (rules != null)
                 {
-                    rules.Save(outputFilePath, logger);
-                    this.logger.LogDebug(UIResources.APG_RulesGeneratedToFile, rules.Count, outputFilePath);
+                    rules.Save(rulesFilePath, logger);
+                    this.logger.LogDebug(UIResources.APG_RulesGeneratedToFile, rules.Count, rulesFilePath);
                     success = true;
                 }
             }
@@ -137,6 +147,25 @@ namespace SonarQube.Plugins.Roslyn
                 this.logger.LogWarning(UIResources.APG_NoAnalyzersFound);
             }
             return success;
+        }
+
+        private IEnumerable<string> GetAssembliesFromPackage(IPackage package, string baseTempDir)
+        {
+            // We can't directly get the paths to the files in package so
+            // we have to extract them first
+            string extractDir = CreateSubDirectory(baseTempDir, ".extract");
+            this.logger.LogDebug(UIResources.APG_ExtractingPackageFiles, extractDir);
+            PhysicalFileSystem fileSystem = new PhysicalFileSystem(extractDir);
+            package.ExtractContents(fileSystem, ".");
+
+            string[] files = Directory.GetFiles(extractDir, "*.*", SearchOption.AllDirectories);
+            return files.Where(f => IsAssembly(f));
+        }
+
+        private static bool IsAssembly(string filePath)
+        {
+            return filePath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) ||
+                filePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase);
         }
 
         private static PluginManifest CreatePluginDefinition(IPackage package)
@@ -182,17 +211,19 @@ namespace SonarQube.Plugins.Roslyn
             return string.Join(",", args);
         }
 
-        private void BuildPlugin(NuGetReference analyzeRef, string sqaleFilePath, string language, PluginManifest pluginDefn, string rulesFilePath, string tempDirectory, IPackage package)
+        private void BuildPlugin(IPackage package, string language, string rulesFilePath, string sqaleFilePath, PluginManifest pluginDefn, string baseTempDirectory)
         {
             this.logger.LogInfo(UIResources.APG_GeneratingPlugin);
 
+            // Make the .jar name match the format [artefactid]-[version].jar
+            // i.e. the format expected by Maven
             string fullJarPath = Path.Combine(Directory.GetCurrentDirectory(),
-                analyzeRef.PackageId + "-plugin." + pluginDefn.Version + ".jar");
+                package.Id + "-plugin-" + pluginDefn.Version + ".jar");
 
             PluginBuilder builder = new PluginBuilder(logger);
             RulesPluginBuilder.ConfigureBuilder(builder, pluginDefn, language, rulesFilePath, sqaleFilePath);
 
-            AddRoslynMetadata(tempDirectory, builder, package);
+            AddRoslynMetadata(baseTempDirectory, builder, package);
             
             builder.SetJarFilePath(fullJarPath);
             builder.Build();
@@ -200,11 +231,14 @@ namespace SonarQube.Plugins.Roslyn
             this.logger.LogInfo(UIResources.APG_PluginGenerated, fullJarPath);
         }
 
-        private static void AddRoslynMetadata(string tempDirectory, PluginBuilder builder, IPackage package)
+        private void AddRoslynMetadata(string baseTempDirectory, PluginBuilder builder, IPackage package)
         {
-            SourceGenerator.CreateSourceFiles(typeof(AnalyzerPluginGenerator).Assembly, RoslynResourcesRoot, tempDirectory, new Dictionary<string, string>());
+            string sourcesDir = CreateSubDirectory(baseTempDirectory, "src");
+            this.logger.LogDebug(UIResources.APG_CreatingRoslynSources, sourcesDir);
 
-            string[] sourceFiles = Directory.GetFiles(tempDirectory, "*.java", SearchOption.AllDirectories);
+            SourceGenerator.CreateSourceFiles(typeof(AnalyzerPluginGenerator).Assembly, RoslynResourcesRoot, sourcesDir, new Dictionary<string, string>());
+
+            string[] sourceFiles = Directory.GetFiles(sourcesDir, "*.java", SearchOption.AllDirectories);
             Debug.Assert(sourceFiles.Any(), "Failed to correctly unpack the Roslyn analyzer specific source files");
 
             foreach (string sourceFile in sourceFiles)

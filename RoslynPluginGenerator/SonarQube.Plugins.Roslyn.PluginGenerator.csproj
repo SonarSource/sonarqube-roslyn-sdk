@@ -65,8 +65,8 @@
       <HintPath>..\packages\Microsoft.Web.Xdt.2.1.1\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NuGet.Core, Version=2.9.0.729, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\NuGet.Core.2.9.0\lib\net40-Client\NuGet.Core.dll</HintPath>
+    <Reference Include="NuGet.Core, Version=2.10.1.766, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\NuGet.Core.2.10.1\lib\net40-Client\NuGet.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -109,7 +109,8 @@
   <ItemGroup>
     <Compile Include="CommandLine\ArgumentProcessor.cs" />
     <Compile Include="DiagnosticAssemblyScanner.cs" />
-    <Compile Include="IRuleGenerator.cs" />
+    <Compile Include="Interfaces\INuGetPackageHandler.cs" />
+    <Compile Include="Interfaces\IRuleGenerator.cs" />
     <Compile Include="NuGetReference.cs" />
     <Compile Include="CommandLine\ProcessedArgs.cs" />
     <Compile Include="CommandLine\CmdLineResources.Designer.cs">
@@ -131,7 +132,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\SonarQube.Plugins.Common.csproj">
