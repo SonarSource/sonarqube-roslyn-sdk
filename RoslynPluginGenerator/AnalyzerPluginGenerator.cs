@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace SonarQube.Plugins.Roslyn
 {
@@ -118,7 +117,7 @@ namespace SonarQube.Plugins.Roslyn
 
             this.logger.LogInfo(UIResources.APG_LocatingAnalyzers);
 
-            string[] files = GetAssembliesFromPackage(package, baseTempDir).ToArray();
+            string[] files = GetFilesFromPackage(package, baseTempDir).ToArray();
 
             string roslynLanguageName = SupportedLanguages.GetRoslynLanguageName(language);
             this.logger.LogDebug(UIResources.APG_LogAnalyzerLanguage, roslynLanguageName);
@@ -149,7 +148,7 @@ namespace SonarQube.Plugins.Roslyn
             return success;
         }
 
-        private IEnumerable<string> GetAssembliesFromPackage(IPackage package, string baseTempDir)
+        private IEnumerable<string> GetFilesFromPackage(IPackage package, string baseTempDir)
         {
             // We can't directly get the paths to the files in package so
             // we have to extract them first
@@ -159,13 +158,7 @@ namespace SonarQube.Plugins.Roslyn
             package.ExtractContents(fileSystem, ".");
 
             string[] files = Directory.GetFiles(extractDir, "*.*", SearchOption.AllDirectories);
-            return files.Where(f => IsAssembly(f));
-        }
-
-        private static bool IsAssembly(string filePath)
-        {
-            return filePath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) ||
-                filePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase);
+            return files;
         }
 
         private static PluginManifest CreatePluginDefinition(IPackage package)

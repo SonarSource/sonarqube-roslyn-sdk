@@ -31,18 +31,26 @@ namespace SonarQube.Plugins.Roslyn
 
         /// <summary>
         /// Loads all of the given assemblies and instantiates Roslyn diagnostic objects - i.e. existing types deriving from
-        /// <see cref="DiagnosticAnalyzer"/>
+        /// <see cref="DiagnosticAnalyzer"/>. Non-assembly files will be ignored.
         /// </summary>
         /// <returns>Enumerable with instances of DiagnosticAnalyzer from discovered assemblies</returns>
         public IEnumerable<DiagnosticAnalyzer> InstantiateDiagnostics(string language, params string[] files)
         {
             List<DiagnosticAnalyzer> analyzers = new List<DiagnosticAnalyzer>();
-            foreach (string assemblyPath in files)
+            foreach (string assemblyPath in files.Where(f => IsAssembly(f)))
             {
                 analyzers.AddRange(InstantiateDiagnosticsFromAssembly(assemblyPath, language));
             }
 
             return analyzers;
+        }
+
+        private static bool IsAssembly(string filePath)
+        {
+            // Not expecting .winmd files to contain Roslyn analyzers
+            // so we'll ignore them
+            return filePath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) ||
+                filePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
