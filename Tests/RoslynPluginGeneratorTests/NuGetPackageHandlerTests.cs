@@ -12,31 +12,92 @@ using NuGet;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
+    /// <summary>
+    /// Tests for NuGetPackageHandler.cs
+    /// 
+    /// There is no test for the scenario released package A depending on prerelease package B as this is not allowed.
+    /// </summary>
     [TestClass]
     public class NuGetPackageHandlerTests
     {
         public TestContext TestContext { get; set; }
 
+        private const string TestPackageName = "testPackage";
+        private const string DependentPackageName = "dependentPackage";
+
+        private const string ReleaseVersion = "1.0.0";
+        private const string PreReleaseVersion = "1.0.0-RC1";
+
         #region Tests
 
         [TestMethod]
-        public void NuGet_TestDependencyResolutionFailure()
+        public void NuGet_TestPackageDownload_Release_Release()
         {
             // Arrange
             string testDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string testDownloadDir = Path.Combine(testDir, "download");
+
+            // Create test NuGet payload and packages
+            BuildTestPackages(true, true);
+
             TestLogger logger = new TestLogger();
-            NuGetPackageHandler handler = new NuGetPackageHandler(testDir, logger);
+            NuGetPackageHandler handler = new NuGetPackageHandler(logger);
 
             // Act
-            // Fetch a package that should fail due to pre-release dependencies
-            IPackage package = handler.FetchPackage("codeCracker", null, testDir);
+            // Attempt to download a package which is released with a dependency that is released
+            IPackage package = handler.FetchPackage(testDir, DependentPackageName, null, testDownloadDir);
 
             // Assert
-            // No files should have been downloaded
-            Assert.IsTrue(Directory.GetFiles(testDir, "*.*", SearchOption.AllDirectories).Length == 0);
-            Assert.IsNull(package);
+            AssertExpectedPackage(package, DependentPackageName, ReleaseVersion);
+            // Package should have been downloaded
+            AssertPackageDownloaded(testDownloadDir, DependentPackageName);
         }
 
+        [TestMethod]
+        public void NuGet_TestPackageDownload_PreRelease_Release()
+        {
+            // Arrange
+            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string testDownloadDir = Path.Combine(testDir, "download");
+
+            // Create test NuGet payload and packages
+            BuildTestPackages(false, true);
+
+            TestLogger logger = new TestLogger();
+            NuGetPackageHandler handler = new NuGetPackageHandler(logger);
+
+            // Act
+            // Attempt to download a package which is not released with a dependency that is released
+            IPackage package = handler.FetchPackage(testDir, DependentPackageName, null, testDownloadDir);
+
+            // Assert
+            AssertExpectedPackage(package, DependentPackageName, PreReleaseVersion);
+            // Package should have been downloaded
+            AssertPackageDownloaded(testDownloadDir, DependentPackageName);
+        }
+
+        [TestMethod]
+        public void NuGet_TestPackageDownload_PreRelease_PreRelease()
+        {
+            // Arrange
+            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string testDownloadDir = Path.Combine(testDir, "download");
+
+            // Create test NuGet payload and packages
+            BuildTestPackages(false, false);
+
+            TestLogger logger = new TestLogger();
+            NuGetPackageHandler handler = new NuGetPackageHandler(logger);
+
+            // Act
+            // Attempt to download a package which is not released with a dependency that is not released
+            IPackage package = handler.FetchPackage(testDir, DependentPackageName, null, testDownloadDir);
+
+            // Assert
+            AssertExpectedPackage(package, DependentPackageName, PreReleaseVersion);
+            // Package should have been downloaded
+            AssertPackageDownloaded(testDownloadDir, DependentPackageName);
+        }
         [TestMethod]
         public void FetchPackage_VersionSpecified_CorrectVersionSelected()
         {
@@ -166,8 +227,80 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             builder.Save(stream);
             stream.Position = 0;
 
-            ZipPackage pkg = new ZipPackage(stream);            
+            ZipPackage pkg = new ZipPackage(stream);
             manager.InstallPackage(pkg, true, true);
+        }
+
+        private ManifestMetadata GenerateTestMetadata(bool isReleased)
+        {
+            return new ManifestMetadata()
+            {
+                Authors = "Microsoft",
+                Version = isReleased ? ReleaseVersion : PreReleaseVersion,
+                Id = TestPackageName,
+                Description = "A description",
+            };
+        }
+
+        private ManifestMetadata GenerateTestMetadataWithDependency(bool isReleased, bool isDependencyReleased)
+        {
+            List<ManifestDependencySet> dependencies = new List<ManifestDependencySet>()
+            {
+                new ManifestDependencySet()
+                {
+                    Dependencies = new List<ManifestDependency>()
+                    {
+                        new ManifestDependency()
+                        {
+                            Id = TestPackageName,
+                            Version = isDependencyReleased ? ReleaseVersion : PreReleaseVersion,
+                        }
+                    }
+                }
+            };
+            return new ManifestMetadata()
+            {
+                Authors = "Microsoft",
+                Version = isReleased ? ReleaseVersion : PreReleaseVersion,
+                Id = DependentPackageName,
+                Description = "A description",
+                DependencySets = dependencies,
+            };
+        }
+
+        private void BuildTestPackages(bool isDependentPackageReleased, bool isTestPackageReleased)
+        {
+            string testDir = TestUtils.EnsureTestDirectoryExists(this.TestContext);
+
+            string testPackageFile = Path.Combine(testDir, TestPackageName);
+            string dependentPackageFile = Path.Combine(testDir, DependentPackageName);
+
+            ManifestMetadata testMetadata = GenerateTestMetadata(isTestPackageReleased);
+            BuildPackage(testMetadata, testPackageFile);
+
+            ManifestMetadata dependentMetadata = GenerateTestMetadataWithDependency(isDependentPackageReleased, isTestPackageReleased);
+            BuildPackage(dependentMetadata, dependentPackageFile);
+        }
+
+        private void BuildPackage(ManifestMetadata metadata, string fileName)
+        {
+            string testDir = TestUtils.EnsureTestDirectoryExists(this.TestContext, "source");
+            string dummyTextFile = TestUtils.CreateTextFile(Guid.NewGuid().ToString(), testDir, "content");
+
+            PackageBuilder packageBuilder = new PackageBuilder();
+
+            PhysicalPackageFile file = new PhysicalPackageFile();
+            file.SourcePath = dummyTextFile;
+            file.TargetPath = "dummy.txt";
+            packageBuilder.Files.Add(file);
+
+            packageBuilder.Populate(metadata);
+
+            string destinationName = fileName + "." + metadata.Version + ".nupkg";
+            using (FileStream stream = File.Open(destinationName, FileMode.OpenOrCreate))
+            {
+                packageBuilder.Save(stream);
+            }
         }
 
         #endregion
@@ -182,6 +315,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             Assert.AreEqual(expectedId, actual.Id, "Unexpected package id");
             Assert.AreEqual(sVersion, actual.Version, "Unexpected package version");
+        }
+
+        private void AssertPackageDownloaded(string downloadDir, string packageName)
+        {
+            Assert.IsNotNull(Directory.GetDirectories(downloadDir).SingleOrDefault(d => d.Contains(packageName)),
+                "Expected a package to have been downloaded: " + packageName);
         }
 
         #endregion
