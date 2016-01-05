@@ -59,7 +59,7 @@ namespace SonarQube.Plugins.Roslyn
             this.logger = logger;
         }
 
-        public bool Generate(NuGetReference analyzeRef, string language, string sqaleFilePath)
+        public bool Generate(NuGetReference analyzeRef, string language, string sqaleFilePath, string outputDirectory)
         {
             // sqale file path is optional
             if (analyzeRef == null)
@@ -90,7 +90,7 @@ namespace SonarQube.Plugins.Roslyn
 
                 if (success)
                 {
-                    BuildPlugin(package, language, rulesFilePath, sqaleFilePath, pluginDefn, baseDirectory);
+                    BuildPlugin(package, language, rulesFilePath, sqaleFilePath, pluginDefn, baseDirectory, outputDirectory);
                 }
             }
 
@@ -204,13 +204,14 @@ namespace SonarQube.Plugins.Roslyn
             return string.Join(",", args);
         }
 
-        private void BuildPlugin(IPackage package, string language, string rulesFilePath, string sqaleFilePath, PluginManifest pluginDefn, string baseTempDirectory)
+        private void BuildPlugin(IPackage package, string language, string rulesFilePath, string sqaleFilePath, PluginManifest pluginDefn, string baseTempDirectory, string outputDirectory)
         {
             this.logger.LogInfo(UIResources.APG_GeneratingPlugin);
 
             // Make the .jar name match the format [artefactid]-[version].jar
             // i.e. the format expected by Maven
-            string fullJarPath = Path.Combine(Directory.GetCurrentDirectory(),
+            Directory.CreateDirectory(outputDirectory);
+            string fullJarPath = Path.Combine(outputDirectory,
                 package.Id + "-plugin-" + pluginDefn.Version + ".jar");
 
             PluginBuilder builder = new PluginBuilder(logger);
