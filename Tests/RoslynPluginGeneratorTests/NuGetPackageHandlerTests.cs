@@ -9,6 +9,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Test.Common;
 using System.IO;
 using NuGet;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
@@ -41,11 +43,11 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             BuildTestPackages(true, true);
 
             TestLogger logger = new TestLogger();
-            NuGetPackageHandler handler = new NuGetPackageHandler(logger);
+            NuGetPackageHandler handler = new NuGetPackageHandler(testDir, logger);
 
             // Act
             // Attempt to download a package which is released with a dependency that is released
-            IPackage package = handler.FetchPackage(testDir, DependentPackageName, null, testDownloadDir);
+            IPackage package = handler.FetchPackage(DependentPackageName, null, testDownloadDir);
 
             // Assert
             AssertExpectedPackage(package, DependentPackageName, ReleaseVersion);
@@ -64,11 +66,11 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             BuildTestPackages(false, true);
 
             TestLogger logger = new TestLogger();
-            NuGetPackageHandler handler = new NuGetPackageHandler(logger);
+            NuGetPackageHandler handler = new NuGetPackageHandler(testDir, logger);
 
             // Act
             // Attempt to download a package which is not released with a dependency that is released
-            IPackage package = handler.FetchPackage(testDir, DependentPackageName, null, testDownloadDir);
+            IPackage package = handler.FetchPackage(DependentPackageName, null, testDownloadDir);
 
             // Assert
             AssertExpectedPackage(package, DependentPackageName, PreReleaseVersion);
@@ -87,11 +89,11 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             BuildTestPackages(false, false);
 
             TestLogger logger = new TestLogger();
-            NuGetPackageHandler handler = new NuGetPackageHandler(logger);
+            NuGetPackageHandler handler = new NuGetPackageHandler(testDir, logger);
 
             // Act
             // Attempt to download a package which is not released with a dependency that is not released
-            IPackage package = handler.FetchPackage(testDir, DependentPackageName, null, testDownloadDir);
+            IPackage package = handler.FetchPackage(DependentPackageName, null, testDownloadDir);
 
             // Assert
             AssertExpectedPackage(package, DependentPackageName, PreReleaseVersion);
