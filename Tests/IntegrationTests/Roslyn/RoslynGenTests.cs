@@ -5,10 +5,13 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NuGet;
 using SonarQube.Plugins.Roslyn;
 using SonarQube.Plugins.Test.Common;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -20,8 +23,7 @@ namespace SonarQube.Plugins.IntegrationTests
         public TestContext TestContext { get; set; }
 
         [TestMethod]
-        [Ignore] // WIP
-        public void RoslynGen()
+        public void RoslynPlugin_GenerateForValidAnalyzer_Succeeds()
         {
             // Arrange
             TestLogger logger = new TestLogger();
@@ -29,30 +31,48 @@ namespace SonarQube.Plugins.IntegrationTests
             PluginInspector inspector = CreatePluginInspector(logger);
 
             // Create a valid analyzer package
+            ExampleAnalyzer1.CSharpAnalyzer analyzer = new ExampleAnalyzer1.CSharpAnalyzer();
+
+            string packageId = "analyzer1.id1";
             string localNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGet");
             IPackageManager localNuGetStore = CreatePackageManager(localNuGetDir);
-            AddPackage(localNuGetStore, "analyzer1", "1.0", typeof(ExampleAnalyzer1.CSharpAnalyzer).Assembly.Location);
-
-
+            AddPackage(localNuGetStore, packageId, "1.0", analyzer.GetType().Assembly.Location);
 
             // Act
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(localNuGetDir, logger);
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference("analyzer1", new SemanticVersion("1.0")), "cs", null, outputDir);
+            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(packageId, new SemanticVersion("1.0")), "cs", null, outputDir);
 
             // Assert
             Assert.IsTrue(result);
             string jarFilePath = AssertPluginJarExists(outputDir);
 
-            object description = inspector.GetPluginDescription(jarFilePath);
+            JarInfo jarInfo = inspector.GetPluginDescription(jarFilePath);
 
+            if (jarInfo != null)
+            {
+                this.TestContext.AddResultFile(jarInfo.FileName);
+            }
+
+            Assert.IsNotNull(jarInfo, "Failed to process the generated jar successfully");
+
+            AssertPropertyDefinitionExists(packageId + "_sarif.AnalyzerId", jarInfo);
+            AssertPropertyDefinitionExists(packageId + "_sarif.RuleNamespace", jarInfo);
+            AssertPropertyDefinitionExists(packageId + "_sarif.nuget.packageId", jarInfo);
+            AssertPropertyDefinitionExists(packageId + "_sarif.nuget.packageVersion", jarInfo);
+
+            JarInfo.RulesDefinition rulesDefn = AssertRulesDefinitionExists(jarInfo);
+            AssertRepositoryIsValid(rulesDefn.Repository);
+
+            AssertExpectedRulesExist(analyzer, rulesDefn.Repository);
+
+            Assert.AreEqual(5, jarInfo.Extensions.Count, "Unexpected number of extensions");
         }
 
         #region Private methods
 
         private PluginInspector CreatePluginInspector(Common.ILogger logger)
         {
-            //// Build the Java inspector class
             string tempDir = TestUtils.CreateTestDirectory(this.TestContext, "pluginInsp");
             PluginInspector inspector = new PluginInspector(logger, tempDir);
 
@@ -99,6 +119,71 @@ namespace SonarQube.Plugins.IntegrationTests
             string[] files = Directory.GetFiles(rootDir, "*.jar", SearchOption.TopDirectoryOnly);
             Assert.AreEqual(1, files.Length, "Expecting one and only one jar file to be created");
             return files.First();
+        }
+
+        private static void AssertPropertyDefinitionExists(string propertyName, JarInfo jarInfo)
+        {
+            Assert.IsNotNull(jarInfo.Extensions, "Extensions should not be null");
+
+            JarInfo.PropertyDefinition actual = jarInfo.Extensions
+                .OfType<JarInfo.PropertyDefinition>()
+                .FirstOrDefault(pd => string.Equals(pd.Key, propertyName, System.StringComparison.Ordinal));
+
+            Assert.IsNotNull(actual, "Failed to find expected property: {0}", propertyName);
+            AssertPropertyHasValue(actual.DefaultValue, propertyName);
+        }
+
+        private static JarInfo.RulesDefinition AssertRulesDefinitionExists(JarInfo jarInfo)
+        {
+            Assert.IsNotNull(jarInfo.Extensions, "Extensions should not be null");
+
+            IEnumerable<JarInfo.RulesDefinition> defns = jarInfo.Extensions.OfType<JarInfo.RulesDefinition>();
+
+            Assert.AreNotEqual(0, defns.Count(), "RulesDefinition extension does not exist");
+            Assert.AreEqual(1, defns.Count(), "Multiple rules definitions exist");
+
+            JarInfo.RulesDefinition defn = defns.Single();
+
+            return defn;
+        }
+
+        private static void AssertRepositoryIsValid(JarInfo.Repository repository)
+        {
+            Assert.IsNotNull(repository, "Repository should not be null");
+
+            AssertPropertyHasValue(repository.Key, "Repository Key");
+            AssertPropertyHasValue(repository.Name, "Repository Name");
+
+            Assert.AreEqual(SupportedLanguages.CSharp, repository.Language, "Unexpected repository language");
+
+            Assert.IsNotNull(repository.Rules, "Repository rules should not be null");
+            Assert.AreNotEqual(0, repository.Rules.Count, "Repository should have at least one rule");
+        }
+
+        private static void AssertPropertyHasValue(string value, string propertyName)
+        {
+            Assert.IsFalse(string.IsNullOrWhiteSpace(value), "Property should have a value: {0}", propertyName);
+        }
+
+        private static void AssertExpectedRulesExist(DiagnosticAnalyzer analyzer, JarInfo.Repository repository)
+        {
+            foreach(DiagnosticDescriptor descriptor in analyzer.SupportedDiagnostics)
+            {
+                AssertRuleExists(descriptor, repository);
+            }
+        }
+
+        private static void AssertRuleExists(DiagnosticDescriptor descriptor, JarInfo.Repository repository)
+        {
+            IEnumerable<JarInfo.Rule> matches = repository.Rules.Where(r => string.Equals(r.InternalKey, descriptor.Id, System.StringComparison.Ordinal));
+
+            Assert.AreNotEqual(0, matches.Count(), "Failed to find expected rule: {0}", descriptor.Id);
+            Assert.AreEqual(1, matches.Count(), "Multiple rules have the same id: {0}", descriptor.Id);
+
+            JarInfo.Rule actual = matches.Single();
+            Assert.AreEqual(descriptor.Title.ToString(), actual.Name, "Unexpected rule name");
+            Assert.AreEqual(descriptor.Id, actual.Key, "Unexpected rule key");
+            AssertPropertyHasValue(actual.Severity, "Severity");
         }
 
         #endregion

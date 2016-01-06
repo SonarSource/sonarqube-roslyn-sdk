@@ -2,10 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  
   <modelVersion>4.0.0</modelVersion>
 
   <dependencies>
-    
+
+    <!-- Complete list of dependencies required to execute the plugin inspector and a generated Roslyn plugin -->
+
     <dependency>
       <groupId>org.codehaus.sonar</groupId>
       <artifactId>sonar-plugin-api</artifactId>
@@ -35,8 +38,7 @@
       <artifactId>guava</artifactId>
       <version>10.0.1</version>
     </dependency>
-    
-    
+        
     <dependency>
       <groupId>org.codehaus.sonar</groupId>
       <artifactId>sonar-squid</artifactId>
@@ -54,40 +56,18 @@
       <artifactId>stax2-api</artifactId>
       <version>3.1.4</version>
     </dependency>
-    <!--
+
     <dependency>
-      <groupId>org.</groupId>
-      <artifactId></artifactId>
-      <version></version>
+      <groupId>org.codehaus.woodstox</groupId>
+      <artifactId>woodstox-core-lgpl</artifactId>
+      <version>4.4.0</version>
     </dependency>
 
     <dependency>
-      <groupId>org.</groupId>
-      <artifactId></artifactId>
-      <version></version>
+      <groupId>org.codehaus.sonar</groupId>
+      <artifactId>sonar-check-api</artifactId>
+      <version>4.5.2</version>
     </dependency>
-    <dependency>
-      <groupId>org.</groupId>
-      <artifactId></artifactId>
-      <version></version>
-    </dependency>
-    <dependency>
-      <groupId>org.</groupId>
-      <artifactId></artifactId>
-      <version></version>
-    </dependency>
-    <dependency>
-      <groupId>org.</groupId>
-      <artifactId></artifactId>
-      <version></version>
-    </dependency>
-    <dependency>
-      <groupId>org.</groupId>
-      <artifactId></artifactId>
-      <version></version>
-    </dependency>
-
--->
 
   </dependencies>
 

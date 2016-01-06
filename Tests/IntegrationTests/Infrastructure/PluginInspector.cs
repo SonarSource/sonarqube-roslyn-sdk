@@ -50,7 +50,7 @@ namespace SonarQube.Plugins.IntegrationTests
             this.jdkWrapper = new JdkWrapper();
         }
 
-        public object GetPluginDescription(string jarFilePath)
+        public JarInfo GetPluginDescription(string jarFilePath)
         {
             Assert.IsTrue(File.Exists(jarFilePath), "Jar file does not exist");
 
@@ -58,7 +58,13 @@ namespace SonarQube.Plugins.IntegrationTests
 
             string reportFilePath = this.RunPluginInspector(jarFilePath, tempDir);
 
-            return reportFilePath;
+            JarInfo jarInfo = null;
+            if (reportFilePath != null)
+            {
+                jarInfo = JarInfo.Load(reportFilePath);
+            }
+
+            return jarInfo;
         }
 
         private void CheckJdkIsInstalled()

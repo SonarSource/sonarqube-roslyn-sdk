@@ -4,7 +4,6 @@ import org.sonar.api.server.rule.RulesDefinition;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-//import org.sonarqube.plugin.sdk.Wintellect.Analyzers_sarif.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -69,7 +68,6 @@ public class PluginInspector  {
             SaveToFile(doc, xmlFilePath);
         }
 
-        String c = true ? "" : "";
         System.exit(exitCode);
     }
 
@@ -279,7 +277,7 @@ public class PluginInspector  {
             extensionClass = extension.getClass();
         }
 
-        Element extensionEl = CreateNewChild("Extension", extensionsEl);
+        Element extensionEl = CreateNewChild(type, extensionsEl);
         extensionEl.setAttribute("type", type);
         extensionEl.setAttribute("class", extensionClass.getName());
 
