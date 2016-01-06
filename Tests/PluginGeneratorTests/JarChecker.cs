@@ -5,19 +5,20 @@
 // </copyright>
 //-----------------------------------------------------------------------
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SonarQube.Plugins.Test.Common;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.PluginGeneratorTests
 {
     internal class JarChecker
     {
         private readonly string unzippedDir;
+        private readonly TestContext testContext;
 
         public JarChecker(TestContext testContext, string fullJarPath)
         {
+            this.testContext = testContext;
             TestUtils.AssertFileExists(fullJarPath);
 
             this.unzippedDir = TestUtils.CreateTestDirectory(testContext, "unzipped");
@@ -28,12 +29,14 @@ namespace SonarQube.Plugins.PluginGeneratorTests
         {
             foreach (string relativePath in expectedRelativePaths)
             {
+                this.testContext.WriteLine("JarChecker: checking for file '{0}'", relativePath);
+
                 string[] matchingFiles = Directory.GetFiles(this.unzippedDir, relativePath, SearchOption.TopDirectoryOnly);
 
                 Assert.IsTrue(matchingFiles.Length < 2, "Test error: supplied relative path should not match multiple files");
-                string fullFilePath = matchingFiles.FirstOrDefault();
+                Assert.AreEqual(1, matchingFiles.Length, "Jar does not contain expected file: {0}", relativePath);
 
-                Assert.IsTrue(File.Exists(fullFilePath), "Jar does not contain expected file: {0}", relativePath);
+                this.testContext.WriteLine("JarChecker: found at '{0}'", matchingFiles[0]);
             }
         }
 

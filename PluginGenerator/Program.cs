@@ -42,9 +42,12 @@ namespace SonarQube.Plugins.PluginGenerator
             //TODO: support multiple languages
             string language = "cs";
 
-            PluginBuilder builder = new PluginBuilder(logger);
-            RulesPluginBuilder.ConfigureBuilder(builder, defn, language, rulesFilePath, sqaleFilePath);
-            builder.SetJarFilePath(fullNewJarFilePath);
+            RulesPluginBuilder builder = new RulesPluginBuilder(logger);
+            builder.SetLanguage(language)
+                .SetRulesFilePath(rulesFilePath)
+                .SetSqaleFilePath(sqaleFilePath)
+                .SetProperties(defn)
+                .SetJarFilePath(fullNewJarFilePath);
             builder.Build();
 
             return SUCCESS_CODE;

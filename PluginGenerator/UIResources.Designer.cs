@@ -82,65 +82,38 @@ namespace SonarQube.Plugins {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to At least one extension class must be specified.
+        ///   Looks up a localized string similar to The file path for the jar file to be created must be specified.
         /// </summary>
-        internal static string CoreBuilder_MustSpecifyAnExtensionClass {
+        internal static string CoreBuilder_Error_OutputJarPathMustBeSpecified {
             get {
-                return ResourceManager.GetString("CoreBuilder_MustSpecifyAnExtensionClass", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The plugin key must be specified.
-        /// </summary>
-        internal static string CoreBuilder_PluginKeyIsRequired {
-            get {
-                return ResourceManager.GetString("CoreBuilder_PluginKeyIsRequired", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The plugin name must be specified.
-        /// </summary>
-        internal static string CoreBuilder_PluginNameIsRequired {
-            get {
-                return ResourceManager.GetString("CoreBuilder_PluginNameIsRequired", resourceCulture);
+                return ResourceManager.GetString("CoreBuilder_Error_OutputJarPathMustBeSpecified", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Required plugin definition property is missing: {0}.
         /// </summary>
-        internal static string Error_MissingProperty {
+        internal static string CoreBuilder_Error_RequiredPropertyMissing {
             get {
-                return ResourceManager.GetString("Error_MissingProperty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The specified rules file does not exist: {0}.
-        /// </summary>
-        internal static string Gen_Error_RulesFileDoesNotExists {
-            get {
-                return ResourceManager.GetString("Gen_Error_RulesFileDoesNotExists", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The specified sqale file does not exist: {0}.
-        /// </summary>
-        internal static string Gen_Error_SqaleFileDoesNotExists {
-            get {
-                return ResourceManager.GetString("Gen_Error_SqaleFileDoesNotExists", resourceCulture);
+                return ResourceManager.GetString("CoreBuilder_Error_RequiredPropertyMissing", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The existing jar file will be overwritten.
         /// </summary>
-        internal static string Gen_ExistingJarWillBeOvewritten {
+        internal static string CoreBuilder_ExistingJarWillBeOvewritten {
             get {
-                return ResourceManager.GetString("Gen_ExistingJarWillBeOvewritten", resourceCulture);
+                return ResourceManager.GetString("CoreBuilder_ExistingJarWillBeOvewritten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to At least one extension class must be specified.
+        /// </summary>
+        internal static string CoreBuilder_MustSpecifyAnExtensionClass {
+            get {
+                return ResourceManager.GetString("CoreBuilder_MustSpecifyAnExtensionClass", resourceCulture);
             }
         }
         
@@ -222,6 +195,42 @@ namespace SonarQube.Plugins {
         internal static string JComp_SourceCompilationSucceeded {
             get {
                 return ResourceManager.GetString("JComp_SourceCompilationSucceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The rule language must be specified.
+        /// </summary>
+        internal static string RulesBuilder_Error_RuleLanguageMustBeSpecified {
+            get {
+                return ResourceManager.GetString("RulesBuilder_Error_RuleLanguageMustBeSpecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The specified rules file does not exist: {0}.
+        /// </summary>
+        internal static string RulesBuilder_Error_RulesFileDoesNotExists {
+            get {
+                return ResourceManager.GetString("RulesBuilder_Error_RulesFileDoesNotExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The path to the rules file must be specified.
+        /// </summary>
+        internal static string RulesBuilder_Error_RulesFileMustBeSpecified {
+            get {
+                return ResourceManager.GetString("RulesBuilder_Error_RulesFileMustBeSpecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The specified sqale file does not exist: {0}.
+        /// </summary>
+        internal static string RulesBuilder_Error_SqaleFileDoesNotExists {
+            get {
+                return ResourceManager.GetString("RulesBuilder_Error_SqaleFileDoesNotExists", resourceCulture);
             }
         }
     }

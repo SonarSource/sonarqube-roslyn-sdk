@@ -7,187 +7,154 @@
 using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace SonarQube.Plugins
 {
-    public class RulesPluginBuilder
+    /// <summary>
+    /// Creates a SonarQube plugin that adds a new rules repository
+    /// </summary>
+    public class RulesPluginBuilder : PluginBuilder
     {
         private const string RulesExtensionClassName = "PluginRulesDefinition.class";
         private const string RulesResourcesRoot = "SonarQube.Plugins.Resources.Rules.";
 
-        private readonly IJdkWrapper jdkWrapper;
-        private readonly ILogger logger;
+        private string language;
+        private string rulesFilePath;
+        private string sqaleFilePath;
+
+        #region Public methods
 
         public RulesPluginBuilder(ILogger logger)
-            :this(new JdkWrapper(), logger)
+            :base(logger)
         {
         }
 
         public RulesPluginBuilder(IJdkWrapper jdkWrapper, ILogger logger)
+            :base(jdkWrapper, logger)
         {
-            if (jdkWrapper == null)
+        }
+        
+        public RulesPluginBuilder SetLanguage(string ruleLanguage)
+        {
+            // This is a general-purpose rule plugin builder i.e.
+            // it's not limited to C# or VB, so we can only check that the 
+            // supplied language isn't null/empty.
+            if (string.IsNullOrWhiteSpace(ruleLanguage))
             {
-                throw new ArgumentNullException("param");
+                throw new ArgumentNullException("ruleLanguage");
             }
-
-            this.jdkWrapper = jdkWrapper;
-            this.logger = logger;
+            this.language = ruleLanguage;
+            return this;
         }
 
-        //TODO: remove once the tests have been refactored to test "ConfigureBuilder"
-        public void GeneratePlugin(PluginManifest definition, string language, string rulesFilePath, string fullJarFilePath)
+        public RulesPluginBuilder SetRulesFilePath(string filePath)
         {
-            if (definition == null)
+            // The existence of the file will be checked before building
+            if (string.IsNullOrWhiteSpace(filePath))
             {
-                throw new ArgumentNullException("definition");
+                throw new ArgumentNullException("filePath");
             }
-            if (string.IsNullOrWhiteSpace(rulesFilePath))
-            {
-                throw new ArgumentNullException("rulesFilePath");
-            }
-            if (string.IsNullOrWhiteSpace(fullJarFilePath))
-            {
-                throw new ArgumentNullException("fullJarFilePath");
-            }
-
-            if (!File.Exists(rulesFilePath))
-            {
-                throw new FileNotFoundException(UIResources.Gen_Error_RulesFileDoesNotExists, rulesFilePath);
-            }
-            if (!this.jdkWrapper.IsJdkInstalled())
-            {
-                throw new InvalidOperationException(UIResources.JarB_JDK_NotInstalled);
-            }
-
-            if (File.Exists(fullJarFilePath))
-            {
-                this.logger.LogWarning(UIResources.Gen_ExistingJarWillBeOvewritten);
-            }
-
-            PluginBuilder builder = new PluginBuilder(jdkWrapper, logger);
-            ConfigureBuilder(builder, definition, language, rulesFilePath, null);
-
-
-            builder.SetJarFilePath(fullJarFilePath);
-            builder.Build();
+            this.rulesFilePath = filePath;
+            return this;
         }
 
-        /// <summary>
-        /// Configures the supplied builder to add a new repository with the specified
-        /// rules and (optionally) SQALE information
-        /// </summary>
-        /// <param name="builder">The builder to configure</param>
-        /// <param name="pluginManifest">Manifest that describes the plugin to SonarQube</param>
-        /// <param name="language">The language for the rules</param>
-        /// <param name="rulesFilePath">Path to the file containing the rule definitions</param>
-        /// <param name="sqaleFilePath">(Optional) path to the file containing SQALE information for the new rules</param>
-        public static void ConfigureBuilder(PluginBuilder builder, PluginManifest pluginManifest, string language, string rulesFilePath, string sqaleFilePath)
+        public RulesPluginBuilder SetSqaleFilePath(string filePath)
         {
-            if (builder == null)
+            // The existence of the file will be checked before building
+            if (string.IsNullOrWhiteSpace(filePath))
             {
-                throw new ArgumentNullException("builder");
+                throw new ArgumentNullException("filePath");
             }
-            if (pluginManifest == null)
-            {
-                throw new ArgumentNullException("pluginManifest");
-            }
-            if (string.IsNullOrWhiteSpace(language))
-            {
-                throw new ArgumentNullException("language");
-            }
-
-            if (string.IsNullOrWhiteSpace(rulesFilePath))
-            {
-                throw new ArgumentNullException("rulesFilePath");
-            }
-
-            if (!File.Exists(rulesFilePath))
-            {
-                throw new FileNotFoundException(UIResources.Gen_Error_RulesFileDoesNotExists, rulesFilePath);
-            }
-
-            if (!string.IsNullOrEmpty(sqaleFilePath) && !File.Exists(sqaleFilePath))
-            {
-                throw new FileNotFoundException(UIResources.Gen_Error_SqaleFileDoesNotExists, sqaleFilePath);
-            }
-
-            // TODO: move - not specific to rules plugins
-            ValidateManifest(pluginManifest);
-
-            // Temp folder which resources will be unpacked into
-            string tempWorkingDir = Path.Combine(Path.GetTempPath(), ".plugins", Guid.NewGuid().ToString());
-            Directory.CreateDirectory(tempWorkingDir);
-
-            DoConfigureBuilder(builder, pluginManifest, language, rulesFilePath, sqaleFilePath, tempWorkingDir);
+            this.sqaleFilePath = filePath;
+            return this;
         }
 
-        private static void ValidateManifest(PluginManifest definition)
-        {
-            // TODO
-            CheckPropertyIsSet(definition.Key, "Key");
-            CheckPropertyIsSet(definition.Name, "Name");
-        }
+        #endregion
 
-        private static void CheckPropertyIsSet(string value, string name)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                throw new ArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture,
-                    UIResources.Error_MissingProperty, name));
-            }
-        }
+        #region Overrides
 
-        private static void DoConfigureBuilder(PluginBuilder builder, PluginManifest definition, string language, string rulesFilePath, string sqaleFilePath, string workingFolder)
+        protected override void ApplyConfiguration(string baseWorkingDirectory)
         {
+            this.ValidateRulesConfiguration();
+
             string uniqueId = Guid.NewGuid().ToString();
 
-            AddRuleSources(workingFolder, builder);
-            ConfigureSourceFileReplacements(language, builder);
-            builder.SetSourceCodeTokenReplacement("[RESOURCE_ID]", uniqueId);
-            builder.AddExtension(RulesExtensionClassName);
+            string tempDir = Utilities.CreateSubDirectory(baseWorkingDirectory, ".rules");
 
-            AddRuleJars(workingFolder, builder);
+            this.AddRuleSources(tempDir);
+            this.AddRuleJars(tempDir);
+
+            this.SetSourceCodeTokenReplacement(WellKnownSourceCodeTokens.Rule_Language, this.language);
+            this.SetSourceCodeTokenReplacement("[RESOURCE_ID]", uniqueId);
+
+            this.AddExtension(RulesExtensionClassName);
 
             // Add the rules and sqale files as resources
             // The files are uniquely named to avoid issues with multiple resources
             // of the same name in different jars on the classpath. This shouldn't be
             // an issue with SonarQube as plugins should be loaded in isolation from each other
-            // but it simplifies testing.
-            builder.AddResourceFile(rulesFilePath, "resources/" + uniqueId + ".rules.xml");
+            // but it simplifies testing
+            Debug.Assert(!string.IsNullOrEmpty(this.rulesFilePath));
+            this.AddResourceFile(this.rulesFilePath, "resources/" + uniqueId + ".rules.xml");
 
-            if (!string.IsNullOrEmpty(sqaleFilePath))
+            if (!string.IsNullOrEmpty(this.sqaleFilePath))
             {
-                builder.AddResourceFile(rulesFilePath, "resources/" + uniqueId + ".sqale.xml");
+                this.AddResourceFile(this.sqaleFilePath, "resources/" + uniqueId + ".sqale.xml");
             }
 
-            // TODO: consider moving - not specific to the rules plugin
-            builder.SetProperties(definition);
+            // Now apply the base configuration
+            base.ApplyConfiguration(baseWorkingDirectory);
         }
 
-        private static void AddRuleSources(string workingDirectory, PluginBuilder builder)
+        #endregion
+
+        #region Private methods
+
+        private void ValidateRulesConfiguration()
+        {
+            if (string.IsNullOrWhiteSpace(this.language))
+            {
+                throw new InvalidOperationException(UIResources.RulesBuilder_Error_RuleLanguageMustBeSpecified);
+            }
+
+            if (string.IsNullOrWhiteSpace(this.rulesFilePath))
+            {
+                throw new InvalidOperationException(UIResources.RulesBuilder_Error_RulesFileMustBeSpecified);
+            }
+            if (!File.Exists(this.rulesFilePath))
+            {
+                throw new FileNotFoundException(UIResources.RulesBuilder_Error_RulesFileDoesNotExists, this.rulesFilePath);
+            }
+
+            if (!string.IsNullOrWhiteSpace(this.sqaleFilePath) && !File.Exists(this.sqaleFilePath))
+            {
+                throw new FileNotFoundException(UIResources.RulesBuilder_Error_SqaleFileDoesNotExists, this.sqaleFilePath);
+            }
+        }
+
+        private void AddRuleSources(string workingDirectory)
         {
             SourceGenerator.CreateSourceFiles(typeof(RulesPluginBuilder).Assembly, RulesResourcesRoot, workingDirectory, new Dictionary<string, string>());
 
             foreach (string sourceFile in Directory.GetFiles(workingDirectory, "*.java", SearchOption.AllDirectories))
             {
-                builder.AddSourceFile(sourceFile);
+                this.AddSourceFile(sourceFile);
             }
         }
 
-        private static void ConfigureSourceFileReplacements(string language, PluginBuilder builder)
-        {
-            builder.SetSourceCodeTokenReplacement(WellKnownSourceCodeTokens.Rule_Language, language);
-        }
-
-        private static void AddRuleJars(string workingDirectory, PluginBuilder builder)
+        private void AddRuleJars(string workingDirectory)
         {
             // Unpack and reference the required jar files
             SourceGenerator.UnpackReferencedJarFiles(typeof(RulesPluginBuilder).Assembly, RulesResourcesRoot, workingDirectory);
             foreach (string jarFile in Directory.GetFiles(workingDirectory, "*.jar"))
             {
-                builder.AddReferencedJar(jarFile);
+                this.AddReferencedJar(jarFile);
             }
         }
+
+        #endregion
+
     }
 }

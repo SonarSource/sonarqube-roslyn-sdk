@@ -33,5 +33,22 @@ namespace SonarQube.Plugins.Common
             Directory.CreateDirectory(newPath);
             return newPath;
         }
+
+        public static string CreateSubDirectory(string parent, string child)
+        {
+            if (string.IsNullOrWhiteSpace(parent))
+            {
+                throw new ArgumentNullException("parent");
+            }
+            if (string.IsNullOrWhiteSpace(child))
+            {
+                throw new ArgumentNullException("child");
+            }
+
+            string newDir = Path.Combine(parent, child);
+            Directory.CreateDirectory(newDir);
+            return newDir;
+        }
+
     }
 }

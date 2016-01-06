@@ -8,11 +8,14 @@ using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Linq;
+using System.Text;
 
 namespace SonarQube.Plugins
 {
+    /// <summary>
+    /// Creates a SonarQube plugin
+    /// </summary>
     public class PluginBuilder
     {
         public const string SONARQUBE_API_VERSION = "4.5.2";
@@ -36,8 +39,7 @@ namespace SonarQube.Plugins
         private const string ExtensionListToken = "[CORE_EXTENSION_CLASS_LIST]";
 
         private readonly IJdkWrapper jdkWrapper;
-        private readonly ILogger logger;
-
+        protected readonly ILogger logger;
         private readonly ISet<string> sourceFiles;
         private readonly ISet<string> referencedJars;
         private readonly ISet<string> extensionClasses;
@@ -196,46 +198,89 @@ namespace SonarQube.Plugins
                 throw new InvalidOperationException(UIResources.JarB_JDK_NotInstalled);
             }
 
-            this.Validate();
-
             // Temp working folder
-            string tempWorkingDir = Path.Combine(Path.GetTempPath(), "plugins",  Guid.NewGuid().ToString());
+            string tempWorkingDir = Utilities.CreateTempDirectory(".builder");
+            tempWorkingDir = Utilities.CreateSubDirectory(tempWorkingDir, Guid.NewGuid().ToString());
             Directory.CreateDirectory(tempWorkingDir);
 
-            AddCoreJars(tempWorkingDir);
-            AddCoreSources(tempWorkingDir);
-            ConfigureSourceFileReplacements();
-            ReplaceTokensInSources();
+            this.ApplyConfiguration(tempWorkingDir); // sub-classes will apply their configuration here
 
-            // Compile sources
-            CompileJavaFiles(tempWorkingDir);
+            this.ReplaceTokensInSources();
 
-            // Build jar
-            BuildJar(tempWorkingDir);
+            this.CompileJavaFiles(tempWorkingDir);
+
+            if (File.Exists(this.JarFilePath))
+            {
+                this.logger.LogWarning(UIResources.CoreBuilder_ExistingJarWillBeOvewritten);
+            }
+
+            this.BuildJar(tempWorkingDir);
         }
 
         public string JarFilePath { get { return this.outputJarFilePath; } }
 
         #endregion
 
-        #region Private methods
+        #region Virtual methods
 
-        private void Validate()
+        /// <summary>
+        /// Sub-classes should override this method to perform any necessary validation
+        /// and configuration e.g. adding specific jar files
+        /// </summary>
+        /// <param name="baseWorkingDirectory">Shared base working directory for temporary files</param>
+        /// <remarks>Sub-classes should perform their configuration (e.g. adding extension classes) before calling base.ApplyConfiguration(...)</remarks>
+        protected virtual void ApplyConfiguration(string baseWorkingDirectory)
+        {
+            this.ValidateCoreConfiguration();
+
+            string tempDir = Utilities.CreateSubDirectory(baseWorkingDirectory, ".core");
+
+            AddCoreJars(tempDir);
+            AddCoreSources(tempDir);
+            ConfigureCoreSourceFileReplacements();
+        }
+
+        #endregion
+
+        #region Protected methods
+
+        private ILogger Logger { get { return this.logger; } }
+
+        protected void SetSourceFileReplacement(string key, string value)
+        {
+            this.sourceFileReplacements[key] = value;
+        }
+
+        #endregion
+
+        #region Core builder configuration
+
+        private void ValidateCoreConfiguration()
         {
             // TODO: validate other inputs
+            this.CheckPropertyIsSet(WellKnownPluginProperties.Key);
+            this.CheckPropertyIsSet(WellKnownPluginProperties.PluginName);
+
             if (this.extensionClasses == null || !this.extensionClasses.Any())
             {
                 throw new InvalidOperationException(UIResources.CoreBuilder_MustSpecifyAnExtensionClass);
             }
 
-            if (string.IsNullOrWhiteSpace(this.FindPluginKey()))
+            if (string.IsNullOrWhiteSpace(this.JarFilePath))
             {
-                throw new InvalidOperationException(UIResources.CoreBuilder_PluginKeyIsRequired);
+                throw new InvalidOperationException(UIResources.CoreBuilder_Error_OutputJarPathMustBeSpecified);
             }
+        }
 
-            if (string.IsNullOrWhiteSpace(this.FindPluginName()))
+        private void CheckPropertyIsSet(string propertyName)
+        {
+            string value;
+            this.properties.TryGetValue(propertyName, out value);
+
+            if (string.IsNullOrWhiteSpace(value))
             {
-                throw new InvalidOperationException(UIResources.CoreBuilder_PluginNameIsRequired);
+                throw new InvalidOperationException(string.Format(System.Globalization.CultureInfo.CurrentCulture,
+                    UIResources.CoreBuilder_Error_RequiredPropertyMissing, propertyName));
             }
         }
 
@@ -263,21 +308,21 @@ namespace SonarQube.Plugins
             }
         }
 
-        private void ConfigureSourceFileReplacements()
+        private void ConfigureCoreSourceFileReplacements()
         {
             string pluginKey = this.FindPluginKey();
             string packageName = CorePluginPackageNameTemplate.Replace(WellKnownSourceCodeTokens.Core_PluginKey, pluginKey);
             string fullPluginClassName = CorePluginEntryClassTemplate.Replace(WellKnownSourceCodeTokens.Core_PluginPackage, packageName);
 
-            this.sourceFileReplacements.Add(WellKnownSourceCodeTokens.Core_PluginPackage, packageName);
-            this.sourceFileReplacements.Add(WellKnownSourceCodeTokens.Core_PluginKey, pluginKey);
-            this.sourceFileReplacements.Add(WellKnownSourceCodeTokens.Core_PluginName, this.FindPluginName());
+            this.SetSourceFileReplacement(WellKnownSourceCodeTokens.Core_PluginPackage, packageName);
+            this.SetSourceFileReplacement(WellKnownSourceCodeTokens.Core_PluginKey, pluginKey);
+            this.SetSourceFileReplacement(WellKnownSourceCodeTokens.Core_PluginName, this.FindPluginName());
 
             this.SetProperty(WellKnownPluginProperties.Class, fullPluginClassName);
 
             // Build and set the list of extensions to be exported
             string javaList = string.Join(", " + Environment.NewLine, this.extensionClasses);
-            this.sourceFileReplacements.Add(ExtensionListToken, javaList);
+            this.SetSourceFileReplacement(ExtensionListToken, javaList);
         }
 
         private void AddCoreJars(string workingDirectory)
@@ -289,6 +334,10 @@ namespace SonarQube.Plugins
                 this.AddReferencedJar(jarFile);
             }
         }
+
+        #endregion
+
+        #region Compile and package implementation
 
         /// <summary>
         /// Perform token-based substitution into the supplied source files prior to compiling
@@ -378,8 +427,6 @@ namespace SonarQube.Plugins
                 sb.Append(" ");
             }
             jarBuilder.SetManifestPropety("Plugin-Dependencies", sb.ToString());
-
-            
 
             return jarBuilder.Build(this.outputJarFilePath);
         }

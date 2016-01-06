@@ -79,7 +79,7 @@ namespace SonarQube.Plugins.Roslyn
             {
                 // Create a uniquely-named temp directory for this generation run
                 string baseDirectory = Utilities.CreateTempDirectory(".gen");
-                baseDirectory = CreateSubDirectory(baseDirectory, Guid.NewGuid().ToString());
+                baseDirectory = Utilities.CreateSubDirectory(baseDirectory, Guid.NewGuid().ToString());
                 this.logger.LogDebug(UIResources.APG_CreatedTempWorkingDir, baseDirectory);
 
                 PluginManifest pluginDefn = CreatePluginDefinition(package);
@@ -95,13 +95,6 @@ namespace SonarQube.Plugins.Roslyn
             }
 
             return package != null;
-        }
-
-        private static string CreateSubDirectory(string parent, string child)
-        {
-            string newDir = Path.Combine(parent, child);
-            Directory.CreateDirectory(newDir);
-            return newDir;
         }
 
         /// <summary>
@@ -152,7 +145,7 @@ namespace SonarQube.Plugins.Roslyn
         {
             // We can't directly get the paths to the files in package so
             // we have to extract them first
-            string extractDir = CreateSubDirectory(baseTempDir, ".extract");
+            string extractDir = Utilities.CreateSubDirectory(baseTempDir, ".extract");
             this.logger.LogDebug(UIResources.APG_ExtractingPackageFiles, extractDir);
             PhysicalFileSystem fileSystem = new PhysicalFileSystem(extractDir);
             package.ExtractContents(fileSystem, ".");
@@ -214,12 +207,19 @@ namespace SonarQube.Plugins.Roslyn
             string fullJarPath = Path.Combine(outputDirectory,
                 package.Id + "-plugin-" + pluginDefn.Version + ".jar");
 
-            PluginBuilder builder = new PluginBuilder(logger);
-            RulesPluginBuilder.ConfigureBuilder(builder, pluginDefn, language, rulesFilePath, sqaleFilePath);
+            RulesPluginBuilder builder = new RulesPluginBuilder(logger);
+            builder.SetLanguage(language)
+                            .SetRulesFilePath(rulesFilePath)
+                            .SetProperties(pluginDefn)
+                            .SetJarFilePath(fullJarPath);
+
+            if (!string.IsNullOrWhiteSpace(sqaleFilePath))
+            {
+                builder.SetSqaleFilePath(sqaleFilePath);
+            }
 
             AddRoslynMetadata(baseTempDirectory, builder, package);
             
-            builder.SetJarFilePath(fullJarPath);
             builder.Build();
 
             this.logger.LogInfo(UIResources.APG_PluginGenerated, fullJarPath);
@@ -227,7 +227,7 @@ namespace SonarQube.Plugins.Roslyn
 
         private void AddRoslynMetadata(string baseTempDirectory, PluginBuilder builder, IPackage package)
         {
-            string sourcesDir = CreateSubDirectory(baseTempDirectory, "src");
+            string sourcesDir = Utilities.CreateSubDirectory(baseTempDirectory, "src");
             this.logger.LogDebug(UIResources.APG_CreatingRoslynSources, sourcesDir);
 
             SourceGenerator.CreateSourceFiles(typeof(AnalyzerPluginGenerator).Assembly, RoslynResourcesRoot, sourcesDir, new Dictionary<string, string>());
