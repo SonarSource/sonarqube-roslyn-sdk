@@ -39,7 +39,7 @@ namespace SonarQube.Plugins
         private const string ExtensionListToken = "[CORE_EXTENSION_CLASS_LIST]";
 
         private readonly IJdkWrapper jdkWrapper;
-        protected readonly ILogger logger;
+        private readonly ILogger logger;
         private readonly ISet<string> sourceFiles;
         private readonly ISet<string> referencedJars;
         private readonly ISet<string> extensionClasses;
@@ -244,7 +244,7 @@ namespace SonarQube.Plugins
 
         #region Protected methods
 
-        private ILogger Logger { get { return this.logger; } }
+        protected ILogger Logger { get { return this.logger; } }
 
         protected void SetSourceFileReplacement(string key, string value)
         {
