@@ -58,6 +58,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>MavenResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Maven\MavenArtifactHandlerExtensions.cs" />
     <Compile Include="NuGet\DataModel.cs" />
     <Compile Include="NuGet\NuGetSpecReader.cs" />
     <Compile Include="RulesPluginBuilder.cs" />
@@ -89,13 +90,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <EmbeddedResource Include="Resources\Core\Core.pom">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Rules\Rules.pom">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Maven\MavenResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>MavenResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Core\sonar-plugin-api-4.5.2.jar" />
     <EmbeddedResource Include="SonarQube\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -109,9 +115,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Core\Plugin.java" />
     <EmbeddedResource Include="Resources\Rules\PluginRulesDefinition.java" />
-    <EmbeddedResource Include="Resources\Rules\sslr-squid-bridge-2.6.jar" />
-    <EmbeddedResource Include="Resources\Core\slf4j-simple-1.7.12.jar" />
-    <EmbeddedResource Include="Resources\Core\slf4j-api-1.7.5.jar" />
     <Content Include="SonarQube\License.txt" />
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 using SonarQube.Plugins.Common;
+using SonarQube.Plugins.Maven;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,6 +20,7 @@ namespace SonarQube.Plugins
     {
         private const string RulesExtensionClassName = "PluginRulesDefinition.class";
         private const string RulesResourcesRoot = "SonarQube.Plugins.Resources.Rules.";
+        private const string RulesPOMResourceName = RulesResourcesRoot + "Rules.pom";
 
         private string language;
         private string rulesFilePath;
@@ -31,8 +33,8 @@ namespace SonarQube.Plugins
         {
         }
 
-        public RulesPluginBuilder(IJdkWrapper jdkWrapper, ILogger logger)
-            :base(jdkWrapper, logger)
+        public RulesPluginBuilder(IJdkWrapper jdkWrapper, IMavenArtifactHandler artifactHandler, ILogger logger)
+            :base(jdkWrapper, artifactHandler, logger)
         {
         }
         
@@ -84,7 +86,7 @@ namespace SonarQube.Plugins
             string tempDir = Utilities.CreateSubDirectory(baseWorkingDirectory, ".rules");
 
             this.AddRuleSources(tempDir);
-            this.AddRuleJars(tempDir);
+            this.AddRuleJars();
 
             this.SetSourceCodeTokenReplacement(WellKnownSourceCodeTokens.Rule_Language, this.language);
             this.SetSourceCodeTokenReplacement("[RESOURCE_ID]", uniqueId);
@@ -144,11 +146,13 @@ namespace SonarQube.Plugins
             }
         }
 
-        private void AddRuleJars(string workingDirectory)
+        private void AddRuleJars()
         {
-            // Unpack and reference the required jar files
-            SourceGenerator.UnpackReferencedJarFiles(typeof(RulesPluginBuilder).Assembly, RulesResourcesRoot, workingDirectory);
-            foreach (string jarFile in Directory.GetFiles(workingDirectory, "*.jar"))
+            // Fetch and reference the required jar files
+            MavenPartialPOM pom = this.ArtifactHandler.GetPOMFromResource(this.GetType().Assembly, RulesPOMResourceName);
+            IEnumerable<string> jarFiles = this.ArtifactHandler.GetJarsFromPOM(pom);
+
+            foreach (string jarFile in jarFiles)
             {
                 this.AddReferencedJar(jarFile);
             }

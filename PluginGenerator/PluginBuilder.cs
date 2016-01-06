@@ -5,6 +5,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 using SonarQube.Plugins.Common;
+using SonarQube.Plugins.Maven;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -38,7 +39,12 @@ namespace SonarQube.Plugins
         /// </summary>
         private const string ExtensionListToken = "[CORE_EXTENSION_CLASS_LIST]";
 
+
+        private const string CoreResourcesRoot = "SonarQube.Plugins.Resources.Core.";
+        private const string CorePOMResourceName = CoreResourcesRoot + "Core.pom";
+
         private readonly IJdkWrapper jdkWrapper;
+        private readonly IMavenArtifactHandler artifactHandler;
         private readonly ILogger logger;
         private readonly ISet<string> sourceFiles;
         private readonly ISet<string> referencedJars;
@@ -62,19 +68,24 @@ namespace SonarQube.Plugins
 
         #region Public methods
 
-        public PluginBuilder(IJdkWrapper jdkWrapper, ILogger logger)
+        public PluginBuilder(IJdkWrapper jdkWrapper, IMavenArtifactHandler artifactHandler, ILogger logger)
         {
             if (jdkWrapper == null)
             {
                 throw new ArgumentNullException("jdkWrapper");
+            }
+            if (artifactHandler == null)
+            {
+                throw new ArgumentNullException("artifactHandler");
             }
             if (logger == null)
             {
                 throw new ArgumentNullException("logger");
             }
 
-            this.logger = logger;
             this.jdkWrapper = jdkWrapper;
+            this.artifactHandler = artifactHandler;
+            this.logger = logger;
 
             this.sourceFiles = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
             this.referencedJars = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
@@ -84,7 +95,7 @@ namespace SonarQube.Plugins
             this.extensionClasses = new HashSet<string>(StringComparer.InvariantCulture); // class names are case-sensitive
         }
 
-        public PluginBuilder(ILogger logger) : this(new JdkWrapper(), logger)
+        public PluginBuilder(ILogger logger) : this(new JdkWrapper(), new MavenArtifactHandler(logger), logger)
         {
         }
 
@@ -235,7 +246,7 @@ namespace SonarQube.Plugins
 
             string tempDir = Utilities.CreateSubDirectory(baseWorkingDirectory, ".core");
 
-            AddCoreJars(tempDir);
+            AddCoreJars();
             AddCoreSources(tempDir);
             ConfigureCoreSourceFileReplacements();
         }
@@ -245,6 +256,8 @@ namespace SonarQube.Plugins
         #region Protected methods
 
         protected ILogger Logger { get { return this.logger; } }
+
+        protected IMavenArtifactHandler ArtifactHandler { get { return this.artifactHandler; }  }
 
         protected void SetSourceFileReplacement(string key, string value)
         {
@@ -300,7 +313,7 @@ namespace SonarQube.Plugins
 
         private void AddCoreSources(string workingDirectory)
         {
-            SourceGenerator.CreateSourceFiles(typeof(RulesPluginBuilder).Assembly, "SonarQube.Plugins.Resources.Core.", workingDirectory, new Dictionary<string, string>());
+            SourceGenerator.CreateSourceFiles(typeof(RulesPluginBuilder).Assembly, CoreResourcesRoot, workingDirectory, new Dictionary<string, string>());
 
             foreach (string sourceFile in Directory.GetFiles(workingDirectory, "*.java", SearchOption.AllDirectories))
             {
@@ -325,11 +338,13 @@ namespace SonarQube.Plugins
             this.SetSourceFileReplacement(ExtensionListToken, javaList);
         }
 
-        private void AddCoreJars(string workingDirectory)
+        private void AddCoreJars()
         {
-            // Unpack and reference the required jar files
-            SourceGenerator.UnpackReferencedJarFiles(typeof(RulesPluginBuilder).Assembly, "SonarQube.Plugins.Resources.Core.", workingDirectory);
-            foreach (string jarFile in Directory.GetFiles(workingDirectory, "*.jar"))
+            // Fetch and reference the required jar files
+            MavenPartialPOM pom = this.ArtifactHandler.GetPOMFromResource(this.GetType().Assembly, CorePOMResourceName);
+            IEnumerable<string> jarFiles = this.ArtifactHandler.GetJarsFromPOM(pom);
+
+            foreach (string jarFile in jarFiles)
             {
                 this.AddReferencedJar(jarFile);
             }

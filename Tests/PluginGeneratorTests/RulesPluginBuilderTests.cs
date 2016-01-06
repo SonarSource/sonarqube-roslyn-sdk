@@ -5,6 +5,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SonarQube.Plugins.Maven;
 using SonarQube.Plugins.Test.Common;
 using System.IO;
 
@@ -26,7 +27,9 @@ namespace SonarQube.Plugins.PluginGeneratorTests
             string rulesXmlFilePath = TestUtils.CreateTextFile("rules.xml", inputDir, "<xml Rules />");
             string sqaleXmlFilePath = TestUtils.CreateTextFile("sqale.xml", inputDir, "<xml sqale />");
 
+            TestLogger logger = new TestLogger();
             IJdkWrapper jdkWrapper = new JdkWrapper();
+            IMavenArtifactHandler artifactHandler = new MavenArtifactHandler(logger);
             PluginManifest defn = new PluginManifest()
             {
                 Key = "MyPlugin",
@@ -38,7 +41,7 @@ namespace SonarQube.Plugins.PluginGeneratorTests
                 Developers = typeof(RulesPluginBuilder).FullName
             };
 
-            RulesPluginBuilder builder = new RulesPluginBuilder(jdkWrapper, new TestLogger());
+            RulesPluginBuilder builder = new RulesPluginBuilder(jdkWrapper, artifactHandler, logger);
             builder.SetLanguage(language)
                 .SetRulesFilePath(rulesXmlFilePath)
                 .SetSqaleFilePath(sqaleXmlFilePath)

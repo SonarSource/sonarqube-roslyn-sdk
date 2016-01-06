@@ -109,13 +109,13 @@ namespace SonarQube.Plugins.Maven
         private string GetArtifactFolderPath(IMavenCoordinate coordinate)
         {
             string path = string.Format(System.Globalization.CultureInfo.InvariantCulture,
-                "{0}/{1}/{2}",
-                coordinate.GroupId.Replace(".", "/"),
+                "{0}\\{1}\\{2}",
+                coordinate.GroupId.Replace(".", "\\"),
                 coordinate.ArtifactId,
                 coordinate.Version
                 );
 
-            path = Path.Combine(path, this.localCacheDirectory);
+            path = Path.Combine(this.localCacheDirectory, path);
             return path;
         }
 

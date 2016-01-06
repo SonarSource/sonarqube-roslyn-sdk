@@ -84,42 +84,5 @@ namespace SonarQube.Plugins
 
             return Path.Combine(rootOutputPath, dir ?? string.Empty, fileName);
         }
-
-        public static void UnpackReferencedJarFiles(Assembly resourceAssembly, string rootResourceName, string outputDir)
-        {
-            // Unpack the embedded jar files into the output directory
-            foreach (string resourceName in resourceAssembly.GetManifestResourceNames().Where(n => n.StartsWith(rootResourceName) && n.EndsWith(".jar")))
-            {
-                string fullJarPath = Path.Combine(outputDir, CalculateJarFileName(rootResourceName, resourceName));
-
-                byte[] buffer = new byte[1024];
-                using (BinaryReader reader = new BinaryReader(resourceAssembly.GetManifestResourceStream(resourceName)))
-                using (BinaryWriter writer = new BinaryWriter(File.OpenWrite(fullJarPath)))
-                {
-                    int bytesRead;                    
-                    do
-                    {
-                        bytesRead = reader.Read(buffer, 0, buffer.Length);
-                        writer.Write(buffer, 0, bytesRead);
-                    } while (bytesRead > 0) ;
-                }
-            }
-
-        }
-
-        private static string CalculateJarFileName(string rootResourceName, string fullResourceName)
-        {
-            if (!fullResourceName.StartsWith(rootResourceName))
-            {
-                return null;
-            }
-
-            Debug.Assert(fullResourceName.EndsWith(".jar"), "Expecting the resource to be a jar file");
-
-            string relativePath = fullResourceName.Replace(rootResourceName, string.Empty);
-            relativePath = relativePath.Trim('.');
-
-            return relativePath;
-        }
     }
 }
