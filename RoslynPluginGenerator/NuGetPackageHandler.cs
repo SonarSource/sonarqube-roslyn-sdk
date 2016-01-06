@@ -106,7 +106,7 @@ namespace SonarQube.Plugins.Roslyn
                 try
                 {
                     // Prerelease packages enabled by default
-                    manager.InstallPackage(package, true, false, false);
+                    manager.InstallPackage(package, false, true, false);
                 }
                 catch (InvalidOperationException e)
                 {

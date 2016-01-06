@@ -51,8 +51,9 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // Assert
             AssertExpectedPackage(package, DependentPackageName, ReleaseVersion);
-            // Package should have been downloaded
-            AssertPackageDownloaded(testDownloadDir, DependentPackageName);
+            // Packages should have been downloaded
+            AssertPackageDownloaded(testDownloadDir, DependentPackageName, ReleaseVersion);
+            AssertPackageDownloaded(testDownloadDir, TestPackageName, ReleaseVersion);
         }
 
         [TestMethod]
@@ -74,8 +75,9 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // Assert
             AssertExpectedPackage(package, DependentPackageName, PreReleaseVersion);
-            // Package should have been downloaded
-            AssertPackageDownloaded(testDownloadDir, DependentPackageName);
+            // Packages should have been downloaded
+            AssertPackageDownloaded(testDownloadDir, DependentPackageName, PreReleaseVersion);
+            AssertPackageDownloaded(testDownloadDir, TestPackageName, ReleaseVersion);
         }
 
         [TestMethod]
@@ -97,9 +99,11 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // Assert
             AssertExpectedPackage(package, DependentPackageName, PreReleaseVersion);
-            // Package should have been downloaded
-            AssertPackageDownloaded(testDownloadDir, DependentPackageName);
+            // Packages should have been downloaded
+            AssertPackageDownloaded(testDownloadDir, DependentPackageName, PreReleaseVersion);
+            AssertPackageDownloaded(testDownloadDir, TestPackageName, PreReleaseVersion);
         }
+
         [TestMethod]
         public void FetchPackage_VersionSpecified_CorrectVersionSelected()
         {
@@ -107,14 +111,14 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
             IPackageManager mgr = CreatePackageManager(sourceNuGetRoot);
 
-            AddPackage(mgr, "package.id.1", "0.8.0");
-            AddPackage(mgr, "package.id.1", "1.0.0-rc1");
-            AddPackage(mgr, "package.id.1", "2.0.0");
+            BuildAndInstallPackage(mgr, "package.id.1", "0.8.0");
+            BuildAndInstallPackage(mgr, "package.id.1", "1.0.0-rc1");
+            BuildAndInstallPackage(mgr, "package.id.1", "2.0.0");
 
-            AddPackage(mgr, "dummy.package.1", "0.8.0");
+            BuildAndInstallPackage(mgr, "dummy.package.1", "0.8.0");
 
-            AddPackage(mgr, "package.id.1", "0.9.0");
-            AddPackage(mgr, "package.id.1", "1.0.0");
+            BuildAndInstallPackage(mgr, "package.id.1", "0.9.0");
+            BuildAndInstallPackage(mgr, "package.id.1", "1.0.0");
 
             NuGetPackageHandler handler = new NuGetPackageHandler(sourceNuGetRoot, new TestLogger());
 
@@ -137,11 +141,11 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
             IPackageManager mgr = CreatePackageManager(sourceNuGetRoot);
 
-            AddPackage(mgr, "package.id.1", "0.8.0");
-            AddPackage(mgr, "package.id.1", "0.9.0-rc1");
-            AddPackage(mgr, "package.id.1", "1.0.0");
-            AddPackage(mgr, "package.id.1", "1.1.0-rc1");
-            AddPackage(mgr, "dummy.package.1", "2.0.0");
+            BuildAndInstallPackage(mgr, "package.id.1", "0.8.0");
+            BuildAndInstallPackage(mgr, "package.id.1", "0.9.0-rc1");
+            BuildAndInstallPackage(mgr, "package.id.1", "1.0.0");
+            BuildAndInstallPackage(mgr, "package.id.1", "1.1.0-rc1");
+            BuildAndInstallPackage(mgr, "dummy.package.1", "2.0.0");
 
             NuGetPackageHandler handler = new NuGetPackageHandler(sourceNuGetRoot, new TestLogger());
 
@@ -160,11 +164,11 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
             IPackageManager mgr = CreatePackageManager(sourceNuGetRoot);
 
-            AddPackage(mgr, "package.id.1", "0.9.0-rc1");
-            AddPackage(mgr, "package.id.1", "1.0.0-rc1");
-            AddPackage(mgr, "package.id.1", "1.1.0-rc1");
-            AddPackage(mgr, "dummy.package.1", "2.0.0");
-            AddPackage(mgr, "dummy.package.1", "2.0.0-rc2");
+            BuildAndInstallPackage(mgr, "package.id.1", "0.9.0-rc1");
+            BuildAndInstallPackage(mgr, "package.id.1", "1.0.0-rc1");
+            BuildAndInstallPackage(mgr, "package.id.1", "1.1.0-rc1");
+            BuildAndInstallPackage(mgr, "dummy.package.1", "2.0.0");
+            BuildAndInstallPackage(mgr, "dummy.package.1", "2.0.0-rc2");
 
             NuGetPackageHandler handler = new NuGetPackageHandler(sourceNuGetRoot, new TestLogger());
 
@@ -183,8 +187,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
             IPackageManager mgr = CreatePackageManager(sourceNuGetRoot);
 
-            AddPackage(mgr, "package.id.1", "0.8.0");
-            AddPackage(mgr, "package.id.1", "0.9.0");
+            BuildAndInstallPackage(mgr, "package.id.1", "0.8.0");
+            BuildAndInstallPackage(mgr, "package.id.1", "0.9.0");
 
             NuGetPackageHandler handler = new NuGetPackageHandler(sourceNuGetRoot, new TestLogger());
 
@@ -207,30 +211,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             PackageManager mgr = new PackageManager(repo, rootDir);
 
             return mgr;
-        }
-
-        private void AddPackage(IPackageManager manager, string id, string version)
-        {
-            string testDir = TestUtils.EnsureTestDirectoryExists(this.TestContext, "source");
-            string dummyTextFile = TestUtils.CreateTextFile(Guid.NewGuid().ToString(), testDir, "content");
-
-            PackageBuilder builder = new PackageBuilder();
-            builder.Id = id;
-            builder.Version = new SemanticVersion(version);
-            builder.Description = "dummy description";
-            builder.Authors.Add("dummy author");
-
-            PhysicalPackageFile file = new PhysicalPackageFile();
-            file.SourcePath = dummyTextFile;
-            file.TargetPath = "dummy.txt";
-            builder.Files.Add(file);
-
-            MemoryStream stream = new MemoryStream();
-            builder.Save(stream);
-            stream.Position = 0;
-
-            ZipPackage pkg = new ZipPackage(stream);
-            manager.InstallPackage(pkg, true, true);
         }
 
         private ManifestMetadata GenerateTestMetadata(bool isReleased)
@@ -270,21 +250,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             };
         }
 
-        private void BuildTestPackages(bool isDependentPackageReleased, bool isTestPackageReleased)
-        {
-            string testDir = TestUtils.EnsureTestDirectoryExists(this.TestContext);
-
-            string testPackageFile = Path.Combine(testDir, TestPackageName);
-            string dependentPackageFile = Path.Combine(testDir, DependentPackageName);
-
-            ManifestMetadata testMetadata = GenerateTestMetadata(isTestPackageReleased);
-            BuildPackage(testMetadata, testPackageFile);
-
-            ManifestMetadata dependentMetadata = GenerateTestMetadataWithDependency(isDependentPackageReleased, isTestPackageReleased);
-            BuildPackage(dependentMetadata, dependentPackageFile);
-        }
-
-        private void BuildPackage(ManifestMetadata metadata, string fileName)
+        private Stream BuildPackageToStream(ManifestMetadata metadata, Stream outputStream)
         {
             string testDir = TestUtils.EnsureTestDirectoryExists(this.TestContext, "source");
             string dummyTextFile = TestUtils.CreateTextFile(Guid.NewGuid().ToString(), testDir, "content");
@@ -297,14 +263,56 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             packageBuilder.Files.Add(file);
 
             packageBuilder.Populate(metadata);
+            packageBuilder.Save(outputStream);
 
-            string destinationName = fileName + "." + metadata.Version + ".nupkg";
-            using (FileStream stream = File.Open(destinationName, FileMode.OpenOrCreate))
+            // Assert correct function of the above code when versions are specifically "Release" or "Prerelease"            
+            if (String.Equals(metadata.Version, ReleaseVersion, StringComparison.CurrentCulture))
             {
-                packageBuilder.Save(stream);
+                Assert.IsTrue(packageBuilder.IsReleaseVersion());
             }
+            else if (String.Equals(metadata.Version, PreReleaseVersion, StringComparison.CurrentCulture))
+            {
+                Assert.IsFalse(packageBuilder.IsReleaseVersion());
+            }
+
+            return outputStream;
         }
 
+        private void BuildAndInstallPackage(IPackageManager manager, string id, string version)
+        {
+            ManifestMetadata metadata = GenerateTestMetadata(true);
+            metadata.Id = id;
+            metadata.Version = new SemanticVersion(version).ToString();
+
+            Stream packageStream = BuildPackageToStream(metadata, new MemoryStream());
+            packageStream.Position = 0;
+
+            ZipPackage pkg = new ZipPackage(packageStream);
+            manager.InstallPackage(pkg, true, true);
+        }
+
+        private void BuildAndSavePackage(ManifestMetadata metadata, string fileName)
+        {
+            string destinationName = fileName + "." + metadata.Version + ".nupkg";
+            Stream fileStream = File.Open(destinationName, FileMode.OpenOrCreate);
+            BuildPackageToStream(metadata, fileStream);
+            fileStream.Dispose();
+        }
+
+        private void BuildTestPackages(bool isDependentPackageReleased, bool isTestPackageReleased)
+        {
+            string testDir = TestUtils.EnsureTestDirectoryExists(this.TestContext);
+
+            string testPackageFile = Path.Combine(testDir, TestPackageName);
+            string dependentPackageFile = Path.Combine(testDir, DependentPackageName);
+
+            ManifestMetadata testMetadata = GenerateTestMetadata(isTestPackageReleased);
+            BuildAndSavePackage(testMetadata, testPackageFile);
+
+            ManifestMetadata dependentMetadata = GenerateTestMetadataWithDependency(isDependentPackageReleased, isTestPackageReleased);
+            BuildAndSavePackage(dependentMetadata, dependentPackageFile);
+        }
+        
         #endregion
 
         #region Checks
@@ -319,10 +327,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             Assert.AreEqual(sVersion, actual.Version, "Unexpected package version");
         }
 
-        private void AssertPackageDownloaded(string downloadDir, string packageName)
+        private void AssertPackageDownloaded(string downloadDir, string expectedName, string expectedVersion)
         {
-            Assert.IsNotNull(Directory.GetDirectories(downloadDir).SingleOrDefault(d => d.Contains(packageName)),
-                "Expected a package to have been downloaded: " + packageName);
+            string packageDir = Directory.GetDirectories(downloadDir)
+                .SingleOrDefault(d => d.Contains(expectedName) && d.Contains(expectedVersion));
+            Assert.IsNotNull(packageDir,
+                "Expected a package to have been downloaded: " + expectedName);
         }
 
         #endregion
