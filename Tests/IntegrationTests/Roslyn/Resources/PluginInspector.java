@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------
+// <copyright file="PluginInspector.java" company="SonarSource SA and Microsoft Corporation">
+//   Copyright (c) SonarSource SA and Microsoft Corporation.  All rights reserved.
+//   Licensed under the MIT License. See License.txt in the project root for license information.
+// </copyright>
+//-----------------------------------------------------------------------
 import org.sonar.api.SonarPlugin;
 import org.sonar.api.config.PropertyDefinition;
 import org.sonar.api.server.rule.RulesDefinition;
@@ -45,7 +51,7 @@ public class PluginInspector  {
 
         if (args.length != 1 && args.length != 2){
             Log("Expecting at least one argument: the full path to the jar file.\r\nOptionally, the name of the file to be created may also be supplied.");
-            jarPath = "c:\\data\\code\\java\\jars\\Wintellect.Analyzers-plugin-1.0.5.jar";
+			System.exit(ErrorCode);
         }
         else{
             jarPath = args[0];

@@ -117,59 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ERROR_FailedToDownloadDependency" xml:space="preserve">
-    <value>Failed to download the Maven dependency from {0}. The HTTP status code was {1} and the reason \"{2}\""</value>
-  </data>
-  <data name="MSG_AddingDependenciesForPOM" xml:space="preserve">
-    <value>Adding dependencies for {0}</value>
-  </data>
-  <data name="MSG_AttemptingToResolveFromParentPOM" xml:space="preserve">
-    <value>Attempting to resolve dependency from parent POM: {0}</value>
-  </data>
-  <data name="MSG_DependencyAlreadyVisited" xml:space="preserve">
-    <value>Dependency has already been visited: {0}</value>
+  <data name="ERROR_FailedToDownloadArtifact" xml:space="preserve">
+    <value>Failed to download the Maven artifact from {0}. The HTTP status code was {1} and the reason \"{2}\""</value>
   </data>
   <data name="MSG_DownloadingFile" xml:space="preserve">
     <value>Downloading file from {0}...</value>
   </data>
-  <data name="MSG_ExpandedProjectVariable" xml:space="preserve">
-    <value>Expanded project variable: {0}</value>
-    <comment>Note: double up to { and } characters that we want to appear in the output string</comment>
-  </data>
   <data name="MSG_FileDownloaded" xml:space="preserve">
     <value>File downloaded to {0}</value>
   </data>
-  <data name="MSG_POMDoesNotContainAJar" xml:space="preserve">
-    <value>POM does not contain a jar. POM: {0}, Packaging: {1}</value>
-  </data>
-  <data name="MSG_ProcessingDependency" xml:space="preserve">
-    <value>Processing Maven dependency {0}</value>
-  </data>
-  <data name="MSG_ResolvedVersionFromDependencyManagement" xml:space="preserve">
-    <value>Resolved version from &lt;dependencyManagement&gt;: {0}</value>
-  </data>
-  <data name="MSG_ResolvedVersionInPom" xml:space="preserve">
-    <value>Resolved dependency using info in parent POM {0}</value>
-  </data>
-  <data name="MSG_SkippingInheritedDependency" xml:space="preserve">
-    <value>Skipping inherited dependency: {0}</value>
-  </data>
-  <data name="MSG_SkippingScopedDependency" xml:space="preserve">
-    <value>Skipping dependency {0}. Scope: {1}</value>
+  <data name="MSG_ProcessingArtifact" xml:space="preserve">
+    <value>Processing Maven artifact {0}</value>
   </data>
   <data name="MSG_UsingCachedFile" xml:space="preserve">
     <value>Using cached copy of {0}</value>
   </data>
-  <data name="WARN_DependencyWasNotFound" xml:space="preserve">
-    <value>Maven dependency was not found. Url: {0}.</value>
-  </data>
-  <data name="WARN_FailedToResolveDependency" xml:space="preserve">
-    <value>Failed to resolved dependency: {0}</value>
-  </data>
-  <data name="WARN_JarAddedByAnotherDependency" xml:space="preserve">
-    <value>The jar has already been added by another dependency. Current coordinate: {0}. Local path: {1}</value>
-  </data>
-  <data name="WARN_UnrecognizedProjectVariable" xml:space="preserve">
-    <value>Unrecognized project variable: {0}</value>
+  <data name="WARN_ArtifactWasNotFound" xml:space="preserve">
+    <value>Maven artifact was not found. Url: {0}.</value>
   </data>
 </root>

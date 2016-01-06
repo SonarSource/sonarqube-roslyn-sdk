@@ -14,7 +14,7 @@ using System.Linq;
 namespace SonarQube.Plugins.PluginGeneratorTests
 {
     [TestClass]
-    public class MavenPOMTests
+    public class MavenPartialPOMTests
     {
         public TestContext TestContext { get; set; }
 
@@ -67,7 +67,7 @@ namespace SonarQube.Plugins.PluginGeneratorTests
         }
 
         [TestMethod]
-        public void MavenPOM_LoadRealExample_Succeeds()
+        public void MavenPOM_LoadRealExampleWithNamespace_Succeeds()
         {
             // Arrange
             #region File content
@@ -354,11 +354,76 @@ namespace SonarQube.Plugins.PluginGeneratorTests
             Assert.IsNotNull(pom.Parent.Version);
 
             Assert.IsNotNull(pom.Dependencies);
-            Assert.AreNotEqual(0, pom.Dependencies.Count, "");
+            Assert.AreNotEqual(0, pom.Dependencies.Count, "Failed to reloaded dependencies");
 
             Assert.IsTrue(pom.Dependencies.TrueForAll(d => d != null && d.Exclusions != null));
             Assert.IsTrue(pom.Dependencies.Any(d => d.Exclusions.Any())); // expecting at least one dependency to have exclusions
             Assert.IsTrue(pom.Dependencies.Any(d => d.Scope != null)); // expecting at least one dependency to have a scope
+        }
+
+        [TestMethod]
+        public void MavenPOM_LoadWithoutNamespace_Succeeds()
+        {
+            // Arrange
+            #region File content
+
+            string simplePOM = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<project xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xsi:schemaLocation=""http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"">
+
+  <parent>
+    <groupId>org.codehaus.sonar.dummy</groupId>
+    <artifactId>sonar</artifactId>
+    <version>4.5.2</version>
+  </parent>
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.codehaus.sonar</groupId>
+  <artifactId>sonar</artifactId>
+  <packaging>pom</packaging>
+  <version>4.5.2</version>
+  <name>SonarQube</name>
+  <url>http://www.sonarqube.org/</url>
+  <description>Open source platform for continuous inspection of code quality</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-annotations</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-core</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+  </dependencies>
+</project>";
+
+            #endregion
+
+            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string filePath = TestUtils.CreateTextFile("noNamespacePOM.txt", testDir, simplePOM);
+            this.TestContext.AddResultFile(filePath);
+
+            // Act
+            MavenPartialPOM pom = MavenPartialPOM.Load(filePath);
+            string resavedFilePath = Path.Combine(testDir, "resaved.txt");
+            pom.Save(resavedFilePath);
+            this.TestContext.AddResultFile(resavedFilePath);
+
+            // Assert - minimal checks that some data was loaded
+            Assert.IsNotNull(pom.ArtifactId);
+            Assert.IsNotNull(pom.Name);
+
+            Assert.IsNotNull(pom.Dependencies);
+            Assert.AreNotEqual(0, pom.Dependencies.Count, "Failed to reloaded dependencies");
         }
 
         #endregion

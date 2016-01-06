@@ -13,6 +13,9 @@ using System.Xml.Serialization;
 
 namespace SonarQube.Plugins.IntegrationTests
 {
+    /// <summary>
+    /// Data classes to load the XML file created by the Java "PluginInspector" class
+    /// </summary>
     [XmlRoot("JarInfo")]
     public class JarInfo
     {

@@ -61,38 +61,11 @@ namespace SonarQube.Plugins.Maven {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to download the Maven dependency from {0}. The HTTP status code was {1} and the reason \&quot;{2}\&quot;&quot;.
+        ///   Looks up a localized string similar to Failed to download the Maven artifact from {0}. The HTTP status code was {1} and the reason \&quot;{2}\&quot;&quot;.
         /// </summary>
-        internal static string ERROR_FailedToDownloadDependency {
+        internal static string ERROR_FailedToDownloadArtifact {
             get {
-                return ResourceManager.GetString("ERROR_FailedToDownloadDependency", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Adding dependencies for {0}.
-        /// </summary>
-        internal static string MSG_AddingDependenciesForPOM {
-            get {
-                return ResourceManager.GetString("MSG_AddingDependenciesForPOM", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Attempting to resolve dependency from parent POM: {0}.
-        /// </summary>
-        internal static string MSG_AttemptingToResolveFromParentPOM {
-            get {
-                return ResourceManager.GetString("MSG_AttemptingToResolveFromParentPOM", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Dependency has already been visited: {0}.
-        /// </summary>
-        internal static string MSG_DependencyAlreadyVisited {
-            get {
-                return ResourceManager.GetString("MSG_DependencyAlreadyVisited", resourceCulture);
+                return ResourceManager.GetString("ERROR_FailedToDownloadArtifact", resourceCulture);
             }
         }
         
@@ -106,15 +79,6 @@ namespace SonarQube.Plugins.Maven {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expanded project variable: {0}.
-        /// </summary>
-        internal static string MSG_ExpandedProjectVariable {
-            get {
-                return ResourceManager.GetString("MSG_ExpandedProjectVariable", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to File downloaded to {0}.
         /// </summary>
         internal static string MSG_FileDownloaded {
@@ -124,56 +88,11 @@ namespace SonarQube.Plugins.Maven {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to POM does not contain a jar. POM: {0}, Packaging: {1}.
+        ///   Looks up a localized string similar to Processing Maven artifact {0}.
         /// </summary>
-        internal static string MSG_POMDoesNotContainAJar {
+        internal static string MSG_ProcessingArtifact {
             get {
-                return ResourceManager.GetString("MSG_POMDoesNotContainAJar", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Processing Maven dependency {0}.
-        /// </summary>
-        internal static string MSG_ProcessingDependency {
-            get {
-                return ResourceManager.GetString("MSG_ProcessingDependency", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Resolved version from &lt;dependencyManagement&gt;: {0}.
-        /// </summary>
-        internal static string MSG_ResolvedVersionFromDependencyManagement {
-            get {
-                return ResourceManager.GetString("MSG_ResolvedVersionFromDependencyManagement", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Resolved dependency using info in parent POM {0}.
-        /// </summary>
-        internal static string MSG_ResolvedVersionInPom {
-            get {
-                return ResourceManager.GetString("MSG_ResolvedVersionInPom", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Skipping inherited dependency: {0}.
-        /// </summary>
-        internal static string MSG_SkippingInheritedDependency {
-            get {
-                return ResourceManager.GetString("MSG_SkippingInheritedDependency", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Skipping dependency {0}. Scope: {1}.
-        /// </summary>
-        internal static string MSG_SkippingScopedDependency {
-            get {
-                return ResourceManager.GetString("MSG_SkippingScopedDependency", resourceCulture);
+                return ResourceManager.GetString("MSG_ProcessingArtifact", resourceCulture);
             }
         }
         
@@ -187,38 +106,11 @@ namespace SonarQube.Plugins.Maven {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Maven dependency was not found. Url: {0}..
+        ///   Looks up a localized string similar to Maven artifact was not found. Url: {0}..
         /// </summary>
-        internal static string WARN_DependencyWasNotFound {
+        internal static string WARN_ArtifactWasNotFound {
             get {
-                return ResourceManager.GetString("WARN_DependencyWasNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to resolved dependency: {0}.
-        /// </summary>
-        internal static string WARN_FailedToResolveDependency {
-            get {
-                return ResourceManager.GetString("WARN_FailedToResolveDependency", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The jar has already been added by another dependency. Current coordinate: {0}. Local path: {1}.
-        /// </summary>
-        internal static string WARN_JarAddedByAnotherDependency {
-            get {
-                return ResourceManager.GetString("WARN_JarAddedByAnotherDependency", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unrecognized project variable: {0}.
-        /// </summary>
-        internal static string WARN_UnrecognizedProjectVariable {
-            get {
-                return ResourceManager.GetString("WARN_UnrecognizedProjectVariable", resourceCulture);
+                return ResourceManager.GetString("WARN_ArtifactWasNotFound", resourceCulture);
             }
         }
     }

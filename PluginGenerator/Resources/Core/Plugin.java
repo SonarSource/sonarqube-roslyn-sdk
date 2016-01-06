@@ -1,4 +1,10 @@
-﻿package [PLUGIN_PACKAGE];
+﻿//-----------------------------------------------------------------------
+// <copyright file="Plugin.java" company="SonarSource SA and Microsoft Corporation">
+//   Copyright (c) SonarSource SA and Microsoft Corporation.  All rights reserved.
+//   Licensed under the MIT License. See License.txt in the project root for license information.
+// </copyright>
+//-----------------------------------------------------------------------
+package [PLUGIN_PACKAGE];
 
 import java.util.Arrays;
 import java.util.List;

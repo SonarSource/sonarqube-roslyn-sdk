@@ -54,7 +54,7 @@ namespace SonarQube.Plugins.Maven
             }
 
 
-            this.logger.LogDebug(MavenResources.MSG_ProcessingDependency, coordinate);
+            this.logger.LogDebug(MavenResources.MSG_ProcessingArtifact, coordinate);
 
             string filePath = TryGetJar(coordinate);
 
@@ -150,11 +150,11 @@ namespace SonarQube.Plugins.Maven
                 {
                     if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     {
-                        this.logger.LogWarning(MavenResources.WARN_DependencyWasNotFound, url);
+                        this.logger.LogWarning(MavenResources.WARN_ArtifactWasNotFound, url);
                     }
                     else
                     {
-                        this.logger.LogError(MavenResources.ERROR_FailedToDownloadDependency, url, response.StatusCode, response.ReasonPhrase);
+                        this.logger.LogError(MavenResources.ERROR_FailedToDownloadArtifact, url, response.StatusCode, response.ReasonPhrase);
                     }
                 }
             }
