@@ -127,12 +127,12 @@ namespace SonarQube.Plugins
             }
             if (!File.Exists(this.rulesFilePath))
             {
-                throw new FileNotFoundException(UIResources.RulesBuilder_Error_RulesFileDoesNotExists, this.rulesFilePath);
+                throw new FileNotFoundException(UIResources.RulesBuilder_Error_RulesFileDoesNotExist, this.rulesFilePath);
             }
 
             if (!string.IsNullOrWhiteSpace(this.sqaleFilePath) && !File.Exists(this.sqaleFilePath))
             {
-                throw new FileNotFoundException(UIResources.RulesBuilder_Error_SqaleFileDoesNotExists, this.sqaleFilePath);
+                throw new FileNotFoundException(UIResources.RulesBuilder_Error_SqaleFileDoesNotExist, this.sqaleFilePath);
             }
         }
 

@@ -127,7 +127,7 @@
     <value>This file has already been added to the jar: {0}</value>
   </data>
   <data name="JarB_Error_FileNotFound" xml:space="preserve">
-    <value>Ths specified file to be included in the jar does not exist: {0}</value>
+    <value>Ths specified file to be included in the jar does not exist</value>
   </data>
   <data name="JarB_Error_RelativeJarPathAlreadySpecified" xml:space="preserve">
     <value>This jar output location has already been used: {0}. File: {1}</value>
@@ -153,8 +153,8 @@
   <data name="JComp_CompliationFailed" xml:space="preserve">
     <value>Java compilation failed</value>
   </data>
-  <data name="RulesBuilder_Error_RulesFileDoesNotExists" xml:space="preserve">
-    <value>The specified rules file does not exist: {0}</value>
+  <data name="RulesBuilder_Error_RulesFileDoesNotExist" xml:space="preserve">
+    <value>The specified rules file does not exist</value>
   </data>
   <data name="AssemblyDescription" xml:space="preserve">
     <value>Rules Plugin Generator for SonarQube</value>
@@ -165,8 +165,8 @@
   <data name="CoreBuilder_MustSpecifyAnExtensionClass" xml:space="preserve">
     <value>At least one extension class must be specified</value>
   </data>
-  <data name="RulesBuilder_Error_SqaleFileDoesNotExists" xml:space="preserve">
-    <value>The specified sqale file does not exist: {0}</value>
+  <data name="RulesBuilder_Error_SqaleFileDoesNotExist" xml:space="preserve">
+    <value>The specified sqale file does not exist</value>
   </data>
   <data name="CoreBuilder_Error_OutputJarPathMustBeSpecified" xml:space="preserve">
     <value>The file path for the jar file to be created must be specified</value>

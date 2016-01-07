@@ -127,7 +127,7 @@ namespace SonarQube.Plugins {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ths specified file to be included in the jar does not exist: {0}.
+        ///   Looks up a localized string similar to Ths specified file to be included in the jar does not exist.
         /// </summary>
         internal static string JarB_Error_FileNotFound {
             get {
@@ -208,11 +208,11 @@ namespace SonarQube.Plugins {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The specified rules file does not exist: {0}.
+        ///   Looks up a localized string similar to The specified rules file does not exist.
         /// </summary>
-        internal static string RulesBuilder_Error_RulesFileDoesNotExists {
+        internal static string RulesBuilder_Error_RulesFileDoesNotExist {
             get {
-                return ResourceManager.GetString("RulesBuilder_Error_RulesFileDoesNotExists", resourceCulture);
+                return ResourceManager.GetString("RulesBuilder_Error_RulesFileDoesNotExist", resourceCulture);
             }
         }
         
@@ -226,11 +226,11 @@ namespace SonarQube.Plugins {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The specified sqale file does not exist: {0}.
+        ///   Looks up a localized string similar to The specified sqale file does not exist.
         /// </summary>
-        internal static string RulesBuilder_Error_SqaleFileDoesNotExists {
+        internal static string RulesBuilder_Error_SqaleFileDoesNotExist {
             get {
-                return ResourceManager.GetString("RulesBuilder_Error_SqaleFileDoesNotExists", resourceCulture);
+                return ResourceManager.GetString("RulesBuilder_Error_SqaleFileDoesNotExist", resourceCulture);
             }
         }
     }

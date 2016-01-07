@@ -14,9 +14,9 @@ namespace SonarQube.Plugins.Test.Common
         /// <summary>
         /// Checks that the expected exception is thrown when the code is executed
         /// </summary>
-        public static Exception Expect<T>(Action op)
+        public static T Expect<T>(Action op) where T : Exception
         {
-            Exception actual = null;
+            T actual = null;
             try
             {
                 op();
@@ -27,10 +27,10 @@ namespace SonarQube.Plugins.Test.Common
                     "Thrown exception is not of the expected type. Expected: {0}, actual: {1}",
                     typeof(T).FullName,
                     ex.GetType().FullName);
-                actual = ex;
+                actual = (T)ex;
             }
 
-            Assert.IsNotNull(actual, "Expecting an exception to be throw");
+            Assert.IsNotNull(actual, "Expecting an exception to be thrown");
             return actual;
         }
     }

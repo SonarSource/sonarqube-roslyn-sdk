@@ -107,7 +107,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="JarChecker.cs" />
+    <Compile Include="Framework\MockMavenartifactHandler.cs" />
+    <Compile Include="Framework\JarChecker.cs" />
     <Compile Include="Framework\MockJdkWrapper.cs" />
     <Compile Include="JarBuilderTests.cs" />
     <Compile Include="MavenPOMTests.cs" />

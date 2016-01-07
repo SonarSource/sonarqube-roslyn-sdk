@@ -5,8 +5,8 @@
 // </copyright>
 //-----------------------------------------------------------------------
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SonarQube.Plugins.Maven;
 using SonarQube.Plugins.Test.Common;
+using System;
 using System.IO;
 
 namespace SonarQube.Plugins.PluginGeneratorTests
@@ -27,9 +27,6 @@ namespace SonarQube.Plugins.PluginGeneratorTests
             string rulesXmlFilePath = TestUtils.CreateTextFile("rules.xml", inputDir, "<xml Rules />");
             string sqaleXmlFilePath = TestUtils.CreateTextFile("sqale.xml", inputDir, "<xml sqale />");
 
-            TestLogger logger = new TestLogger();
-            IJdkWrapper jdkWrapper = new JdkWrapper();
-            IMavenArtifactHandler artifactHandler = new MavenArtifactHandler(logger);
             PluginManifest defn = new PluginManifest()
             {
                 Key = "MyPlugin",
@@ -41,25 +38,143 @@ namespace SonarQube.Plugins.PluginGeneratorTests
                 Developers = typeof(RulesPluginBuilder).FullName
             };
 
-            RulesPluginBuilder builder = new RulesPluginBuilder(jdkWrapper, artifactHandler, logger);
+            MockJdkWrapper mockJdkWrapper = new MockJdkWrapper();
+
+            RulesPluginBuilder builder = new RulesPluginBuilder(mockJdkWrapper, new MockMavenArtifactHandler(), new TestLogger());
+
             builder.SetLanguage(language)
                 .SetRulesFilePath(rulesXmlFilePath)
                 .SetSqaleFilePath(sqaleXmlFilePath)
                 .SetJarFilePath(fullJarFilePath)
                 .SetProperties(defn);
+
+            builder.Build(); // should not fail
+            mockJdkWrapper.AssertJarBuilt();
+        }
+
+        [TestMethod]
+        public void RulesPluginBuilder_LanguageSetToNull_Fails()
+        {
+            // Arrange
+            RulesPluginBuilder builder = new RulesPluginBuilder(new TestLogger());
+
+            // Act and assert
+            AssertException.Expect<ArgumentNullException>(() => builder.SetLanguage(null));
+            AssertException.Expect<ArgumentNullException>(() => builder.SetLanguage(""));
+        }
+
+        [TestMethod]
+        public void RulesPluginBuilder_RulesFileSetToNull_Fails()
+        {
+            // Arrange
+            RulesPluginBuilder builder = new RulesPluginBuilder(new TestLogger());
+
+            // Act and assert
+            AssertException.Expect<ArgumentNullException>(() => builder.SetRulesFilePath(null));
+            AssertException.Expect<ArgumentNullException>(() => builder.SetRulesFilePath(""));
+        }
+
+        [TestMethod]
+        public void RulesPluginBuilder_SqaleFileSetToNull_Fails()
+        {
+            // Arrange
+            RulesPluginBuilder builder = new RulesPluginBuilder(new TestLogger());
+
+            // Act and assert
+            AssertException.Expect<ArgumentNullException>(() => builder.SetSqaleFilePath(null));
+            AssertException.Expect<ArgumentNullException>(() => builder.SetSqaleFilePath(""));
+        }
+
+        [TestMethod]
+        public void RulesPluginBuilder_RulesFileValidation()
+        {
+            // Arrange
+            MockJdkWrapper mockJdkWrapper = new MockJdkWrapper();
+            RulesPluginBuilder builder = new RulesPluginBuilder(mockJdkWrapper, new MockMavenArtifactHandler(), new TestLogger());
+            SetValidCoreProperties(builder);
+            builder.SetLanguage("aLanguage");
+
+            // 1. Rules file not specified -> error
+            AssertException.Expect<InvalidOperationException>(() => builder.Build());
+
+            // 2. Non-existent rules file specified -> error
+            string testDir = TestUtils.EnsureTestDirectoryExists(this.TestContext);
+            string rulesFile = Path.Combine(testDir, "missingFile.txt");
+            mockJdkWrapper.AssertCodeNotCompiled();
+
+            builder.SetRulesFilePath(rulesFile);
+            FileNotFoundException ex = AssertException.Expect<FileNotFoundException>(() => builder.Build());
+            Assert.AreEqual(ex.FileName, rulesFile);
+            mockJdkWrapper.AssertCodeNotCompiled();
+
+            // 3. Rules file exists -> succeeds
+            AddValidDummyRulesFiles(builder);
+            builder.Build(); // should succeed
+            mockJdkWrapper.AssertJarBuilt();
+        }
+
+        [TestMethod]
+        public void RulesPluginBuilder_SqaleFileValidation()
+        {
+            // Arrange
+            string testDir = TestUtils.EnsureTestDirectoryExists(this.TestContext);
+
+            MockJdkWrapper mockJdkWrapper = new MockJdkWrapper();
+            RulesPluginBuilder builder = new RulesPluginBuilder(mockJdkWrapper, new MockMavenArtifactHandler(), new TestLogger());
+            SetValidCoreProperties(builder);
+            builder.SetLanguage("aLanguage");
+            AddValidDummyRulesFiles(builder);
+
+            // 1. Sqale file not specified -> ok
             builder.Build();
 
-            if (File.Exists(fullJarFilePath))
-            {
-                this.TestContext.AddResultFile(fullJarFilePath);
-            }
+            // 2. Non-existent Sqale file specified -> error
+            mockJdkWrapper.ClearCalledMethodList();
 
-            new JarChecker(this.TestContext, fullJarFilePath)
-                .JarContainsFiles(
-                    "resources\\*rules.xml",
-                    "resources\\*sqale.xml",
-                    "org\\sonarqube\\plugin\\sdk\\MyPlugin\\Plugin.class",
-                    "org\\sonarqube\\plugin\\sdk\\MyPlugin\\PluginRulesDefinition.class");
+            string sqaleFile = Path.Combine(testDir, "missingFile.txt");
+            builder.SetSqaleFilePath(sqaleFile);
+            FileNotFoundException ex = AssertException.Expect<FileNotFoundException>(() => builder.Build());
+            Assert.AreEqual(ex.FileName, sqaleFile);
+            mockJdkWrapper.AssertCodeNotCompiled();
+
+            // 3. Sqale file exists -> succeeds
+            sqaleFile = TestUtils.CreateTextFile("sqale.txt", testDir, "dummy sqale file");
+            builder.SetSqaleFilePath(sqaleFile);
+            builder.Build(); // should succeed
+            mockJdkWrapper.AssertJarBuilt();
         }
+
+        [TestMethod]
+        public void RulesPluginBuilder_LanguageIsRequired()
+        {
+            // Arrange
+            RulesPluginBuilder builder = new RulesPluginBuilder(new TestLogger());
+            SetValidCoreProperties(builder);
+            AddValidDummyRulesFiles(builder);
+
+            // Act and assert
+            AssertException.Expect<InvalidOperationException>(() => builder.Build());
+        }
+
+        #region Private methods
+
+        private void SetValidCoreProperties(RulesPluginBuilder builder)
+        {
+            string testDir = TestUtils.EnsureTestDirectoryExists(this.TestContext);
+
+            builder.SetPluginKey("dummy.key")
+                .SetPluginName("dummy name")
+                .SetJarFilePath(Path.Combine(testDir, "dummy.jar.txt"));
+        }
+
+        private void AddValidDummyRulesFiles(RulesPluginBuilder builder)
+        {
+            string testDir = TestUtils.EnsureTestDirectoryExists(this.TestContext);
+            string rulesFile = TestUtils.CreateTextFile("rules.txt", testDir, "dummy rules file");
+
+            builder.SetRulesFilePath(rulesFile);
+        }
+
+        #endregion
     }
 }
