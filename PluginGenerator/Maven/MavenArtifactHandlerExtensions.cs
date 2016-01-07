@@ -7,7 +7,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace SonarQube.Plugins.Maven
@@ -51,13 +53,17 @@ namespace SonarQube.Plugins.Maven
                 throw new ArgumentNullException("pom");
             }
 
-            IList<string> jarFilePaths = new List<string>();
+            ISet<string> jarFilePaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             foreach (MavenDependency dependency in pom.Dependencies)
             {
                 string jarFilePath = handler.FetchArtifactJarFile(dependency);
                 if (jarFilePath != null)
                 {
+                    Debug.Assert(!jarFilePaths.Contains(jarFilePath, StringComparer.OrdinalIgnoreCase), "Expecting full jar paths to be unique");
+                    Debug.Assert(!jarFilePaths.Any(j => Path.GetFileName(j).Equals(Path.GetFileName(jarFilePath), StringComparison.OrdinalIgnoreCase)),
+                        "Expecting jars file names to be unique");
+
                     jarFilePaths.Add(jarFilePath);
                 }
             }
