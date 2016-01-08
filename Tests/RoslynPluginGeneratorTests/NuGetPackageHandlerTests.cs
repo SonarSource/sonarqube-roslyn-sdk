@@ -266,11 +266,11 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             packageBuilder.Save(outputStream);
 
             // Assert correct function of the above code when versions are specifically "Release" or "Prerelease"            
-            if (String.Equals(metadata.Version, ReleaseVersion, StringComparison.CurrentCulture))
+            if (String.Equals(metadata.Version, ReleaseVersion, StringComparison.OrdinalIgnoreCase))
             {
                 Assert.IsTrue(packageBuilder.IsReleaseVersion());
             }
-            else if (String.Equals(metadata.Version, PreReleaseVersion, StringComparison.CurrentCulture))
+            else if (String.Equals(metadata.Version, PreReleaseVersion, StringComparison.OrdinalIgnoreCase))
             {
                 Assert.IsFalse(packageBuilder.IsReleaseVersion());
             }

@@ -4,7 +4,6 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
-using SonarQube.Plugins.Common;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -18,8 +17,12 @@ namespace SonarQube.Plugins.Common
     /// </summary>
     public sealed class AssemblyResolver : IDisposable
     {
+        private const string DllExtension = ".dll";
+
         private readonly string[] rootSearchPaths;
         private readonly ILogger logger;
+
+        public bool ResolverCalled { get; private set; } // for testing
 
         /// <summary>
         /// Create a new AssemblyResolver that will search in the given directories (recursively) for dependencies.
@@ -30,10 +33,12 @@ namespace SonarQube.Plugins.Common
             if (logger == null)
             {
                 throw new ArgumentNullException("logger");
-            } else if (rootSearchPaths == null || rootSearchPaths.Length < 1)
+            }
+            if (rootSearchPaths == null || rootSearchPaths.Length < 1)
             {
                 throw new ArgumentException(Resources.Resolver_ConstructorNoPaths);
             }
+            this.ResolverCalled = true;
 
             this.rootSearchPaths = rootSearchPaths;            
             this.logger = logger;
@@ -48,10 +53,15 @@ namespace SonarQube.Plugins.Common
         public Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args) // set to public for test purposes
         {
             // This line causes a StackOverflowException unless Resources has already been called upon previously
-            this.logger.LogDebug(Resources.Resolver_ResolvingAssembly, args.Name, args.RequestingAssembly.FullName);
+            this.logger.LogDebug(Resources.Resolver_ResolvingAssembly, args.Name, args?.RequestingAssembly?.FullName ?? Resources.Resolver_UnspecifiedRequestingAssembly);
             Assembly asm = null;
 
-            string fileName = CreateFileNameFromAssemblyName(args.Name);
+            // The supplied assembly name could be a file name or an assembly full name. Work out which it is
+            bool isFileName = IsFileName(args.Name);
+
+            // Now work out the file name we are looking for
+            string fileName = GetAssemblyFileName(args.Name);
+            
 
             foreach (string rootSearchPath in rootSearchPaths)
             {
@@ -59,7 +69,13 @@ namespace SonarQube.Plugins.Common
                 {
                     asm = Assembly.LoadFile(file);
 
-                    if (string.Equals(args.Name, asm.FullName, StringComparison.CurrentCultureIgnoreCase))
+                    if (
+                        // If the input was e.g foo.dll then compare against the file name...
+                        (isFileName && string.Equals(Path.GetFileName(asm.Location), fileName,  StringComparison.OrdinalIgnoreCase))
+                        ||
+                        // ... otherwise compare against the full name
+                        (!isFileName || string.Equals(args.Name, asm.FullName, StringComparison.OrdinalIgnoreCase))
+                        )
                     {
                         this.logger.LogDebug(Resources.Resolver_AssemblyLocated, file);
                         return asm;
@@ -75,28 +91,28 @@ namespace SonarQube.Plugins.Common
         }
 
         /// <summary>
-        /// Attempts to create the name of the file associated with a given assembly name.
+        /// Turns the input assembly ref argument into an files name.
+        /// The input might be a file name (e.g. foo.dll) or a full assembly name
+        /// (e.g. SimpleAssemblyByFullName, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null)
         /// </summary>
-        public static string CreateFileNameFromAssemblyName(string input) // Public for testing purposes
+        private static string GetAssemblyFileName(string input) // Public for testing purposes
         {
             Debug.Assert(input != null);
             Debug.Assert(input.Length > 0);
 
-            if (input.EndsWith(".dll"))
+            if (IsFileName(input))
             {
                 return input;
             }
 
-            string result = input;
-            if (input.Contains(" "))
-            {
-                // If the assembly name has multiple words (seperated by spaces), use only the first word
-                // (e.g. "foo bar" -> "foo")
-                string[] parts = input.Split(new char[] { ' ' });
-                result = parts[0].Substring(0, parts[0].Length - 1);
-            }
+            AssemblyName assemblyName = new AssemblyName(input);
+            return assemblyName.Name + DllExtension;
+        }
 
-            return  result + ".dll";
+        private static bool IsFileName(string fileName)
+        {
+            bool result = fileName.EndsWith(DllExtension, StringComparison.OrdinalIgnoreCase);
+            return result;
         }
 
         #region IDisposable Support
@@ -108,6 +124,7 @@ namespace SonarQube.Plugins.Common
             {
                 if (disposing)
                 {
+                    this.logger.LogDebug(Resources.Resolver_Dispose);
                     AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomain_AssemblyResolve;
                 }
 

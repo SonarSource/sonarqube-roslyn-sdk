@@ -83,13 +83,13 @@ namespace SonarQube.Plugins
             }
             args.Add(sb.ToString());
             
-            args.Add(string.Format(CultureInfo.CurrentCulture, " -d {0}", GetQuotedArg(outputDirectory)));
+            args.Add(string.Format(CultureInfo.InvariantCulture, " -d {0}", GetQuotedArg(outputDirectory)));
 
-            args.Add(string.Format(CultureInfo.CurrentCulture, " -s {0}", GetQuotedArg(sourcesDirectory)));
+            args.Add(string.Format(CultureInfo.InvariantCulture, " -s {0}", GetQuotedArg(sourcesDirectory)));
 
             foreach (string source in this.sources)
             {
-                args.Add(string.Format(CultureInfo.CurrentCulture, " {0}", GetQuotedArg(source)));
+                args.Add(string.Format(CultureInfo.InvariantCulture, " {0}", GetQuotedArg(source)));
             }
 
             bool success = this.jdkWrapper.CompileSources(args, logger);

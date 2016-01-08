@@ -137,7 +137,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             {
                 foreach (String tag in rule.Tags)
                 {
-                    Assert.IsTrue(String.Equals(tag, tag.ToLower(), StringComparison.CurrentCulture));
+                    Assert.IsTrue(String.Equals(tag, tag.ToLowerInvariant(), StringComparison.InvariantCulture));
                 }
             }
         }

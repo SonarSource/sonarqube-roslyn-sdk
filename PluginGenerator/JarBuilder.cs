@@ -170,7 +170,7 @@ namespace SonarQube.Plugins
             StringBuilder sb = new StringBuilder();
             foreach (KeyValuePair<string, string> kvp in this.manifestProperties)
             {
-                sb.AppendFormat(System.Globalization.CultureInfo.CurrentCulture,
+                sb.AppendFormat(System.Globalization.CultureInfo.InvariantCulture,
                     "{0}: {1}",
                     kvp.Key, kvp.Value);
                 sb.AppendLine();

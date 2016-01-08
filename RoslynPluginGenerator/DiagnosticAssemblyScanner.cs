@@ -63,8 +63,8 @@ namespace SonarQube.Plugins.Roslyn
             Assembly analyzerAssembly = LoadAnalyzerAssembly(assemblyPath);
             IEnumerable<DiagnosticAnalyzer> analyzers = null;
 
-            Debug.Assert(String.Equals(language, LanguageNames.CSharp, StringComparison.CurrentCulture) 
-                || String.Equals(language, LanguageNames.VisualBasic, StringComparison.CurrentCulture));
+            Debug.Assert(String.Equals(language, LanguageNames.CSharp, StringComparison.Ordinal) 
+                || String.Equals(language, LanguageNames.VisualBasic, StringComparison.Ordinal));
 
             if (analyzerAssembly != null)
             {

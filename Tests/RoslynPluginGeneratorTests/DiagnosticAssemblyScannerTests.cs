@@ -60,7 +60,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
         {
             // Arrange
             TestLogger logger = new TestLogger();
-            DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
+            DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger, this.TestContext.DeploymentDirectory);
 
             string exampleAnalyzer1DllPath = typeof(ExampleAnalyzer1.CSharpAnalyzer).Assembly.Location;
 
