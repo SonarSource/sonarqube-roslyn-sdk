@@ -23,7 +23,7 @@ namespace SonarQube.Plugins.CommonTests
         #region Tests
 
         /// <summary>
-        /// Tests the loading of an assembly with a single type and no dependencies. This should succeed even without AssemblyResolver.
+        /// Tests the loading of an assembly with a single type and no dependencies. This should succeed even without the AssemblyResolver.
         /// </summary>
         [TestMethod]
         public void AssemblyResolver_NoImpactOnDefaultResolution()

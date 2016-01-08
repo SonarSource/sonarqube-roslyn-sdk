@@ -50,7 +50,7 @@ namespace SonarQube.Plugins.Common
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
         }
 
-        public Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args) // set to public for test purposes
+        private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             // This line causes a StackOverflowException unless Resources has already been called upon previously
             this.logger.LogDebug(Resources.Resolver_ResolvingAssembly, args.Name, args?.RequestingAssembly?.FullName ?? Resources.Resolver_UnspecifiedRequestingAssembly);
@@ -95,7 +95,7 @@ namespace SonarQube.Plugins.Common
         /// The input might be a file name (e.g. foo.dll) or a full assembly name
         /// (e.g. SimpleAssemblyByFullName, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null)
         /// </summary>
-        private static string GetAssemblyFileName(string input) // Public for testing purposes
+        private static string GetAssemblyFileName(string input)
         {
             Debug.Assert(input != null);
             Debug.Assert(input.Length > 0);
