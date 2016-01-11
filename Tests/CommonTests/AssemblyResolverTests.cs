@@ -22,6 +22,19 @@ namespace SonarQube.Plugins.CommonTests
 
         #region Tests
 
+        [TestMethod]
+        public void AssemblyResolver_Creation()
+        {
+            // 1. Null logger
+            AssertException.Expect<ArgumentNullException>(() => new AssemblyResolver(null, new string[] { this.TestContext.TestDeploymentDir }));
+
+            // 2. Null paths
+            AssertException.Expect<ArgumentException>(() => new AssemblyResolver(new TestLogger(), null));
+
+            // 3. Empty paths
+            AssertException.Expect<ArgumentException>(() => new AssemblyResolver(new TestLogger(), new string[] { }));
+        }
+
         /// <summary>
         /// Tests the loading of an assembly with a single type and no dependencies. This should succeed even without the AssemblyResolver.
         /// </summary>
@@ -91,7 +104,7 @@ namespace SonarQube.Plugins.CommonTests
             Assembly testAssembly = CompileSimpleAssembly("SimpleAssemblyByFullName.dll", testFolder, new TestLogger());
 
             // Act
-            Assembly resolvedAssembly = AssertAssemblyLoadSucceedsOnlyWithResolver("SimpleAssemblyByFullName, Version = 0.0.0.0, Culture = neutral, PublicKeyToken = null", testFolder);
+            Assembly resolvedAssembly = AssertAssemblyLoadSucceedsOnlyWithResolver("SimpleAssemblyByFullName, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null", testFolder);
 
             // Assert
             AssertExpectedAssemblyLoaded(testAssembly, resolvedAssembly);
@@ -125,7 +138,7 @@ namespace SonarQube.Plugins.CommonTests
             Assembly testAssembly = CompileSimpleAssembly("Space in Name ByFullName.dll", testFolder, new TestLogger());
 
             // Act
-            Assembly resolvedAssembly = AssertAssemblyLoadSucceedsOnlyWithResolver("Space in Name ByFullName, Version = 0.0.0.0, Culture = neutral, PublicKeyToken = null", testFolder);
+            Assembly resolvedAssembly = AssertAssemblyLoadSucceedsOnlyWithResolver("Space in Name ByFullName, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null", testFolder);
 
             // Assert
             AssertExpectedAssemblyLoaded(testAssembly, resolvedAssembly);
@@ -154,18 +167,20 @@ namespace SonarQube.Plugins.CommonTests
         [TestMethod]
         public void AssemblyResolver_VersionAssemblyRequested()
         {
-            // Arrange
+            // Setup
             string testFolder = TestUtils.CreateTestDirectory(this.TestContext);
             Assembly testAssembly = CompileSimpleAssembly("VersionAsm1.dll", testFolder, new TestLogger(), "2.1.0.4");
 
-            // Act
+            // 1. Search for a version that can be found -> succeeds
             Assembly resolvedAssembly = AssertAssemblyLoadSucceedsOnlyWithResolver("VersionAsm1, Version = 2.1.0.4, Culture = neutral, PublicKeyToken = null", testFolder);
-
-            // Assert
             AssertExpectedAssemblyLoaded(testAssembly, resolvedAssembly);
 
-            AssertAssemblyLoadFails("VersionAsm1, Version = 1.0.0.4, Culture = neutral, PublicKeyToken = null");
-
+            // 2. Search for a version that can't be found -> fails
+            using (AssemblyResolver resolver = new AssemblyResolver(new TestLogger(), testFolder))
+            {
+                AssertAssemblyLoadFails("VersionAsm1, Version = 1.0.0.4, Culture = neutral, PublicKeyToken = null");
+                AssertResolverCaller(resolver);
+            }
         }
 
         #endregion

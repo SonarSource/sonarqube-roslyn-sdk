@@ -36,7 +36,7 @@ namespace SonarQube.Plugins.Common
             }
             if (rootSearchPaths == null || rootSearchPaths.Length < 1)
             {
-                throw new ArgumentException(Resources.Resolver_ConstructorNoPaths);
+                throw new ArgumentException(Resources.Resolver_ConstructorNoPaths, "rootSearchPaths");
             }
             this.ResolverCalled = true;
 
@@ -74,7 +74,7 @@ namespace SonarQube.Plugins.Common
                         (isFileName && string.Equals(Path.GetFileName(asm.Location), fileName,  StringComparison.OrdinalIgnoreCase))
                         ||
                         // ... otherwise compare against the full name
-                        (!isFileName || string.Equals(args.Name, asm.FullName, StringComparison.OrdinalIgnoreCase))
+                        (!isFileName && string.Equals(args.Name, asm.FullName, StringComparison.OrdinalIgnoreCase))
                         )
                     {
                         this.logger.LogDebug(Resources.Resolver_AssemblyLocated, file);
