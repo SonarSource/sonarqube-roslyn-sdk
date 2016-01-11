@@ -12,6 +12,8 @@ namespace SonarQube.Plugins.Common
 {
     public static class Utilities
     {
+        private const string DllExtension = ".dll";
+
         public static void LogAssemblyVersion(Assembly assembly, string description, ILogger logger)
         {
             if (assembly == null)
@@ -50,5 +52,14 @@ namespace SonarQube.Plugins.Common
             return newDir;
         }
 
+        /// <summary>
+        /// Returns whether the supplied string is an assembly library (i.e. dll)
+        /// </summary>
+        public static bool IsAssemblyLibraryFileName(string filePath)
+        {
+            // Not expecting .winmd or .exe files to contain Roslyn analyzers
+            // so we'll ignore them
+            return filePath.EndsWith(DllExtension, StringComparison.OrdinalIgnoreCase);
+        }
     }
 }

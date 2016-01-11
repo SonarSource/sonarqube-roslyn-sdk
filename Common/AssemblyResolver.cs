@@ -57,7 +57,7 @@ namespace SonarQube.Plugins.Common
             Assembly asm = null;
 
             // The supplied assembly name could be a file name or an assembly full name. Work out which it is
-            bool isFileName = IsFileName(args.Name);
+            bool isFileName = Utilities.IsAssemblyLibraryFileName(args.Name);
 
             // Now work out the file name we are looking for
             string fileName = GetAssemblyFileName(args.Name);
@@ -100,19 +100,13 @@ namespace SonarQube.Plugins.Common
             Debug.Assert(input != null);
             Debug.Assert(input.Length > 0);
 
-            if (IsFileName(input))
+            if (Utilities.IsAssemblyLibraryFileName(input))
             {
                 return input;
             }
 
             AssemblyName assemblyName = new AssemblyName(input);
             return assemblyName.Name + DllExtension;
-        }
-
-        private static bool IsFileName(string fileName)
-        {
-            bool result = fileName.EndsWith(DllExtension, StringComparison.OrdinalIgnoreCase);
-            return result;
         }
 
         #region IDisposable Support

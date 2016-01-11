@@ -37,20 +37,12 @@ namespace SonarQube.Plugins.Roslyn
         public IEnumerable<DiagnosticAnalyzer> InstantiateDiagnostics(string language, params string[] files)
         {
             List<DiagnosticAnalyzer> analyzers = new List<DiagnosticAnalyzer>();
-            foreach (string assemblyPath in files.Where(f => IsAssembly(f)))
+            foreach (string assemblyPath in files.Where(f => Utilities.IsAssemblyLibraryFileName(f)))
             {
                 analyzers.AddRange(InstantiateDiagnosticsFromAssembly(assemblyPath, language));
             }
 
             return analyzers;
-        }
-
-        private static bool IsAssembly(string filePath)
-        {
-            // Not expecting .winmd files to contain Roslyn analyzers
-            // so we'll ignore them
-            return filePath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) ||
-                filePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
