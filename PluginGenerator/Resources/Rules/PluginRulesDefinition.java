@@ -21,7 +21,9 @@ public final class PluginRulesDefinition implements RulesDefinition {
 
   private static final Logger LOG = LoggerFactory.getLogger(PluginRulesDefinition.class);
 
+  // Unique to the plugin: used when naming the repository and the properties
   protected static final String KEY = "[PLUGIN_KEY]";
+  
   protected static final String NAME = "[PLUGIN_NAME]";
 
   protected static final List<String> LANGUAGE_KEYS = Arrays.asList("[RULE_LANGUAGE]");
@@ -75,7 +77,7 @@ public final class PluginRulesDefinition implements RulesDefinition {
 
   public static String getRepositoryKeyForLanguage(String languageKey) {
     //return languageKey.toLowerCase() + "-" + KEY;
-	return KEY.toLowerCase();
+	return "roslyn." + KEY.toLowerCase();
   }
 
   public static String getRepositoryNameForLanguage(String languageKey) {

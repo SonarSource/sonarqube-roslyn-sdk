@@ -37,11 +37,6 @@ namespace SonarQube.Plugins.Roslyn
         private const string PackageId_Token = "[ROSLYN_NUGET_PACKAGE_ID]";
         private const string PackageVersion_Token = "[ROSLYN_NUGET_PACKAGE_VERSION]";
 
-        /// <summary>
-        /// The SARIF plugin must be able to distinguish the plugins generating SARIF style issues - a suffix convention is used
-        /// </summary>
-        private const string PluginKeySuffix = "_sarif";
-
         private readonly INuGetPackageHandler packageHandler;
         private readonly SonarQube.Plugins.Common.ILogger logger;
 
@@ -162,7 +157,7 @@ namespace SonarQube.Plugins.Roslyn
             pluginDefn.Developers = GetValidManifestString(ListToString(package.Authors));
 
             pluginDefn.Homepage = GetValidManifestString(package.ProjectUrl?.ToString());
-            pluginDefn.Key = GetValidManifestString(package.Id) + PluginKeySuffix;
+            pluginDefn.Key = GetValidManifestString(package.Id);
 
             pluginDefn.Name = GetValidManifestString(package.Title) ?? pluginDefn.Key;
             pluginDefn.Organization = GetValidManifestString(ListToString(package.Owners));

@@ -33,15 +33,15 @@ namespace SonarQube.Plugins.IntegrationTests
             // Create a valid analyzer package
             ExampleAnalyzer1.CSharpAnalyzer analyzer = new ExampleAnalyzer1.CSharpAnalyzer();
 
-            string packageId = "analyzer1.id1";
+            string packageId = "analyzer1.pkgid1";
             string localNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGet");
             IPackageManager localNuGetStore = CreatePackageManager(localNuGetDir);
-            AddPackage(localNuGetStore, packageId, "1.0", analyzer.GetType().Assembly.Location);
+            AddPackage(localNuGetStore, packageId, "1.0.2", analyzer.GetType().Assembly.Location);
 
             // Act
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(localNuGetDir, logger);
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(packageId, new SemanticVersion("1.0")), "cs", null, outputDir);
+            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(packageId, new SemanticVersion("1.0.2")), "cs", null, outputDir);
 
             // Assert
             Assert.IsTrue(result);
@@ -56,15 +56,18 @@ namespace SonarQube.Plugins.IntegrationTests
 
             Assert.IsNotNull(jarInfo, "Failed to process the generated jar successfully");
 
-            AssertPropertyDefinitionExists(packageId + "_sarif.AnalyzerId", jarInfo);
-            AssertPropertyDefinitionExists(packageId + "_sarif.RuleNamespace", jarInfo);
-            AssertPropertyDefinitionExists(packageId + "_sarif.nuget.packageId", jarInfo);
-            AssertPropertyDefinitionExists(packageId + "_sarif.nuget.packageVersion", jarInfo);
+            AssertExpectedManifestValue(WellKnownPluginProperties.Key, "analyzer1.pkgid1", jarInfo);
+
+            // Check for the expected property values required by the C# plugin
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.analyzerId", "analyzer1.pkgid1", jarInfo);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.ruleNamespace", "analyzer1.pkgid1", jarInfo);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.nuget.packageId", "analyzer1.pkgid1", jarInfo);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.nuget.packageVersion", "1.0.2", jarInfo);
 
             JarInfo.RulesDefinition rulesDefn = AssertRulesDefinitionExists(jarInfo);
             AssertRepositoryIsValid(rulesDefn.Repository);
-
             AssertExpectedRulesExist(analyzer, rulesDefn.Repository);
+            Assert.AreEqual("roslyn.analyzer1.pkgid1", rulesDefn.Repository.Key, "Unexpected repository key");
 
             Assert.AreEqual(5, jarInfo.Extensions.Count, "Unexpected number of extensions");
         }
@@ -121,7 +124,13 @@ namespace SonarQube.Plugins.IntegrationTests
             return files.First();
         }
 
-        private static void AssertPropertyDefinitionExists(string propertyName, JarInfo jarInfo)
+        private static void AssertExpectedPropertyDefinitionValue(string propertyName, string expected, JarInfo jarInfo)
+        {
+            JarInfo.PropertyDefinition actual = AssertPropertyDefinitionExists(propertyName, jarInfo);
+            Assert.AreEqual(expected, actual.DefaultValue, "Property definition does not have the expected value. Property: {0}", propertyName);
+        }
+
+        private static JarInfo.PropertyDefinition AssertPropertyDefinitionExists(string propertyName, JarInfo jarInfo)
         {
             Assert.IsNotNull(jarInfo.Extensions, "Extensions should not be null");
 
@@ -131,6 +140,7 @@ namespace SonarQube.Plugins.IntegrationTests
 
             Assert.IsNotNull(actual, "Failed to find expected property: {0}", propertyName);
             AssertPropertyHasValue(actual.DefaultValue, propertyName);
+            return actual;
         }
 
         private static JarInfo.RulesDefinition AssertRulesDefinitionExists(JarInfo jarInfo)
@@ -184,6 +194,17 @@ namespace SonarQube.Plugins.IntegrationTests
             Assert.AreEqual(descriptor.Title.ToString(), actual.Name, "Unexpected rule name");
             Assert.AreEqual(descriptor.Id, actual.Key, "Unexpected rule key");
             AssertPropertyHasValue(actual.Severity, "Severity");
+        }
+
+        private static void AssertExpectedManifestValue(string propertyName, string expectedValue, JarInfo jarInfo)
+        {
+            Assert.IsNotNull(jarInfo.Manifest, "Manifest should not be null");
+
+            JarInfo.ManifestItem actual = jarInfo.Manifest
+                .FirstOrDefault(item => string.Equals(item.Key, propertyName, System.StringComparison.OrdinalIgnoreCase));
+
+            Assert.IsNotNull(actual, "Failed to find expected manifest property: {0}", propertyName);
+            Assert.AreEqual(expectedValue, actual.Value, "Unexpected manifest value for {0}", propertyName);
         }
 
         #endregion

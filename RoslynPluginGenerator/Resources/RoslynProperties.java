@@ -5,12 +5,12 @@ import org.sonar.api.config.PropertyDefinition;
 // Defines the metadata properties required by the C# plugin
 public final class RoslynProperties {
 
-  public static PropertyDefinition AnalyzerId = PropertyDefinition.builder(PluginRulesDefinition.KEY + ".AnalyzerId")
+  public static PropertyDefinition AnalyzerId = PropertyDefinition.builder(PluginRulesDefinition.KEY + ".analyzerId")
 	.defaultValue("[ROSLYN_ANALYZER_ID]")
 	.hidden()
 	.build();
 
-  public static PropertyDefinition RuleNamespace = PropertyDefinition.builder(PluginRulesDefinition.KEY + ".RuleNamespace")
+  public static PropertyDefinition RuleNamespace = PropertyDefinition.builder(PluginRulesDefinition.KEY + ".ruleNamespace")
 	.defaultValue("[ROSLYN_RULE_NAMESPACE]")
 	.hidden()
 	.build();
