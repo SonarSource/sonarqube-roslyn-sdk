@@ -13,6 +13,9 @@ namespace SonarQube.Plugins.Roslyn
     /// </summary>
     public interface INuGetPackageHandler
     {
+
+        string localCacheRoot { get; }
+
         /// <summary>
         /// Attempts to fetch the specified package
         /// </summary>
@@ -20,8 +23,8 @@ namespace SonarQube.Plugins.Roslyn
         /// <param name="version">The version of the package to download. Can be null,
         /// in which case the most recent version will be downloaded (which could be 
         /// a pre-release version).</param>
-        /// <param name="localNuGetPath">The directory in which the local NuGet repository should be created.</param>
+        /// 
         /// <returns>A reference to the package, or null if the package could not be located</returns>
-        IPackage FetchPackage(string packageId, SemanticVersion version, string localNuGetPath);
+        IPackage FetchPackage(string packageId, SemanticVersion version);
     }
 }

@@ -29,7 +29,7 @@ namespace SonarQube.Plugins.Roslyn
             bool success = false;
             if (processedArgs != null)
             {
-                NuGetPackageHandler packageHandler = new NuGetPackageHandler(NuGetPackageSource, logger);
+                NuGetPackageHandler packageHandler = new NuGetPackageHandler(logger, NuGetPackageSource);
                 AnalyzerPluginGenerator generator = new AnalyzerPluginGenerator(packageHandler, logger);
                 success = generator.Generate(processedArgs.AnalyzerRef, processedArgs.Language, processedArgs.SqaleFilePath,
                     System.IO.Directory.GetCurrentDirectory());

@@ -106,6 +106,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AnalyzerPluginGeneratorTests.cs" />
     <Compile Include="ArgumentProcessorTests.cs" />
     <Compile Include="DiagnosticAssemblyScannerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

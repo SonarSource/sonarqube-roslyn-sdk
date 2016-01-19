@@ -67,11 +67,17 @@ namespace SonarQube.Plugins.Roslyn
             }
             SupportedLanguages.ThrowIfNotSupported(language);
 
-            string nuGetDirectory = Utilities.CreateTempDirectory(".nuget");
-            IPackage package = this.packageHandler.FetchPackage(analyzeRef.PackageId, analyzeRef.Version, nuGetDirectory);
+            IPackage package = this.packageHandler.FetchPackage(analyzeRef.PackageId, analyzeRef.Version);
 
             if (package != null)
             {
+                // Build machines will need to install this package, it is not feasible to create plugins for packages requiring license acceptance
+                if (PackageRequiresLicenseAcceptance(package)) 
+                {
+                    this.logger.LogError(UIResources.APG_NGPackageRequiresLicenseAcceptance);
+                    return false;
+                }
+
                 // Create a uniquely-named temp directory for this generation run
                 string baseDirectory = Utilities.CreateTempDirectory(".gen");
                 baseDirectory = Utilities.CreateSubDirectory(baseDirectory, Guid.NewGuid().ToString());
@@ -81,7 +87,7 @@ namespace SonarQube.Plugins.Roslyn
 
                 string rulesFilePath = Path.Combine(baseDirectory, "rules.xml");
 
-                bool success = TryGenerateRulesFile(package, nuGetDirectory, baseDirectory, rulesFilePath, language);
+                bool success = TryGenerateRulesFile(package, this.packageHandler.localCacheRoot, baseDirectory, rulesFilePath, language);
 
                 if (success)
                 {
@@ -90,6 +96,33 @@ namespace SonarQube.Plugins.Roslyn
             }
 
             return package != null;
+        }
+
+        /// <summary>
+        /// Recursively checks a package and all dependencies for the presence of the RequireLicenseAcceptance flag.
+        /// Returns true if any of the packages in the dependency tree require license acceptance.
+        /// </summary>
+        /// <param name="package">The package to test.</param>
+        /// <returns></returns>
+        private bool PackageRequiresLicenseAcceptance(IPackage package)
+        {
+            if (package.RequireLicenseAcceptance)
+            {
+                return true;
+            }
+            foreach (PackageDependencySet dependencySet in package.DependencySets)
+            {
+                foreach (PackageDependency dependency in dependencySet.Dependencies)
+                {
+                    // Also check that no dependencies require license acceptance
+                    IPackage dependencyPkg = packageHandler.FetchPackage(dependency.Id, dependency.VersionSpec.MaxVersion);
+                    if (PackageRequiresLicenseAcceptance(dependencyPkg))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         /// <summary>

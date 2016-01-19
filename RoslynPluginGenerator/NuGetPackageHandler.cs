@@ -5,6 +5,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 using NuGet;
+using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -17,7 +18,16 @@ namespace SonarQube.Plugins.Roslyn
     public class NuGetPackageHandler : INuGetPackageHandler
     {
         private readonly string packageSource;
+        private readonly string localCacheRoot;
         private readonly Common.ILogger logger;
+
+        string INuGetPackageHandler.localCacheRoot
+        {
+            get
+            {
+                return localCacheRoot;
+            }
+        }
 
         private class NuGetLoggerAdapter : NuGet.ILogger
         {
@@ -58,9 +68,9 @@ namespace SonarQube.Plugins.Roslyn
             }
         }
 
-        public NuGetPackageHandler(string packageSource, Common.ILogger logger)
+        public NuGetPackageHandler(Common.ILogger logger, string remotePackageSource, string localPackageDestination = null)
         {
-            if (string.IsNullOrWhiteSpace(packageSource))
+            if (string.IsNullOrWhiteSpace(remotePackageSource))
             {
                 throw new ArgumentNullException("packageSource");
             }
@@ -68,21 +78,30 @@ namespace SonarQube.Plugins.Roslyn
             {
                 throw new ArgumentNullException("logger");
             }
-            this.packageSource = packageSource;
+
             this.logger = logger;
+            this.packageSource = remotePackageSource;
+            if (localPackageDestination != null)
+            {
+                this.localCacheRoot = localPackageDestination;
+
+            } else
+            {
+                this.localCacheRoot = Utilities.CreateTempDirectory(".nuget");
+            }
         }
 
         /// <summary>
         /// Attempts to download a NuGet package with the specified id and optional version
         /// to the specified directory
         /// </summary>
-        public IPackage FetchPackage(string packageId, SemanticVersion version, string localNuGetPath)
+        public IPackage FetchPackage(string packageId, SemanticVersion version)
         {
             if (string.IsNullOrWhiteSpace(packageId))
             {
                 throw new ArgumentNullException("packageId");
             }
-            if (string.IsNullOrWhiteSpace(localNuGetPath))
+            if (string.IsNullOrWhiteSpace(localCacheRoot))
             {
                 throw new ArgumentNullException("localNuGetPath");
             }
@@ -98,9 +117,9 @@ namespace SonarQube.Plugins.Roslyn
 
             if (package != null)
             {
-                Directory.CreateDirectory(localNuGetPath);
+                Directory.CreateDirectory(localCacheRoot);
 
-                IPackageManager manager = new PackageManager(repository, localNuGetPath);
+                IPackageManager manager = new PackageManager(repository, localCacheRoot);
                 manager.Logger = new NuGetLoggerAdapter(this.logger);
 
                 try

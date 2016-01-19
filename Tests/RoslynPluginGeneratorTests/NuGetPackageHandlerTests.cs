@@ -43,11 +43,11 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             BuildTestPackages(true, true);
 
             TestLogger logger = new TestLogger();
-            NuGetPackageHandler handler = new NuGetPackageHandler(testDir, logger);
+            NuGetPackageHandler handler = new NuGetPackageHandler(logger, testDir, testDownloadDir);
 
             // Act
             // Attempt to download a package which is released with a dependency that is released
-            IPackage package = handler.FetchPackage(DependentPackageName, null, testDownloadDir);
+            IPackage package = handler.FetchPackage(DependentPackageName, null);
 
             // Assert
             AssertExpectedPackage(package, DependentPackageName, ReleaseVersion);
@@ -67,11 +67,11 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             BuildTestPackages(false, true);
 
             TestLogger logger = new TestLogger();
-            NuGetPackageHandler handler = new NuGetPackageHandler(testDir, logger);
+            NuGetPackageHandler handler = new NuGetPackageHandler(logger, testDir, testDownloadDir);
 
             // Act
             // Attempt to download a package which is not released with a dependency that is released
-            IPackage package = handler.FetchPackage(DependentPackageName, null, testDownloadDir);
+            IPackage package = handler.FetchPackage(DependentPackageName, null);
 
             // Assert
             AssertExpectedPackage(package, DependentPackageName, PreReleaseVersion);
@@ -91,11 +91,11 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             BuildTestPackages(false, false);
 
             TestLogger logger = new TestLogger();
-            NuGetPackageHandler handler = new NuGetPackageHandler(testDir, logger);
+            NuGetPackageHandler handler = new NuGetPackageHandler(logger, testDir, testDownloadDir);
 
             // Act
             // Attempt to download a package which is not released with a dependency that is not released
-            IPackage package = handler.FetchPackage(DependentPackageName, null, testDownloadDir);
+            IPackage package = handler.FetchPackage(DependentPackageName, null);
 
             // Assert
             AssertExpectedPackage(package, DependentPackageName, PreReleaseVersion);
@@ -120,16 +120,16 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             BuildAndInstallPackage(mgr, "package.id.1", "0.9.0");
             BuildAndInstallPackage(mgr, "package.id.1", "1.0.0");
 
-            NuGetPackageHandler handler = new NuGetPackageHandler(sourceNuGetRoot, new TestLogger());
+            NuGetPackageHandler handler = new NuGetPackageHandler(new TestLogger(), sourceNuGetRoot);
 
             // Check for specific versions
-            IPackage actual = handler.FetchPackage("package.id.1", new SemanticVersion("0.8.0"), targetNuGetRoot);
+            IPackage actual = handler.FetchPackage("package.id.1", new SemanticVersion("0.8.0"));
             AssertExpectedPackage(actual, "package.id.1", "0.8.0");
 
-            actual = handler.FetchPackage("package.id.1", new SemanticVersion("1.0.0-rc1"), targetNuGetRoot);
+            actual = handler.FetchPackage("package.id.1", new SemanticVersion("1.0.0-rc1"));
             AssertExpectedPackage(actual, "package.id.1", "1.0.0-rc1");
 
-            actual = handler.FetchPackage("package.id.1", new SemanticVersion("2.0.0"), targetNuGetRoot);
+            actual = handler.FetchPackage("package.id.1", new SemanticVersion("2.0.0"));
             AssertExpectedPackage(actual, "package.id.1", "2.0.0");
         }
 
@@ -147,10 +147,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             BuildAndInstallPackage(mgr, "package.id.1", "1.1.0-rc1");
             BuildAndInstallPackage(mgr, "dummy.package.1", "2.0.0");
 
-            NuGetPackageHandler handler = new NuGetPackageHandler(sourceNuGetRoot, new TestLogger());
+            NuGetPackageHandler handler = new NuGetPackageHandler(new TestLogger(), sourceNuGetRoot);
 
             // Act
-            IPackage actual = handler.FetchPackage("package.id.1", null, targetNuGetRoot);
+            IPackage actual = handler.FetchPackage("package.id.1", null);
 
             // Assert
             AssertExpectedPackage(actual, "package.id.1", "1.0.0");
@@ -170,10 +170,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             BuildAndInstallPackage(mgr, "dummy.package.1", "2.0.0");
             BuildAndInstallPackage(mgr, "dummy.package.1", "2.0.0-rc2");
 
-            NuGetPackageHandler handler = new NuGetPackageHandler(sourceNuGetRoot, new TestLogger());
+            NuGetPackageHandler handler = new NuGetPackageHandler(new TestLogger(), sourceNuGetRoot);
 
             // Act
-            IPackage actual = handler.FetchPackage("package.id.1", null, targetNuGetRoot);
+            IPackage actual = handler.FetchPackage("package.id.1", null);
 
             // Assert
             AssertExpectedPackage(actual, "package.id.1", "1.1.0-rc1");
@@ -190,14 +190,14 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             BuildAndInstallPackage(mgr, "package.id.1", "0.8.0");
             BuildAndInstallPackage(mgr, "package.id.1", "0.9.0");
 
-            NuGetPackageHandler handler = new NuGetPackageHandler(sourceNuGetRoot, new TestLogger());
+            NuGetPackageHandler handler = new NuGetPackageHandler(new TestLogger(), sourceNuGetRoot);
 
             // 1. Package id not found
-            IPackage actual = handler.FetchPackage("unknown.package.id", new SemanticVersion("0.8.0"), targetNuGetRoot);
+            IPackage actual = handler.FetchPackage("unknown.package.id", new SemanticVersion("0.8.0"));
             Assert.IsNull(actual, "Not expecting a package to be found");
 
             // 2. Package id not found
-            actual = handler.FetchPackage("package.id.1", new SemanticVersion("0.7.0"), targetNuGetRoot);
+            actual = handler.FetchPackage("package.id.1", new SemanticVersion("0.7.0"));
             Assert.IsNull(actual, "Not expecting a package to be found");
         }
 
