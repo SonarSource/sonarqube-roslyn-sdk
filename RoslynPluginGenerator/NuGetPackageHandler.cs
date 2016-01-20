@@ -21,7 +21,7 @@ namespace SonarQube.Plugins.Roslyn
         private readonly string localCacheRoot;
         private readonly Common.ILogger logger;
 
-        string INuGetPackageHandler.localCacheRoot
+        string INuGetPackageHandler.LocalCacheRoot
         {
             get
             {
@@ -67,8 +67,11 @@ namespace SonarQube.Plugins.Roslyn
                 return FileConflictResolution.Ignore;
             }
         }
+        public NuGetPackageHandler(Common.ILogger logger, string remotePackageSource) : this(logger, remotePackageSource, null)
+        {
+        }
 
-        public NuGetPackageHandler(Common.ILogger logger, string remotePackageSource, string localPackageDestination = null)
+        public /* for test */ NuGetPackageHandler(Common.ILogger logger, string remotePackageSource, string localPackageDestination)
         {
             if (string.IsNullOrWhiteSpace(remotePackageSource))
             {
@@ -84,8 +87,8 @@ namespace SonarQube.Plugins.Roslyn
             if (localPackageDestination != null)
             {
                 this.localCacheRoot = localPackageDestination;
-
-            } else
+            }
+            else
             {
                 this.localCacheRoot = Utilities.CreateTempDirectory(".nuget");
             }
@@ -100,10 +103,6 @@ namespace SonarQube.Plugins.Roslyn
             if (string.IsNullOrWhiteSpace(packageId))
             {
                 throw new ArgumentNullException("packageId");
-            }
-            if (string.IsNullOrWhiteSpace(localCacheRoot))
-            {
-                throw new ArgumentNullException("localNuGetPath");
             }
             if (logger == null)
             {

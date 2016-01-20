@@ -14,7 +14,7 @@ namespace SonarQube.Plugins.Roslyn
     public interface INuGetPackageHandler
     {
 
-        string localCacheRoot { get; }
+        string LocalCacheRoot { get; }
 
         /// <summary>
         /// Attempts to fetch the specified package

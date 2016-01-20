@@ -133,7 +133,7 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Plugins cannot be created for NuGet packages that require the user to accept a license..
+        ///   Looks up a localized string similar to Package {0} (version {1})  requires the user to accept a license..
         /// </summary>
         public static string APG_NGPackageRequiresLicenseAcceptance {
             get {
