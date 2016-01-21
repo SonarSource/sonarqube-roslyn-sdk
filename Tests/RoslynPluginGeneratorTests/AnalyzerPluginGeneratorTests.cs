@@ -50,17 +50,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_PackageNoAccept_MultipleLevelDependencies_DependenciesNoAccept_Succeeds()
         {
             // Arrange
-            TestLogger logger = new TestLogger();
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
 
-            string localNuGetSourceDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGetSource");
-            string localNuGetDownloadDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGetDownload");
-            IPackageManager localNuGetSourceStore = CreatePackageManager(localNuGetSourceDir);
-            SetupTestGraph(localNuGetSourceStore);
+            SetupTestGraph(CreatePackageManager(GetLocalNuGetSourceDir()));
 
             // Act
-            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(logger, localNuGetSourceDir, localNuGetDownloadDir);
-            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Root.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
 
             // Assert
@@ -71,17 +66,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_PackageRequiresAccept_NoDependencies_Fails()
         {
             // Arrange
-            TestLogger logger = new TestLogger();
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
 
-            string localNuGetSourceDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGetSource");
-            string localNuGetDownloadDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGetDownload");
-            IPackageManager localNuGetSourceStore = CreatePackageManager(localNuGetSourceDir);
-            SetupTestGraph(localNuGetSourceStore, Node.Grandchild1_1);
+            SetupTestGraph(CreatePackageManager(GetLocalNuGetSourceDir()), Node.Grandchild1_1);
 
             // Act
-            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(logger, localNuGetSourceDir, localNuGetDownloadDir);
-            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Grandchild1_1.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
 
             // Assert
@@ -92,17 +82,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_PackageNoAccept_OneDependency_DependencyRequiresAccept_Fails()
         {
             // Arrange
-            TestLogger logger = new TestLogger();
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
 
-            string localNuGetSourceDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGetSource");
-            string localNuGetDownloadDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGetDownload");
-            IPackageManager localNuGetSourceStore = CreatePackageManager(localNuGetSourceDir);
-            SetupTestGraph(localNuGetSourceStore, Node.Grandchild1_1);
+            SetupTestGraph(CreatePackageManager(GetLocalNuGetSourceDir()), Node.Grandchild1_1);
 
             // Act
-            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(logger, localNuGetSourceDir, localNuGetDownloadDir);
-            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Child1.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
 
             // Assert
@@ -113,17 +98,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_PackageRequiresAccept_OneDependency_DependencyRequiresAccept_Fails()
         {
             // Arrange
-            TestLogger logger = new TestLogger();
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
 
-            string localNuGetSourceDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGetSource");
-            string localNuGetDownloadDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGetDownload");
-            IPackageManager localNuGetSourceStore = CreatePackageManager(localNuGetSourceDir);
-            SetupTestGraph(localNuGetSourceStore, Node.Child1, Node.Grandchild1_1);
+            SetupTestGraph(CreatePackageManager(GetLocalNuGetSourceDir()), Node.Child1, Node.Grandchild1_1);
 
             // Act
-            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(logger, localNuGetSourceDir, localNuGetDownloadDir);
-            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Child1.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
 
             // Assert
@@ -134,17 +114,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_PackageNoAccept_MultipleDependencies_OneDependencyRequiresAccept_Fails()
         {
             // Arrange
-            TestLogger logger = new TestLogger();
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
 
-            string localNuGetSourceDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGetSource");
-            string localNuGetDownloadDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGetDownload");
-            IPackageManager localNuGetSourceStore = CreatePackageManager(localNuGetSourceDir);
-            SetupTestGraph(localNuGetSourceStore, Node.Grandchild2_1);
+            SetupTestGraph(CreatePackageManager(GetLocalNuGetSourceDir()), Node.Grandchild2_1);
 
             // Act
-            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(logger, localNuGetSourceDir, localNuGetDownloadDir);
-            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Child2.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
 
             // Assert
@@ -155,17 +130,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_PackageNoAccept_MultipleDependencies_SecondDependencyRequiresAccept_Fails()
         {
             // Arrange
-            TestLogger logger = new TestLogger();
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
 
-            string localNuGetSourceDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGetSource");
-            string localNuGetDownloadDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGetDownload");
-            IPackageManager localNuGetSourceStore = CreatePackageManager(localNuGetSourceDir);
-            SetupTestGraph(localNuGetSourceStore, Node.Grandchild2_2);
+            SetupTestGraph(CreatePackageManager(GetLocalNuGetSourceDir()), Node.Grandchild2_2);
 
             // Act
-            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(logger, localNuGetSourceDir, localNuGetDownloadDir);
-            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Child2.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
 
             // Assert
@@ -176,17 +146,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_PackageRequiresAccept_MultipleDependencies_AllDependenciesRequiresAccept_Fails()
         {
             // Arrange
-            TestLogger logger = new TestLogger();
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
 
-            string localNuGetSourceDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGetSource");
-            string localNuGetDownloadDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGetDownload");
-            IPackageManager localNuGetSourceStore = CreatePackageManager(localNuGetSourceDir);
-            SetupTestGraph(localNuGetSourceStore, Node.Child2, Node.Grandchild2_1, Node.Grandchild2_2);
+            SetupTestGraph(CreatePackageManager(GetLocalNuGetSourceDir()), Node.Child2, Node.Grandchild2_1, Node.Grandchild2_2);
 
             // Act
-            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(logger, localNuGetSourceDir, localNuGetDownloadDir);
-            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Child2.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
 
             // Assert
@@ -197,17 +162,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_PackageNoAccept_MultipleLevelDependencies_SecondLevelDependencyRequiresAccept_Fails()
         {
             // Arrange
-            TestLogger logger = new TestLogger();
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
 
-            string localNuGetSourceDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGetSource");
-            string localNuGetDownloadDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGetDownload");
-            IPackageManager localNuGetSourceStore = CreatePackageManager(localNuGetSourceDir);
-            SetupTestGraph(localNuGetSourceStore, Node.Grandchild1_1);
+            SetupTestGraph(CreatePackageManager(GetLocalNuGetSourceDir()), Node.Grandchild1_1);
 
             // Act
-            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(logger, localNuGetSourceDir, localNuGetDownloadDir);
-            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Root.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
 
             // Assert
@@ -218,17 +178,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_PackageNoAccept_MultipleLevelDependencies_SecondLevelSecondDependencyRequiresAccept_Fails()
         {
             // Arrange
-            TestLogger logger = new TestLogger();
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
 
-            string localNuGetSourceDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGetSource");
-            string localNuGetDownloadDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGetDownload");
-            IPackageManager localNuGetSourceStore = CreatePackageManager(localNuGetSourceDir);
-            SetupTestGraph(localNuGetSourceStore, Node.Grandchild2_1);
+            SetupTestGraph(CreatePackageManager(GetLocalNuGetSourceDir()), Node.Grandchild2_1);
 
             // Act
-            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(logger, localNuGetSourceDir, localNuGetDownloadDir);
-            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Root.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
 
             // Assert
@@ -236,6 +191,13 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         }
 
         #region Private methods
+
+        private AnalyzerPluginGenerator CreateLocalNuGetPackageHander()
+        {
+            TestLogger logger = new TestLogger();
+            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(logger, GetLocalNuGetSourceDir(), GetLocalNuGetDownloadDir());
+            return new AnalyzerPluginGenerator(nuGetHandler, logger);
+        }
 
         /// <summary>
         /// Creates a graph used for testing, with nodes labelled in breadth-first order.
@@ -253,19 +215,16 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         private void SetupTestGraph(IPackageManager mgr, params Node[] nodesRequireLicense)
         {
             // leaf nodes
-            CreatePackage(mgr, IsLicenseRequiredFor(Node.Grandchild1_1, nodesRequireLicense), Node.Grandchild1_1.ToString());
-            CreatePackage(mgr, IsLicenseRequiredFor(Node.Grandchild2_1, nodesRequireLicense), Node.Grandchild2_1.ToString());
-            CreatePackage(mgr, IsLicenseRequiredFor(Node.Grandchild2_2, nodesRequireLicense), Node.Grandchild2_2.ToString());
+            CreatePackage(mgr, IsLicenseRequiredFor(Node.Grandchild1_1, nodesRequireLicense), Node.Grandchild1_1);
+            CreatePackage(mgr, IsLicenseRequiredFor(Node.Grandchild2_1, nodesRequireLicense), Node.Grandchild2_1);
+            CreatePackage(mgr, IsLicenseRequiredFor(Node.Grandchild2_2, nodesRequireLicense), Node.Grandchild2_2);
 
             // non-leaf nodes
-            CreatePackage(mgr, IsLicenseRequiredFor(Node.Child1, nodesRequireLicense), Node.Child1.ToString(),
-                Node.Grandchild1_1);
-            CreatePackage(mgr, IsLicenseRequiredFor(Node.Child2, nodesRequireLicense), Node.Child2.ToString(),
-                Node.Grandchild2_1, Node.Grandchild2_2);
+            CreatePackage(mgr, IsLicenseRequiredFor(Node.Child1, nodesRequireLicense), Node.Child1, Node.Grandchild1_1);
+            CreatePackage(mgr, IsLicenseRequiredFor(Node.Child2, nodesRequireLicense), Node.Child2, Node.Grandchild2_1, Node.Grandchild2_2);
 
             // root
-            CreatePackage(mgr, IsLicenseRequiredFor(Node.Root, nodesRequireLicense), Node.Root.ToString(),
-                Node.Child1, Node.Child2);
+            CreatePackage(mgr, IsLicenseRequiredFor(Node.Root, nodesRequireLicense), Node.Root, Node.Child1, Node.Child2);
         }
 
         private License IsLicenseRequiredFor(Node node, Node[] nodesRequireLicense)
@@ -281,14 +240,14 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             return mgr;
         }
 
-        private void CreatePackage(IPackageManager manager, License requiresLicenseAccept, string id, params Node[] dependencyNodes)
+        private void CreatePackage(IPackageManager manager, License requiresLicenseAccept, Node packageNode, params Node[] dependencyNodes)
         {
             PackageBuilder builder = new PackageBuilder();
             ManifestMetadata metadata = new ManifestMetadata()
             {
                 Authors = "dummy author",
                 Version = new SemanticVersion("1.0").ToString(),
-                Id = id,
+                Id = packageNode.ToString(),
                 Description = "dummy description",
                 LicenseUrl = "http://choosealicense.com/",
                 RequireLicenseAcceptance = (requiresLicenseAccept == License.Required)
@@ -324,13 +283,23 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             file.TargetPath = "dummy.txt";
             builder.Files.Add(file);
 
-            string fileName = id + "." + metadata.Version + ".nupkg";
+            string fileName = packageNode.ToString() + "." + metadata.Version + ".nupkg";
             string destinationName = Path.Combine(manager.LocalRepository.Source.ToString(), fileName);
             
             using (Stream fileStream = File.Open(destinationName, FileMode.OpenOrCreate))
             {
                 builder.Save(fileStream);
             }
+        }
+
+        private string GetLocalNuGetDownloadDir()
+        {
+            return TestUtils.EnsureTestDirectoryExists(this.TestContext, ".localNuGetDownload");
+        }
+
+        private string GetLocalNuGetSourceDir()
+        {
+            return TestUtils.EnsureTestDirectoryExists(this.TestContext, ".localNuGetSource");
         }
 
         #endregion

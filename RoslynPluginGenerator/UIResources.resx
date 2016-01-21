@@ -142,7 +142,7 @@
     <value>Looking for {0} analyzers</value>
   </data>
   <data name="APG_NGPackageRequiresLicenseAcceptance" xml:space="preserve">
-    <value>Package {0} (version {1})  requires the user to accept a license.</value>
+    <value>Package {0} (version {1}) requires the user to accept a license.</value>
   </data>
   <data name="APG_NoAnalyzersFound" xml:space="preserve">
     <value>No analyzers were found in the specified package</value>
