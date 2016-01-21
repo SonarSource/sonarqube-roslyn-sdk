@@ -21,14 +21,6 @@ namespace SonarQube.Plugins.Roslyn
         private readonly string localCacheRoot;
         private readonly Common.ILogger logger;
 
-        string INuGetPackageHandler.LocalCacheRoot
-        {
-            get
-            {
-                return localCacheRoot;
-            }
-        }
-
         private class NuGetLoggerAdapter : NuGet.ILogger
         {
             private readonly Common.ILogger logger;
@@ -67,15 +59,20 @@ namespace SonarQube.Plugins.Roslyn
                 return FileConflictResolution.Ignore;
             }
         }
-        public NuGetPackageHandler(Common.ILogger logger, string remotePackageSource) : this(logger, remotePackageSource, null)
+
+        public NuGetPackageHandler(string remotePackageSource, Common.ILogger logger) : this(remotePackageSource, Utilities.CreateTempDirectory(".nuget"), logger)
         {
         }
 
-        public /* for test */ NuGetPackageHandler(Common.ILogger logger, string remotePackageSource, string localPackageDestination)
+        public /* for test */ NuGetPackageHandler(string remotePackageSource, string localPackageDestination, Common.ILogger logger)
         {
             if (string.IsNullOrWhiteSpace(remotePackageSource))
             {
                 throw new ArgumentNullException("packageSource");
+            }
+            if (string.IsNullOrWhiteSpace(localPackageDestination))
+            {
+                throw new ArgumentNullException("localPackageDestination");
             }
             if (logger == null)
             {
@@ -84,13 +81,16 @@ namespace SonarQube.Plugins.Roslyn
 
             this.logger = logger;
             this.packageSource = remotePackageSource;
-            if (localPackageDestination != null)
+            this.localCacheRoot = localPackageDestination;
+        }
+
+        #region INuGetPackageHandler
+
+        public string LocalCacheRoot
+        {
+            get
             {
-                this.localCacheRoot = localPackageDestination;
-            }
-            else
-            {
-                this.localCacheRoot = Utilities.CreateTempDirectory(".nuget");
+                return localCacheRoot;
             }
         }
 
@@ -135,6 +135,8 @@ namespace SonarQube.Plugins.Roslyn
 
             return package;
         }
+
+        #endregion
 
         private IPackage TryGetPackage(IPackageRepository repository, string packageId, SemanticVersion packageVersion)
         {

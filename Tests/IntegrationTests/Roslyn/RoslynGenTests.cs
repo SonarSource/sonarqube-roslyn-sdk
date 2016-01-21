@@ -39,7 +39,7 @@ namespace SonarQube.Plugins.IntegrationTests
             AddPackage(localNuGetStore, packageId, "1.0.2", analyzer.GetType().Assembly.Location);
 
             // Act
-            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(logger, localNuGetDir);
+            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(localNuGetDir, logger);
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(packageId, new SemanticVersion("1.0.2")), "cs", null, outputDir);
 

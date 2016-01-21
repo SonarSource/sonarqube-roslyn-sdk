@@ -28,16 +28,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_PackageNoAccept_NoDependencies_Succeeds()
         {
             // Arrange
-            TestLogger logger = new TestLogger();
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");            
-            string localNuGetSourceDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGetSource");
-            string localNuGetDownloadDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGetDownload");
+            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
 
-            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(logger, localNuGetSourceDir, localNuGetDownloadDir);
-            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
-
-            IPackageManager localNuGetSourceStore = CreatePackageManager(localNuGetSourceDir);
-            SetupTestGraph(localNuGetSourceStore);
+            SetupTestGraph();
 
             // Act
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Grandchild1_1.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
@@ -47,13 +41,13 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         }
 
         [TestMethod]
-        public void Generate_PackageNoAccept_MultipleLevelDependencies_DependenciesNoAccept_Succeeds()
+        public void Generate_PackageNoAccept_MultiLevel_DependenciesNoAccept_Succeeds()
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
             AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
 
-            SetupTestGraph(CreatePackageManager(GetLocalNuGetSourceDir()));
+            SetupTestGraph();
 
             // Act
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Root.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
@@ -69,7 +63,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
             AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
 
-            SetupTestGraph(CreatePackageManager(GetLocalNuGetSourceDir()), Node.Grandchild1_1);
+            SetupTestGraph(Node.Grandchild1_1);
 
             // Act
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Grandchild1_1.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
@@ -85,7 +79,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
             AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
 
-            SetupTestGraph(CreatePackageManager(GetLocalNuGetSourceDir()), Node.Grandchild1_1);
+            SetupTestGraph(Node.Grandchild1_1);
 
             // Act
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Child1.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
@@ -101,7 +95,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
             AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
 
-            SetupTestGraph(CreatePackageManager(GetLocalNuGetSourceDir()), Node.Child1, Node.Grandchild1_1);
+            SetupTestGraph(Node.Child1, Node.Grandchild1_1);
 
             // Act
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Child1.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
@@ -117,7 +111,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
             AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
 
-            SetupTestGraph(CreatePackageManager(GetLocalNuGetSourceDir()), Node.Grandchild2_1);
+            SetupTestGraph(Node.Grandchild2_1);
 
             // Act
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Child2.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
@@ -133,7 +127,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
             AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
 
-            SetupTestGraph(CreatePackageManager(GetLocalNuGetSourceDir()), Node.Grandchild2_2);
+            SetupTestGraph(Node.Grandchild2_2);
 
             // Act
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Child2.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
@@ -149,7 +143,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
             AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
 
-            SetupTestGraph(CreatePackageManager(GetLocalNuGetSourceDir()), Node.Child2, Node.Grandchild2_1, Node.Grandchild2_2);
+            SetupTestGraph(Node.Child2, Node.Grandchild2_1, Node.Grandchild2_2);
 
             // Act
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Child2.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
@@ -159,13 +153,13 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         }
 
         [TestMethod]
-        public void Generate_PackageNoAccept_MultipleLevelDependencies_SecondLevelDependencyRequiresAccept_Fails()
+        public void Generate_PackageNoAccept_MultiLevel_SecondLevelDependencyRequiresAccept_Fails()
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
             AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
 
-            SetupTestGraph(CreatePackageManager(GetLocalNuGetSourceDir()), Node.Grandchild1_1);
+            SetupTestGraph(Node.Grandchild1_1);
 
             // Act
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Root.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
@@ -175,13 +169,13 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         }
 
         [TestMethod]
-        public void Generate_PackageNoAccept_MultipleLevelDependencies_SecondLevelSecondDependencyRequiresAccept_Fails()
+        public void Generate_PackageNoAccept_MultiLevel_SecondLevelSecondDependencyRequiresAccept_Fails()
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
             AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
 
-            SetupTestGraph(CreatePackageManager(GetLocalNuGetSourceDir()), Node.Grandchild2_1);
+            SetupTestGraph(Node.Grandchild2_1);
 
             // Act
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Root.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
@@ -195,7 +189,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         private AnalyzerPluginGenerator CreateLocalNuGetPackageHander()
         {
             TestLogger logger = new TestLogger();
-            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(logger, GetLocalNuGetSourceDir(), GetLocalNuGetDownloadDir());
+            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(GetLocalNuGetSourceDir(), GetLocalNuGetDownloadDir(), logger);
             return new AnalyzerPluginGenerator(nuGetHandler, logger);
         }
 
@@ -212,35 +206,36 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         /// <param name="nodesRequireLicense">
         /// Nodes in the graph that should be packages with the field requireLicenseAccept set to true
         /// </param>
-        private void SetupTestGraph(IPackageManager mgr, params Node[] nodesRequireLicense)
+        private void SetupTestGraph(params Node[] nodesRequireLicense)
         {
+            string packageSource = GetLocalNuGetSourceDir();
+            IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository(packageSource);
+            PackageManager mgr = new PackageManager(repo, packageSource);
+
             // leaf nodes
-            CreatePackage(mgr, IsLicenseRequiredFor(Node.Grandchild1_1, nodesRequireLicense), Node.Grandchild1_1);
-            CreatePackage(mgr, IsLicenseRequiredFor(Node.Grandchild2_1, nodesRequireLicense), Node.Grandchild2_1);
-            CreatePackage(mgr, IsLicenseRequiredFor(Node.Grandchild2_2, nodesRequireLicense), Node.Grandchild2_2);
+            CreatePackage(mgr, Node.Grandchild1_1, nodesRequireLicense);
+            CreatePackage(mgr, Node.Grandchild2_1, nodesRequireLicense);
+            CreatePackage(mgr, Node.Grandchild2_2, nodesRequireLicense);
 
             // non-leaf nodes
-            CreatePackage(mgr, IsLicenseRequiredFor(Node.Child1, nodesRequireLicense), Node.Child1, Node.Grandchild1_1);
-            CreatePackage(mgr, IsLicenseRequiredFor(Node.Child2, nodesRequireLicense), Node.Child2, Node.Grandchild2_1, Node.Grandchild2_2);
+            CreatePackage(mgr, Node.Child1, nodesRequireLicense, Node.Grandchild1_1);
+            CreatePackage(mgr, Node.Child2, nodesRequireLicense, Node.Grandchild2_1, Node.Grandchild2_2);
 
             // root
-            CreatePackage(mgr, IsLicenseRequiredFor(Node.Root, nodesRequireLicense), Node.Root, Node.Child1, Node.Child2);
+            CreatePackage(mgr, Node.Root, nodesRequireLicense, Node.Child1, Node.Child2);
+        }
+
+        private void CreatePackage(IPackageManager manager, Node packageNode, Node[] nodesRequireLicense, params Node[] dependencyNodes)
+        {
+            CreatePackage(manager, packageNode, IsLicenseRequiredFor(packageNode, nodesRequireLicense), dependencyNodes);
         }
 
         private License IsLicenseRequiredFor(Node node, Node[] nodesRequireLicense)
         {
             return nodesRequireLicense.Contains(node) ? License.Required : License.NotRequired;
         }
-
-        private IPackageManager CreatePackageManager(string packageSource)
-        {
-            IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository(packageSource);
-            PackageManager mgr = new PackageManager(repo, packageSource);
-
-            return mgr;
-        }
-
-        private void CreatePackage(IPackageManager manager, License requiresLicenseAccept, Node packageNode, params Node[] dependencyNodes)
+        
+        private void CreatePackage(IPackageManager manager, Node packageNode, License requiresLicenseAccept, params Node[] dependencyNodes)
         {
             PackageBuilder builder = new PackageBuilder();
             ManifestMetadata metadata = new ManifestMetadata()

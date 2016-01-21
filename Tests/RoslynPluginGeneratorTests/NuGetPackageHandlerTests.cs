@@ -43,7 +43,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             BuildTestPackages(true, true);
 
             TestLogger logger = new TestLogger();
-            NuGetPackageHandler handler = new NuGetPackageHandler(logger, testDir, testDownloadDir);
+            NuGetPackageHandler handler = new NuGetPackageHandler(testDir, testDownloadDir, logger);
 
             // Act
             // Attempt to download a package which is released with a dependency that is released
@@ -67,7 +67,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             BuildTestPackages(false, true);
 
             TestLogger logger = new TestLogger();
-            NuGetPackageHandler handler = new NuGetPackageHandler(logger, testDir, testDownloadDir);
+            NuGetPackageHandler handler = new NuGetPackageHandler(testDir, testDownloadDir, logger);
 
             // Act
             // Attempt to download a package which is not released with a dependency that is released
@@ -91,7 +91,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             BuildTestPackages(false, false);
 
             TestLogger logger = new TestLogger();
-            NuGetPackageHandler handler = new NuGetPackageHandler(logger, testDir, testDownloadDir);
+            NuGetPackageHandler handler = new NuGetPackageHandler(testDir, testDownloadDir, logger);
 
             // Act
             // Attempt to download a package which is not released with a dependency that is not released
@@ -120,7 +120,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             BuildAndInstallPackage(mgr, "package.id.1", "0.9.0");
             BuildAndInstallPackage(mgr, "package.id.1", "1.0.0");
 
-            NuGetPackageHandler handler = new NuGetPackageHandler(new TestLogger(), sourceNuGetRoot);
+            NuGetPackageHandler handler = new NuGetPackageHandler(sourceNuGetRoot, new TestLogger());
 
             // Check for specific versions
             IPackage actual = handler.FetchPackage("package.id.1", new SemanticVersion("0.8.0"));
@@ -147,7 +147,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             BuildAndInstallPackage(mgr, "package.id.1", "1.1.0-rc1");
             BuildAndInstallPackage(mgr, "dummy.package.1", "2.0.0");
 
-            NuGetPackageHandler handler = new NuGetPackageHandler(new TestLogger(), sourceNuGetRoot);
+            NuGetPackageHandler handler = new NuGetPackageHandler(sourceNuGetRoot, new TestLogger());
 
             // Act
             IPackage actual = handler.FetchPackage("package.id.1", null);
@@ -170,7 +170,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             BuildAndInstallPackage(mgr, "dummy.package.1", "2.0.0");
             BuildAndInstallPackage(mgr, "dummy.package.1", "2.0.0-rc2");
 
-            NuGetPackageHandler handler = new NuGetPackageHandler(new TestLogger(), sourceNuGetRoot);
+            NuGetPackageHandler handler = new NuGetPackageHandler(sourceNuGetRoot, new TestLogger());
 
             // Act
             IPackage actual = handler.FetchPackage("package.id.1", null);
@@ -190,7 +190,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             BuildAndInstallPackage(mgr, "package.id.1", "0.8.0");
             BuildAndInstallPackage(mgr, "package.id.1", "0.9.0");
 
-            NuGetPackageHandler handler = new NuGetPackageHandler(new TestLogger(), sourceNuGetRoot);
+            NuGetPackageHandler handler = new NuGetPackageHandler(sourceNuGetRoot, new TestLogger());
 
             // 1. Package id not found
             IPackage actual = handler.FetchPackage("unknown.package.id", new SemanticVersion("0.8.0"));
