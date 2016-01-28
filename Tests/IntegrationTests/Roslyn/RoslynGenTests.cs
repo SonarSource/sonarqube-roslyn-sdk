@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NuGet;
 using SonarQube.Plugins.Roslyn;
 using SonarQube.Plugins.Test.Common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -36,7 +37,7 @@ namespace SonarQube.Plugins.IntegrationTests
             string packageId = "analyzer1.pkgid1";
             string localNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGet");
             IPackageManager localNuGetStore = CreatePackageManager(localNuGetDir);
-            AddPackage(localNuGetStore, packageId, "1.0.2", analyzer.GetType().Assembly.Location);
+            IPackage analyzerPkg =  AddPackage(localNuGetStore, packageId, "1.0.2", analyzer.GetType().Assembly.Location);
 
             // Act
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(localNuGetDir, logger);
@@ -57,6 +58,9 @@ namespace SonarQube.Plugins.IntegrationTests
             Assert.IsNotNull(jarInfo, "Failed to process the generated jar successfully");
 
             AssertExpectedManifestValue(WellKnownPluginProperties.Key, "analyzer1.pkgid1", jarInfo);
+
+            // Check that NuGet package properties have been correctly mapped to the plugin manifest
+            AssertPackagePropertiesInManifest(analyzerPkg, jarInfo);
 
             // Check for the expected property values required by the C# plugin
             AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.analyzerId", "analyzer1.pkgid1", jarInfo);
@@ -90,27 +94,33 @@ namespace SonarQube.Plugins.IntegrationTests
             return mgr;
         }
 
-        private void AddPackage(IPackageManager manager, string id, string version, string payloadAssemblyFilePath)
+        private IPackage AddPackage(IPackageManager manager, string id, string version, string payloadAssemblyFilePath)
         {
             PackageBuilder builder = new PackageBuilder();
             builder.Id = id;
+            builder.Title = "dummy title";
             builder.Version = new SemanticVersion(version);
             builder.Description = "dummy description";
             builder.Authors.Add("dummy author");
+            builder.Owners.Add("dummy owner");
+            builder.ProjectUrl = new System.Uri("http://dummyurl/");
 
             PhysicalPackageFile file = new PhysicalPackageFile();
             file.SourcePath = payloadAssemblyFilePath;
             file.TargetPath = "analyzers/" + Path.GetFileName(payloadAssemblyFilePath);
             builder.Files.Add(file);
 
+            ZipPackage pkg;
             using (MemoryStream stream = new MemoryStream())
             {
                 builder.Save(stream);
                 stream.Position = 0;
 
-                ZipPackage pkg = new ZipPackage(stream);
+                pkg = new ZipPackage(stream);
                 manager.InstallPackage(pkg, true, true);
             }
+
+            return pkg;
         }
 
         #endregion
@@ -194,6 +204,17 @@ namespace SonarQube.Plugins.IntegrationTests
             Assert.AreEqual(descriptor.Title.ToString(), actual.Name, "Unexpected rule name");
             Assert.AreEqual(descriptor.Id, actual.Key, "Unexpected rule key");
             AssertPropertyHasValue(actual.Severity, "Severity");
+        }
+
+        private static void AssertPackagePropertiesInManifest(IPackage package, JarInfo jarInfo)
+        {            
+            AssertExpectedManifestValue("Plugin-Key", package.Id, jarInfo);
+            AssertExpectedManifestValue("Plugin-Name", package.Title, jarInfo);
+            AssertExpectedManifestValue("Plugin-Version", package.Version.ToString(), jarInfo);
+            AssertExpectedManifestValue("Plugin-Description", package.Description, jarInfo);
+            AssertExpectedManifestValue("Plugin-Organization", String.Join(", ", package.Owners), jarInfo);
+            AssertExpectedManifestValue("Plugin-Homepage", package.ProjectUrl.ToString(), jarInfo);
+            AssertExpectedManifestValue("Plugin-Developers", String.Join(", ", package.Authors), jarInfo);
         }
 
         private static void AssertExpectedManifestValue(string propertyName, string expectedValue, JarInfo jarInfo)

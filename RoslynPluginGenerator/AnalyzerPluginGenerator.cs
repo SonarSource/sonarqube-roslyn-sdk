@@ -195,11 +195,6 @@ namespace SonarQube.Plugins.Roslyn
             pluginDefn.Organization = GetValidManifestString(ListToString(package.Owners));
             pluginDefn.Version = GetValidManifestString(package.Version.ToNormalizedString());
 
-            //pluginDefn.IssueTrackerUrl
-            //pluginDefn.License;
-            //pluginDefn.SourcesUrl;
-            //pluginDefn.TermsConditionsUrl;
-
             return pluginDefn;
         }
 
