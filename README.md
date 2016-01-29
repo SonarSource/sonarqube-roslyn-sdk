@@ -47,3 +47,18 @@ e.g. Wintellect.Analyzers-plugin-1.0.5.jar
 The generated jar can be installed to SonarQube as normal (e.g. by dropping it in the SonarQube server *extensions\plugins* folder and restarting the SonarQube server).
 You will see a new repository containing all of the rules defined by the analyzer. The rules can be added to Quality Profiles just like any other SonarQube rule.
 
+#### NuGet packing information:
+
+The SDK uses information from NuGet to populate relevant fields in the generated plugin. The following NuGet properties are mapped:    
+
+| NuGet property | Plugin property |
+|---|---|
+| title | Name |
+| description | Description |
+| version | Version |
+| authors | Developers |
+| owners | Organisation |
+| projectUrl | Homepage |
+| id | Key* |    
+
+\* This property is not visible to users, but must be unique.

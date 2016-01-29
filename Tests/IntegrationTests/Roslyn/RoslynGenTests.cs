@@ -101,8 +101,13 @@ namespace SonarQube.Plugins.IntegrationTests
             builder.Title = "dummy title";
             builder.Version = new SemanticVersion(version);
             builder.Description = "dummy description";
-            builder.Authors.Add("dummy author");
-            builder.Owners.Add("dummy owner");
+
+            builder.Authors.Add("dummy author 1");
+            builder.Authors.Add("dummy author 2");
+
+            builder.Owners.Add("dummy owner 1");
+            builder.Owners.Add("dummy owner 2");
+
             builder.ProjectUrl = new System.Uri("http://dummyurl/");
 
             PhysicalPackageFile file = new PhysicalPackageFile();
@@ -110,17 +115,16 @@ namespace SonarQube.Plugins.IntegrationTests
             file.TargetPath = "analyzers/" + Path.GetFileName(payloadAssemblyFilePath);
             builder.Files.Add(file);
 
-            ZipPackage pkg;
             using (MemoryStream stream = new MemoryStream())
             {
                 builder.Save(stream);
                 stream.Position = 0;
 
-                pkg = new ZipPackage(stream);
+                ZipPackage pkg = new ZipPackage(stream);
                 manager.InstallPackage(pkg, true, true);
-            }
 
-            return pkg;
+                return pkg;
+            }
         }
 
         #endregion
@@ -212,9 +216,9 @@ namespace SonarQube.Plugins.IntegrationTests
             AssertExpectedManifestValue("Plugin-Name", package.Title, jarInfo);
             AssertExpectedManifestValue("Plugin-Version", package.Version.ToString(), jarInfo);
             AssertExpectedManifestValue("Plugin-Description", package.Description, jarInfo);
-            AssertExpectedManifestValue("Plugin-Organization", String.Join(", ", package.Owners), jarInfo);
+            AssertExpectedManifestValue("Plugin-Organization", String.Join(",", package.Owners), jarInfo);
             AssertExpectedManifestValue("Plugin-Homepage", package.ProjectUrl.ToString(), jarInfo);
-            AssertExpectedManifestValue("Plugin-Developers", String.Join(", ", package.Authors), jarInfo);
+            AssertExpectedManifestValue("Plugin-Developers", String.Join(",", package.Authors), jarInfo);
         }
 
         private static void AssertExpectedManifestValue(string propertyName, string expectedValue, JarInfo jarInfo)
