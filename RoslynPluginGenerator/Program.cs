@@ -4,8 +4,9 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
-using SonarQube.Plugins.Roslyn.CommandLine;
+using NuGet;
 using SonarQube.Plugins.Common;
+using SonarQube.Plugins.Roslyn.CommandLine;
 
 namespace SonarQube.Plugins.Roslyn
 {
@@ -20,14 +21,18 @@ namespace SonarQube.Plugins.Roslyn
         static int Main(string[] args)
         {
             ConsoleLogger logger = new ConsoleLogger();
-            Common.Utilities.LogAssemblyVersion(typeof(Program).Assembly, UIResources.AssemblyDescription, logger);
+            Utilities.LogAssemblyVersion(typeof(Program).Assembly, UIResources.AssemblyDescription, logger);
             
             ProcessedArgs processedArgs = ArgumentProcessor.TryProcessArguments(args, logger);
 
             bool success = false;
             if (processedArgs != null)
             {
-                NuGetPackageHandler packageHandler = new NuGetPackageHandler(logger);
+                ISettings nuGetSettings = NuGetRepositoryFactory.GetSettingsFromConfigFiles();
+                IPackageRepository repo = NuGetRepositoryFactory.CreateRepository(nuGetSettings, logger);
+                string localNuGetCache = Utilities.CreateTempDirectory(".nuget");
+                NuGetPackageHandler packageHandler = new NuGetPackageHandler(repo, localNuGetCache, logger);
+
                 AnalyzerPluginGenerator generator = new AnalyzerPluginGenerator(packageHandler, logger);
                 success = generator.Generate(processedArgs.AnalyzerRef, processedArgs.Language, processedArgs.SqaleFilePath,
                     System.IO.Directory.GetCurrentDirectory());

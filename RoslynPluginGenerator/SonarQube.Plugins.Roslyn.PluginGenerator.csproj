@@ -121,6 +121,7 @@
       <DependentUpon>CmdLineResources.resx</DependentUpon>
     </Compile>
     <Compile Include="NuGet\NuGetPackageHandler.cs" />
+    <Compile Include="NuGet\NuGetRepositoryFactory.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AnalyzerPluginGenerator.cs" />

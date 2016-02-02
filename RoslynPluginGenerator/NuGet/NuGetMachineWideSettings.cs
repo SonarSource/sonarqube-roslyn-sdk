@@ -16,16 +16,27 @@ namespace SonarQube.Plugins.Roslyn
     /// Returns any settings in the standard machine-wide NuGet settings folders, together
     /// with any that exist in the "SonarQube" sub-directory
     /// </summary>
-    internal class NuGetMachineWideSettings : IMachineWideSettings
+    public class NuGetMachineWideSettings : IMachineWideSettings
     {
-        private const string ConfigDir = "SonarQube";
+        public const string SonarQubeConfigSubDirName = "SonarQube";
 
         private readonly Settings[] machineSettings;
 
         public NuGetMachineWideSettings()
+            : this(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData))
         {
-            string baseDir = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            this.machineSettings = Settings.LoadMachineWideSettings(new PhysicalFileSystem(baseDir), ConfigDir).ToArray();
+        }
+
+        /// <summary>
+        /// Constructor used for testing
+        /// </summary>
+        public NuGetMachineWideSettings(string baseDir)
+        {
+            if (string.IsNullOrWhiteSpace(baseDir))
+            {
+                throw new ArgumentNullException("baseDir");
+            }
+            this.machineSettings = Settings.LoadMachineWideSettings(new PhysicalFileSystem(baseDir), SonarQubeConfigSubDirName).ToArray();
         }
 
         #region IMachineWideSettings methods

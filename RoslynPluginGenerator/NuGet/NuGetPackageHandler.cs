@@ -5,7 +5,6 @@
 // </copyright>
 //-----------------------------------------------------------------------
 using NuGet;
-using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,52 +20,13 @@ namespace SonarQube.Plugins.Roslyn
         private readonly string localCacheRoot;
         private readonly Common.ILogger logger;
 
-        public static IPackageRepository GetRepositoryFromConfigFiles(Common.ILogger logger)
-        {
-            if (logger == null)
-            {
-                throw new ArgumentNullException("logger");
-            }
-
-            // Load the user and machine-wide settings
-            logger.LogDebug(UIResources.NG_FetchingConfigFiles);
-
-            NuGetMachineWideSettings machineSettings = new NuGetMachineWideSettings();
-            ISettings settings = Settings.LoadDefaultSettings(null, null, machineSettings);
-           
-            // Get a package source provider that can use the settings
-            PackageSourceProvider packageSourceProvider = new PackageSourceProvider(settings);
-
-            logger.LogDebug(UIResources.NG_ListingEnablePackageSources);
-            IEnumerable<PackageSource> enabledSources = packageSourceProvider.GetEnabledPackageSources();
-            if (!enabledSources.Any())
-            {
-                logger.LogWarning(UIResources.NG_NoEnabledPackageSources);
-            }
-            else
-            {
-                foreach (PackageSource enabledSource in enabledSources)
-                {
-                    logger.LogDebug(UIResources.NG_ListEnabledPackageSource, enabledSource.Source, enabledSource.IsMachineWide);
-                }
-            }
-            // Create an aggregate repository that uses all of the configured sources
-            AggregateRepository aggRepo = packageSourceProvider.CreateAggregateRepository(PackageRepositoryFactory.Default, true /* ignore failing repos */ );
-
-            return aggRepo;
-        }
-
-        public NuGetPackageHandler(Common.ILogger logger) : this(GetRepositoryFromConfigFiles(logger), Utilities.CreateTempDirectory(".nuget"), logger)
-        {
-        }
-
-        public /* for test */ NuGetPackageHandler(IPackageRepository remoteRepository, string localPackageDestination, Common.ILogger logger)
+        public NuGetPackageHandler(IPackageRepository remoteRepository, string localCacheRoot, Common.ILogger logger)
         {
             if (remoteRepository == null)
             {
                 throw new ArgumentNullException("remoteRepository");
             }
-            if (string.IsNullOrWhiteSpace(localPackageDestination))
+            if (string.IsNullOrWhiteSpace(localCacheRoot))
             {
                 throw new ArgumentNullException("localPackageDestination");
             }
@@ -77,7 +37,7 @@ namespace SonarQube.Plugins.Roslyn
 
             this.logger = logger;
             this.remoteRepository = remoteRepository;
-            this.localCacheRoot = localPackageDestination;
+            this.localCacheRoot = localCacheRoot;
         }
 
         #region INuGetPackageHandler
