@@ -131,52 +131,5 @@ namespace SonarQube.Plugins.Common {
                 return ResourceManager.GetString("Resolver_UnspecifiedRequestingAssembly", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not instantiate analyzers from &apos;{0}&apos;. 
-        ///
-        ///Error: {1}.
-        /// </summary>
-        internal static string Scanner_AnalyzerInstantiationFail {
-            get {
-                return ResourceManager.GetString("Scanner_AnalyzerInstantiationFail", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Loaded analyzer: {0}.
-        /// </summary>
-        internal static string Scanner_AnalyzerLoaded {
-            get {
-                return ResourceManager.GetString("Scanner_AnalyzerLoaded", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Loaded: {0} analyzers..
-        /// </summary>
-        internal static string Scanner_AnalyzersLoadSuccess {
-            get {
-                return ResourceManager.GetString("Scanner_AnalyzersLoadSuccess", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Loaded assembly: {0}.
-        /// </summary>
-        internal static string Scanner_AssemblyLoadSuccess {
-            get {
-                return ResourceManager.GetString("Scanner_AssemblyLoadSuccess", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to No analyzers found in assembly..
-        /// </summary>
-        internal static string Scanner_NoAnalyzers {
-            get {
-                return ResourceManager.GetString("Scanner_NoAnalyzers", resourceCulture);
-            }
-        }
     }
 }
