@@ -35,12 +35,14 @@ namespace SonarQube.Plugins.IntegrationTests
             ExampleAnalyzer1.CSharpAnalyzer analyzer = new ExampleAnalyzer1.CSharpAnalyzer();
 
             string packageId = "analyzer1.pkgid1";
-            string localNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".localNuGet");
-            IPackageManager localNuGetStore = CreatePackageManager(localNuGetDir);
-            IPackage analyzerPkg =  AddPackage(localNuGetStore, packageId, "1.0.2", analyzer.GetType().Assembly.Location);
+            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".fakeRemoteNuGet");
+            IPackageManager fakeRemotePkgMgr = CreatePackageManager(fakeRemoteNuGetDir);
+            IPackage analyzerPkg =  AddPackage(fakeRemotePkgMgr, packageId, "1.0.2", analyzer.GetType().Assembly.Location);
+
+            string localPackageDestination = TestUtils.CreateTestDirectory(this.TestContext, ".localpackages");
 
             // Act
-            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(localNuGetDir, logger);
+            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
             bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(packageId, new SemanticVersion("1.0.2")), "cs", null, outputDir);
 

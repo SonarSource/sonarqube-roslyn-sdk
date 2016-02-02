@@ -71,7 +71,7 @@ namespace SonarQube.Plugins.Roslyn
                     }
                     else
                     {
-                        this.logger.LogError(UIResources.Scanner_NoAnalyzers);
+                        this.logger.LogWarning(UIResources.Scanner_NoAnalyzers, analyzerAssembly.ToString());
                     }
                 }
                 catch (Exception ex)

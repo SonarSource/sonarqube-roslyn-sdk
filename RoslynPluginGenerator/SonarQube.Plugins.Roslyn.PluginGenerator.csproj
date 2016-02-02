@@ -111,14 +111,16 @@
     <Compile Include="DiagnosticAssemblyScanner.cs" />
     <Compile Include="Interfaces\INuGetPackageHandler.cs" />
     <Compile Include="Interfaces\IRuleGenerator.cs" />
-    <Compile Include="NuGetReference.cs" />
+    <Compile Include="NuGet\NuGetLoggerAdapter.cs" />
+    <Compile Include="NuGet\NuGetMachineWideSettings.cs" />
+    <Compile Include="NuGet\NuGetReference.cs" />
     <Compile Include="CommandLine\ProcessedArgs.cs" />
     <Compile Include="CommandLine\CmdLineResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>CmdLineResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="NuGetPackageHandler.cs" />
+    <Compile Include="NuGet\NuGetPackageHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AnalyzerPluginGenerator.cs" />

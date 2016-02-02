@@ -186,11 +186,27 @@ Check that there are released versions of the package, or specify a pre-release 
   <data name="NG_ExtractingFile" xml:space="preserve">
     <value>Extracting file '{0}' to {1}</value>
   </data>
+  <data name="NG_FetchingConfigFiles" xml:space="preserve">
+    <value>Fetching NuGet config files...</value>
+  </data>
+  <data name="NG_FileConflictOccurred" xml:space="preserve">
+    <value>NuGet file conflict occurred: {0}
+The conflict will be ignored.</value>
+  </data>
   <data name="NG_IsLatestPackageVersionSuffix" xml:space="preserve">
     <value>- latest version</value>
   </data>
+  <data name="NG_ListEnabledPackageSource" xml:space="preserve">
+    <value>    {0}, machine-wide: {1}</value>
+  </data>
+  <data name="NG_ListingEnablePackageSources" xml:space="preserve">
+    <value>Enabled package sources:</value>
+  </data>
   <data name="NG_LocatingPackages" xml:space="preserve">
     <value>Attempting to locate package with id '{0}'</value>
+  </data>
+  <data name="NG_NoEnabledPackageSources" xml:space="preserve">
+    <value>No enabled package sources. Please update the NuGet config to specify at least one valid package source.</value>
   </data>
   <data name="NG_NumberOfPackagesLocated" xml:space="preserve">
     <value>Number of packages located: {0}</value>
@@ -234,6 +250,6 @@ Error: {1}</value>
     <value>Loaded assembly: {0}</value>
   </data>
   <data name="Scanner_NoAnalyzers" xml:space="preserve">
-    <value>No analyzers found in assembly.</value>
+    <value>No analyzers found in assembly {0}</value>
   </data>
 </root>

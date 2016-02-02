@@ -17,58 +17,54 @@ namespace SonarQube.Plugins.Roslyn
 {
     public class NuGetPackageHandler : INuGetPackageHandler
     {
-        private readonly string packageSource;
+        private readonly IPackageRepository remoteRepository;
         private readonly string localCacheRoot;
         private readonly Common.ILogger logger;
 
-        private class NuGetLoggerAdapter : NuGet.ILogger
+        public static IPackageRepository GetRepositoryFromConfigFiles(Common.ILogger logger)
         {
-            private readonly Common.ILogger logger;
-
-            public NuGetLoggerAdapter(Common.ILogger logger)
+            if (logger == null)
             {
-                if (logger == null)
-                {
-                    throw new ArgumentNullException("logger");
-                }
-                this.logger = logger;
+                throw new ArgumentNullException("logger");
             }
 
-            public void Log(MessageLevel level, string message, params object[] args)
+            // Load the user and machine-wide settings
+            logger.LogDebug(UIResources.NG_FetchingConfigFiles);
+
+            NuGetMachineWideSettings machineSettings = new NuGetMachineWideSettings();
+            ISettings settings = Settings.LoadDefaultSettings(null, null, machineSettings);
+           
+            // Get a package source provider that can use the settings
+            PackageSourceProvider packageSourceProvider = new PackageSourceProvider(settings);
+
+            logger.LogDebug(UIResources.NG_ListingEnablePackageSources);
+            IEnumerable<PackageSource> enabledSources = packageSourceProvider.GetEnabledPackageSources();
+            if (!enabledSources.Any())
             {
-                switch (level)
+                logger.LogWarning(UIResources.NG_NoEnabledPackageSources);
+            }
+            else
+            {
+                foreach (PackageSource enabledSource in enabledSources)
                 {
-                    case MessageLevel.Debug:
-                        this.logger.LogDebug(message, args);
-                        break;
-                    case MessageLevel.Error:
-                        this.logger.LogError(message, args);
-                        break;
-                    case MessageLevel.Warning:
-                        this.logger.LogWarning(message, args);
-                        break;
-                    default:
-                        this.logger.LogInfo(message, args);
-                        break;
+                    logger.LogDebug(UIResources.NG_ListEnabledPackageSource, enabledSource.Source, enabledSource.IsMachineWide);
                 }
             }
+            // Create an aggregate repository that uses all of the configured sources
+            AggregateRepository aggRepo = packageSourceProvider.CreateAggregateRepository(PackageRepositoryFactory.Default, true /* ignore failing repos */ );
 
-            public FileConflictResolution ResolveFileConflict(string message)
-            {
-                this.logger.LogInfo("NuGet: ResolveFileConflict: {0}", message);
-                return FileConflictResolution.Ignore;
-            }
+            return aggRepo;
         }
 
-        public NuGetPackageHandler(string remotePackageSource, Common.ILogger logger) : this(remotePackageSource, Utilities.CreateTempDirectory(".nuget"), logger)
+        public NuGetPackageHandler(Common.ILogger logger) : this(GetRepositoryFromConfigFiles(logger), Utilities.CreateTempDirectory(".nuget"), logger)
         {
         }
 
-        public /* for test */ NuGetPackageHandler(string remotePackageSource, string localPackageDestination, Common.ILogger logger)
+        public /* for test */ NuGetPackageHandler(IPackageRepository remoteRepository, string localPackageDestination, Common.ILogger logger)
         {
-            if (string.IsNullOrWhiteSpace(remotePackageSource))
+            if (remoteRepository == null)
             {
-                throw new ArgumentNullException("packageSource");
+                throw new ArgumentNullException("remoteRepository");
             }
             if (string.IsNullOrWhiteSpace(localPackageDestination))
             {
@@ -80,7 +76,7 @@ namespace SonarQube.Plugins.Roslyn
             }
 
             this.logger = logger;
-            this.packageSource = remotePackageSource;
+            this.remoteRepository = remoteRepository;
             this.localCacheRoot = localPackageDestination;
         }
 
@@ -109,16 +105,13 @@ namespace SonarQube.Plugins.Roslyn
                 throw new ArgumentNullException("logger");
             }
 
-            logger.LogDebug(UIResources.NG_CreatingRepository, this.packageSource);
-            IPackageRepository repository = PackageRepositoryFactory.Default.CreateRepository(packageSource);
-
-            IPackage package = TryGetPackage(repository, packageId, version);
+            IPackage package = TryGetPackage(this.remoteRepository, packageId, version);
 
             if (package != null)
             {
                 Directory.CreateDirectory(localCacheRoot);
 
-                IPackageManager manager = new PackageManager(repository, localCacheRoot);
+                IPackageManager manager = new PackageManager(this.remoteRepository, localCacheRoot);
                 manager.Logger = new NuGetLoggerAdapter(this.logger);
 
                 try

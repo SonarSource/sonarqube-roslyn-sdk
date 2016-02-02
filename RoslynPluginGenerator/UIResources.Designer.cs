@@ -262,6 +262,25 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Fetching NuGet config files....
+        /// </summary>
+        public static string NG_FetchingConfigFiles {
+            get {
+                return ResourceManager.GetString("NG_FetchingConfigFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NuGet file conflict occurred: {0}
+        ///The conflict will be ignored..
+        /// </summary>
+        public static string NG_FileConflictOccurred {
+            get {
+                return ResourceManager.GetString("NG_FileConflictOccurred", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to - latest version.
         /// </summary>
         public static string NG_IsLatestPackageVersionSuffix {
@@ -271,11 +290,38 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to     {0}, machine-wide: {1}.
+        /// </summary>
+        public static string NG_ListEnabledPackageSource {
+            get {
+                return ResourceManager.GetString("NG_ListEnabledPackageSource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enabled package sources:.
+        /// </summary>
+        public static string NG_ListingEnablePackageSources {
+            get {
+                return ResourceManager.GetString("NG_ListingEnablePackageSources", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Attempting to locate package with id &apos;{0}&apos;.
         /// </summary>
         public static string NG_LocatingPackages {
             get {
                 return ResourceManager.GetString("NG_LocatingPackages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No enabled package sources. Please update the NuGet config to specify at least one valid package source..
+        /// </summary>
+        public static string NG_NoEnabledPackageSources {
+            get {
+                return ResourceManager.GetString("NG_NoEnabledPackageSources", resourceCulture);
             }
         }
         
@@ -399,7 +445,7 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No analyzers found in assembly..
+        ///   Looks up a localized string similar to No analyzers found in assembly {0}.
         /// </summary>
         public static string Scanner_NoAnalyzers {
             get {

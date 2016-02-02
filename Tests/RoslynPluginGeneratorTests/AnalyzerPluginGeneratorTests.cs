@@ -29,7 +29,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
 
             SetupTestGraph();
 
@@ -45,7 +45,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
 
             SetupTestGraph();
 
@@ -61,7 +61,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
 
             SetupTestGraph(Node.Grandchild1_1);
 
@@ -77,7 +77,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
 
             SetupTestGraph(Node.Grandchild1_1);
 
@@ -93,7 +93,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
 
             SetupTestGraph(Node.Child1, Node.Grandchild1_1);
 
@@ -109,7 +109,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
 
             SetupTestGraph(Node.Grandchild2_1);
 
@@ -125,7 +125,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
 
             SetupTestGraph(Node.Grandchild2_2);
 
@@ -141,7 +141,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
 
             SetupTestGraph(Node.Child2, Node.Grandchild2_1, Node.Grandchild2_2);
 
@@ -157,7 +157,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
 
             SetupTestGraph(Node.Grandchild1_1);
 
@@ -173,7 +173,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            AnalyzerPluginGenerator apg = CreateLocalNuGetPackageHander();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
 
             SetupTestGraph(Node.Grandchild2_1);
 
@@ -186,10 +186,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
         #region Private methods
 
-        private AnalyzerPluginGenerator CreateLocalNuGetPackageHander()
+        private AnalyzerPluginGenerator CreateTestSubjectWithFakeRemoteRepo()
         {
             TestLogger logger = new TestLogger();
-            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(GetLocalNuGetSourceDir(), GetLocalNuGetDownloadDir(), logger);
+            IPackageRepository fakeRemoteRepo = new LocalPackageRepository(GetFakeRemoteNuGetSourceDir());
+
+            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
             return new AnalyzerPluginGenerator(nuGetHandler, logger);
         }
 
@@ -208,7 +210,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         /// </param>
         private void SetupTestGraph(params Node[] nodesRequireLicense)
         {
-            string packageSource = GetLocalNuGetSourceDir();
+            string packageSource = GetFakeRemoteNuGetSourceDir();
             IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository(packageSource);
             PackageManager mgr = new PackageManager(repo, packageSource);
 
@@ -292,9 +294,9 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             return TestUtils.EnsureTestDirectoryExists(this.TestContext, ".localNuGetDownload");
         }
 
-        private string GetLocalNuGetSourceDir()
+        private string GetFakeRemoteNuGetSourceDir()
         {
-            return TestUtils.EnsureTestDirectoryExists(this.TestContext, ".localNuGetSource");
+            return TestUtils.EnsureTestDirectoryExists(this.TestContext, ".fakeRemoteNuGetSource");
         }
 
         #endregion

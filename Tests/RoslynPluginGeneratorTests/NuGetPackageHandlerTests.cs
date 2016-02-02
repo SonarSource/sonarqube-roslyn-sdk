@@ -24,8 +24,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
     {
         public TestContext TestContext { get; set; }
 
-        private const string TestPackageName = "testPackage";
-        private const string DependentPackageName = "dependentPackage";
+        private const string TestPackageId = "testPackage";
+        private const string DependentPackageId = "dependentPackage";
 
         private const string ReleaseVersion = "1.0.0";
         private const string PreReleaseVersion = "1.0.0-RC1";
@@ -36,80 +36,77 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void NuGet_TestPackageDownload_Release_Release()
         {
             // Arrange
-            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
-            string testDownloadDir = Path.Combine(testDir, "download");
+            string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
 
             // Create test NuGet payload and packages
-            BuildTestPackages(true, true);
+            IPackageRepository fakeRemoteRepo = BuildTestPackages(true, true);
 
             TestLogger logger = new TestLogger();
-            NuGetPackageHandler handler = new NuGetPackageHandler(testDir, testDownloadDir, logger);
+            NuGetPackageHandler handler = new NuGetPackageHandler(fakeRemoteRepo, targetNuGetRoot, logger);
 
             // Act
             // Attempt to download a package which is released with a dependency that is released
-            IPackage package = handler.FetchPackage(DependentPackageName, null);
+            IPackage package = handler.FetchPackage(DependentPackageId, null);
 
             // Assert
-            AssertExpectedPackage(package, DependentPackageName, ReleaseVersion);
+            AssertExpectedPackage(package, DependentPackageId, ReleaseVersion);
             // Packages should have been downloaded
-            AssertPackageDownloaded(testDownloadDir, DependentPackageName, ReleaseVersion);
-            AssertPackageDownloaded(testDownloadDir, TestPackageName, ReleaseVersion);
+            AssertPackageDownloaded(targetNuGetRoot, DependentPackageId, ReleaseVersion);
+            AssertPackageDownloaded(targetNuGetRoot, TestPackageId, ReleaseVersion);
         }
 
         [TestMethod]
         public void NuGet_TestPackageDownload_PreRelease_Release()
         {
             // Arrange
-            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
-            string testDownloadDir = Path.Combine(testDir, "download");
+            string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
 
             // Create test NuGet payload and packages
-            BuildTestPackages(false, true);
+            IPackageRepository fakeRemoteRepo = BuildTestPackages(false, true);
 
             TestLogger logger = new TestLogger();
-            NuGetPackageHandler handler = new NuGetPackageHandler(testDir, testDownloadDir, logger);
+            NuGetPackageHandler handler = new NuGetPackageHandler(fakeRemoteRepo, targetNuGetRoot, logger);
 
             // Act
             // Attempt to download a package which is not released with a dependency that is released
-            IPackage package = handler.FetchPackage(DependentPackageName, null);
+            IPackage package = handler.FetchPackage(DependentPackageId, null);
 
             // Assert
-            AssertExpectedPackage(package, DependentPackageName, PreReleaseVersion);
+            AssertExpectedPackage(package, DependentPackageId, PreReleaseVersion);
             // Packages should have been downloaded
-            AssertPackageDownloaded(testDownloadDir, DependentPackageName, PreReleaseVersion);
-            AssertPackageDownloaded(testDownloadDir, TestPackageName, ReleaseVersion);
+            AssertPackageDownloaded(targetNuGetRoot, DependentPackageId, PreReleaseVersion);
+            AssertPackageDownloaded(targetNuGetRoot, TestPackageId, ReleaseVersion);
         }
 
         [TestMethod]
         public void NuGet_TestPackageDownload_PreRelease_PreRelease()
         {
             // Arrange
-            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
-            string testDownloadDir = Path.Combine(testDir, "download");
+            string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
 
             // Create test NuGet payload and packages
-            BuildTestPackages(false, false);
+            IPackageRepository fakeRemoteRepo = BuildTestPackages(false, false);
 
             TestLogger logger = new TestLogger();
-            NuGetPackageHandler handler = new NuGetPackageHandler(testDir, testDownloadDir, logger);
+            NuGetPackageHandler handler = new NuGetPackageHandler(fakeRemoteRepo, targetNuGetRoot, logger);
 
             // Act
             // Attempt to download a package which is not released with a dependency that is not released
-            IPackage package = handler.FetchPackage(DependentPackageName, null);
+            IPackage package = handler.FetchPackage(DependentPackageId, null);
 
             // Assert
-            AssertExpectedPackage(package, DependentPackageName, PreReleaseVersion);
+            AssertExpectedPackage(package, DependentPackageId, PreReleaseVersion);
             // Packages should have been downloaded
-            AssertPackageDownloaded(testDownloadDir, DependentPackageName, PreReleaseVersion);
-            AssertPackageDownloaded(testDownloadDir, TestPackageName, PreReleaseVersion);
+            AssertPackageDownloaded(targetNuGetRoot, DependentPackageId, PreReleaseVersion);
+            AssertPackageDownloaded(targetNuGetRoot, TestPackageId, PreReleaseVersion);
         }
 
         [TestMethod]
         public void FetchPackage_VersionSpecified_CorrectVersionSelected()
         {
-            string sourceNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.source");
+            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.remote");
             string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
-            IPackageManager mgr = CreatePackageManager(sourceNuGetRoot);
+            IPackageManager mgr = CreatePackageManager(fakeRemoteNuGetDir);
 
             BuildAndInstallPackage(mgr, "package.id.1", "0.8.0");
             BuildAndInstallPackage(mgr, "package.id.1", "1.0.0-rc1");
@@ -120,7 +117,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             BuildAndInstallPackage(mgr, "package.id.1", "0.9.0");
             BuildAndInstallPackage(mgr, "package.id.1", "1.0.0");
 
-            NuGetPackageHandler handler = new NuGetPackageHandler(sourceNuGetRoot, new TestLogger());
+            IPackageRepository fakeRemoteRepo = new LocalPackageRepository(fakeRemoteNuGetDir);
+            NuGetPackageHandler handler = new NuGetPackageHandler(fakeRemoteRepo, targetNuGetRoot, new TestLogger());
 
             // Check for specific versions
             IPackage actual = handler.FetchPackage("package.id.1", new SemanticVersion("0.8.0"));
@@ -137,9 +135,9 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void FetchPackage_VersionNotSpecified_ReleaseVersionExists_LastReleaseVersionSelected()
         {
             // Arrange
-            string sourceNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.source");
+            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.remote");
             string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
-            IPackageManager mgr = CreatePackageManager(sourceNuGetRoot);
+            IPackageManager mgr = CreatePackageManager(fakeRemoteNuGetDir);
 
             BuildAndInstallPackage(mgr, "package.id.1", "0.8.0");
             BuildAndInstallPackage(mgr, "package.id.1", "0.9.0-rc1");
@@ -147,7 +145,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             BuildAndInstallPackage(mgr, "package.id.1", "1.1.0-rc1");
             BuildAndInstallPackage(mgr, "dummy.package.1", "2.0.0");
 
-            NuGetPackageHandler handler = new NuGetPackageHandler(sourceNuGetRoot, new TestLogger());
+            IPackageRepository fakeRemoteRepo = new LocalPackageRepository(fakeRemoteNuGetDir);
+            NuGetPackageHandler handler = new NuGetPackageHandler(fakeRemoteRepo, targetNuGetRoot, new TestLogger());
 
             // Act
             IPackage actual = handler.FetchPackage("package.id.1", null);
@@ -160,9 +159,9 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void FetchPackage_VersionNotSpecified_NoReleaseVersions_LastPreReleaseVersionSelected()
         {
             // Arrange
-            string sourceNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.source");
+            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.remote");
             string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
-            IPackageManager mgr = CreatePackageManager(sourceNuGetRoot);
+            IPackageManager mgr = CreatePackageManager(fakeRemoteNuGetDir);
 
             BuildAndInstallPackage(mgr, "package.id.1", "0.9.0-rc1");
             BuildAndInstallPackage(mgr, "package.id.1", "1.0.0-rc1");
@@ -170,7 +169,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             BuildAndInstallPackage(mgr, "dummy.package.1", "2.0.0");
             BuildAndInstallPackage(mgr, "dummy.package.1", "2.0.0-rc2");
 
-            NuGetPackageHandler handler = new NuGetPackageHandler(sourceNuGetRoot, new TestLogger());
+            IPackageRepository fakeRemoteRepo = new LocalPackageRepository(fakeRemoteNuGetDir);
+            NuGetPackageHandler handler = new NuGetPackageHandler(fakeRemoteRepo, targetNuGetRoot, new TestLogger());
 
             // Act
             IPackage actual = handler.FetchPackage("package.id.1", null);
@@ -183,14 +183,15 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void FetchPackage_PackageNotFound_NullReturned()
         {
             // Arrange
-            string sourceNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.source");
+            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.remote");
             string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
-            IPackageManager mgr = CreatePackageManager(sourceNuGetRoot);
+            IPackageManager mgr = CreatePackageManager(fakeRemoteNuGetDir);
 
             BuildAndInstallPackage(mgr, "package.id.1", "0.8.0");
             BuildAndInstallPackage(mgr, "package.id.1", "0.9.0");
 
-            NuGetPackageHandler handler = new NuGetPackageHandler(sourceNuGetRoot, new TestLogger());
+            IPackageRepository fakeRemoteRepo = new LocalPackageRepository(fakeRemoteNuGetDir);
+            NuGetPackageHandler handler = new NuGetPackageHandler(fakeRemoteRepo, targetNuGetRoot, new TestLogger());
 
             // 1. Package id not found
             IPackage actual = handler.FetchPackage("unknown.package.id", new SemanticVersion("0.8.0"));
@@ -219,7 +220,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             {
                 Authors = "Microsoft",
                 Version = isReleased ? ReleaseVersion : PreReleaseVersion,
-                Id = TestPackageName,
+                Id = TestPackageId,
                 Description = "A description",
             };
         }
@@ -234,7 +235,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                     {
                         new ManifestDependency()
                         {
-                            Id = TestPackageName,
+                            Id = TestPackageId,
                             Version = isDependencyReleased ? ReleaseVersion : PreReleaseVersion,
                         }
                     }
@@ -244,7 +245,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             {
                 Authors = "Microsoft",
                 Version = isReleased ? ReleaseVersion : PreReleaseVersion,
-                Id = DependentPackageName,
+                Id = DependentPackageId,
                 Description = "A description",
                 DependencySets = dependencies,
             };
@@ -299,18 +300,26 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             fileStream.Dispose();
         }
 
-        private void BuildTestPackages(bool isDependentPackageReleased, bool isTestPackageReleased)
+        private IPackageRepository BuildTestPackages(bool isDependentPackageReleased, bool isTestPackageReleased)
         {
-            string testDir = TestUtils.EnsureTestDirectoryExists(this.TestContext);
+            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.remote");
 
-            string testPackageFile = Path.Combine(testDir, TestPackageName);
-            string dependentPackageFile = Path.Combine(testDir, DependentPackageName);
+            string testPackageFile = Path.Combine(fakeRemoteNuGetDir, TestPackageId);
+            string dependentPackageFile = Path.Combine(fakeRemoteNuGetDir, DependentPackageId);
 
             ManifestMetadata testMetadata = GenerateTestMetadata(isTestPackageReleased);
             BuildAndSavePackage(testMetadata, testPackageFile);
 
             ManifestMetadata dependentMetadata = GenerateTestMetadataWithDependency(isDependentPackageReleased, isTestPackageReleased);
             BuildAndSavePackage(dependentMetadata, dependentPackageFile);
+
+            LocalPackageRepository fakeRemoteRepo = new LocalPackageRepository(fakeRemoteNuGetDir);
+
+            // Sanity check the test setup: check we can retrieve the new packages
+            Assert.IsNotNull(fakeRemoteRepo.FindPackage(TestPackageId), "Test setup error: failed to locate test package '{0}'", TestPackageId);
+            Assert.IsNotNull(fakeRemoteRepo.FindPackage(DependentPackageId), "Test setup error: failed to locate test package '{0}'", DependentPackageId);
+
+            return fakeRemoteRepo;
         }
         
         #endregion
