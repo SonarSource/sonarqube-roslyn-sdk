@@ -19,10 +19,16 @@ namespace SonarQube.Plugins.Roslyn
         /// <summary>
         /// Returns the settings loaded from the user- and machine-wide config files
         /// </summary>
-        public static ISettings GetSettingsFromConfigFiles()
+        /// <param name="configDirectory">Optional. Specifies an additional directory in which to look for a NuGet.config file</param>
+        public static ISettings GetSettingsFromConfigFiles(string configDirectory)
         {
+            IFileSystem fileSystem = null;
+            if (configDirectory != null)
+            {
+                fileSystem = new PhysicalFileSystem(configDirectory);
+            }
             NuGetMachineWideSettings machineSettings = new NuGetMachineWideSettings();
-            ISettings settings = Settings.LoadDefaultSettings(null, null, machineSettings);
+            ISettings settings = Settings.LoadDefaultSettings(fileSystem, null, machineSettings);
             return settings;
         }
 
@@ -60,7 +66,8 @@ namespace SonarQube.Plugins.Roslyn
                 }
             }
             // Create an aggregate repository that uses all of the configured sources
-            AggregateRepository aggRepo = packageSourceProvider.CreateAggregateRepository(PackageRepositoryFactory.Default, true /* ignore failing repos */ );
+            AggregateRepository aggRepo = packageSourceProvider.CreateAggregateRepository(PackageRepositoryFactory.Default, false /* don't ignore failing repos */ );
+            aggRepo.Logger = new NuGetLoggerAdapter(logger);
 
             return aggRepo;
         }
