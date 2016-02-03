@@ -12,11 +12,11 @@ namespace SonarQube.Plugins.Roslyn
     /// <summary>
     /// Adapter between the NuGet logger interface and the SonarQube logger interface
     /// </summary>
-    internal class NuGetLoggerAdapter : NuGet.ILogger
+    public class NuGetLoggerAdapter : NuGet.ILogger
     {
         private readonly Common.ILogger logger;
 
-        private const string LogMessagePrefix = "[NuGet] "; // does not need to be localised
+        public const string LogMessagePrefix = "[NuGet] "; // does not need to be localised
 
         public NuGetLoggerAdapter(Common.ILogger logger)
         {

@@ -65,8 +65,10 @@ namespace SonarQube.Plugins.Roslyn
                     logger.LogDebug(UIResources.NG_ListEnabledPackageSource, enabledSource.Source, enabledSource.IsMachineWide);
                 }
             }
+
             // Create an aggregate repository that uses all of the configured sources
-            AggregateRepository aggRepo = packageSourceProvider.CreateAggregateRepository(PackageRepositoryFactory.Default, false /* don't ignore failing repos */ );
+            AggregateRepository aggRepo = packageSourceProvider.CreateAggregateRepository(PackageRepositoryFactory.Default,
+                true /* ignore failing repos. Errors will be logged as warnings. */ );
             aggRepo.Logger = new NuGetLoggerAdapter(logger);
 
             return aggRepo;

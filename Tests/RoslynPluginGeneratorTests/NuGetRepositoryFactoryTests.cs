@@ -51,6 +51,9 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             AssertExpectedPackageSources(actualAggregateRepo,
                 "d:\\active_cache",
                 "c:\\another\\active\\cache");
+
+            logger.AssertErrorsLogged(0);
+            logger.AssertWarningsLogged(0);
         }
 
         [TestMethod]
@@ -110,6 +113,32 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             AssertExpectedPackageSources(actualAggregateRepo
                 /* no packages sources so no repositories */ );
+        }
+
+        [TestMethod]
+        public void RepoFactory_FailingRepo_ErrorLoggedAndSuppressed()
+        {
+            // Arrange
+            TestLogger logger = new TestLogger();
+
+            string configXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<configuration>
+  <packageSources>
+    <add key=""remote_bad"" value=""http://bad.remote.unreachable.repo"" />
+  </packageSources>
+</configuration>";
+
+            Settings settings = CreateSettingsFromXml(configXml);
+
+            // Act
+            IPackageRepository actualRepo = NuGetRepositoryFactory.CreateRepository(settings, logger);
+            IPackage locatedPackage = actualRepo.FindPackage("dummy.package.id"); // trying to use the bad repo should fail
+
+            // Assert
+            Assert.IsNull(locatedPackage, "Should have failed to locate a package");
+            logger.AssertSingleWarningExists(NuGetLoggerAdapter.LogMessagePrefix, "http://bad.remote.unreachable.repo");
+            logger.AssertWarningsLogged(1);
+            logger.AssertErrorsLogged(0);
         }
 
         #endregion
