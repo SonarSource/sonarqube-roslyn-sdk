@@ -74,7 +74,7 @@ namespace SonarQube.Plugins.Roslyn
                 // Build machines will need to install this package, it is not feasible to create plugins for packages requiring license acceptance
                 if (PackageRequiresLicenseAcceptance(package))
                 {
-                    this.logger.LogError(UIResources.APG_NGPackageRequiresLicenseAcceptance);
+                    this.logger.LogError(UIResources.APG_NGPackageRequiresLicenseAcceptance, package.Id, package.Version);
                     return false;
                 }
 
