@@ -14,5 +14,7 @@ namespace SonarQube.Plugins
         public const string Core_PluginPackage = "[PLUGIN_PACKAGE]";
 
         public const string Rule_Language = "[RULE_LANGUAGE]";
+        public const string Rule_PluginId = "[RULE_REPOSITORY_ID]";
+        public const string Rule_ResourceId = "[RULE_RESOURCE_ID]";
     }
 }

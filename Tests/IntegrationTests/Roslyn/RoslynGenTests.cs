@@ -34,7 +34,7 @@ namespace SonarQube.Plugins.IntegrationTests
             // Create a valid analyzer package
             ExampleAnalyzer1.CSharpAnalyzer analyzer = new ExampleAnalyzer1.CSharpAnalyzer();
 
-            string packageId = "analyzer1.pkgid1";
+            string packageId = "Analyzer1.Pkgid1"; // package id is not all lowercase
             string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".fakeRemoteNuGet");
             IPackageManager fakeRemotePkgMgr = CreatePackageManager(fakeRemoteNuGetDir);
             IPackage analyzerPkg =  AddPackage(fakeRemotePkgMgr, packageId, "1.0.2", analyzer.GetType().Assembly.Location);
@@ -65,9 +65,10 @@ namespace SonarQube.Plugins.IntegrationTests
             AssertPackagePropertiesInManifest(analyzerPkg, jarInfo);
 
             // Check for the expected property values required by the C# plugin
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.analyzerId", "analyzer1.pkgid1", jarInfo);
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.ruleNamespace", "analyzer1.pkgid1", jarInfo);
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.nuget.packageId", "analyzer1.pkgid1", jarInfo);
+            // Property name prefixes should be lower case; the case of the value should be the same as the package id
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.analyzerId", "Analyzer1.Pkgid1", jarInfo);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.ruleNamespace", "Analyzer1.Pkgid1", jarInfo);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.nuget.packageId", "Analyzer1.Pkgid1", jarInfo);
             AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.nuget.packageVersion", "1.0.2", jarInfo);
 
             JarInfo.RulesDefinition rulesDefn = AssertRulesDefinitionExists(jarInfo);
@@ -214,7 +215,7 @@ namespace SonarQube.Plugins.IntegrationTests
 
         private static void AssertPackagePropertiesInManifest(IPackage package, JarInfo jarInfo)
         {            
-            AssertExpectedManifestValue("Plugin-Key", package.Id, jarInfo);
+            AssertExpectedManifestValue("Plugin-Key", package.Id.ToLowerInvariant(), jarInfo); // plugin-key should be lowercase
             AssertExpectedManifestValue("Plugin-Name", package.Title, jarInfo);
             AssertExpectedManifestValue("Plugin-Version", package.Version.ToString(), jarInfo);
             AssertExpectedManifestValue("Plugin-Description", package.Description, jarInfo);

@@ -264,6 +264,18 @@ namespace SonarQube.Plugins
             this.sourceFileReplacements[key] = value;
         }
 
+        protected string FindPluginKey()
+        {
+            string pluginKey;
+            this.properties.TryGetValue(WellKnownPluginProperties.Key, out pluginKey);
+            if (pluginKey != null)
+            {
+                // By convention this is all lower-case
+                pluginKey = pluginKey.ToLowerInvariant();
+            }
+            return pluginKey;
+        }
+
         #endregion
 
         #region Core builder configuration
@@ -295,13 +307,6 @@ namespace SonarQube.Plugins
                 throw new InvalidOperationException(string.Format(System.Globalization.CultureInfo.CurrentCulture,
                     UIResources.CoreBuilder_Error_RequiredPropertyMissing, propertyName));
             }
-        }
-
-        private string FindPluginKey()
-        {
-            string pluginKey;
-            this.properties.TryGetValue(WellKnownPluginProperties.Key, out pluginKey);
-            return pluginKey;
         }
 
         private string FindPluginName()

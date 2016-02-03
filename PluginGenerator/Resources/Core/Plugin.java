@@ -20,6 +20,10 @@ public final class Plugin extends SonarPlugin {
 
   private static final Logger LOG = LoggerFactory.getLogger(Plugin.class);
 
+  protected static final String KEY = "[PLUGIN_KEY]";
+
+  protected static final String NAME = "[PLUGIN_NAME]";
+
   // This is where you're going to declare all your SonarQube extensions
   @Override
   public List getExtensions() {

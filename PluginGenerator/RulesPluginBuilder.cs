@@ -88,8 +88,9 @@ namespace SonarQube.Plugins
             this.AddRuleSources(tempDir);
             this.AddRuleJars();
 
+            this.SetSourceCodeTokenReplacement(WellKnownSourceCodeTokens.Rule_PluginId, this.FindPluginKey());
             this.SetSourceCodeTokenReplacement(WellKnownSourceCodeTokens.Rule_Language, this.language);
-            this.SetSourceCodeTokenReplacement("[RESOURCE_ID]", uniqueId);
+            this.SetSourceCodeTokenReplacement(WellKnownSourceCodeTokens.Rule_ResourceId, uniqueId);
 
             this.AddExtension(RulesExtensionClassName);
 
