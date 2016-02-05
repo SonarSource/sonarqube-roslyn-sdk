@@ -142,7 +142,7 @@
     <value>Looking for {0} analyzers</value>
   </data>
   <data name="APG_NGPackageRequiresLicenseAcceptance" xml:space="preserve">
-    <value>Package {0} (version {1}) requires the user to accept a license.</value>
+    <value>Cannot create a plugin for NuGet package {0}:{1} because it requires acceptance of a license, which is not supported in this version of the tool.</value>
   </data>
   <data name="APG_NoAnalyzersFound" xml:space="preserve">
     <value>No analyzers were found in the specified package</value>
