@@ -70,13 +70,16 @@ namespace SonarQube.Plugins.IntegrationTests
             AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.ruleNamespace", "Analyzer1.Pkgid1", jarInfo);
             AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.nuget.packageId", "Analyzer1.Pkgid1", jarInfo);
             AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.nuget.packageVersion", "1.0.2", jarInfo);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.staticResourceName", "Analyzer1.Pkgid1.zip", jarInfo);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.pluginKey", "analyzer1.pkgid1", jarInfo);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.pluginVersion", "1.0.2", jarInfo);
 
             JarInfo.RulesDefinition rulesDefn = AssertRulesDefinitionExists(jarInfo);
             AssertRepositoryIsValid(rulesDefn.Repository);
             AssertExpectedRulesExist(analyzer, rulesDefn.Repository);
             Assert.AreEqual("roslyn.analyzer1.pkgid1", rulesDefn.Repository.Key, "Unexpected repository key");
 
-            Assert.AreEqual(5, jarInfo.Extensions.Count, "Unexpected number of extensions");
+            Assert.AreEqual(8, jarInfo.Extensions.Count, "Unexpected number of extensions");
         }
 
         #region Private methods

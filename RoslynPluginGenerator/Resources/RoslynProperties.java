@@ -24,4 +24,20 @@ public final class RoslynProperties {
 	.defaultValue("[ROSLYN_NUGET_PACKAGE_VERSION]")
 	.hidden()
 	.build();
+
+  public static PropertyDefinition AnalyzerResourceName = PropertyDefinition.builder(PluginRulesDefinition.REPOSITORY_ID + ".staticResourceName")
+	.defaultValue("[ROSLYN_STATIC_RESOURCENAME]")
+	.hidden()
+	.build();
+
+  public static PropertyDefinition PluginKey = PropertyDefinition.builder(PluginRulesDefinition.REPOSITORY_ID + ".pluginKey")
+	.defaultValue("[ROSLYN_PLUGIN_KEY]")
+	.hidden()
+	.build();
+
+  public static PropertyDefinition PluginVersion = PropertyDefinition.builder(PluginRulesDefinition.REPOSITORY_ID + ".pluginVersion")
+	.defaultValue("[ROSLYN_PLUGIN_VERSION]")
+	.hidden()
+	.build();
+
 }

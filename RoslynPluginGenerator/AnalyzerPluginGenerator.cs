@@ -29,13 +29,19 @@ namespace SonarQube.Plugins.Roslyn
             "RoslynProperties.AnalyzerId",
             "RoslynProperties.RuleNamespace",
             "RoslynProperties.NuGetPackageId",
-            "RoslynProperties.NuGetPackageVersion"
+            "RoslynProperties.NuGetPackageVersion",
+            "RoslynProperties.AnalyzerResourceName",
+            "RoslynProperties.PluginKey",
+            "RoslynProperties.PluginVersion"
         };
 
         private const string AnalyzerId_Token = "[ROSLYN_ANALYZER_ID]";
         private const string RuleNamespace_Token = "[ROSLYN_RULE_NAMESPACE]";
         private const string PackageId_Token = "[ROSLYN_NUGET_PACKAGE_ID]";
         private const string PackageVersion_Token = "[ROSLYN_NUGET_PACKAGE_VERSION]";
+        private const string StaticResourceName_Token = "[ROSLYN_STATIC_RESOURCENAME]";
+        private const string PluginKey_Token = "[ROSLYN_PLUGIN_KEY]";
+        private const string PluginVersion_Token = "[ROSLYN_PLUGIN_VERSION]";
 
         private readonly INuGetPackageHandler packageHandler;
         private readonly SonarQube.Plugins.Common.ILogger logger;
@@ -67,6 +73,10 @@ namespace SonarQube.Plugins.Roslyn
             }
             SupportedLanguages.ThrowIfNotSupported(language);
 
+            RoslynPluginDefinition definition = new RoslynPluginDefinition();
+            definition.Language = language;
+            definition.SqaleFilePath = sqaleFilePath;
+
             IPackage package = this.packageHandler.FetchPackage(analyzeRef.PackageId, analyzeRef.Version);
 
             if (package != null)
@@ -83,15 +93,19 @@ namespace SonarQube.Plugins.Roslyn
                 baseDirectory = Utilities.CreateSubDirectory(baseDirectory, Guid.NewGuid().ToString());
                 this.logger.LogDebug(UIResources.APG_CreatedTempWorkingDir, baseDirectory);
 
-                PluginManifest pluginDefn = CreatePluginDefinition(package);
+                // Collect the remaining data required to build the plugin
+                definition.PackageId = package.Id;
+                definition.PackageVersion = package.Version.ToString();
+                definition.Manifest = CreatePluginDefinition(package);
+                definition.RulesFilePath = Path.Combine(baseDirectory, "rules.xml");
+                definition.EmbeddedZipFileName = package.Id + ".zip"; // TODO - generate the zip file
 
-                string rulesFilePath = Path.Combine(baseDirectory, "rules.xml");
+                bool success = TryGenerateRulesFile(package, this.packageHandler.LocalCacheRoot, baseDirectory, definition.RulesFilePath, language);
 
-                bool success = TryGenerateRulesFile(package, this.packageHandler.LocalCacheRoot, baseDirectory, rulesFilePath, language);
-
+                
                 if (success)
                 {
-                    BuildPlugin(package, language, rulesFilePath, sqaleFilePath, pluginDefn, baseDirectory, outputDirectory);
+                    BuildPlugin(definition, baseDirectory, outputDirectory);
                 }
             }
 
@@ -219,7 +233,7 @@ namespace SonarQube.Plugins.Roslyn
             return string.Join(",", args);
         }
 
-        private void BuildPlugin(IPackage package, string language, string rulesFilePath, string sqaleFilePath, PluginManifest pluginDefn, string baseTempDirectory, string outputDirectory)
+        private void BuildPlugin(RoslynPluginDefinition definition, string baseTempDirectory, string outputDirectory)
         {
             this.logger.LogInfo(UIResources.APG_GeneratingPlugin);
 
@@ -227,27 +241,27 @@ namespace SonarQube.Plugins.Roslyn
             // i.e. the format expected by Maven
             Directory.CreateDirectory(outputDirectory);
             string fullJarPath = Path.Combine(outputDirectory,
-                package.Id + "-plugin-" + pluginDefn.Version + ".jar");
+                definition.Manifest.Key + "-plugin-" + definition.Manifest.Version + ".jar");
 
             RulesPluginBuilder builder = new RulesPluginBuilder(logger);
-            builder.SetLanguage(language)
-                            .SetRulesFilePath(rulesFilePath)
-                            .SetProperties(pluginDefn)
+            builder.SetLanguage(definition.Language)
+                            .SetRulesFilePath(definition.RulesFilePath)
+                            .SetProperties(definition.Manifest)
                             .SetJarFilePath(fullJarPath);
 
-            if (!string.IsNullOrWhiteSpace(sqaleFilePath))
+            if (!string.IsNullOrWhiteSpace(definition.SqaleFilePath))
             {
-                builder.SetSqaleFilePath(sqaleFilePath);
+                builder.SetSqaleFilePath(definition.SqaleFilePath);
             }
 
-            AddRoslynMetadata(baseTempDirectory, builder, package);
+            AddRoslynMetadata(baseTempDirectory, builder, definition);
             
             builder.Build();
 
             this.logger.LogInfo(UIResources.APG_PluginGenerated, fullJarPath);
         }
 
-        private void AddRoslynMetadata(string baseTempDirectory, PluginBuilder builder, IPackage package)
+        private void AddRoslynMetadata(string baseTempDirectory, PluginBuilder builder, RoslynPluginDefinition definition)
         {
             string sourcesDir = Utilities.CreateSubDirectory(baseTempDirectory, "src");
             this.logger.LogDebug(UIResources.APG_CreatingRoslynSources, sourcesDir);
@@ -262,10 +276,13 @@ namespace SonarQube.Plugins.Roslyn
                 builder.AddSourceFile(sourceFile);
             }
 
-            builder.SetSourceCodeTokenReplacement(PackageId_Token, package.Id);
-            builder.SetSourceCodeTokenReplacement(PackageVersion_Token, package.Version.ToString());
-            builder.SetSourceCodeTokenReplacement(AnalyzerId_Token, package.Id);
-            builder.SetSourceCodeTokenReplacement(RuleNamespace_Token, package.Id);
+            builder.SetSourceCodeTokenReplacement(PackageId_Token, definition.PackageId);
+            builder.SetSourceCodeTokenReplacement(PackageVersion_Token, definition.PackageVersion);
+            builder.SetSourceCodeTokenReplacement(AnalyzerId_Token, definition.PackageId);
+            builder.SetSourceCodeTokenReplacement(RuleNamespace_Token, definition.PackageId);
+            builder.SetSourceCodeTokenReplacement(StaticResourceName_Token, definition.EmbeddedZipFileName);
+            builder.SetSourceCodeTokenReplacement(PluginKey_Token, definition.Manifest.Key);
+            builder.SetSourceCodeTokenReplacement(PluginVersion_Token, definition.Manifest.Version);
 
             foreach (string extension in Extensions)
             {
