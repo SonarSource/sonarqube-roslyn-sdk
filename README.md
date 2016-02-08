@@ -35,8 +35,8 @@ These limitations will be addressed at some point in the future.
 
 2. Run the generator tool
   * The SDK uses the Java compiler and jar packaging tool, so you will need a machine with a recent version of the [Java SE development kit](http://www.oracle.com/technetwork/java/javase/overview/index.html).
-  * Run the generator tool *SonarQube.Plugin.Roslyn.PluginGenerator.exe* located in *RoslynPluginGenerator\bin\[build flavour]\*, specifying the analyzer NuGet package id
-  e.g. *SonarQube.Plugin.Roslyn.PluginGenerator /a:Wintellect.Analyzers*
+  * Run the generator tool *SonarQube.Plugins.Roslyn.PluginGenerator.exe* located in *RoslynPluginGenerator\bin\[build flavour]\*, specifying the analyzer NuGet package id
+  e.g. *SonarQube.Plugins.Roslyn.PluginGenerator /a:Wintellect.Analyzers*
 
 It is possible to specify an optional package version
 e.g. */a:Wintellect.Analyzers:1.0.5.0*
