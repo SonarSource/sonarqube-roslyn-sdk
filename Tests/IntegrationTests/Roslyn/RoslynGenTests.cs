@@ -70,7 +70,7 @@ namespace SonarQube.Plugins.IntegrationTests
             AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.ruleNamespace", "Analyzer1.Pkgid1", jarInfo);
             AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.nuget.packageId", "Analyzer1.Pkgid1", jarInfo);
             AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.nuget.packageVersion", "1.0.2", jarInfo);
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.staticResourceName", "Analyzer1.Pkgid1.zip", jarInfo);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.staticResourceName", "Analyzer1.Pkgid1.1.0.2.zip", jarInfo);
             AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.pluginKey", "analyzer1.pkgid1", jarInfo);
             AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.pluginVersion", "1.0.2", jarInfo);
 
@@ -78,6 +78,10 @@ namespace SonarQube.Plugins.IntegrationTests
             AssertRepositoryIsValid(rulesDefn.Repository);
             AssertExpectedRulesExist(analyzer, rulesDefn.Repository);
             Assert.AreEqual("roslyn.analyzer1.pkgid1", rulesDefn.Repository.Key, "Unexpected repository key");
+
+            AssertExpectedStaticZipFileExists(jarFilePath, "static\\analyzer1.pkgid1.1.0.2.zip",
+                /* zip file contents */
+                "analyzers\\ExampleAnalyzer1.dll");
 
             Assert.AreEqual(8, jarInfo.Extensions.Count, "Unexpected number of extensions");
         }
@@ -236,6 +240,19 @@ namespace SonarQube.Plugins.IntegrationTests
 
             Assert.IsNotNull(actual, "Failed to find expected manifest property: {0}", propertyName);
             Assert.AreEqual(expectedValue, actual.Value, "Unexpected manifest value for {0}", propertyName);
+        }
+
+        private void AssertExpectedStaticZipFileExists(string jarFilePath, string staticResourceName,
+            params string[] expectedZipContents)
+        {
+            // Check the jar contains the expected zip file
+            ZipFileChecker jarChecker = new ZipFileChecker(this.TestContext, jarFilePath);
+            jarChecker.AssertZipContainsFiles(staticResourceName);
+
+            // Now create another checker to check the contents of the zip file
+            string embeddedZipFilePath = Path.Combine(jarChecker.UnzippedDirectoryPath, staticResourceName);
+            ZipFileChecker embeddedFileChecker = new ZipFileChecker(this.TestContext, embeddedZipFilePath);
+            embeddedFileChecker.AssertZipContainsFiles(expectedZipContents);
         }
 
         #endregion

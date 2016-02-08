@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 
 namespace SonarQube.Plugins.Roslyn
@@ -73,10 +74,6 @@ namespace SonarQube.Plugins.Roslyn
             }
             SupportedLanguages.ThrowIfNotSupported(language);
 
-            RoslynPluginDefinition definition = new RoslynPluginDefinition();
-            definition.Language = language;
-            definition.SqaleFilePath = sqaleFilePath;
-
             IPackage package = this.packageHandler.FetchPackage(analyzeRef.PackageId, analyzeRef.Version);
 
             if (package != null)
@@ -94,15 +91,22 @@ namespace SonarQube.Plugins.Roslyn
                 this.logger.LogDebug(UIResources.APG_CreatedTempWorkingDir, baseDirectory);
 
                 // Collect the remaining data required to build the plugin
+                RoslynPluginDefinition definition = new RoslynPluginDefinition();
+                definition.Language = language;
+                definition.SqaleFilePath = sqaleFilePath;
                 definition.PackageId = package.Id;
                 definition.PackageVersion = package.Version.ToString();
                 definition.Manifest = CreatePluginDefinition(package);
                 definition.RulesFilePath = Path.Combine(baseDirectory, "rules.xml");
-                definition.EmbeddedZipFileName = package.Id + ".zip"; // TODO - generate the zip file
 
-                bool success = TryGenerateRulesFile(package, this.packageHandler.LocalCacheRoot, baseDirectory, definition.RulesFilePath, language);
+                string packageDir = this.packageHandler.GetLocalPackageRootDirectory(package);
 
+                definition.StaticResourceName = Path.GetFileName(packageDir) + ".zip";
+                definition.SourceZipFilePath = Path.Combine(baseDirectory, definition.StaticResourceName);
+                ZipFile.CreateFromDirectory(packageDir, definition.SourceZipFilePath, CompressionLevel.Optimal, false);
                 
+                bool success = TryGenerateRulesFile(this.packageHandler.LocalCacheRoot, definition.RulesFilePath, language, packageDir);
+
                 if (success)
                 {
                     BuildPlugin(definition, baseDirectory, outputDirectory);
@@ -142,22 +146,22 @@ namespace SonarQube.Plugins.Roslyn
         /// Attempts to generate a rules file for assemblies in the specified package.
         /// </summary>
         /// <param name="additionalSearchFolder">Root directory to search when looking for analyzer dependencies</param>
-        /// <param name="baseTempDir">Base temporary working directory for this generation run</param>
         /// <param name="rulesFilePath">Full name of the file to create</param>
-        private bool TryGenerateRulesFile(IPackage package, string additionalSearchFolder, string baseTempDir, string rulesFilePath, string language)
+        /// <param name="packageRootDir">The directory containing all of the files in the analyzer package</param>
+        private bool TryGenerateRulesFile(string additionalSearchFolder, string rulesFilePath, string language, string packageRootDir)
         {
             bool success = false;
             this.logger.LogInfo(UIResources.APG_GeneratingRules);
 
             this.logger.LogInfo(UIResources.APG_LocatingAnalyzers);
 
-            string[] files = GetFilesFromPackage(package, baseTempDir).ToArray();
-
+            string[] analyzerFiles = Directory.GetFiles(packageRootDir, "*.dll", SearchOption.AllDirectories);
+            
             string roslynLanguageName = SupportedLanguages.GetRoslynLanguageName(language);
             this.logger.LogDebug(UIResources.APG_LogAnalyzerLanguage, roslynLanguageName);
 
             DiagnosticAssemblyScanner diagnosticAssemblyScanner = new DiagnosticAssemblyScanner(this.logger, additionalSearchFolder);
-            IEnumerable<DiagnosticAnalyzer> analyzers = diagnosticAssemblyScanner.InstantiateDiagnostics(roslynLanguageName, files.ToArray());
+            IEnumerable<DiagnosticAnalyzer> analyzers = diagnosticAssemblyScanner.InstantiateDiagnostics(roslynLanguageName, analyzerFiles.ToArray());
 
             this.logger.LogInfo(UIResources.APG_AnalyzersLocated, analyzers.Count());
 
@@ -180,19 +184,6 @@ namespace SonarQube.Plugins.Roslyn
                 this.logger.LogWarning(UIResources.APG_NoAnalyzersFound);
             }
             return success;
-        }
-
-        private IEnumerable<string> GetFilesFromPackage(IPackage package, string baseTempDir)
-        {
-            // We can't directly get the paths to the files in package so
-            // we have to extract them first
-            string extractDir = Utilities.CreateSubDirectory(baseTempDir, ".extract");
-            this.logger.LogDebug(UIResources.APG_ExtractingPackageFiles, extractDir);
-            PhysicalFileSystem fileSystem = new PhysicalFileSystem(extractDir);
-            package.ExtractContents(fileSystem, ".");
-
-            string[] files = Directory.GetFiles(extractDir, "*.*", SearchOption.AllDirectories);
-            return files;
         }
 
         private static PluginManifest CreatePluginDefinition(IPackage package)
@@ -255,7 +246,10 @@ namespace SonarQube.Plugins.Roslyn
             }
 
             AddRoslynMetadata(baseTempDirectory, builder, definition);
-            
+
+            string relativeStaticFilePath = "static/" + Path.GetFileName(definition.StaticResourceName);
+            builder.AddResourceFile(definition.SourceZipFilePath, relativeStaticFilePath);
+
             builder.Build();
 
             this.logger.LogInfo(UIResources.APG_PluginGenerated, fullJarPath);
@@ -280,7 +274,7 @@ namespace SonarQube.Plugins.Roslyn
             builder.SetSourceCodeTokenReplacement(PackageVersion_Token, definition.PackageVersion);
             builder.SetSourceCodeTokenReplacement(AnalyzerId_Token, definition.PackageId);
             builder.SetSourceCodeTokenReplacement(RuleNamespace_Token, definition.PackageId);
-            builder.SetSourceCodeTokenReplacement(StaticResourceName_Token, definition.EmbeddedZipFileName);
+            builder.SetSourceCodeTokenReplacement(StaticResourceName_Token, definition.StaticResourceName);
             builder.SetSourceCodeTokenReplacement(PluginKey_Token, definition.Manifest.Key);
             builder.SetSourceCodeTokenReplacement(PluginVersion_Token, definition.Manifest.Version);
 

@@ -84,8 +84,8 @@ namespace SonarQube.Plugins.PluginGeneratorTests
             // Assert
             Assert.IsTrue(success, "Failed to build the jar file");
             
-            new JarChecker(this.TestContext, finalJarPath)
-                .JarContainsFiles(
+            new ZipFileChecker(this.TestContext, finalJarPath)
+                .AssertZipContainsFiles(
                     "META-INF\\MANIFEST.MF",
                     "file1.txt",
                     "myorg\\myapp\\f2.txt");

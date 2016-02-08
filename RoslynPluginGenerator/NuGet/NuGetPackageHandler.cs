@@ -19,6 +19,7 @@ namespace SonarQube.Plugins.Roslyn
         private readonly IPackageRepository remoteRepository;
         private readonly string localCacheRoot;
         private readonly Common.ILogger logger;
+        private readonly IPackageManager packageManager;
 
         public NuGetPackageHandler(IPackageRepository remoteRepository, string localCacheRoot, Common.ILogger logger)
         {
@@ -38,6 +39,10 @@ namespace SonarQube.Plugins.Roslyn
             this.logger = logger;
             this.remoteRepository = remoteRepository;
             this.localCacheRoot = localCacheRoot;
+
+            Directory.CreateDirectory(localCacheRoot);
+            this.packageManager = new PackageManager(remoteRepository, localCacheRoot);
+            this.packageManager.Logger = new NuGetLoggerAdapter(logger);
         }
 
         #region INuGetPackageHandler
@@ -69,15 +74,10 @@ namespace SonarQube.Plugins.Roslyn
 
             if (package != null)
             {
-                Directory.CreateDirectory(localCacheRoot);
-
-                IPackageManager manager = new PackageManager(this.remoteRepository, localCacheRoot);
-                manager.Logger = new NuGetLoggerAdapter(this.logger);
-
                 try
                 {
                     // Prerelease packages enabled by default
-                    manager.InstallPackage(package, false, true, false);
+                    this.packageManager.InstallPackage(package, false, true, false);
                 }
                 catch (InvalidOperationException e)
                 {
@@ -87,6 +87,21 @@ namespace SonarQube.Plugins.Roslyn
             }
 
             return package;
+        }
+
+        public string GetLocalPackageRootDirectory(IPackage package)
+        {
+            if (package == null)
+            {
+                throw new ArgumentNullException("package");
+            }
+
+            Debug.Assert(this.packageManager.FileSystem != null);
+            Debug.Assert(this.packageManager.PathResolver != null);
+            string packageDirectory = this.packageManager.FileSystem.GetFullPath(this.packageManager.PathResolver.GetPackageDirectory(package));
+
+            Debug.Assert(Directory.Exists(packageDirectory), "Expecting the package directory to exist: {0}", packageDirectory);
+            return packageDirectory;
         }
 
         #endregion

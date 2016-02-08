@@ -5,6 +5,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 using NuGet;
+using System.Collections.Generic;
 
 namespace SonarQube.Plugins.Roslyn
 {
@@ -13,7 +14,6 @@ namespace SonarQube.Plugins.Roslyn
     /// </summary>
     public interface INuGetPackageHandler
     {
-
         string LocalCacheRoot { get; }
 
         /// <summary>
@@ -26,5 +26,11 @@ namespace SonarQube.Plugins.Roslyn
         /// 
         /// <returns>A reference to the package, or null if the package could not be located</returns>
         IPackage FetchPackage(string packageId, SemanticVersion version);
+
+        /// <summary>
+        /// Returns the local directory containing the specified package
+        /// </summary>
+        /// <remarks>Assumes that the package has already been fetched</remarks>
+        string GetLocalPackageRootDirectory(IPackage package);
     }
 }

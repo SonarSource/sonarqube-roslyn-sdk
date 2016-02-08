@@ -20,8 +20,13 @@ namespace SonarQube.Plugins.Roslyn
         public string RulesFilePath { get; set; }
 
         /// <summary>
-        /// Name of the zip file containing the assemblies to be embedded in the jar as a static resource
+        /// Name for the embedded resource that contains the zipped analyzer assemblies
         /// </summary>
-        public string EmbeddedZipFileName { get; set; }
+        public string StaticResourceName { get; set; }
+
+        /// <summary>
+        /// Full path to zip file containing the assemblies to be embedded in the jar as a static resource
+        /// </summary>
+        public string SourceZipFilePath { get; set; }
     }
 }
