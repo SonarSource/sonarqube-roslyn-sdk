@@ -4,7 +4,6 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
-
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -32,7 +31,7 @@ namespace SonarQube.Plugins.IntegrationTests
             PluginInspector inspector = CreatePluginInspector(logger);
 
             // Create a valid analyzer package
-            ExampleAnalyzer1.CSharpAnalyzer analyzer = new ExampleAnalyzer1.CSharpAnalyzer();
+            RoslynAnalyzer11.CSharpAnalyzer analyzer = new RoslynAnalyzer11.CSharpAnalyzer();
 
             string packageId = "Analyzer1.Pkgid1"; // package id is not all lowercase
             string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".fakeRemoteNuGet");
@@ -82,7 +81,7 @@ namespace SonarQube.Plugins.IntegrationTests
 
             AssertExpectedStaticZipFileExists(jarFilePath, "static\\analyzer1.pkgid1.1.0.2.zip",
                 /* zip file contents */
-                "analyzers\\ExampleAnalyzer1.dll");
+                "analyzers\\RoslynAnalyzer11.dll");
 
             Assert.AreEqual(8, jarInfo.Extensions.Count, "Unexpected number of extensions");
         }

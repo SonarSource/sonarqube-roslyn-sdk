@@ -4,7 +4,7 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
-using ExampleAnalyzer1;
+using RoslynAnalyzer11;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
