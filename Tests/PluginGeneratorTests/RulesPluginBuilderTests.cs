@@ -43,6 +43,7 @@ namespace SonarQube.Plugins.PluginGeneratorTests
             RulesPluginBuilder builder = new RulesPluginBuilder(mockJdkWrapper, new MockMavenArtifactHandler(), new TestLogger());
 
             builder.SetLanguage(language)
+                .SetRepositoryKey("repo.key")
                 .SetRulesFilePath(rulesXmlFilePath)
                 .SetSqaleFilePath(sqaleXmlFilePath)
                 .SetJarFilePath(fullJarFilePath)
@@ -93,6 +94,7 @@ namespace SonarQube.Plugins.PluginGeneratorTests
             RulesPluginBuilder builder = new RulesPluginBuilder(mockJdkWrapper, new MockMavenArtifactHandler(), new TestLogger());
             SetValidCoreProperties(builder);
             builder.SetLanguage("aLanguage");
+            builder.SetRepositoryKey("repo.key");
 
             // 1. Rules file not specified -> error
             AssertException.Expect<InvalidOperationException>(() => builder.Build());
@@ -123,6 +125,7 @@ namespace SonarQube.Plugins.PluginGeneratorTests
             RulesPluginBuilder builder = new RulesPluginBuilder(mockJdkWrapper, new MockMavenArtifactHandler(), new TestLogger());
             SetValidCoreProperties(builder);
             builder.SetLanguage("aLanguage");
+            builder.SetRepositoryKey("repo");
             AddValidDummyRulesFiles(builder);
 
             // 1. Sqale file not specified -> ok
@@ -162,7 +165,7 @@ namespace SonarQube.Plugins.PluginGeneratorTests
         {
             string testDir = TestUtils.EnsureTestDirectoryExists(this.TestContext);
 
-            builder.SetPluginKey("dummy.key")
+            builder.SetPluginKey("dummykey")
                 .SetPluginName("dummy name")
                 .SetJarFilePath(Path.Combine(testDir, "dummy.jar.txt"));
         }

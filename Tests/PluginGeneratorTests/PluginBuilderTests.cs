@@ -83,7 +83,7 @@ public final class Program {}
             builder
                 .AddSourceFile(source1)
                 .SetJarFilePath(pluginFilePath)
-                .SetPluginKey("dummy.key")
+                .SetPluginKey("dummykey")
                 .SetPluginName("dummy name");
 
             //Act and assert
@@ -173,7 +173,7 @@ public final class MyExtensionClass
                 .SetJarFilePath(pluginFilePath)
                 .SetProperty("Property1", "prop 1 value")
                 .AddExtension("myorg.app1.MyExtensionClass.class")
-                .SetPluginKey("dummy.key")
+                .SetPluginKey("dummykey")
                 .SetPluginName("plugin name");
 
             return builder;

@@ -270,8 +270,7 @@ namespace SonarQube.Plugins
             this.properties.TryGetValue(WellKnownPluginProperties.Key, out pluginKey);
             if (pluginKey != null)
             {
-                // By convention this is all lower-case
-                pluginKey = pluginKey.ToLowerInvariant();
+                pluginKey = PluginKeyUtilities.GetValidKey(pluginKey);
             }
             return pluginKey;
         }
@@ -283,8 +282,9 @@ namespace SonarQube.Plugins
         private void ValidateCoreConfiguration()
         {
             // TODO: validate other inputs
-            this.CheckPropertyIsSet(WellKnownPluginProperties.Key);
             this.CheckPropertyIsSet(WellKnownPluginProperties.PluginName);
+            string key = this.CheckPropertyIsSet(WellKnownPluginProperties.Key);
+            PluginKeyUtilities.ThrowIfInvalid(key);
 
             if (this.extensionClasses == null || !this.extensionClasses.Any())
             {
@@ -297,7 +297,7 @@ namespace SonarQube.Plugins
             }
         }
 
-        private void CheckPropertyIsSet(string propertyName)
+        private string CheckPropertyIsSet(string propertyName)
         {
             string value;
             this.properties.TryGetValue(propertyName, out value);
@@ -307,6 +307,7 @@ namespace SonarQube.Plugins
                 throw new InvalidOperationException(string.Format(System.Globalization.CultureInfo.CurrentCulture,
                     UIResources.CoreBuilder_Error_RequiredPropertyMissing, propertyName));
             }
+            return value;
         }
 
         private string FindPluginName()

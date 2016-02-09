@@ -25,6 +25,7 @@ namespace SonarQube.Plugins
         private string language;
         private string rulesFilePath;
         private string sqaleFilePath;
+        private string repositoryKey;
 
         #region Public methods
 
@@ -73,6 +74,13 @@ namespace SonarQube.Plugins
             return this;
         }
 
+        public RulesPluginBuilder SetRepositoryKey(string key)
+        {
+            RepositoryKeyUtilities.ThrowIfInvalid(key);
+            this.repositoryKey = key;
+            return this;
+        }
+
         #endregion
 
         #region Overrides
@@ -88,7 +96,7 @@ namespace SonarQube.Plugins
             this.AddRuleSources(tempDir);
             this.AddRuleJars();
 
-            this.SetSourceCodeTokenReplacement(WellKnownSourceCodeTokens.Rule_PluginId, this.FindPluginKey());
+            this.SetSourceCodeTokenReplacement(WellKnownSourceCodeTokens.Rule_RepositoryId, this.repositoryKey);
             this.SetSourceCodeTokenReplacement(WellKnownSourceCodeTokens.Rule_Language, this.language);
             this.SetSourceCodeTokenReplacement(WellKnownSourceCodeTokens.Rule_ResourceId, uniqueId);
 
@@ -135,6 +143,8 @@ namespace SonarQube.Plugins
             {
                 throw new FileNotFoundException(UIResources.RulesBuilder_Error_SqaleFileDoesNotExist, this.sqaleFilePath);
             }
+
+            RepositoryKeyUtilities.ThrowIfInvalid(this.repositoryKey);
         }
 
         private void AddRuleSources(string workingDirectory)

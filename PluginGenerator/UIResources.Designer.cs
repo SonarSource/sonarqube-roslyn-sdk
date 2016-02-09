@@ -199,6 +199,24 @@ namespace SonarQube.Plugins {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The plugin key is not valid. It must be alphanumeric and not blank. Key: {0}.
+        /// </summary>
+        internal static string Misc_Error_InvalidPluginKey {
+            get {
+                return ResourceManager.GetString("Misc_Error_InvalidPluginKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The repository key is not valid. It must be not blank and less than 255 characters. Characters must be alphanumeric, a period, dash or underscore. Key: {0}.
+        /// </summary>
+        internal static string Misc_Error_InvalidRepositoryKey {
+            get {
+                return ResourceManager.GetString("Misc_Error_InvalidRepositoryKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The rule language must be specified.
         /// </summary>
         internal static string RulesBuilder_Error_RuleLanguageMustBeSpecified {

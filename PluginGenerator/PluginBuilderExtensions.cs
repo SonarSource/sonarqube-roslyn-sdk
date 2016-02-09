@@ -19,10 +19,7 @@ namespace SonarQube.Plugins
             {
                 throw new ArgumentNullException("builder");
             }
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                throw new ArgumentNullException("key");
-            }
+            PluginKeyUtilities.ThrowIfInvalid(key);
             builder.SetProperty(WellKnownPluginProperties.Key, key);
             return builder;
         }
@@ -63,7 +60,8 @@ namespace SonarQube.Plugins
             SetNonNullManifestProperty(WellKnownPluginProperties.OrganizationName, definition.Organization, builder);
             SetNonNullManifestProperty(WellKnownPluginProperties.PluginName, definition.Name, builder);
             SetNonNullManifestProperty(WellKnownPluginProperties.Description, definition.Description, builder);
-            SetNonNullManifestProperty(WellKnownPluginProperties.Key, definition.Key, builder);
+
+            SetPluginKey(builder, definition.Key);
 
             return builder;
         }

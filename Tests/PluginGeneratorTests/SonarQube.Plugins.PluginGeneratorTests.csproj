@@ -113,6 +113,8 @@
     <Compile Include="NuGetDataModelTests.cs" />
     <Compile Include="PluginBuilderTests.cs" />
     <Compile Include="PluginDefinitionTests.cs" />
+    <Compile Include="RepositoryKeyUtilitiesTests.cs" />
+    <Compile Include="PluginKeyUtilitiesTests.cs" />
     <Compile Include="RulesPluginBuilderTests.cs" />
     <Compile Include="SourceGeneratorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -61,6 +61,8 @@
     <Compile Include="Maven\MavenArtifactHandlerExtensions.cs" />
     <Compile Include="NuGet\DataModel.cs" />
     <Compile Include="NuGet\NuGetSpecReader.cs" />
+    <Compile Include="PluginKeyUtilities.cs" />
+    <Compile Include="RepositoryKeyUtilities.cs" />
     <Compile Include="RulesPluginBuilder.cs" />
     <Compile Include="JarBuilder.cs" />
     <Compile Include="JavaCompilationBuilder.cs" />
@@ -110,6 +112,7 @@
     <EmbeddedResource Include="UIResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>UIResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

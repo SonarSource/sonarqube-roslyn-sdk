@@ -194,7 +194,7 @@ namespace SonarQube.Plugins.Roslyn
             pluginDefn.Developers = GetValidManifestString(ListToString(package.Authors));
 
             pluginDefn.Homepage = GetValidManifestString(package.ProjectUrl?.ToString());
-            pluginDefn.Key = GetValidManifestString(package.Id);
+            pluginDefn.Key = PluginKeyUtilities.GetValidKey(package.Id);
 
             pluginDefn.Name = GetValidManifestString(package.Title) ?? pluginDefn.Key;
             pluginDefn.Organization = GetValidManifestString(ListToString(package.Owners));
@@ -234,11 +234,14 @@ namespace SonarQube.Plugins.Roslyn
             string fullJarPath = Path.Combine(outputDirectory,
                 definition.Manifest.Key + "-plugin-" + definition.Manifest.Version + ".jar");
 
+            string repoKey = RepositoryKeyUtilities.GetValidKey(definition.PackageId + "." + definition.Language);
+
             RulesPluginBuilder builder = new RulesPluginBuilder(logger);
             builder.SetLanguage(definition.Language)
-                            .SetRulesFilePath(definition.RulesFilePath)
-                            .SetProperties(definition.Manifest)
-                            .SetJarFilePath(fullJarPath);
+                        .SetRepositoryKey(repoKey)
+                        .SetRulesFilePath(definition.RulesFilePath)
+                        .SetProperties(definition.Manifest)
+                        .SetJarFilePath(fullJarPath);
 
             if (!string.IsNullOrWhiteSpace(definition.SqaleFilePath))
             {

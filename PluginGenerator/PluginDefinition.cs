@@ -18,7 +18,6 @@ namespace SonarQube.Plugins
     public class PluginManifest
     {
         private readonly IDictionary<string, string> relativePathToFileMap;
-        private string pluginKey;
 
         public PluginManifest()
         {
@@ -28,19 +27,7 @@ namespace SonarQube.Plugins
         /// <summary>
         /// Provide a unique identifier for the plugin
         /// </summary>
-        /// <remarks>By convention these are lower-case so the returned value will always be lower-cased.</remarks>
-        public string Key
-        {
-            get { return this.pluginKey; }
-            set
-            {
-                this.pluginKey = value;
-                if (this.pluginKey != null)
-                {
-                    this.pluginKey = this.pluginKey.ToLowerInvariant();
-                }
-            }
-        }
+        public string Key { get; set; }
 
         /// <summary>
         /// The plugin version. Used by the "Update Centre" in SonarQube to

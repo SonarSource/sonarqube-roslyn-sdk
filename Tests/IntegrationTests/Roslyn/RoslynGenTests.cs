@@ -59,25 +59,26 @@ namespace SonarQube.Plugins.IntegrationTests
 
             Assert.IsNotNull(jarInfo, "Failed to process the generated jar successfully");
 
-            AssertExpectedManifestValue(WellKnownPluginProperties.Key, "analyzer1.pkgid1", jarInfo);
+            AssertExpectedManifestValue(WellKnownPluginProperties.Key, "analyzer1pkgid1", jarInfo);
 
             // Check that NuGet package properties have been correctly mapped to the plugin manifest
+            AssertExpectedManifestValue("Plugin-Key", "analyzer1pkgid1", jarInfo); // plugin-key should be lowercase and alphanumeric
             AssertPackagePropertiesInManifest(analyzerPkg, jarInfo);
 
             // Check for the expected property values required by the C# plugin
             // Property name prefixes should be lower case; the case of the value should be the same as the package id
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.analyzerId", "Analyzer1.Pkgid1", jarInfo);
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.ruleNamespace", "Analyzer1.Pkgid1", jarInfo);
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.nuget.packageId", "Analyzer1.Pkgid1", jarInfo);
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.nuget.packageVersion", "1.0.2", jarInfo);
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.staticResourceName", "Analyzer1.Pkgid1.1.0.2.zip", jarInfo);
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.pluginKey", "analyzer1.pkgid1", jarInfo);
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.pluginVersion", "1.0.2", jarInfo);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.analyzerId", "Analyzer1.Pkgid1", jarInfo);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.ruleNamespace", "Analyzer1.Pkgid1", jarInfo);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.nuget.packageId", "Analyzer1.Pkgid1", jarInfo);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.nuget.packageVersion", "1.0.2", jarInfo);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.staticResourceName", "Analyzer1.Pkgid1.1.0.2.zip", jarInfo);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.pluginKey", "analyzer1pkgid1", jarInfo);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.pluginVersion", "1.0.2", jarInfo);
 
             JarInfo.RulesDefinition rulesDefn = AssertRulesDefinitionExists(jarInfo);
             AssertRepositoryIsValid(rulesDefn.Repository);
             AssertExpectedRulesExist(analyzer, rulesDefn.Repository);
-            Assert.AreEqual("roslyn.analyzer1.pkgid1", rulesDefn.Repository.Key, "Unexpected repository key");
+            Assert.AreEqual("roslyn.analyzer1.pkgid1.cs", rulesDefn.Repository.Key, "Unexpected repository key");
 
             AssertExpectedStaticZipFileExists(jarFilePath, "static\\analyzer1.pkgid1.1.0.2.zip",
                 /* zip file contents */
@@ -222,7 +223,6 @@ namespace SonarQube.Plugins.IntegrationTests
 
         private static void AssertPackagePropertiesInManifest(IPackage package, JarInfo jarInfo)
         {            
-            AssertExpectedManifestValue("Plugin-Key", package.Id.ToLowerInvariant(), jarInfo); // plugin-key should be lowercase
             AssertExpectedManifestValue("Plugin-Name", package.Title, jarInfo);
             AssertExpectedManifestValue("Plugin-Version", package.Version.ToString(), jarInfo);
             AssertExpectedManifestValue("Plugin-Description", package.Description, jarInfo);
