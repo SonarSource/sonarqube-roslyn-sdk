@@ -73,6 +73,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             Assert_AnalyzerIsPresent(result, "RoslynAnalyzer11.InternalAnalyzer");
 
             Assert_AnalyzerNotPresent(result, typeof(RoslynAnalyzer11.AbstractAnalyzer)); // not expecting abstract analyzers
+            Assert_AnalyzerNotPresent(result, typeof(RoslynAnalyzer11.UnattributedAnalyzer)); // not expecting analyzers without attributes
 
             Assert.AreEqual(3, result.Count(), "Expecting 3 C# analyzers");
         }

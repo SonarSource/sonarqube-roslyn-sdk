@@ -143,6 +143,11 @@ namespace SonarQube.Plugins.Roslyn
             DiagnosticAnalyzerAttribute analyzerAttribute =
                 (DiagnosticAnalyzerAttribute)Attribute.GetCustomAttribute(type, typeof(DiagnosticAnalyzerAttribute));
 
+            // Analyzer must have a [DiagnosticAnalyzerAttribute] to be recognised as a valid analyzer
+            if (analyzerAttribute == null)
+            {
+                return false;
+            }
             return analyzerAttribute.Languages.Any(l => String.Equals(l, language, StringComparison.OrdinalIgnoreCase));
         }
     }
