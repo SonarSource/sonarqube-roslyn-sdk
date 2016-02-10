@@ -70,9 +70,11 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             // Assert
             Assert_AnalyzerIsPresent(result, typeof(RoslynAnalyzer11.CSharpAnalyzer));
             Assert_AnalyzerIsPresent(result, typeof(RoslynAnalyzer11.ConfigurableAnalyzer));
+            Assert_AnalyzerIsPresent(result, "RoslynAnalyzer11.InternalAnalyzer");
+
             Assert_AnalyzerNotPresent(result, typeof(RoslynAnalyzer11.AbstractAnalyzer)); // not expecting abstract analyzers
 
-            Assert.AreEqual(2, result.Count(), "Expecting 2 C# analyzers");
+            Assert.AreEqual(3, result.Count(), "Expecting 3 C# analyzers");
         }
 
         [TestMethod]
@@ -119,22 +121,29 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             // Assert
             Assert_AnalyzerIsPresent(result, typeof(RoslynAnalyzer11.CSharpAnalyzer));
             Assert_AnalyzerIsPresent(result, typeof(RoslynAnalyzer11.ConfigurableAnalyzer));
+            Assert_AnalyzerIsPresent(result, "RoslynAnalyzer11.InternalAnalyzer");
+
             Assert_AnalyzerNotPresent(result, typeof(RoslynAnalyzer11.AbstractAnalyzer)); // not expecting abstract analyzers
 
             Assert_AnalyzerIsPresent(result, typeof(RoslynAnalyzer10.ExampleAnalyzer2));
 
-            Assert.AreEqual(3, result.Count(), "Unexpected number of C# analyzers returned");
+            Assert.AreEqual(4, result.Count(), "Unexpected number of C# analyzers returned");
         }
 
         #region Private Methods
 
+        private void Assert_AnalyzerIsPresent(IEnumerable<DiagnosticAnalyzer> analyzers, string fullExpectedTypeName)
+        {
+            Assert.IsNotNull(
+                analyzers.SingleOrDefault(d => d.GetType().FullName == fullExpectedTypeName),
+                "Expected an analyzer with name: " + fullExpectedTypeName);
+        }
+
         private void Assert_AnalyzerIsPresent(IEnumerable<DiagnosticAnalyzer> analyzers, Type expected)
         {
-            string analyzerName = expected.FullName;
-            Assert.IsNotNull(
-                analyzers.SingleOrDefault(d => d.GetType().FullName == analyzerName),
-                "Expected an analyzer with name: " + analyzerName);
+            Assert_AnalyzerIsPresent(analyzers, expected.FullName);
         }
+
         private void Assert_AnalyzerNotPresent(IEnumerable<DiagnosticAnalyzer> analyzers, Type expected)
         {
             string analyzerName = expected.FullName;
