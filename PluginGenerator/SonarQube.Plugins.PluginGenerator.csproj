@@ -74,6 +74,9 @@
     <Compile Include="PluginBuilderExtensions.cs" />
     <Compile Include="PluginDefinition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\AssemblyInfo.Shared.cs">
+      <Link>Properties\AssemblyInfo.Shared.cs</Link>
+    </Compile>
     <Compile Include="SonarQube\NativeMethods.cs" />
     <Compile Include="SonarQube\ProcessRunner.cs" />
     <Compile Include="SonarQube\ProcessRunnerArguments.cs" />

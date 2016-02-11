@@ -115,6 +115,9 @@
     <Compile Include="NuGetMachineWideSettingsTests.cs" />
     <Compile Include="NuGetRepositoryFactoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\..\AssemblyInfo.Shared.cs">
+      <Link>Properties\AssemblyInfo.Shared.cs</Link>
+    </Compile>
     <Compile Include="RulesGeneratorTests.cs" />
     <Compile Include="NuGetPackageHandlerTests.cs" />
     <Compile Include="SupportedLanguagesTests.cs" />
