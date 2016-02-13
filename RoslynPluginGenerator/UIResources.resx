@@ -129,6 +129,9 @@
   <data name="APG_ExtractingPackageFiles" xml:space="preserve">
     <value>Extracting files from the package to {0}</value>
   </data>
+  <data name="APG_GeneratingConstantSqaleFile" xml:space="preserve">
+    <value>Generating fixed remediation cost SQALE file...</value>
+  </data>
   <data name="APG_GeneratingPlugin" xml:space="preserve">
     <value>Generating plugin...</value>
   </data>
@@ -152,6 +155,9 @@
   </data>
   <data name="APG_RulesGeneratedToFile" xml:space="preserve">
     <value>{0} rules generated to {1}</value>
+  </data>
+  <data name="APG_SqaleGeneratedToFile" xml:space="preserve">
+    <value>SQALE generated to file {0}</value>
   </data>
   <data name="APG_UnsupportedLanguage" xml:space="preserve">
     <value>The language '{0}' is not supported. Valid options are 'cs' or 'vb'.</value>

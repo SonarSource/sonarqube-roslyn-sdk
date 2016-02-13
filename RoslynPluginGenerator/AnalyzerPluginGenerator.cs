@@ -7,6 +7,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using NuGet;
+using SonarLint.XmlDescriptor;
 using SonarQube.Plugins.Common;
 using SonarQube.Plugins.Roslyn.CommandLine;
 using System;
@@ -97,18 +98,24 @@ namespace SonarQube.Plugins.Roslyn
                 definition.PackageId = package.Id;
                 definition.PackageVersion = package.Version.ToString();
                 definition.Manifest = CreatePluginDefinition(package);
-                definition.RulesFilePath = Path.Combine(baseDirectory, "rules.xml");
 
                 string packageDir = this.packageHandler.GetLocalPackageRootDirectory(package);
 
                 definition.StaticResourceName = Path.GetFileName(packageDir) + ".zip";
                 definition.SourceZipFilePath = Path.Combine(baseDirectory, definition.StaticResourceName);
                 ZipFile.CreateFromDirectory(packageDir, definition.SourceZipFilePath, CompressionLevel.Optimal, false);
-                
-                bool success = TryGenerateRulesFile(this.packageHandler.LocalCacheRoot, definition.RulesFilePath, language, packageDir);
 
-                if (success)
+                IEnumerable<DiagnosticAnalyzer> analyzers = GetAnalyzers(packageDir, this.packageHandler.LocalCacheRoot, language);
+
+                if (analyzers.Any())
                 {
+                    definition.RulesFilePath = GenerateRulesFile(analyzers, baseDirectory);
+
+                    if (definition.SqaleFilePath == null)
+                    {
+                        definition.SqaleFilePath = GenerateFixedSqaleFile(analyzers, baseDirectory);
+                    }
+
                     BuildPlugin(definition, baseDirectory, outputDirectory);
                 }
             }
@@ -142,48 +149,72 @@ namespace SonarQube.Plugins.Roslyn
             return false;
         }
 
-        /// <summary>
-        /// Attempts to generate a rules file for assemblies in the specified package.
-        /// </summary>
-        /// <param name="additionalSearchFolder">Root directory to search when looking for analyzer dependencies</param>
-        /// <param name="rulesFilePath">Full name of the file to create</param>
-        /// <param name="packageRootDir">The directory containing all of the files in the analyzer package</param>
-        private bool TryGenerateRulesFile(string additionalSearchFolder, string rulesFilePath, string language, string packageRootDir)
+        private IEnumerable<DiagnosticAnalyzer> GetAnalyzers(string packageRootDir, string additionalSearchFolder, string language)
         {
-            bool success = false;
-            this.logger.LogInfo(UIResources.APG_GeneratingRules);
-
             this.logger.LogInfo(UIResources.APG_LocatingAnalyzers);
-
             string[] analyzerFiles = Directory.GetFiles(packageRootDir, "*.dll", SearchOption.AllDirectories);
-            
+
             string roslynLanguageName = SupportedLanguages.GetRoslynLanguageName(language);
             this.logger.LogDebug(UIResources.APG_LogAnalyzerLanguage, roslynLanguageName);
 
             DiagnosticAssemblyScanner diagnosticAssemblyScanner = new DiagnosticAssemblyScanner(this.logger, additionalSearchFolder);
             IEnumerable<DiagnosticAnalyzer> analyzers = diagnosticAssemblyScanner.InstantiateDiagnostics(roslynLanguageName, analyzerFiles.ToArray());
 
-            this.logger.LogInfo(UIResources.APG_AnalyzersLocated, analyzers.Count());
-
             if (analyzers.Any())
             {
-                RuleGenerator ruleGen = new RuleGenerator(this.logger);
-                Rules rules = ruleGen.GenerateRules(analyzers);
-
-                Debug.Assert(rules != null, "Not expecting the generated rules to be null");
-
-                if (rules != null)
-                {
-                    rules.Save(rulesFilePath, logger);
-                    this.logger.LogDebug(UIResources.APG_RulesGeneratedToFile, rules.Count, rulesFilePath);
-                    success = true;
-                }
+                this.logger.LogInfo(UIResources.APG_AnalyzersLocated, analyzers.Count());
             }
             else
             {
                 this.logger.LogWarning(UIResources.APG_NoAnalyzersFound);
             }
-            return success;
+            return analyzers;
+        }
+
+        /// <summary>
+        /// Generate a rules file for the specified analyzers
+        /// </summary>
+        /// <returns>The full path to the generated file</returns>
+        private string GenerateRulesFile(IEnumerable<DiagnosticAnalyzer> analyzers, string baseDirectory)
+        {
+            this.logger.LogInfo(UIResources.APG_GeneratingRules);
+
+            Debug.Assert(analyzers.Any(), "Expecting at least one analyzer");
+
+            string rulesFilePath = Path.Combine(baseDirectory, "rules.xml");
+
+            RuleGenerator ruleGen = new RuleGenerator(this.logger);
+            Rules rules = ruleGen.GenerateRules(analyzers);
+
+            Debug.Assert(rules != null, "Not expecting the generated rules to be null");
+
+            if (rules != null)
+            {
+                rules.Save(rulesFilePath, logger);
+                this.logger.LogDebug(UIResources.APG_RulesGeneratedToFile, rules.Count, rulesFilePath);
+            }
+
+            return rulesFilePath;
+        }
+
+        /// <summary>
+        /// Generates a SQALE file with fixed remediation costs for the specified analyzers
+        /// </summary>
+        /// <returns>The full path to the generated file</returns>
+        private string GenerateFixedSqaleFile(IEnumerable<DiagnosticAnalyzer> analyzers, string baseDirectory)
+        {
+            this.logger.LogInfo(UIResources.APG_GeneratingConstantSqaleFile);
+
+            HardcodedConstantSqaleGenerator generator = new HardcodedConstantSqaleGenerator(this.logger);
+
+            string sqaleFilePath = Path.Combine(baseDirectory, "sqale.xml");
+
+            SqaleRoot sqale = generator.GenerateSqaleData(analyzers, "15min");
+
+            Serializer.SaveModel(sqale, sqaleFilePath);
+            this.logger.LogDebug(UIResources.APG_SqaleGeneratedToFile, sqaleFilePath);
+
+            return sqaleFilePath;
         }
 
         private static PluginManifest CreatePluginDefinition(IPackage package)

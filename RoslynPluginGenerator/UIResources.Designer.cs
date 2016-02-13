@@ -97,6 +97,15 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Generating fixed remediation cost SQALE file....
+        /// </summary>
+        public static string APG_GeneratingConstantSqaleFile {
+            get {
+                return ResourceManager.GetString("APG_GeneratingConstantSqaleFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Generating plugin....
         /// </summary>
         public static string APG_GeneratingPlugin {
@@ -165,6 +174,15 @@ namespace SonarQube.Plugins.Roslyn {
         public static string APG_RulesGeneratedToFile {
             get {
                 return ResourceManager.GetString("APG_RulesGeneratedToFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SQALE generated to file {0}.
+        /// </summary>
+        public static string APG_SqaleGeneratedToFile {
+            get {
+                return ResourceManager.GetString("APG_SqaleGeneratedToFile", resourceCulture);
             }
         }
         
