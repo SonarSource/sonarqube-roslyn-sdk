@@ -89,7 +89,11 @@ namespace SonarQube.Plugins
         {
             this.ValidateRulesConfiguration();
 
-            string uniqueId = Guid.NewGuid().ToString();
+            string packageName = this.FindPackageName(); ;
+            Debug.Assert(!string.IsNullOrWhiteSpace(packageName), "Package name should be set");
+
+            string resourceRoot = packageName.Replace(".", "/") + "/resources/";
+            string absoluteResourceRoot = "/" + resourceRoot;
 
             string tempDir = Utilities.CreateSubDirectory(baseWorkingDirectory, ".rules");
 
@@ -98,7 +102,7 @@ namespace SonarQube.Plugins
 
             this.SetSourceCodeTokenReplacement(WellKnownSourceCodeTokens.Rule_RepositoryId, this.repositoryKey);
             this.SetSourceCodeTokenReplacement(WellKnownSourceCodeTokens.Rule_Language, this.language);
-            this.SetSourceCodeTokenReplacement(WellKnownSourceCodeTokens.Rule_ResourceId, uniqueId);
+            this.SetSourceCodeTokenReplacement(WellKnownSourceCodeTokens.Rule_ResourceId, absoluteResourceRoot);
 
             this.AddExtension(RulesExtensionClassName);
 
@@ -108,11 +112,11 @@ namespace SonarQube.Plugins
             // an issue with SonarQube as plugins should be loaded in isolation from each other
             // but it simplifies testing
             Debug.Assert(!string.IsNullOrEmpty(this.rulesFilePath));
-            this.AddResourceFile(this.rulesFilePath, "resources/" + uniqueId + ".rules.xml");
+            this.AddResourceFile(this.rulesFilePath, resourceRoot + "rules.xml");
 
             if (!string.IsNullOrEmpty(this.sqaleFilePath))
             {
-                this.AddResourceFile(this.sqaleFilePath, "resources/" + uniqueId + ".sqale.xml");
+                this.AddResourceFile(this.sqaleFilePath, resourceRoot+ "sqale.xml");
             }
 
             // Now apply the base configuration

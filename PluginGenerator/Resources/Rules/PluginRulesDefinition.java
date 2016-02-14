@@ -30,16 +30,16 @@ public final class PluginRulesDefinition implements RulesDefinition {
   }
 
   protected String rulesDefinitionFilePath() {
-    return "/resources/[RULE_RESOURCE_ID].rules.xml";
+    return "[RULE_RESOURCE_ID]rules.xml";
   }
 
   protected String sqaleDefinitionFilePath() {
-    return "/resources/[RULE_RESOURCE_ID].sqale.xml";
+    return "[RULE_RESOURCE_ID]sqale.xml";
   }
 
   private void defineRulesForLanguage(Context context, String repositoryKey, String repositoryName, String languageKey) {
     NewRepository repository = context.createRepository(repositoryKey, languageKey).setName(repositoryName);
-
+	
     InputStream rulesXml = this.getClass().getResourceAsStream(rulesDefinitionFilePath());
     if (rulesXml == null)
 	{

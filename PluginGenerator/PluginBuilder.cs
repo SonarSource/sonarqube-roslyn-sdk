@@ -8,6 +8,7 @@ using SonarQube.Plugins.Common;
 using SonarQube.Plugins.Maven;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -275,6 +276,18 @@ namespace SonarQube.Plugins
             return pluginKey;
         }
 
+        protected string FindPackageName()
+        {
+            string packageName = null;
+
+            string pluginKey = this.FindPluginKey();
+            if (pluginKey != null)
+            {
+                packageName = CorePluginPackageNameTemplate.Replace(WellKnownSourceCodeTokens.Core_PluginKey, pluginKey);
+            }
+            return packageName;
+        }
+
         #endregion
 
         #region Core builder configuration
@@ -330,8 +343,11 @@ namespace SonarQube.Plugins
         private void ConfigureCoreSourceFileReplacements()
         {
             string pluginKey = this.FindPluginKey();
-            string packageName = CorePluginPackageNameTemplate.Replace(WellKnownSourceCodeTokens.Core_PluginKey, pluginKey);
+            string packageName = this.FindPackageName();
             string fullPluginClassName = CorePluginEntryClassTemplate.Replace(WellKnownSourceCodeTokens.Core_PluginPackage, packageName);
+
+            Debug.Assert(!string.IsNullOrWhiteSpace(pluginKey), "Plugin key should be set");
+            Debug.Assert(!string.IsNullOrWhiteSpace(packageName), "Package name should be set");
 
             this.SetSourceFileReplacement(WellKnownSourceCodeTokens.Core_PluginPackage, packageName);
             this.SetSourceFileReplacement(WellKnownSourceCodeTokens.Core_PluginKey, pluginKey);
