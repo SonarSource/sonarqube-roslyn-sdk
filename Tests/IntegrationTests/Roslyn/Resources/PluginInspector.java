@@ -19,9 +19,12 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.jar.Attributes;
@@ -51,7 +54,8 @@ public class PluginInspector  {
 
         if (args.length != 1 && args.length != 2){
             Log("Expecting at least one argument: the full path to the jar file.\r\nOptionally, the name of the file to be created may also be supplied.");
-			System.exit(ErrorCode);
+            //          jarPath = "C:\\SonarQube\\sonarqube-5.2\\extensions\\plugins\\analyzer1pkgid1-plugin-1.0.2.jar";
+            System.exit(ErrorCode);
         }
         else{
             jarPath = args[0];
@@ -63,21 +67,72 @@ public class PluginInspector  {
             System.exit(ErrorCode);
         }
 
-        Document doc = ProcessJar(jarPath);
+        String xmlFilePath = args.length == 2 ? args[1] : jarPath + ".dump.xml";
 
-        int exitCode = SuccessCode;
+        Integer exitCode = CreateAndInvokeInspector(jarPath, xmlFilePath);
+
+        System.exit(exitCode.intValue());
+    }
+
+    public static Integer CreateAndInvokeInspector(String jarPath, String xmlFilePath) throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        // Create a class loader that will be used to load the plugin jar and
+        // // all of the required SonarQube jars. It will also be able to
+        // load the resources from the jar.
+        // We're doing this to work round the fact that the SqaleXmLoader uses
+        // it's class loader to locate the embedded SQALE file (unlike the Rule
+        // reader that accepts an InputStream). This means that the class loader
+        // that created the SqaleXmlLoader must be able to locate resources embedded
+        // in the plugin. So, we'll create a class loader that can find everything
+        // without delegating to the main App class loader for the executable
+        URLClassLoader loader = CreatePluginLoader(jarPath);
+
+        Class<?> inspectorClass = loader.loadClass("PluginInspector");
+        Object inspector = TryCreateInstance(inspectorClass);
+
+        // The inspector has been created using a different class loader so we
+        // can't cast it to PluginInspector. Instead, we have to invoke the
+        // method using reflection.
+        Method method = inspectorClass.getMethod("Invoke", String.class, String.class);
+        Integer exitCode = (Integer)method.invoke(inspector, jarPath, xmlFilePath);
+        return exitCode;
+    }
+
+    private static URLClassLoader CreatePluginLoader(String jarPath) throws MalformedURLException {
+
+        // Creates and returns a class loader that can load the specified jar and all
+        // of the jars that the App plugin loader can handle, but that is not
+        // parented to the App plugin loader
+        URL jarUrl = new URL("file:/" + jarPath);
+
+        // Hard-cast to URLClassLoader
+        URLClassLoader parentUrlLoader = (URLClassLoader)PluginInspector.class.getClassLoader();
+
+        // Create a list containing all of the parent URLs together with the specified jar URL
+        ArrayList<URL> allUrls = new ArrayList<URL>();
+        allUrls.addAll(Arrays.asList(parentUrlLoader.getURLs()));
+        allUrls.add(jarUrl);
+        URL[] urlArray = allUrls.toArray(new URL[0]);
+
+        URLClassLoader loader = new URLClassLoader(urlArray, parentUrlLoader.getParent());
+        return loader;
+    }
+
+    public Integer Invoke(String jarPath, String xmlFilePath) throws Exception {
+
+        ClassLoader pluginLoader = this.getClass().getClassLoader();
+        Document doc = this.ProcessJar(jarPath, pluginLoader);
+
+        Integer exitCode = SuccessCode;
         if (doc == null) {
             exitCode = ErrorCode;
         }
         else {
-            String xmlFilePath = args.length == 2 ? args[1] : jarPath + ".dump.xml";
             SaveToFile(doc, xmlFilePath);
         }
-
-        System.exit(exitCode);
+        return exitCode;
     }
 
-    private static Document ProcessJar(String jarPath) throws MalformedURLException, ClassNotFoundException {
+    private Document ProcessJar(String jarPath, ClassLoader pluginLoader) throws MalformedURLException, ClassNotFoundException {
         Manifest manifest = TryGetManifest(jarPath);
 
         if (manifest == null)
@@ -103,9 +158,7 @@ public class PluginInspector  {
         ProcessManifest(mainAttrs, doc, root);
 
         Log("Creating plugin dynamically...");
-        URL jarUrl = new URL("file:/" + jarPath);
-        URLClassLoader loader = new URLClassLoader(new URL[]{jarUrl});
-        Class<?> pluginClass = loader.loadClass(pluginClassName);
+        Class<?> pluginClass = pluginLoader.loadClass(pluginClassName);
         SonarPlugin plugin = TryCreateInstance(pluginClass);
 
         if (plugin != null) {
