@@ -117,7 +117,7 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
 
             // 2. Missing sqale file
             logger = new TestLogger();
-            rawArgs = new string[] { "/s:missingFile.txt", "/a:validId" };
+            rawArgs = new string[] { "/sqale:missingFile.txt", "/a:validId" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             AssertArgumentsNotProcessed(actualArgs, logger);
@@ -128,7 +128,7 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             string filePath = TestUtils.CreateTextFile("valid.sqale.txt", testDir, "sqale file contents");
             
             logger = new TestLogger();
-            rawArgs = new string[] { "/s:" + filePath,  "/a:valid:1.0" };
+            rawArgs = new string[] { "/sqale:" + filePath,  "/a:valid:1.0" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             AssertArgumentsProcessed(actualArgs, logger, "valid", "1.0", filePath);

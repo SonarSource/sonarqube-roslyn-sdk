@@ -38,7 +38,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             Descriptors.Add(new ArgumentDescriptor(
                 id: KeywordIds.AnalyzerRef, prefixes: new string[] { "/analyzer:", "/a:" }, required: true, allowMultiple: false, description: CmdLineResources.ArgDescription_AnalzyerRef));
             Descriptors.Add(new ArgumentDescriptor(
-                id: KeywordIds.SqaleXmlFile, prefixes: new string[] { "/sqale:", "/s:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_SqaleXmlFile));
+                id: KeywordIds.SqaleXmlFile, prefixes: new string[] { "/sqale:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_SqaleXmlFile));
 
             Debug.Assert(Descriptors.All(d => d.Prefixes != null && d.Prefixes.Any()), "All descriptors must provide at least one prefix");
             Debug.Assert(Descriptors.Select(d => d.Id).Distinct().Count() == Descriptors.Count, "All descriptors must have a unique id");

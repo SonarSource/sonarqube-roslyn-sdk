@@ -138,6 +138,9 @@
   <data name="APG_GeneratingRules" xml:space="preserve">
     <value>Generating rules...</value>
   </data>
+  <data name="APG_InvalidSqaleFile" xml:space="preserve">
+    <value>The specified SQALE file is invalid: {0}</value>
+  </data>
   <data name="APG_LocatingAnalyzers" xml:space="preserve">
     <value>Looking for analyzers in the package...</value>
   </data>
@@ -158,6 +161,11 @@
   </data>
   <data name="APG_SqaleGeneratedToFile" xml:space="preserve">
     <value>SQALE generated to file {0}</value>
+  </data>
+  <data name="APG_TemplateSqaleFileGenerated" xml:space="preserve">
+    <value>
+A template SQALE file was saved to {0}. To use the template, fill in the appropriate remediation information for each rule, then re-run this generator specifying the sqale file to use with the /sqale:[filename] argument.
+</value>
   </data>
   <data name="APG_UnsupportedLanguage" xml:space="preserve">
     <value>The language '{0}' is not supported. Valid options are 'cs' or 'vb'.</value>

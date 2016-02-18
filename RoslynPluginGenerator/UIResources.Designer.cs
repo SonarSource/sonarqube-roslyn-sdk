@@ -124,6 +124,15 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The specified SQALE file is invalid: {0}.
+        /// </summary>
+        public static string APG_InvalidSqaleFile {
+            get {
+                return ResourceManager.GetString("APG_InvalidSqaleFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Looking for analyzers in the package....
         /// </summary>
         public static string APG_LocatingAnalyzers {
@@ -183,6 +192,17 @@ namespace SonarQube.Plugins.Roslyn {
         public static string APG_SqaleGeneratedToFile {
             get {
                 return ResourceManager.GetString("APG_SqaleGeneratedToFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 
+        ///A template SQALE file was saved to {0}. To use the template, fill in the appropriate remediation information for each rule, then re-run this generator specifying the sqale file to use with the /sqale:[filename] argument.
+        ///.
+        /// </summary>
+        public static string APG_TemplateSqaleFileGenerated {
+            get {
+                return ResourceManager.GetString("APG_TemplateSqaleFileGenerated", resourceCulture);
             }
         }
         

@@ -11,6 +11,9 @@ using System.IO;
 using NuGet;
 using System.Linq;
 using System.Collections.Generic;
+using SonarQube.Plugins.Roslyn.CommandLine;
+using SonarLint.XmlDescriptor;
+
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
     /// <summary>
@@ -184,6 +187,76 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
         }
 
+        [TestMethod]
+        public void Generate_SqaleFileNotSpecified_TemplateFileCreated()
+        {
+            // Arrange
+            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
+            CreatePackageInFakeRemoteRepo("dummy.id", "1.1");
+
+            string expectedSqaleFilePath = Path.Combine(outputDir, AnalyzerPluginGenerator.SqaleTemplateFileName);
+
+            // Act
+            bool result = apg.Generate(new NuGetReference("dummy.id", new SemanticVersion("1.1")), "cs", null, outputDir);
+
+            // Assert
+            Assert.IsTrue(result, "Expecting generation to have succeeded");
+            Assert.IsTrue(DoesTemplateSqaleFileExists(outputDir), "Expecting a template sqale file to have been created");
+            this.TestContext.AddResultFile(expectedSqaleFilePath);
+        }
+
+        [TestMethod]
+        public void Generate_ValidSqaleFileSpecified_TemplateFileNotCreated()
+        {
+            // Arrange
+            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
+            CreatePackageInFakeRemoteRepo("dummy.id", "1.1");
+
+            // Create a dummy sqale file
+            string dummySqaleFilePath = Path.Combine(outputDir, "inputSqale.xml");
+            SqaleRoot dummySqale = new SqaleRoot();
+            Serializer.SaveModel(dummySqale, dummySqaleFilePath);
+
+            // Act
+            bool result = apg.Generate(new NuGetReference("dummy.id", new SemanticVersion("1.1")), "cs", dummySqaleFilePath, outputDir);
+
+            // Assert
+            Assert.IsTrue(result, "Expecting generation to have succeeded");
+            Assert.IsFalse(DoesTemplateSqaleFileExists(outputDir), "Not expecting a template sqale file to have been created because a sqale file was supplied");
+        }
+
+        [TestMethod]
+        public void Generate_InvalidSqaleFileSpecified_GeneratorError()
+        {
+            // Arrange
+            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+
+            TestLogger logger = new TestLogger();
+            IPackageRepository fakeRemoteRepo = new LocalPackageRepository(GetFakeRemoteNuGetSourceDir());
+            CreatePackageInFakeRemoteRepo("dummy.id", "1.1");
+
+            // Create an invalid sqale file
+            string dummySqaleFilePath = Path.Combine(outputDir, "invalidSqale.xml");
+            File.WriteAllText(dummySqaleFilePath, "not valid xml");
+
+            string templateSqaleFilePath = Path.Combine(outputDir, AnalyzerPluginGenerator.SqaleTemplateFileName);
+
+            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
+            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
+
+            // Act
+            bool result = apg.Generate(new NuGetReference("dummy.id", new SemanticVersion("1.1")), "cs", dummySqaleFilePath, outputDir);
+
+            // Assert
+            Assert.IsFalse(result, "Expecting generation to have failed");
+            Assert.IsFalse(DoesTemplateSqaleFileExists(outputDir), "Not expecting a template sqale file to have been created because a sqale file was supplied");
+            logger.AssertSingleErrorExists("invalidSqale.xml"); // expecting an error containing the invalid sqale file name
+        }
+
         #region Private methods
 
         private AnalyzerPluginGenerator CreateTestSubjectWithFakeRemoteRepo()
@@ -227,9 +300,21 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             CreatePackage(mgr, Node.Root, nodesRequireLicense, Node.Child1, Node.Child2);
         }
 
+        private void CreatePackageInFakeRemoteRepo(string packageId, string packageVersion)
+        {
+            string packageSource = GetFakeRemoteNuGetSourceDir();
+            IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository(packageSource);
+            PackageManager mgr = new PackageManager(repo, packageSource);
+
+            CreatePackage(mgr, packageId, packageVersion, typeof(RoslynAnalyzer11.AbstractAnalyzer).Assembly.Location, License.NotRequired /* no dependencies */ );
+        }
+
         private void CreatePackage(IPackageManager manager, Node packageNode, Node[] nodesRequireLicense, params Node[] dependencyNodes)
         {
-            CreatePackage(manager, packageNode, IsLicenseRequiredFor(packageNode, nodesRequireLicense), dependencyNodes);
+            CreatePackage(manager, packageNode.ToString(), "1.0",
+                typeof(RoslynAnalyzer11.CSharpAnalyzer).Assembly.Location, // generation will fail unless there are analyzers to process
+                IsLicenseRequiredFor(packageNode, nodesRequireLicense),
+                dependencyNodes.Select(n => n.ToString()).ToArray());
         }
 
         private License IsLicenseRequiredFor(Node node, Node[] nodesRequireLicense)
@@ -237,26 +322,31 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             return nodesRequireLicense.Contains(node) ? License.Required : License.NotRequired;
         }
         
-        private void CreatePackage(IPackageManager manager, Node packageNode, License requiresLicenseAccept, params Node[] dependencyNodes)
+        private void CreatePackage(IPackageManager manager,
+            string packageId,
+            string packageVersion,
+            string contentFilePath,
+            License requiresLicenseAccept,
+            params string[] dependencyIds)
         {
             PackageBuilder builder = new PackageBuilder();
             ManifestMetadata metadata = new ManifestMetadata()
             {
                 Authors = "dummy author",
-                Version = new SemanticVersion("1.0").ToString(),
-                Id = packageNode.ToString(),
+                Version = new SemanticVersion(packageVersion).ToString(),
+                Id = packageId,
                 Description = "dummy description",
                 LicenseUrl = "http://choosealicense.com/",
                 RequireLicenseAcceptance = (requiresLicenseAccept == License.Required)
             };
 
             List<ManifestDependency> dependencyList = new List<ManifestDependency>();
-            foreach (Node dependencyNode in dependencyNodes)
+            foreach (string dependencyNode in dependencyIds)
             {
                 dependencyList.Add(new ManifestDependency()
                 {
-                    Id = dependencyNode.ToString(),
-                    Version = new SemanticVersion("1.0").ToString(),
+                    Id = dependencyNode,
+                    Version = new SemanticVersion(packageVersion).ToString(),
                 });
             }
 
@@ -271,16 +361,20 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             builder.Populate(metadata);
 
-            // dummy payload
-            string testDir = TestUtils.EnsureTestDirectoryExists(this.TestContext, "source");
-            string dummyTextFile = TestUtils.CreateTextFile("blank.txt", testDir, "content");
+            string fileToEmbed = contentFilePath;
+            // Create a dummy payload if required
+            if (fileToEmbed == null)
+            {
+                string testDir = TestUtils.EnsureTestDirectoryExists(this.TestContext, "source");
+                fileToEmbed = TestUtils.CreateTextFile("blank.txt", testDir, "content");
+            }
 
             PhysicalPackageFile file = new PhysicalPackageFile();
-            file.SourcePath = dummyTextFile;
-            file.TargetPath = "dummy.txt";
+            file.SourcePath = fileToEmbed;
+            file.TargetPath = Path.GetFileName(fileToEmbed);
             builder.Files.Add(file);
 
-            string fileName = packageNode.ToString() + "." + metadata.Version + ".nupkg";
+            string fileName = packageId.ToString() + "." + metadata.Version + ".nupkg";
             string destinationName = Path.Combine(manager.LocalRepository.Source.ToString(), fileName);
             
             using (Stream fileStream = File.Open(destinationName, FileMode.OpenOrCreate))
@@ -299,6 +393,11 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             return TestUtils.EnsureTestDirectoryExists(this.TestContext, ".fakeRemoteNuGetSource");
         }
 
+        private static bool DoesTemplateSqaleFileExists(string directory)
+        {
+            string filePath = Path.Combine(directory, AnalyzerPluginGenerator.SqaleTemplateFileName);
+            return File.Exists(filePath);
+        }
         #endregion
 
     }

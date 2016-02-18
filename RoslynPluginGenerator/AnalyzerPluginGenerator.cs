@@ -21,6 +21,9 @@ namespace SonarQube.Plugins.Roslyn
 {
     public class AnalyzerPluginGenerator
     {
+        public const string SqaleTemplateFileName = "sqale.template.xml";
+        private const string DefaultRemediationCost = "15min";
+
         private const string RoslynResourcesRoot = "SonarQube.Plugins.Roslyn.Resources.";
 
         /// <summary>
@@ -76,16 +79,25 @@ namespace SonarQube.Plugins.Roslyn
             SupportedLanguages.ThrowIfNotSupported(language);
 
             IPackage package = this.packageHandler.FetchPackage(analyzeRef.PackageId, analyzeRef.Version);
-
-            if (package != null)
+            if (package == null)
             {
-                // Build machines will need to install this package, it is not feasible to create plugins for packages requiring license acceptance
-                if (PackageRequiresLicenseAcceptance(package))
-                {
-                    this.logger.LogError(UIResources.APG_NGPackageRequiresLicenseAcceptance, package.Id, package.Version);
-                    return false;
-                }
+                return false; // failed to retrieve a package
+            }
 
+            // Build machines will need to install this package, it is not feasible to create plugins for packages requiring license acceptance
+            if (PackageRequiresLicenseAcceptance(package))
+            {
+                this.logger.LogError(UIResources.APG_NGPackageRequiresLicenseAcceptance, package.Id, package.Version);
+                return false;
+            }
+
+            string packageDir = this.packageHandler.GetLocalPackageRootDirectory(package);
+            IEnumerable<DiagnosticAnalyzer> analyzers = GetAnalyzers(packageDir, this.packageHandler.LocalCacheRoot, language);
+
+            string createJarFilePath = null;
+
+            if (analyzers.Any())
+            {
                 // Create a uniquely-named temp directory for this generation run
                 string baseDirectory = Utilities.CreateTempDirectory(".gen");
                 baseDirectory = Utilities.CreateSubDirectory(baseDirectory, Guid.NewGuid().ToString());
@@ -99,28 +111,41 @@ namespace SonarQube.Plugins.Roslyn
                 definition.PackageVersion = package.Version.ToString();
                 definition.Manifest = CreatePluginDefinition(package);
 
-                string packageDir = this.packageHandler.GetLocalPackageRootDirectory(package);
-
+                // Create a zip containing the required analyzer files
                 definition.StaticResourceName = Path.GetFileName(packageDir) + ".zip";
                 definition.SourceZipFilePath = Path.Combine(baseDirectory, definition.StaticResourceName);
                 ZipFile.CreateFromDirectory(packageDir, definition.SourceZipFilePath, CompressionLevel.Optimal, false);
 
-                IEnumerable<DiagnosticAnalyzer> analyzers = GetAnalyzers(packageDir, this.packageHandler.LocalCacheRoot, language);
+                definition.RulesFilePath = GenerateRulesFile(analyzers, baseDirectory);
 
-                if (analyzers.Any())
+                string generatedSqaleFile = null;
+                bool generate = true;
+                if (definition.SqaleFilePath == null)
                 {
-                    definition.RulesFilePath = GenerateRulesFile(analyzers, baseDirectory);
-
-                    if (definition.SqaleFilePath == null)
-                    {
-                        definition.SqaleFilePath = GenerateFixedSqaleFile(analyzers, baseDirectory);
-                    }
-
-                    BuildPlugin(definition, baseDirectory, outputDirectory);
+                    generatedSqaleFile = GenerateFixedSqaleFile(analyzers, outputDirectory);
+                    Debug.Assert(!string.IsNullOrWhiteSpace(generatedSqaleFile) && File.Exists(generatedSqaleFile));
                 }
+                else
+                {
+                    generate = IsValidSqaleFile(definition.SqaleFilePath);
+                }
+
+                if (generate)
+                {
+                    createJarFilePath = BuildPlugin(definition, baseDirectory, outputDirectory);
+                }
+
+                if (generatedSqaleFile != null)
+                {
+                    // Log a messsage about the generated sqale file at the end of the process: if we
+                    // log it earlier it will be too easy to miss
+                    this.logger.LogInfo(UIResources.APG_TemplateSqaleFileGenerated, generatedSqaleFile);
+                }
+                this.logger.LogInfo(UIResources.APG_PluginGenerated, createJarFilePath);
+
             }
 
-            return package != null;
+            return createJarFilePath != null;
         }
 
         /// <summary>
@@ -201,21 +226,44 @@ namespace SonarQube.Plugins.Roslyn
         /// Generates a SQALE file with fixed remediation costs for the specified analyzers
         /// </summary>
         /// <returns>The full path to the generated file</returns>
-        private string GenerateFixedSqaleFile(IEnumerable<DiagnosticAnalyzer> analyzers, string baseDirectory)
+        private string GenerateFixedSqaleFile(IEnumerable<DiagnosticAnalyzer> analyzers, string outputDirectory)
         {
             this.logger.LogInfo(UIResources.APG_GeneratingConstantSqaleFile);
 
             HardcodedConstantSqaleGenerator generator = new HardcodedConstantSqaleGenerator(this.logger);
 
-            string sqaleFilePath = Path.Combine(baseDirectory, "sqale.xml");
+            string sqaleFilePath = Path.Combine(outputDirectory, SqaleTemplateFileName);
 
-            SqaleRoot sqale = generator.GenerateSqaleData(analyzers, "15min");
+            SqaleRoot sqale = generator.GenerateSqaleData(analyzers, DefaultRemediationCost);
 
             Serializer.SaveModel(sqale, sqaleFilePath);
             this.logger.LogDebug(UIResources.APG_SqaleGeneratedToFile, sqaleFilePath);
 
             return sqaleFilePath;
         }
+
+        /// <summary>
+        /// Checks that the supplied sqale file has valid content
+        /// </summary>
+        private bool IsValidSqaleFile(string sqaleFilePath)
+        {
+            Debug.Assert(!string.IsNullOrWhiteSpace(sqaleFilePath));
+            // Existence is checked when parsing the arguments
+            Debug.Assert(File.Exists(sqaleFilePath), "Expecting the sqale file to exist: " + sqaleFilePath);
+
+            try
+            {
+                // TODO: consider adding further checks
+                Serializer.LoadModel<SqaleRoot>(sqaleFilePath);
+            }
+            catch(InvalidOperationException) // will be thrown for invalid xml
+            {
+                this.logger.LogError(UIResources.APG_InvalidSqaleFile, sqaleFilePath);
+                return false;
+            }
+            return true;
+        }
+
 
         private static PluginManifest CreatePluginDefinition(IPackage package)
         {
@@ -255,7 +303,10 @@ namespace SonarQube.Plugins.Roslyn
             return string.Join(",", args);
         }
 
-        private void BuildPlugin(RoslynPluginDefinition definition, string baseTempDirectory, string outputDirectory)
+        /// <summary>
+        /// Builds the plugin and returns the name of the jar that was created
+        /// </summary>
+        private string BuildPlugin(RoslynPluginDefinition definition, string baseTempDirectory, string outputDirectory)
         {
             this.logger.LogInfo(UIResources.APG_GeneratingPlugin);
 
@@ -285,8 +336,7 @@ namespace SonarQube.Plugins.Roslyn
             builder.AddResourceFile(definition.SourceZipFilePath, relativeStaticFilePath);
 
             builder.Build();
-
-            this.logger.LogInfo(UIResources.APG_PluginGenerated, fullJarPath);
+            return fullJarPath;
         }
 
         private void AddRoslynMetadata(string baseTempDirectory, PluginBuilder builder, RoslynPluginDefinition definition)
