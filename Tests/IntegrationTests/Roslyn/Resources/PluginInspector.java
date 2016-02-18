@@ -54,7 +54,6 @@ public class PluginInspector  {
 
         if (args.length != 1 && args.length != 2){
             Log("Expecting at least one argument: the full path to the jar file.\r\nOptionally, the name of the file to be created may also be supplied.");
-            //          jarPath = "C:\\SonarQube\\sonarqube-5.2\\extensions\\plugins\\analyzer1pkgid1-plugin-1.0.2.jar";
             System.exit(ErrorCode);
         }
         else{

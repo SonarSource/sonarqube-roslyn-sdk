@@ -28,6 +28,33 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         private enum Node { Root, Child1, Child2, Grandchild1_1, Grandchild2_1, Grandchild2_2 };
 
         [TestMethod]
+        public void Generate_NoAnalyzersFoundInPackage_GenerateFails()
+        {
+            // Arrange
+            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+
+            TestLogger logger = new TestLogger();
+
+            // Create a fake remote repo containing a package that does not contain analyzers
+            string packageSource = GetFakeRemoteNuGetSourceDir();
+            IPackageRepository fakeRemoteRepo = new LocalPackageRepository(packageSource);
+            PackageManager mgr = new PackageManager(fakeRemoteRepo, packageSource);
+            CreatePackage(mgr, "no.analyzers.id", "0.9", TestUtils.CreateTextFile("dummy.txt", outputDir), License.NotRequired /* no dependencies */ );
+           
+            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
+            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
+
+            // Act
+            bool result = apg.Generate(new NuGetReference("no.analyzers.id", new SemanticVersion("0.9")), "cs", null, outputDir);
+
+            // Assert
+            Assert.IsFalse(result, "Expecting generation to fail");
+            logger.AssertWarningsLogged(1);
+            AssertSqaleTemplateDoesNotExist(outputDir);
+
+        }
+
+        [TestMethod]
         public void Generate_PackageNoAccept_NoDependencies_Succeeds()
         {
             // Arrange
@@ -193,18 +220,23 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
 
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
+            TestLogger logger = new TestLogger();
+            IPackageRepository fakeRemoteRepo = new LocalPackageRepository(GetFakeRemoteNuGetSourceDir());
             CreatePackageInFakeRemoteRepo("dummy.id", "1.1");
+            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
 
-            string expectedSqaleFilePath = Path.Combine(outputDir, AnalyzerPluginGenerator.SqaleTemplateFileName);
+            string expectedTemplateSqaleFilePath = Path.Combine(outputDir, "dummy.id.1.1.sqale.template.xml");
+
+            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
 
             // Act
             bool result = apg.Generate(new NuGetReference("dummy.id", new SemanticVersion("1.1")), "cs", null, outputDir);
 
             // Assert
             Assert.IsTrue(result, "Expecting generation to have succeeded");
-            Assert.IsTrue(DoesTemplateSqaleFileExists(outputDir), "Expecting a template sqale file to have been created");
-            this.TestContext.AddResultFile(expectedSqaleFilePath);
+            Assert.IsTrue(File.Exists(expectedTemplateSqaleFilePath), "Expecting a template sqale file to have been created");
+            this.TestContext.AddResultFile(expectedTemplateSqaleFilePath);
+            logger.AssertSingleInfoMessageExists(expectedTemplateSqaleFilePath); // should be a message about the generated file
         }
 
         [TestMethod]
@@ -226,7 +258,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // Assert
             Assert.IsTrue(result, "Expecting generation to have succeeded");
-            Assert.IsFalse(DoesTemplateSqaleFileExists(outputDir), "Not expecting a template sqale file to have been created because a sqale file was supplied");
+            AssertSqaleTemplateDoesNotExist(outputDir);
         }
 
         [TestMethod]
@@ -238,14 +270,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             TestLogger logger = new TestLogger();
             IPackageRepository fakeRemoteRepo = new LocalPackageRepository(GetFakeRemoteNuGetSourceDir());
             CreatePackageInFakeRemoteRepo("dummy.id", "1.1");
+            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
 
             // Create an invalid sqale file
             string dummySqaleFilePath = Path.Combine(outputDir, "invalidSqale.xml");
             File.WriteAllText(dummySqaleFilePath, "not valid xml");
 
-            string templateSqaleFilePath = Path.Combine(outputDir, AnalyzerPluginGenerator.SqaleTemplateFileName);
-
-            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
 
             // Act
@@ -253,7 +283,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // Assert
             Assert.IsFalse(result, "Expecting generation to have failed");
-            Assert.IsFalse(DoesTemplateSqaleFileExists(outputDir), "Not expecting a template sqale file to have been created because a sqale file was supplied");
+            AssertSqaleTemplateDoesNotExist(outputDir);
             logger.AssertSingleErrorExists("invalidSqale.xml"); // expecting an error containing the invalid sqale file name
         }
 
@@ -393,11 +423,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             return TestUtils.EnsureTestDirectoryExists(this.TestContext, ".fakeRemoteNuGetSource");
         }
 
-        private static bool DoesTemplateSqaleFileExists(string directory)
+        private static void AssertSqaleTemplateDoesNotExist(string outputDir)
         {
-            string filePath = Path.Combine(directory, AnalyzerPluginGenerator.SqaleTemplateFileName);
-            return File.Exists(filePath);
+            string[] matches = Directory.GetFiles(outputDir, "*sqale*template*", SearchOption.AllDirectories);
+            Assert.AreEqual(0, matches.Length, "Not expecting any squale template files to exist");
         }
+
         #endregion
 
     }
