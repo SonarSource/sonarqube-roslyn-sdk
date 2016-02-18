@@ -5,6 +5,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.VisualBasic;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,9 @@ namespace RoslynAnalyzer11
         public static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
         public static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
         public const string Category = "Testing";
+
+        // Referencing this forces some commonly-used libraries to be loaded
+        private static readonly LanguageVersion vbVersion = Microsoft.CodeAnalysis.VisualBasic.LanguageVersion.VisualBasic10;
 
         private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 

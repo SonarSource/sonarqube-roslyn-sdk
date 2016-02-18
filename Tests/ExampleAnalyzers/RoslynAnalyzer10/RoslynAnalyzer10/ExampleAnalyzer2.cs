@@ -24,6 +24,9 @@ namespace RoslynAnalyzer10
         private static readonly LocalizableString Description = "ExampleAnalyzer2 Description";
         private const string Category = "Naming";
 
+        // Referencing this forces some commonly-used libraries to be loaded
+        private static readonly LanguageVersion csVersion = Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp1;
+
         private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }

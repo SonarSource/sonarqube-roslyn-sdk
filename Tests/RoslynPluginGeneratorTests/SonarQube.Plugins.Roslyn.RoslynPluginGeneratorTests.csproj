@@ -157,7 +157,9 @@
     <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers.1.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="..\..\RoslynPluginGenerator\App.config">
+      <Link>App.config</Link>
+    </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
