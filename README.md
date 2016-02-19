@@ -52,16 +52,19 @@ You will see a new repository containing all of the rules defined by the analyze
 
 The SDK uses information from the NuGet package to populate the fields in the generated plugin that affect how the plugin is described in the Update Centre in the SonarQube UI. It is not currently possible to customise these values.
 
+The NuGet package properties are documented [here](http://docs.nuget.org/Create/Nuspec-Reference) and the SonarQube plugin properties are documented [here](http://docs.sonarqube.org/display/DEV/Build+plugin).
+
 The NuGet package properties are mapped to plugin properties as follows:
 
 | NuGet property | Plugin property |
 |---|---|
-| title | Name |
-| description | Description |
-| version | Version |
-| authors | Developers |
-| owners | Organisation |
-| projectUrl | Homepage |
+| title | Plugin-Name |
+| description | Plugin-Description |
+| version | Plugin-Version |
+| authors | Plugin-Developers |
+| owners | Plugin-Organisation |
+| projectUrl | Plugin-Homepage |
+| licenseUrl | Plugin-TermsConditionsUrl |
 | id | Key* |    
 
 \* This property is not visible to users, but must be unique. It is calculated from the package id.
