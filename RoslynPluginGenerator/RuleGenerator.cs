@@ -95,9 +95,9 @@ namespace SonarQube.Plugins.Roslyn
                 newRule.Status = Status;
 
                 // Diagnostic properties that don't have an obvious Rule xml equivalent:
-                //diagnostic.Category;
-                //diagnostic.IsEnabledByDefault;
-                //diagnostic.MessageFormat;
+                //  diagnostic.Category
+                //  diagnostic.IsEnabledByDefault
+                //  diagnostic.MessageFormat
 
                 /* Remark: Custom tags are used so that Visual Studio handles diagnostics and are not equivalent to SonarQube's tags
                 *

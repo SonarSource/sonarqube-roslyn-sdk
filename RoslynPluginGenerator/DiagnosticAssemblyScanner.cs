@@ -107,8 +107,7 @@ namespace SonarQube.Plugins.Roslyn
         /// </summary>
         private Assembly LoadAnalyzerAssembly(string assemblyPath)
         {
-
-            Assembly analyzerAssembly = null;
+            Assembly analyzerAssembly;
             analyzerAssembly = Assembly.LoadFrom(assemblyPath);
 
             this.logger.LogInfo(UIResources.Scanner_AssemblyLoadSuccess, analyzerAssembly.FullName);

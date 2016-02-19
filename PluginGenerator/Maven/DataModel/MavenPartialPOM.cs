@@ -131,6 +131,7 @@ namespace SonarQube.Plugins.Maven
             }
             catch (InvalidOperationException)
             {
+                // Ignore deserialization errors
             }
 
             return data;

@@ -44,10 +44,10 @@ namespace SonarQube.Plugins.IntegrationTests
                 throw new ArgumentNullException("tempDir");
             }
 
-
             this.logger = logger;
             this.tempDir = tempDir;
             this.jdkWrapper = new JdkWrapper();
+            this.CheckJdkIsInstalled();
         }
 
         public JarInfo GetPluginDescription(string jarFilePath)
@@ -143,11 +143,11 @@ namespace SonarQube.Plugins.IntegrationTests
             return classFilePaths.First();
         }
 
-        private string RunPluginInspector(string jarFilePath, string tempDir)
+        private string RunPluginInspector(string jarFilePath, string outputDIr)
         {
             Debug.Assert(!string.IsNullOrEmpty(this.inspectorClassFilePath));
 
-            string reportFilePath = Path.Combine(tempDir, "report.xml");
+            string reportFilePath = Path.Combine(outputDIr, "report.xml");
 
             IEnumerable<string> jarFiles = GetRuntimeDependencies();
 

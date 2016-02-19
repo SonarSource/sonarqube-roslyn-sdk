@@ -6,7 +6,6 @@
 //-----------------------------------------------------------------------
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SonarQube.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,11 +18,6 @@ namespace SonarQube.Plugins.Test.Common
         public List<string> InfoMessages { get; private set; }
         public List<string> Warnings { get; private set; }
         public List<string> Errors { get; private set; }
-
-        //public LoggerVerbosity Verbosity
-        //{
-        //    get; set;
-        //}
 
         public bool IncludeTimestamp
         {
@@ -42,8 +36,6 @@ namespace SonarQube.Plugins.Test.Common
             InfoMessages = new List<string>();
             Warnings = new List<string>();
             Errors = new List<string>();
-
-            //this.Verbosity = LoggerVerbosity.Debug;
         }
 
         #region Public methods
@@ -164,11 +156,6 @@ namespace SonarQube.Plugins.Test.Common
             IEnumerable<string> matches = this.Errors.Where(w => expected.All(e => w.Contains(e)));
             Assert.AreEqual(0, matches.Count(), "Not expecting any errors to contain the specified strings: {0}", string.Join(",", expected));
         }
-
-        //public void AssertVerbosity(LoggerVerbosity expected)
-        //{
-        //    Assert.AreEqual(expected, this.Verbosity, "Logger verbosity mismatch");
-        //}
 
         #endregion
 

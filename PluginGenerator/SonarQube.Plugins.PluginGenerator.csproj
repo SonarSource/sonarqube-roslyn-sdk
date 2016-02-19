@@ -62,8 +62,6 @@
       <DependentUpon>MavenResources.resx</DependentUpon>
     </Compile>
     <Compile Include="Maven\MavenArtifactHandlerExtensions.cs" />
-    <Compile Include="NuGet\DataModel.cs" />
-    <Compile Include="NuGet\NuGetSpecReader.cs" />
     <Compile Include="PluginKeyUtilities.cs" />
     <Compile Include="RepositoryKeyUtilities.cs" />
     <Compile Include="RulesPluginBuilder.cs" />

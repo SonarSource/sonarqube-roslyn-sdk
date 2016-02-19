@@ -55,8 +55,8 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             // Arrange
             TestLogger logger = new TestLogger();
             ConfigurableAnalyzer analyzer = new ConfigurableAnalyzer();
-            var diagnostic1 = analyzer.RegisterDiagnostic(key: "DiagnosticID1", tags: new[] { "t1" });
-            var diagnostic2 = analyzer.RegisterDiagnostic(key: "DiagnosticID2", tags: new[] { "T2" });
+            analyzer.RegisterDiagnostic(key: "DiagnosticID1", tags: new[] { "t1" });
+            analyzer.RegisterDiagnostic(key: "DiagnosticID2", tags: new[] { "T2" });
 
             IRuleGenerator generator = new RuleGenerator(logger);
 
@@ -78,9 +78,9 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             // Arrange
             TestLogger logger = new TestLogger();
             ConfigurableAnalyzer analyzer = new ConfigurableAnalyzer();
-            var diagnostic1 = analyzer.RegisterDiagnostic(key: "DiagnosticID1", description: null);
-            var diagnostic2 = analyzer.RegisterDiagnostic(key: "DiagnosticID1", description: "");
-            var diagnostic3 = analyzer.RegisterDiagnostic(key: "DiagnosticID2", description: " ");
+            analyzer.RegisterDiagnostic(key: "DiagnosticID1", description: null);
+            analyzer.RegisterDiagnostic(key: "DiagnosticID1", description: "");
+            analyzer.RegisterDiagnostic(key: "DiagnosticID2", description: " ");
 
             IRuleGenerator generator = new RuleGenerator(logger);
 
@@ -99,13 +99,6 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
         #endregion Tests
 
         #region Checks
-
-        private static void ValidateRule(Rules rules, string expectedKey, string[] expectedTags)
-        {
-            Rule rule = rules.SingleOrDefault(r => r.Key == expectedKey);
-            Assert.IsNotNull(rule, "No rule found with the Key " + expectedKey);
-            CollectionAssert.AreEquivalent(rule.Tags, expectedTags, "Mismatch in rule tags");
-        }
 
         private static void AssertExpectedRuleCount(int expected, Rules rules)
         {

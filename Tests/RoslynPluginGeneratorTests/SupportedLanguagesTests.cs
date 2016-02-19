@@ -34,22 +34,22 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             SupportedLanguages.ThrowIfNotSupported("cs");
         }
 
+        [TestMethod]
         public void GetRoslynName_Unrecognised_Throws()
         {
             AssertException.Expect<ArgumentOutOfRangeException>(() => SupportedLanguages.GetRoslynLanguageName("foo"));
-            AssertException.Expect<ArgumentOutOfRangeException>(() => SupportedLanguages.GetRoslynLanguageName("CS"));
-            AssertException.Expect<ArgumentOutOfRangeException>(() => SupportedLanguages.GetRoslynLanguageName("VB"));
+            AssertException.Expect<ArgumentOutOfRangeException>(() => SupportedLanguages.GetRoslynLanguageName("CS")); // case-sensitive
+            AssertException.Expect<ArgumentOutOfRangeException>(() => SupportedLanguages.GetRoslynLanguageName("VB")); // case-sensitive
         }
 
+        [TestMethod]
         public void GetRoslynName_Recognised_ReturnsExpected()
         {
             string result = SupportedLanguages.GetRoslynLanguageName("cs");
             Assert.AreEqual(result, "C#");
 
-            result = SupportedLanguages.GetRoslynLanguageName("VB");
+            result = SupportedLanguages.GetRoslynLanguageName("vb");
             Assert.AreEqual(result, "Visual Basic");
-
-            result = SupportedLanguages.GetRoslynLanguageName("cS");
         }
     }
 }

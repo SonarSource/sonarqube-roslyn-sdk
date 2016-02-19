@@ -23,7 +23,7 @@ namespace SonarQube.Plugins.PluginGeneratorTests
             TestLogger logger = new TestLogger();
             string inputsDir = TestUtils.CreateTestDirectory(this.TestContext, "inputs");
             string rootTempDir = TestUtils.CreateTestDirectory(this.TestContext, "temp");
-            string contentDir = Path.Combine(rootTempDir, JarBuilder.JAR_CONTENT_DIRECTORY_NAME);
+            string contentDir = Path.Combine(rootTempDir, JarBuilder.JarContentFolderName);
 
             string file1 = TestUtils.CreateTextFile("file1.txt", inputsDir, "file1 content");
             string file2 = TestUtils.CreateTextFile("file2.txt", inputsDir, "file2 content");

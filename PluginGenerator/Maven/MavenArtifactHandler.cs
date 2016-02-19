@@ -15,7 +15,6 @@ namespace SonarQube.Plugins.Maven
     public class MavenArtifactHandler : IMavenArtifactHandler
     {
         private const string LocalMavenDirectory = ".maven";
-        private const string POM_Extension = "pom";
         private const string JAR_Extension = "jar";
 
         private readonly string localCacheDirectory;

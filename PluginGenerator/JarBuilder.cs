@@ -15,7 +15,8 @@ namespace SonarQube.Plugins
 {
     public class JarBuilder
     {
-        public const string JAR_CONTENT_DIRECTORY_NAME = "jarContent";
+        public const string JarContentFolderName = "jarContent";
+        private const string JarBuilderRootFolderName = ".jarBuilder";
 
         private readonly ILogger logger;
         private readonly IJdkWrapper jdkWrapper;
@@ -34,9 +35,8 @@ namespace SonarQube.Plugins
                 this.rootTempFolder = rootTempFolder;
             }
 
-            public string RootTempFolder { get { return this.rootTempFolder; } }
             public string ManifestFilePath {  get { return Path.Combine(this.rootTempFolder, JdkWrapper.MANIFEST_FILE_NAME); } }
-            public string JarContentDirectory { get { return Path.Combine(this.rootTempFolder, JAR_CONTENT_DIRECTORY_NAME); } }
+            public string JarContentDirectory { get { return Path.Combine(this.rootTempFolder, JarContentFolderName); } }
         }
 
         public JarBuilder(ILogger logger, IJdkWrapper jdkWrapper)
@@ -53,8 +53,8 @@ namespace SonarQube.Plugins
             this.logger = logger;
             this.jdkWrapper = jdkWrapper;
 
-            this.manifestProperties = new Dictionary<string, string>();
-            this.fileToRelativePathMap = new Dictionary<string, string>();
+            this.manifestProperties = new Dictionary<string, string>(StringComparer.Ordinal); // treate manifests as case-sensitive
+            this.fileToRelativePathMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase); // file names are not case-sensitive
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace SonarQube.Plugins
                 throw new InvalidOperationException(UIResources.JarB_JDK_NotInstalled);
             }
 
-            string tempPath = Path.Combine(Path.GetTempPath(), ".jarBuilder", Guid.NewGuid().ToString());
+            string tempPath = Path.Combine(Utilities.CreateTempDirectory(JarBuilderRootFolderName), Guid.NewGuid().ToString());
 
             JarFolders folders = new JarFolders(tempPath);
             this.LayoutFiles(tempPath);
@@ -161,7 +161,7 @@ namespace SonarQube.Plugins
 
         private string TryGetExistingJarPathKey(string relativePath)
         {
-            KeyValuePair<string, string> existing = this.fileToRelativePathMap.FirstOrDefault(k => k.Value.Equals(relativePath));
+            KeyValuePair<string, string> existing = this.fileToRelativePathMap.FirstOrDefault(k => k.Value.Equals(relativePath, StringComparison.OrdinalIgnoreCase));
             return existing.Key;
         }
 

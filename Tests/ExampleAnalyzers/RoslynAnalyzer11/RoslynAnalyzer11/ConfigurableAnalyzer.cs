@@ -38,7 +38,7 @@ namespace RoslynAnalyzer11
             string category = DefaultCategory,
             DiagnosticSeverity severity = DiagnosticSeverity.Warning,
             bool isEnabledByDefault = true,
-            string description = "",
+            string description = DefaultDescription,
             string helpLinkUri = "",
             string[] tags = null)
         {
@@ -66,10 +66,6 @@ namespace RoslynAnalyzer11
         #region Boilerplate code
 
         public override void Initialize(AnalysisContext context)
-        {
-        }
-
-        private static void AnalyzeSymbol(SymbolAnalysisContext context)
         {
         }
 

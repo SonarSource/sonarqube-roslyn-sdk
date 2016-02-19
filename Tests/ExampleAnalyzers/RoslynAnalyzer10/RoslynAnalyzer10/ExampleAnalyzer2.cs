@@ -4,15 +4,10 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Threading;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using System;
+using System.Collections.Immutable;
 
 namespace RoslynAnalyzer10
 {
@@ -45,7 +40,7 @@ namespace RoslynAnalyzer10
             var namedTypeSymbol = (INamedTypeSymbol)context.Symbol;
 
             // Report issues against symbols called "FISH"
-            if (namedTypeSymbol.Name.Equals("FISH"))
+            if (namedTypeSymbol.Name.Equals("FISH", StringComparison.Ordinal))
             {
                 // For all such symbols, produce a diagnostic.
                 var diagnostic = Diagnostic.Create(Rule, namedTypeSymbol.Locations[0], namedTypeSymbol.Name);

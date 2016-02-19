@@ -111,7 +111,6 @@
     <Compile Include="Framework\MockJdkWrapper.cs" />
     <Compile Include="JarBuilderTests.cs" />
     <Compile Include="MavenPOMTests.cs" />
-    <Compile Include="NuGetDataModelTests.cs" />
     <Compile Include="PluginBuilderTests.cs" />
     <Compile Include="PluginDefinitionTests.cs" />
     <Compile Include="RepositoryKeyUtilitiesTests.cs" />
