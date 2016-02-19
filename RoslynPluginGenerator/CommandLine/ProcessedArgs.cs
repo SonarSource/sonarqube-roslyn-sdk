@@ -13,8 +13,9 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
         private readonly NuGetReference analyzerRef;
         private readonly string sqaleFilePath;
         private readonly string language;
+        private readonly bool acceptLicenses;
 
-        public ProcessedArgs(NuGetReference analyzerRef, string sqaleFilePath, string language)
+        public ProcessedArgs(NuGetReference analyzerRef, string sqaleFilePath, string language, bool acceptLicenses)
         {
             if (analyzerRef == null)
             {
@@ -25,6 +26,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             this.analyzerRef = analyzerRef;
             this.sqaleFilePath = sqaleFilePath; // can be null
             this.language = language;
+            this.acceptLicenses = acceptLicenses;
         }
 
         public NuGetReference AnalyzerRef { get { return this.analyzerRef; } }
@@ -32,5 +34,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
         public string SqaleFilePath {  get { return this.sqaleFilePath; } }
 
         public string Language { get { return this.language; } }
+
+        public bool AcceptLicenses { get { return this.acceptLicenses; } }
     }
 }

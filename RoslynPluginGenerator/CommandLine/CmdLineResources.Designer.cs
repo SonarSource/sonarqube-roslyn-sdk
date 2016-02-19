@@ -61,6 +61,15 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to /acceptLicenses - indicates that you accept the licenses for any packages that required license acceptance.
+        /// </summary>
+        internal static string ArgDescription_AcceptLicenses {
+            get {
+                return ResourceManager.GetString("ArgDescription_AcceptLicenses", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to /a:[NuGet package id]  or  /a:[NuGet package id]:[version].
         /// </summary>
         internal static string ArgDescription_AnalzyerRef {

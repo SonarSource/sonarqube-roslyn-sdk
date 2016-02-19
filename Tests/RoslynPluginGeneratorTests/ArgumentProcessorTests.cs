@@ -82,23 +82,22 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             rawArgs = new string[] { "/a:testing.id.no.version" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
-            AssertArgumentsProcessed(actualArgs, logger, "testing.id.no.version", null, null);
+            AssertArgumentsProcessed(actualArgs, logger, "testing.id.no.version", null, null, false);
 
             // 2. Id and version
             logger = new TestLogger();
             rawArgs = new string[] { "/analyzer:testing.id.with.version:1.0.0-rc1" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
-            AssertArgumentsProcessed(actualArgs, logger, "testing.id.with.version", "1.0.0-rc1", null);
+            AssertArgumentsProcessed(actualArgs, logger, "testing.id.with.version", "1.0.0-rc1", null, false);
 
             // 3. Id containing a colon, with version
             logger = new TestLogger();
             rawArgs = new string[] { "/analyzer:id.with:colon:2.1.0" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
-            AssertArgumentsProcessed(actualArgs, logger, "id.with:colon", "2.1.0", null);
+            AssertArgumentsProcessed(actualArgs, logger, "id.with:colon", "2.1.0", null, false);
         }
-
 
         [TestMethod]
         public void ArgProc_SqaleFile()
@@ -113,7 +112,7 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             rawArgs = new string[] { "/a:validId" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
-            AssertArgumentsProcessed(actualArgs, logger, "validId", null, null);
+            AssertArgumentsProcessed(actualArgs, logger, "validId", null, null, false);
 
             // 2. Missing sqale file
             logger = new TestLogger();
@@ -131,7 +130,53 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             rawArgs = new string[] { "/sqale:" + filePath,  "/a:valid:1.0" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
-            AssertArgumentsProcessed(actualArgs, logger, "valid", "1.0", filePath);
+            AssertArgumentsProcessed(actualArgs, logger, "valid", "1.0", filePath, false);
+        }
+
+        [TestMethod]
+        public void ArgProc_AcceptLicenses_Valid()
+        {
+            // 0. Setup
+            TestLogger logger;
+            string[] rawArgs;
+            ProcessedArgs actualArgs;
+
+            // 1. Correct argument -> valid and accept is true
+            logger = new TestLogger();
+            rawArgs = new string[] { "/a:validId", "/acceptLicenses" };
+            actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
+
+            AssertArgumentsProcessed(actualArgs, logger, "validId", null, null, true);
+        }
+
+        [TestMethod]
+        public void ArgProc_AcceptLicensesInvalid()
+        {
+            // 0. Setup
+            TestLogger logger;
+            string[] rawArgs;
+            ProcessedArgs actualArgs;
+
+            // 1. Correct text, wrong case -> invalid
+            logger = new TestLogger();
+            rawArgs = new string[] { "/a:validId", "/ACCEPTLICENSES" };
+            actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
+
+            AssertArgumentsNotProcessed(actualArgs, logger);
+
+            // 2. Unrecognised argument -> invalid
+            logger = new TestLogger();
+            rawArgs = new string[] { "/a:validId", "/acceptLicenses=true" };
+            actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
+
+            AssertArgumentsNotProcessed(actualArgs, logger);
+
+            // 3. Unrecognised argument -> invalid
+            logger = new TestLogger();
+            rawArgs = new string[] { "/a:validId", "/acceptLicensesXXX" };
+            actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
+
+            AssertArgumentsNotProcessed(actualArgs, logger);
         }
 
         #endregion
@@ -144,7 +189,7 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             logger.AssertErrorsLogged();
         }
 
-        private static void AssertArgumentsProcessed(ProcessedArgs actualArgs, TestLogger logger, string expectedId, string expectedVersion, string expectedSqale)
+        private static void AssertArgumentsProcessed(ProcessedArgs actualArgs, TestLogger logger, string expectedId, string expectedVersion, string expectedSqale, bool expectedAcceptLicenses)
         {
             Assert.IsNotNull(actualArgs, "Expecting the arguments to have been processed successfully");
 
@@ -167,6 +212,8 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             {
                 Assert.IsTrue(File.Exists(expectedSqale), "Specified sqale file should exist: {0}", expectedSqale);
             }
+
+            Assert.AreEqual(expectedAcceptLicenses, actualArgs.AcceptLicenses, "Unexpected value for AcceptLicenses");
 
             logger.AssertErrorsLogged(0);
         }
