@@ -109,7 +109,7 @@ namespace SonarQube.Plugins.Roslyn
             definition.SqaleFilePath = sqaleFilePath;
             definition.PackageId = package.Id;
             definition.PackageVersion = package.Version.ToString();
-            definition.Manifest = CreatePluginDefinition(package);
+            definition.Manifest = CreatePluginManifest(package);
 
             // Create a zip containing the required analyzer files
             definition.StaticResourceName = Path.GetFileName(packageDir) + ".zip";
@@ -293,8 +293,11 @@ namespace SonarQube.Plugins.Roslyn
         }
 
 
-        private static PluginManifest CreatePluginDefinition(IPackage package)
+        private static PluginManifest CreatePluginManifest(IPackage package)
         {
+            // The manifest properties supported by SonarQube are documented at
+            // http://docs.sonarqube.org/display/DEV/Build+plugin
+
             PluginManifest pluginDefn = new PluginManifest();
 
             pluginDefn.Description = GetValidManifestString(package.Description);
@@ -306,6 +309,17 @@ namespace SonarQube.Plugins.Roslyn
             pluginDefn.Name = GetValidManifestString(package.Title) ?? pluginDefn.Key;
             pluginDefn.Organization = GetValidManifestString(ListToString(package.Owners));
             pluginDefn.Version = GetValidManifestString(package.Version.ToNormalizedString());
+
+            if (package.LicenseUrl != null)
+            {
+                // The TermsConditionsUrl is only displayed in the "Update Center - Available" page
+                // i.e. for plugins that are available through the public Update Center.
+                // If the property has a value then the link will be displayed with a checkbox 
+                // for acceptance.
+                // It is not used when plugins are directly dropped into the extensions\plugins
+                // folder of the SonarQube server.
+                pluginDefn.TermsConditionsUrl = package.LicenseUrl.ToString();
+            }
 
             return pluginDefn;
         }

@@ -119,6 +119,8 @@ namespace SonarQube.Plugins.IntegrationTests
             builder.Owners.Add("dummy owner 2");
 
             builder.ProjectUrl = new System.Uri("http://dummyurl/");
+            builder.LicenseUrl = new Uri("http://my.license/readme.txt");
+
 
             PhysicalPackageFile file = new PhysicalPackageFile();
             file.SourcePath = payloadAssemblyFilePath;
@@ -228,6 +230,7 @@ namespace SonarQube.Plugins.IntegrationTests
             AssertExpectedManifestValue("Plugin-Organization", String.Join(",", package.Owners), jarInfo);
             AssertExpectedManifestValue("Plugin-Homepage", package.ProjectUrl.ToString(), jarInfo);
             AssertExpectedManifestValue("Plugin-Developers", String.Join(",", package.Authors), jarInfo);
+            AssertExpectedManifestValue("Plugin-TermsConditionsUrl", package.LicenseUrl.ToString(), jarInfo);
         }
 
         private static void AssertExpectedManifestValue(string propertyName, string expectedValue, JarInfo jarInfo)
