@@ -9,6 +9,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NuGet;
 using SonarQube.Plugins.Roslyn;
+using SonarQube.Plugins.Roslyn.CommandLine;
 using SonarQube.Plugins.Test.Common;
 using System;
 using System.Collections.Generic;
@@ -43,7 +44,8 @@ namespace SonarQube.Plugins.IntegrationTests
             // Act
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(packageId, new SemanticVersion("1.0.2")), "cs", null, outputDir);
+            ProcessedArgs args = new ProcessedArgs(packageId, new SemanticVersion("1.0.2"), "cs", null, false, outputDir);
+            bool result = apg.Generate(args);
 
             // Assert
             Assert.IsTrue(result);

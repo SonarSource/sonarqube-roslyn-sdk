@@ -39,9 +39,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
            
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
+            ProcessedArgs args = CreateArgs("no.analyzers.id", "0.9", "cs", null, false, outputDir);
 
             // Act
-            bool result = apg.Generate(new NuGetReference("no.analyzers.id", new SemanticVersion("0.9")), "cs", null, outputDir);
+            bool result = apg.Generate(args);
 
             // Assert
             Assert.IsFalse(result, "Expecting generation to fail");
@@ -60,8 +61,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             SetupTestGraph(remoteRepoBuilder);
 
+            ProcessedArgs args = CreateArgs(Node.Grandchild1_1.ToString(), "1.0", "cs", null, false, outputDir);
+
             // Act
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Grandchild1_1.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
+            bool result = apg.Generate(args);
 
             // Assert
             Assert.IsTrue(result, "Generator should succeed if there are no licenses to accept");
@@ -77,8 +80,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             SetupTestGraph(remoteRepoBuilder);
 
+            ProcessedArgs args = CreateArgs(Node.Root.ToString(), "1.0", "cs", null, false, outputDir);
+
             // Act
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Root.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
+            bool result = apg.Generate(args);
 
             // Assert
             Assert.IsTrue(result, "Generator should succeed if there are no licenses to accept");
@@ -94,8 +99,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             SetupTestGraph(remoteRepoBuilder, Node.Grandchild1_1);
 
+            ProcessedArgs args = CreateArgs(Node.Grandchild1_1.ToString(), "1.0", "cs", null, false, outputDir);
+
             // Act
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Grandchild1_1.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
+            bool result = apg.Generate(args);
 
             // Assert
             Assert.IsFalse(result, "Generator should fail if the package requires license Accept");
@@ -111,8 +118,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             SetupTestGraph(remoteRepoBuilder, Node.Grandchild1_1);
 
+            ProcessedArgs args = CreateArgs(Node.Child1.ToString(), "1.0", "cs", null, false, outputDir);
+
             // Act
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Child1.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
+            bool result = apg.Generate(args);
 
             // Assert
             Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
@@ -128,8 +137,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             SetupTestGraph(remoteRepoBuilder, Node.Child1, Node.Grandchild1_1);
 
+            ProcessedArgs args = CreateArgs(Node.Child1.ToString(), "1.0", "cs", null, false, outputDir);
+
             // Act
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Child1.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
+            bool result = apg.Generate(args);
 
             // Assert
             Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
@@ -145,8 +156,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             SetupTestGraph(remoteRepoBuilder, Node.Grandchild2_1);
 
+            ProcessedArgs args = CreateArgs(Node.Child2.ToString(), "1.0", "cs", null, false, outputDir);
+
             // Act
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Child2.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
+            bool result = apg.Generate(args);
 
             // Assert
             Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
@@ -162,8 +175,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             SetupTestGraph(remoteRepoBuilder, Node.Grandchild2_2);
 
+            ProcessedArgs args = CreateArgs(Node.Child2.ToString(), "1.0", "cs", null, false, outputDir);
+
             // Act
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Child2.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
+            bool result = apg.Generate(args);
 
             // Assert
             Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
@@ -179,8 +194,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             SetupTestGraph(remoteRepoBuilder, Node.Child2, Node.Grandchild2_1, Node.Grandchild2_2);
 
+            ProcessedArgs args = CreateArgs(Node.Child2.ToString(), "1.0", "cs", null, false, outputDir);
+
             // Act
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Child2.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
+            bool result = apg.Generate(args);
 
             // Assert
             Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
@@ -196,8 +213,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             SetupTestGraph(remoteRepoBuilder, Node.Grandchild1_1);
 
+            ProcessedArgs args = CreateArgs(Node.Root.ToString(), "1.0", "cs", null, false, outputDir);
+
             // Act
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Root.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
+            bool result = apg.Generate(args);
 
             // Assert
             Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
@@ -213,8 +232,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             SetupTestGraph(remoteRepoBuilder, Node.Grandchild2_1);
 
+            ProcessedArgs args = CreateArgs(Node.Root.ToString(), "1.0", "cs", null, false, outputDir);
+
             // Act
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Root.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
+            bool result = apg.Generate(args);
 
             // Assert
             Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
@@ -237,8 +258,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
 
+            ProcessedArgs args = CreateArgs("dummy.id", "1.1", "cs", null, false, outputDir);
+
             // Act
-            bool result = apg.Generate(new NuGetReference("dummy.id", new SemanticVersion("1.1")), "cs", null, outputDir);
+            bool result = apg.Generate(args);
 
             // Assert
             Assert.IsTrue(result, "Expecting generation to have succeeded");
@@ -263,8 +286,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             SqaleRoot dummySqale = new SqaleRoot();
             Serializer.SaveModel(dummySqale, dummySqaleFilePath);
 
+            ProcessedArgs args = CreateArgs("dummy.id", "1.1", "cs", dummySqaleFilePath, false, outputDir);
+
             // Act
-            bool result = apg.Generate(new NuGetReference("dummy.id", new SemanticVersion("1.1")), "cs", dummySqaleFilePath, outputDir);
+            bool result = apg.Generate(args);
 
             // Assert
             Assert.IsTrue(result, "Expecting generation to have succeeded");
@@ -290,8 +315,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
 
+            ProcessedArgs args = CreateArgs("dummy.id", "1.1", "cs", dummySqaleFilePath, false, outputDir);
+
             // Act
-            bool result = apg.Generate(new NuGetReference("dummy.id", new SemanticVersion("1.1")), "cs", dummySqaleFilePath, outputDir);
+            bool result = apg.Generate(args);
 
             // Assert
             Assert.IsFalse(result, "Expecting generation to have failed");
@@ -300,6 +327,18 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         }
 
         #region Private methods
+
+        private static ProcessedArgs CreateArgs(string packageId, string packageVersion, string language, string sqaleFilePath, bool acceptLicenses, string outputDirectory)
+        {
+            ProcessedArgs args = new ProcessedArgs(
+                packageId,
+                new SemanticVersion(packageVersion),
+                language,
+                sqaleFilePath,
+                acceptLicenses,
+                outputDirectory);
+            return args;
+        }
 
         private AnalyzerPluginGenerator CreateTestSubjectWithFakeRemoteRepo(RemoteRepoBuilder remoteRepoBuilder)
         {

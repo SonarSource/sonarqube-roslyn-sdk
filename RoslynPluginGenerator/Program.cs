@@ -37,8 +37,7 @@ namespace SonarQube.Plugins.Roslyn
                 NuGetPackageHandler packageHandler = new NuGetPackageHandler(repo, localNuGetCache, logger);
 
                 AnalyzerPluginGenerator generator = new AnalyzerPluginGenerator(packageHandler, logger);
-                success = generator.Generate(processedArgs.AnalyzerRef, processedArgs.Language, processedArgs.SqaleFilePath,
-                    System.IO.Directory.GetCurrentDirectory());
+                success = generator.Generate(processedArgs);
             }
 
             return success ? SUCCESS_CODE : ERROR_CODE;

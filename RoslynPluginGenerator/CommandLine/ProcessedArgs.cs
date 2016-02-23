@@ -4,37 +4,51 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
+using NuGet;
 using System;
 
 namespace SonarQube.Plugins.Roslyn.CommandLine
 {
     public class ProcessedArgs
     {
-        private readonly NuGetReference analyzerRef;
+        private readonly string packageId;
+        private readonly SemanticVersion packageVersion;
         private readonly string sqaleFilePath;
         private readonly string language;
         private readonly bool acceptLicenses;
+        private readonly string outputDirectory;
 
-        public ProcessedArgs(NuGetReference analyzerRef, string sqaleFilePath, string language, bool acceptLicenses)
+        public ProcessedArgs(string packageId, SemanticVersion packageVersion, string language, string sqaleFilePath, bool acceptLicenses, string outputDirectory)
         {
-            if (analyzerRef == null)
+            if (string.IsNullOrWhiteSpace(packageId))
             {
-                throw new ArgumentNullException("analyzerRef");
+                throw new ArgumentNullException("packageId");
             }
+            // Version can be null
             SupportedLanguages.ThrowIfNotSupported(language);
+            if (string.IsNullOrWhiteSpace(outputDirectory))
+            {
+                throw new ArgumentNullException("outputDirectory");
+            }
 
-            this.analyzerRef = analyzerRef;
+            this.packageId = packageId;
+            this.packageVersion = packageVersion;
             this.sqaleFilePath = sqaleFilePath; // can be null
             this.language = language;
             this.acceptLicenses = acceptLicenses;
+            this.outputDirectory = outputDirectory;
         }
 
-        public NuGetReference AnalyzerRef { get { return this.analyzerRef; } }
+        public string PackageId { get { return this.packageId; } }
+
+        public SemanticVersion PackageVersion { get { return this.packageVersion; } }
 
         public string SqaleFilePath {  get { return this.sqaleFilePath; } }
 
         public string Language { get { return this.language; } }
 
         public bool AcceptLicenses { get { return this.acceptLicenses; } }
+
+        public string OutputDirectory { get { return this.outputDirectory; } }
     }
 }

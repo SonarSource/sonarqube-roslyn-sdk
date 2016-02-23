@@ -68,45 +68,43 @@ namespace SonarQube.Plugins.Roslyn
             this.logger = logger;
         }
 
-        public bool Generate(NuGetReference analyzerRef, string language, string sqaleFilePath, string outputDirectory)
+        public bool Generate(ProcessedArgs args)
         {
-            // sqale file path is optional
-            if (analyzerRef == null)
+            if (args == null)
             {
-                throw new ArgumentNullException("analyzeRef");
-            }
-            if (string.IsNullOrWhiteSpace(language))
-            {
-                throw new ArgumentNullException("language");
-            }
-            SupportedLanguages.ThrowIfNotSupported(language);
-            if (string.IsNullOrWhiteSpace(outputDirectory))
-            {
-                throw new ArgumentNullException("outputDirectory");
+                throw new ArgumentNullException("args");
             }
 
-            IPackage package = TryGetPackage(analyzerRef);
+            IPackage package = this.packageHandler.FetchPackage(args.PackageId, args.PackageVersion);
             if (package == null)
             {
                 return false;
             }
 
+            IEnumerable<IPackage> licenseAcceptancePackages = this.GetPackagesRequiringLicenseAcceptance(package);
+            if (licenseAcceptancePackages.Any() && ! args.AcceptLicenses)
+            {
+                this.logger.LogError(UIResources.APG_NGPackageRequiresLicenseAcceptance, package.Id, package.Version.ToString());
+                this.ListPackagesRequiringLicenseAcceptance(licenseAcceptancePackages);
+                return false;
+            }
+
             string packageDir = this.packageHandler.GetLocalPackageRootDirectory(package);
-            IEnumerable<DiagnosticAnalyzer> analyzers = GetAnalyzers(packageDir, this.packageHandler.LocalCacheRoot, language);
+            IEnumerable<DiagnosticAnalyzer> analyzers = GetAnalyzers(packageDir, this.packageHandler.LocalCacheRoot, args.Language);
 
             if (!analyzers.Any())
             {
                 return false;
             }
 
-            string createJarFilePath = null;
+            string createdJarFilePath = null;
 
             string baseDirectory = CreateBaseWorkingDirectory();
 
             // Collect the remaining data required to build the plugin
             RoslynPluginDefinition definition = new RoslynPluginDefinition();
-            definition.Language = language;
-            definition.SqaleFilePath = sqaleFilePath;
+            definition.Language = args.Language;
+            definition.SqaleFilePath = args.SqaleFilePath;
             definition.PackageId = package.Id;
             definition.PackageVersion = package.Version.ToString();
             definition.Manifest = CreatePluginManifest(package);
@@ -122,7 +120,7 @@ namespace SonarQube.Plugins.Roslyn
             bool generate = true;
             if (definition.SqaleFilePath == null)
             {
-                generatedSqaleFile = CalculateSqaleFileName(package, outputDirectory);
+                generatedSqaleFile = CalculateSqaleFileName(package, args.OutputDirectory);
                 GenerateFixedSqaleFile(analyzers, generatedSqaleFile);
                 Debug.Assert(File.Exists(generatedSqaleFile));
             }
@@ -133,44 +131,63 @@ namespace SonarQube.Plugins.Roslyn
 
             if (generate)
             {
-                createJarFilePath = BuildPlugin(definition, baseDirectory, outputDirectory);
+                createdJarFilePath = BuildPlugin(definition, baseDirectory, args.OutputDirectory);
             }
 
+            LogSummary(createdJarFilePath, generatedSqaleFile, licenseAcceptancePackages);
+
+            return createdJarFilePath != null;
+        }
+
+        private void LogSummary(string createdJarFilePath, string generatedSqaleFile, IEnumerable<IPackage> licenseAcceptancePackages)
+        {
             if (generatedSqaleFile != null)
             {
                 // Log a messsage about the generated sqale file at the end of the process: if we
                 // log it earlier it will be too easy to miss
                 this.logger.LogInfo(UIResources.APG_TemplateSqaleFileGenerated, generatedSqaleFile);
             }
-            this.logger.LogInfo(UIResources.APG_PluginGenerated, createJarFilePath);
 
+            if (licenseAcceptancePackages.Any())
+            {
+                // If we got this far then the user must have accepted 
+                this.logger.LogWarning(UIResources.APG_NGAcceptedPackageLicenses);
+                this.ListPackagesRequiringLicenseAcceptance(licenseAcceptancePackages);
+            }
 
-            return createJarFilePath != null;
+            this.logger.LogInfo(UIResources.APG_PluginGenerated, createdJarFilePath);
         }
 
-        private IPackage TryGetPackage(NuGetReference analyzerRef)
+        private void ListPackagesRequiringLicenseAcceptance(IEnumerable<IPackage> licensedPackages)
         {
-            IPackage package = this.packageHandler.FetchPackage(analyzerRef.PackageId, analyzerRef.Version);
-            if (package != null && PackageRequiresLicenseAcceptance(package))
+            foreach (IPackage package in licensedPackages)
             {
-                // Build machines will need to install this package, it is not feasible to create plugins for packages requiring license acceptance
-                this.logger.LogError(UIResources.APG_NGPackageRequiresLicenseAcceptance, package.Id, package.Version);
-                package = null;
+                string license;
+                if (package.LicenseUrl == null)
+                {
+                    license = "";
+                }
+                else
+                {
+                    license = package.LicenseUrl.ToString();
+                }
+                this.logger.LogWarning("  {0} v{1}: {2}", package.Id, package.Version, license);
             }
-            return package;
         }
 
         /// <summary>
-        /// Recursively checks a package and all dependencies for the presence of the RequireLicenseAcceptance flag.
+        /// Returns all of the packages from the supplied package and its dependencies that require license acceptance
         /// </summary>
-        /// <param name="package">The package to test.</param>
-        /// <returns>Returns true if any of the packages in the dependency tree require license acceptance.</returns>
-        private bool PackageRequiresLicenseAcceptance(IPackage package)
+        private IEnumerable<IPackage> GetPackagesRequiringLicenseAcceptance(IPackage package)
         {
-            bool licenseRequired = package.RequireLicenseAcceptance 
-                || this.packageHandler.GetInstalledDependencies(package).Any(d => d.RequireLicenseAcceptance);
+            List<IPackage> licensed = new List<IPackage>();
+            if (package.RequireLicenseAcceptance)
+            {
+                licensed.Add(package);
+            }
 
-            return licenseRequired;
+            licensed.AddRange(this.packageHandler.GetInstalledDependencies(package).Where(d => d.RequireLicenseAcceptance));
+            return licensed;
         }
 
         /// <summary>
@@ -278,7 +295,6 @@ namespace SonarQube.Plugins.Roslyn
             }
             return true;
         }
-
 
         private static PluginManifest CreatePluginManifest(IPackage package)
         {

@@ -112,7 +112,6 @@
     <Compile Include="Interfaces\IRuleGenerator.cs" />
     <Compile Include="NuGet\NuGetLoggerAdapter.cs" />
     <Compile Include="NuGet\NuGetMachineWideSettings.cs" />
-    <Compile Include="NuGet\NuGetReference.cs" />
     <Compile Include="CommandLine\ProcessedArgs.cs" />
     <Compile Include="CommandLine\CmdLineResources.Designer.cs">
       <AutoGen>True</AutoGen>

@@ -49,6 +49,26 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
 
         #endregion Argument definitions
 
+        private class NuGetReference
+        {
+            private readonly string packageId;
+            private readonly NuGet.SemanticVersion version;
+
+            public NuGetReference(string packageId, NuGet.SemanticVersion version)
+            {
+                if (string.IsNullOrWhiteSpace(packageId))
+                {
+                    throw new ArgumentNullException("packageId");
+                }
+                this.packageId = packageId;
+                this.version = version;
+            }
+
+            public string PackageId { get { return this.packageId; } }
+            public NuGet.SemanticVersion Version { get { return this.version; } }
+        }
+
+
         public static ProcessedArgs TryProcessArguments(string[] commandLineArgs, ILogger logger)
         {
             if (logger == null)
@@ -87,10 +107,13 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             if (parsedOk)
             {
                 Debug.Assert(analyzerRef != null, "Expecting to have a valid analyzer reference");
-                processed = new ProcessedArgs(analyzerRef,
-                    sqaleFilePath,
+                processed = new ProcessedArgs(
+                    analyzerRef.PackageId,
+                    analyzerRef.Version,
                     SupportedLanguages.CSharp, /* TODO: support multiple languages */
-                    acceptLicense);
+                    sqaleFilePath,
+                    acceptLicense,
+                    System.IO.Directory.GetCurrentDirectory());
             }
 
             return processed;

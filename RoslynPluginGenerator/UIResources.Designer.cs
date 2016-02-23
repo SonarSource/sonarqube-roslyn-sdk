@@ -151,7 +151,16 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot create a plugin for NuGet package {0}:{1} because it requires acceptance of a license, which is not supported in this version of the tool..
+        ///   Looks up a localized string similar to You have accepted the licenses for the following packages:.
+        /// </summary>
+        public static string APG_NGAcceptedPackageLicenses {
+            get {
+                return ResourceManager.GetString("APG_NGAcceptedPackageLicenses", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot create a plugin for NuGet package {0} v{1} because the packages listed below require licenses to be accepted. Please check the licenses and then re-run the generator specifying the &quot;/acceptLicenses&quot; argument..
         /// </summary>
         public static string APG_NGPackageRequiresLicenseAcceptance {
             get {

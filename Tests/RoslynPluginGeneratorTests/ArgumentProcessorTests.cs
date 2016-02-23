@@ -193,18 +193,16 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
         {
             Assert.IsNotNull(actualArgs, "Expecting the arguments to have been processed successfully");
 
-            Assert.IsNotNull(actualArgs.AnalyzerRef, "Not expecting the analyzer reference to be null");
-            Assert.AreEqual(actualArgs.AnalyzerRef.PackageId, expectedId, "Unexpected package id returned");
+            Assert.AreEqual(actualArgs.PackageId, expectedId, "Unexpected package id returned");
 
-            NuGetReference actualRef = actualArgs.AnalyzerRef;
             if (expectedVersion == null)
             {
-                Assert.IsNull(actualRef.Version, "Expecting the version to be null");
+                Assert.IsNull(actualArgs.PackageVersion, "Expecting the version to be null");
             }
             else
             {
-                Assert.IsNotNull(actualRef.Version, "Not expecting the version to be null");
-                Assert.AreEqual(expectedVersion, actualRef.Version.ToString());
+                Assert.IsNotNull(actualArgs.PackageVersion, "Not expecting the version to be null");
+                Assert.AreEqual(expectedVersion, actualArgs.PackageVersion.ToString());
             }
 
             Assert.AreEqual(expectedSqale, actualArgs.SqaleFilePath, "Unexpected sqale file path");

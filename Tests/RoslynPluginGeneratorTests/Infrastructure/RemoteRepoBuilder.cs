@@ -109,7 +109,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                 builder.Save(fileStream);
             }
 
-            // Retrieve and return the newly-created pacakge
+            // Retrieve and return the newly-created package
             IPackage package = this.fakeRemoteRepo.FindPackage(packageId, new SemanticVersion(packageVersion));
             Assert.IsNotNull(package, "Test setup error: failed to create and retrieve a test package");
 
