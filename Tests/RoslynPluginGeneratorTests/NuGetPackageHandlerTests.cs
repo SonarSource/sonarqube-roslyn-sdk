@@ -10,7 +10,6 @@ using SonarQube.Plugins.Test.Common;
 using System.IO;
 using NuGet;
 using System.Linq;
-using System.Collections.Generic;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
@@ -39,7 +38,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
 
             // Create test NuGet payload and packages
-            IPackageRepository fakeRemoteRepo = BuildTestPackages(true, true);
+            IPackageRepository fakeRemoteRepo = CreateTestPackageWithSingleDependency(ReleaseVersion, ReleaseVersion);
 
             TestLogger logger = new TestLogger();
             NuGetPackageHandler handler = new NuGetPackageHandler(fakeRemoteRepo, targetNuGetRoot, logger);
@@ -62,7 +61,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
 
             // Create test NuGet payload and packages
-            IPackageRepository fakeRemoteRepo = BuildTestPackages(false, true);
+            IPackageRepository fakeRemoteRepo = CreateTestPackageWithSingleDependency(PreReleaseVersion, ReleaseVersion);
 
             TestLogger logger = new TestLogger();
             NuGetPackageHandler handler = new NuGetPackageHandler(fakeRemoteRepo, targetNuGetRoot, logger);
@@ -85,7 +84,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
 
             // Create test NuGet payload and packages
-            IPackageRepository fakeRemoteRepo = BuildTestPackages(false, false);
+            IPackageRepository fakeRemoteRepo = CreateTestPackageWithSingleDependency(PreReleaseVersion, PreReleaseVersion);
 
             TestLogger logger = new TestLogger();
             NuGetPackageHandler handler = new NuGetPackageHandler(fakeRemoteRepo, targetNuGetRoot, logger);
@@ -104,21 +103,19 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         [TestMethod]
         public void FetchPackage_VersionSpecified_CorrectVersionSelected()
         {
-            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.remote");
             string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
-            IPackageManager mgr = CreatePackageManager(fakeRemoteNuGetDir);
 
-            BuildAndInstallPackage(mgr, "package.id.1", "0.8.0");
-            BuildAndInstallPackage(mgr, "package.id.1", "1.0.0-rc1");
-            BuildAndInstallPackage(mgr, "package.id.1", "2.0.0");
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "0.8.0");
+            BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "1.0.0-rc1");
+            BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "2.0.0");
 
-            BuildAndInstallPackage(mgr, "dummy.package.1", "0.8.0");
+            BuildAndInstallPackage(remoteRepoBuilder, "dummy.package.1", "0.8.0");
 
-            BuildAndInstallPackage(mgr, "package.id.1", "0.9.0");
-            BuildAndInstallPackage(mgr, "package.id.1", "1.0.0");
+            BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "0.9.0");
+            BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "1.0.0");
 
-            IPackageRepository fakeRemoteRepo = new LocalPackageRepository(fakeRemoteNuGetDir);
-            NuGetPackageHandler handler = new NuGetPackageHandler(fakeRemoteRepo, targetNuGetRoot, new TestLogger());
+            NuGetPackageHandler handler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, targetNuGetRoot, new TestLogger());
 
             // Check for specific versions
             IPackage actual = handler.FetchPackage("package.id.1", new SemanticVersion("0.8.0"));
@@ -135,18 +132,16 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void FetchPackage_VersionNotSpecified_ReleaseVersionExists_LastReleaseVersionSelected()
         {
             // Arrange
-            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.remote");
             string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
-            IPackageManager mgr = CreatePackageManager(fakeRemoteNuGetDir);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
 
-            BuildAndInstallPackage(mgr, "package.id.1", "0.8.0");
-            BuildAndInstallPackage(mgr, "package.id.1", "0.9.0-rc1");
-            BuildAndInstallPackage(mgr, "package.id.1", "1.0.0");
-            BuildAndInstallPackage(mgr, "package.id.1", "1.1.0-rc1");
-            BuildAndInstallPackage(mgr, "dummy.package.1", "2.0.0");
+            BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "0.8.0");
+            BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "0.9.0-rc1");
+            BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "1.0.0");
+            BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "1.1.0-rc1");
+            BuildAndInstallPackage(remoteRepoBuilder, "dummy.package.1", "2.0.0");
 
-            IPackageRepository fakeRemoteRepo = new LocalPackageRepository(fakeRemoteNuGetDir);
-            NuGetPackageHandler handler = new NuGetPackageHandler(fakeRemoteRepo, targetNuGetRoot, new TestLogger());
+            NuGetPackageHandler handler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, targetNuGetRoot, new TestLogger());
 
             // Act
             IPackage actual = handler.FetchPackage("package.id.1", null);
@@ -159,18 +154,16 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void FetchPackage_VersionNotSpecified_NoReleaseVersions_LastPreReleaseVersionSelected()
         {
             // Arrange
-            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.remote");
             string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
-            IPackageManager mgr = CreatePackageManager(fakeRemoteNuGetDir);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
 
-            BuildAndInstallPackage(mgr, "package.id.1", "0.9.0-rc1");
-            BuildAndInstallPackage(mgr, "package.id.1", "1.0.0-rc1");
-            BuildAndInstallPackage(mgr, "package.id.1", "1.1.0-rc1");
-            BuildAndInstallPackage(mgr, "dummy.package.1", "2.0.0");
-            BuildAndInstallPackage(mgr, "dummy.package.1", "2.0.0-rc2");
+            BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "0.9.0-rc1");
+            BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "1.0.0-rc1");
+            BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "1.1.0-rc1");
+            BuildAndInstallPackage(remoteRepoBuilder, "dummy.package.1", "2.0.0");
+            BuildAndInstallPackage(remoteRepoBuilder, "dummy.package.1", "2.0.0-rc2");
 
-            IPackageRepository fakeRemoteRepo = new LocalPackageRepository(fakeRemoteNuGetDir);
-            NuGetPackageHandler handler = new NuGetPackageHandler(fakeRemoteRepo, targetNuGetRoot, new TestLogger());
+            NuGetPackageHandler handler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, targetNuGetRoot, new TestLogger());
 
             // Act
             IPackage actual = handler.FetchPackage("package.id.1", null);
@@ -183,15 +176,13 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void FetchPackage_PackageNotFound_NullReturned()
         {
             // Arrange
-            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.remote");
             string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
-            IPackageManager mgr = CreatePackageManager(fakeRemoteNuGetDir);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
 
-            BuildAndInstallPackage(mgr, "package.id.1", "0.8.0");
-            BuildAndInstallPackage(mgr, "package.id.1", "0.9.0");
+            BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "0.8.0");
+            BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "0.9.0");
 
-            IPackageRepository fakeRemoteRepo = new LocalPackageRepository(fakeRemoteNuGetDir);
-            NuGetPackageHandler handler = new NuGetPackageHandler(fakeRemoteRepo, targetNuGetRoot, new TestLogger());
+            NuGetPackageHandler handler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, targetNuGetRoot, new TestLogger());
 
             // 1. Package id not found
             IPackage actual = handler.FetchPackage("unknown.package.id", new SemanticVersion("0.8.0"));
@@ -206,122 +197,30 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
         #region Private methods
 
-        private IPackageManager CreatePackageManager(string rootDir)
+        private IPackage BuildAndInstallPackage(RemoteRepoBuilder remoteRepoBuilder, string id, string version)
         {
-            IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository(rootDir);
-            PackageManager mgr = new PackageManager(repo, rootDir);
+            string dummyTextFile = CreateDummyContentFile();
+            return remoteRepoBuilder.CreatePackage(id, version, dummyTextFile, RemoteRepoBuilder.License.NotRequired);
+        }
+        
+        private IPackageRepository CreateTestPackageWithSingleDependency(string dependentPackageVersion, string testPackageVersion)
+        {
+            string dummyTextFile = CreateDummyContentFile();
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
 
-            return mgr;
+            IPackage testPackage = remoteRepoBuilder.CreatePackage(TestPackageId, testPackageVersion, dummyTextFile, RemoteRepoBuilder.License.NotRequired);
+            remoteRepoBuilder.CreatePackage(DependentPackageId, dependentPackageVersion, dummyTextFile, RemoteRepoBuilder.License.NotRequired, testPackage);
+
+            return remoteRepoBuilder.FakeRemoteRepo;
         }
 
-        private ManifestMetadata GenerateTestMetadata(bool isReleased)
-        {
-            return new ManifestMetadata()
-            {
-                Authors = "Microsoft",
-                Version = isReleased ? ReleaseVersion : PreReleaseVersion,
-                Id = TestPackageId,
-                Description = "A description",
-            };
-        }
-
-        private ManifestMetadata GenerateTestMetadataWithDependency(bool isReleased, bool isDependencyReleased)
-        {
-            List<ManifestDependencySet> dependencies = new List<ManifestDependencySet>()
-            {
-                new ManifestDependencySet()
-                {
-                    Dependencies = new List<ManifestDependency>()
-                    {
-                        new ManifestDependency()
-                        {
-                            Id = TestPackageId,
-                            Version = isDependencyReleased ? ReleaseVersion : PreReleaseVersion,
-                        }
-                    }
-                }
-            };
-            return new ManifestMetadata()
-            {
-                Authors = "Microsoft",
-                Version = isReleased ? ReleaseVersion : PreReleaseVersion,
-                Id = DependentPackageId,
-                Description = "A description",
-                DependencySets = dependencies,
-            };
-        }
-
-        private Stream BuildPackageToStream(ManifestMetadata metadata, Stream outputStream)
+        private string CreateDummyContentFile()
         {
             string testDir = TestUtils.EnsureTestDirectoryExists(this.TestContext, "source");
             string dummyTextFile = TestUtils.CreateTextFile(Guid.NewGuid().ToString(), testDir, "content");
-
-            PackageBuilder packageBuilder = new PackageBuilder();
-
-            PhysicalPackageFile file = new PhysicalPackageFile();
-            file.SourcePath = dummyTextFile;
-            file.TargetPath = "dummy.txt";
-            packageBuilder.Files.Add(file);
-
-            packageBuilder.Populate(metadata);
-            packageBuilder.Save(outputStream);
-
-            // Assert correct function of the above code when versions are specifically "Release" or "Prerelease"            
-            if (String.Equals(metadata.Version, ReleaseVersion, StringComparison.OrdinalIgnoreCase))
-            {
-                Assert.IsTrue(packageBuilder.IsReleaseVersion());
-            }
-            else if (String.Equals(metadata.Version, PreReleaseVersion, StringComparison.OrdinalIgnoreCase))
-            {
-                Assert.IsFalse(packageBuilder.IsReleaseVersion());
-            }
-
-            return outputStream;
+            return dummyTextFile;
         }
 
-        private void BuildAndInstallPackage(IPackageManager manager, string id, string version)
-        {
-            ManifestMetadata metadata = GenerateTestMetadata(true);
-            metadata.Id = id;
-            metadata.Version = new SemanticVersion(version).ToString();
-
-            Stream packageStream = BuildPackageToStream(metadata, new MemoryStream());
-            packageStream.Position = 0;
-
-            ZipPackage pkg = new ZipPackage(packageStream);
-            manager.InstallPackage(pkg, true, true);
-        }
-
-        private void BuildAndSavePackage(ManifestMetadata metadata, string fileName)
-        {
-            string destinationName = fileName + "." + metadata.Version + ".nupkg";
-            Stream fileStream = File.Open(destinationName, FileMode.OpenOrCreate);
-            BuildPackageToStream(metadata, fileStream);
-            fileStream.Dispose();
-        }
-
-        private IPackageRepository BuildTestPackages(bool isDependentPackageReleased, bool isTestPackageReleased)
-        {
-            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.remote");
-
-            string testPackageFile = Path.Combine(fakeRemoteNuGetDir, TestPackageId);
-            string dependentPackageFile = Path.Combine(fakeRemoteNuGetDir, DependentPackageId);
-
-            ManifestMetadata testMetadata = GenerateTestMetadata(isTestPackageReleased);
-            BuildAndSavePackage(testMetadata, testPackageFile);
-
-            ManifestMetadata dependentMetadata = GenerateTestMetadataWithDependency(isDependentPackageReleased, isTestPackageReleased);
-            BuildAndSavePackage(dependentMetadata, dependentPackageFile);
-
-            LocalPackageRepository fakeRemoteRepo = new LocalPackageRepository(fakeRemoteNuGetDir);
-
-            // Sanity check the test setup: check we can retrieve the new packages
-            Assert.IsNotNull(fakeRemoteRepo.FindPackage(TestPackageId), "Test setup error: failed to locate test package '{0}'", TestPackageId);
-            Assert.IsNotNull(fakeRemoteRepo.FindPackage(DependentPackageId), "Test setup error: failed to locate test package '{0}'", DependentPackageId);
-
-            return fakeRemoteRepo;
-        }
-        
         #endregion
 
         #region Checks

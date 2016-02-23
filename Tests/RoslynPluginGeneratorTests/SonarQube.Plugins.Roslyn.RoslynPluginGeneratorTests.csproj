@@ -114,6 +114,7 @@
     <Compile Include="DiagnosticAssemblyScannerTests.cs" />
     <Compile Include="NuGetMachineWideSettingsTests.cs" />
     <Compile Include="NuGetRepositoryFactoryTests.cs" />
+    <Compile Include="Infrastructure\RemoteRepoBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\..\AssemblyInfo.Shared.cs">
       <Link>Properties\AssemblyInfo.Shared.cs</Link>
