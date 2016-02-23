@@ -57,45 +57,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             this.manager.InstallPackage(package, true, true);
         }
 
-        public IPackage CreatePackageXXX(
-            string packageId,
-            string packageVersion,
-            string contentFilePath,
-            License requiresLicenseAccept)
-        {
-            PackageBuilder builder = new PackageBuilder();
-            ManifestMetadata metadata = new ManifestMetadata()
-            {
-                Authors = "dummy author",
-                Version = new SemanticVersion(packageVersion).ToString(),
-                Id = packageId,
-                Description = "dummy description",
-                LicenseUrl = "http://choosealicense.com/",
-                RequireLicenseAcceptance = (requiresLicenseAccept == License.Required)
-            };
-
-            builder.Populate(metadata);
-
-            PhysicalPackageFile file = new PhysicalPackageFile();
-            file.SourcePath = contentFilePath;
-            file.TargetPath = Path.GetFileName(contentFilePath);
-            builder.Files.Add(file);
-
-            string fileName = packageId.ToString() + "." + metadata.Version + ".nupkg";
-            string destinationName = Path.Combine(this.manager.LocalRepository.Source, fileName);
-
-            using (Stream fileStream = File.Open(destinationName, FileMode.OpenOrCreate))
-            {
-                builder.Save(fileStream);
-            }
-
-            // Retrieve and return the newly-created pacakge
-            IPackage package = this.fakeRemoteRepo.FindPackage(packageId, new SemanticVersion(packageVersion));
-            Assert.IsNotNull(package, "Test setup error: failed to create and retrieve a test package");
-
-            return package;
-        }
-
         public IPackage CreatePackage(
             string packageId,
             string packageVersion,
