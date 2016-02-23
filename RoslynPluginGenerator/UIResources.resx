@@ -181,6 +181,9 @@ SQALE: an empty SQALE file for the analyzer was saved to {0}. To provide SQALE r
 * NuGet package Id (mandatory), and
 * NuGet package version (optional)</value>
   </data>
+  <data name="NG_AddingNewDependency" xml:space="preserve">
+    <value>  Adding new dependency: {0} version {1}</value>
+  </data>
   <data name="NG_CreatingRepository" xml:space="preserve">
     <value>Creating NuGet repository: {0}</value>
   </data>
@@ -189,6 +192,9 @@ SQALE: an empty SQALE file for the analyzer was saved to {0}. To provide SQALE r
   </data>
   <data name="NG_DownloadingPackage" xml:space="preserve">
     <value>Downloading package...</value>
+  </data>
+  <data name="NG_DuplicateDependency" xml:space="preserve">
+    <value>  Duplicate dependency: {0} version {1}</value>
   </data>
   <data name="NG_ERROR_PackageInstallFail" xml:space="preserve">
     <value>Failed to install package: {0}
@@ -202,6 +208,9 @@ Check that there are released versions of the package, or specify a pre-release 
   </data>
   <data name="NG_ExtractingFile" xml:space="preserve">
     <value>Extracting file '{0}' to {1}</value>
+  </data>
+  <data name="NG_FailedToResolveDependency" xml:space="preserve">
+    <value>Failed to resolve dependency: {0} version {1}</value>
   </data>
   <data name="NG_FetchingConfigFiles" xml:space="preserve">
     <value>Fetching NuGet config files...</value>
@@ -230,6 +239,9 @@ The conflict will be ignored.</value>
   </data>
   <data name="NG_PackageVersionListHeader" xml:space="preserve">
     <value>Package versions:</value>
+  </data>
+  <data name="NG_ResolvingPackageDependencies" xml:space="preserve">
+    <value>Resolving dependencies for {0} version {1}...</value>
   </data>
   <data name="NG_SelectedPackageVersion" xml:space="preserve">
     <value>Version was not specified. Using version {0}.</value>

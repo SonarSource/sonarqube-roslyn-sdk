@@ -77,7 +77,7 @@ namespace SonarQube.Plugins.Roslyn
                 try
                 {
                     // Prerelease packages enabled by default
-                    this.packageManager.InstallPackage(package, false, true, false);
+                    this.packageManager.InstallPackage(package, false, true, false);                   
                 }
                 catch (InvalidOperationException e)
                 {
@@ -87,6 +87,19 @@ namespace SonarQube.Plugins.Roslyn
             }
 
             return package;
+        }
+                
+        public IEnumerable<IPackage> GetInstalledDependencies(IPackage package)
+        {
+            if (package == null)
+            {
+                throw new ArgumentNullException("package");
+            }
+
+            List<IPackage> dependencies = new List<IPackage>();
+            GetAllDependencies(package, dependencies);
+
+            return dependencies;
         }
 
         public string GetLocalPackageRootDirectory(IPackage package)
@@ -178,5 +191,36 @@ namespace SonarQube.Plugins.Roslyn
 
             return package;
         }
+
+        private void GetAllDependencies(IPackage current, List<IPackage> collectedDependencies)
+        {
+            this.logger.LogDebug(UIResources.NG_ResolvingPackageDependencies, current.Id, current.Version);
+            Debug.Assert(current != null);
+
+            foreach (PackageDependency dependency in current.GetCompatiblePackageDependencies(null))
+            {
+                IPackage dependencyPackage = this.packageManager.LocalRepository.ResolveDependency(dependency, true, true);
+
+                if (dependencyPackage == null)
+                {
+                    this.logger.LogWarning(UIResources.NG_FailedToResolveDependency, dependency.Id, dependency.VersionSpec.ToString());
+                }
+                else
+                {
+                    if (collectedDependencies.Contains(dependencyPackage))
+                    {
+                        this.logger.LogDebug(UIResources.NG_DuplicateDependency, dependencyPackage.Id, dependencyPackage.Version);
+                    }
+                    else
+                    {
+                        this.logger.LogDebug(UIResources.NG_AddingNewDependency, dependencyPackage.Id, dependencyPackage.Version);
+                        collectedDependencies.Add(dependencyPackage);
+
+                        GetAllDependencies(dependencyPackage, collectedDependencies);
+                    }
+                }
+            }
+        }
+
     }
 }

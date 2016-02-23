@@ -167,23 +167,10 @@ namespace SonarQube.Plugins.Roslyn
         /// <returns>Returns true if any of the packages in the dependency tree require license acceptance.</returns>
         private bool PackageRequiresLicenseAcceptance(IPackage package)
         {
-            if (package.RequireLicenseAcceptance)
-            {
-                return true;
-            }
-            foreach (PackageDependencySet dependencySet in package.DependencySets)
-            {
-                foreach (PackageDependency dependency in dependencySet.Dependencies)
-                {
-                    // Also check that no dependencies require license acceptance
-                    IPackage dependencyPkg = packageHandler.FetchPackage(dependency.Id, dependency.VersionSpec.MaxVersion);
-                    if (PackageRequiresLicenseAcceptance(dependencyPkg))
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
+            bool licenseRequired = package.RequireLicenseAcceptance 
+                || this.packageHandler.GetInstalledDependencies(package).Any(d => d.RequireLicenseAcceptance);
+
+            return licenseRequired;
         }
 
         /// <summary>

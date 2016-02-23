@@ -10,6 +10,7 @@ using SonarQube.Plugins.Test.Common;
 using System.IO;
 using NuGet;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
@@ -193,6 +194,88 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             Assert.IsNull(actual, "Not expecting a package to be found");
         }
 
+        [TestMethod]
+        public void GetDependencies_DependenciesInstalledLocally_Succeeds()
+        {
+            // Arrange
+            string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            string dummyContentFile = CreateDummyContentFile();
+
+            // Build a dependency graph 
+            // A depends on B
+            // B depends on C, D, E
+            // D also depends on E => duplicate dependency
+            // E depends on F
+            // -> expected [B, C, D, E, F]
+            
+            // Leaf nodes
+            IPackage f = remoteRepoBuilder.CreatePackage("f", "1.0", dummyContentFile, RemoteRepoBuilder.License.NotRequired /* no dependencies */);
+            IPackage c = remoteRepoBuilder.CreatePackage("c", "1.0", dummyContentFile, RemoteRepoBuilder.License.NotRequired /* no dependencies */);
+
+            IPackage e = remoteRepoBuilder.CreatePackage("e", "1.0", dummyContentFile, RemoteRepoBuilder.License.Required, f);
+            IPackage d = remoteRepoBuilder.CreatePackage("d", "1.1", dummyContentFile, RemoteRepoBuilder.License.Required, e);
+
+            IPackage b = remoteRepoBuilder.CreatePackage("b", "1.2", dummyContentFile, RemoteRepoBuilder.License.Required, c, d, e);
+
+            IPackage a = remoteRepoBuilder.CreatePackage("a", "2.0", dummyContentFile, RemoteRepoBuilder.License.NotRequired, b);
+
+            NuGetPackageHandler testSubject = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, targetNuGetRoot, new TestLogger());
+
+            // We assume that all of the packages have been installed locally we attempt to resolve the dependencies
+            testSubject.FetchPackage("a", new SemanticVersion("2.0"));
+
+            // 1. Package with no dependencies -> empty list
+            IEnumerable<IPackage> actualDependencies = testSubject.GetInstalledDependencies(f);
+            AssertExpectedPackageIds(actualDependencies /* none */);
+
+            // 2. Package with only direct dependencies -> non-empty list
+            actualDependencies = testSubject.GetInstalledDependencies(e);
+            AssertExpectedPackageIds(actualDependencies, "f");
+
+            // 3. Package with indirect dependencies -> non-empty list
+            actualDependencies = testSubject.GetInstalledDependencies(a);
+            AssertExpectedPackageIds(actualDependencies, "b", "c", "d", "e", "f");
+        }
+
+        [TestMethod]
+        public void GetDependencies_DependenciesNotInstalledLocally_Warning()
+        {
+            // Arrange
+            string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            string dummyContentFile = CreateDummyContentFile();
+
+            IEnumerable<IPackage> actualDependencies;
+
+            // Build a dependency graph: "main" depends on "dependency"
+            IPackage dependencyPackage = remoteRepoBuilder.CreatePackage("dependency.package.id", "1.2", dummyContentFile, RemoteRepoBuilder.License.Required /* no dependencies */);
+            IPackage mainPackage = remoteRepoBuilder.CreatePackage("a", "2.0", dummyContentFile, RemoteRepoBuilder.License.NotRequired, dependencyPackage);
+
+
+            // 1. Dependencies have not been installed locally -> warning but no error
+            TestLogger logger = new TestLogger();
+            NuGetPackageHandler testSubject = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, targetNuGetRoot, logger);
+            actualDependencies = testSubject.GetInstalledDependencies(mainPackage);
+            AssertExpectedPackageIds(actualDependencies /* no dependencies resolved*/);
+
+            logger.AssertErrorsLogged(0);
+            logger.AssertWarningsLogged(1);
+            logger.AssertSingleWarningExists("dependency.package.id");
+
+
+            // 2. Now install the package -> dependencies should resolve ok
+            logger = new TestLogger();
+            testSubject = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, targetNuGetRoot, logger);
+
+            testSubject.FetchPackage(mainPackage.Id, mainPackage.Version);
+            actualDependencies = testSubject.GetInstalledDependencies(mainPackage);
+            AssertExpectedPackageIds(actualDependencies, "dependency.package.id");
+
+            logger.AssertErrorsLogged(0);
+            logger.AssertWarningsLogged(0);
+        }
+
         #endregion
 
         #region Private methods
@@ -241,6 +324,15 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                 .SingleOrDefault(d => d.Contains(expectedName) && d.Contains(expectedVersion));
             Assert.IsNotNull(packageDir,
                 "Expected a package to have been downloaded: " + expectedName);
+        }
+
+        private static void AssertExpectedPackageIds(IEnumerable<IPackage> actual, params string[] expectedIds)
+        {
+            foreach(string expectedId in expectedIds)
+            {
+                Assert.IsTrue(actual.Any(p => string.Equals(p.Id, expectedId, StringComparison.Ordinal)), "Dependency with the expected package id was not found. Id: {0}", expectedId);
+            }
+            Assert.AreEqual(expectedIds.Length, actual.Count(), "Too many dependencies returned");
         }
 
         #endregion

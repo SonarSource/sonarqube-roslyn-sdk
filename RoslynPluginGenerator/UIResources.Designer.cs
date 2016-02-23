@@ -239,6 +239,15 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to   Adding new dependency: {0} version {1}.
+        /// </summary>
+        public static string NG_AddingNewDependency {
+            get {
+                return ResourceManager.GetString("NG_AddingNewDependency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Creating NuGet repository: {0}.
         /// </summary>
         public static string NG_CreatingRepository {
@@ -262,6 +271,15 @@ namespace SonarQube.Plugins.Roslyn {
         public static string NG_DownloadingPackage {
             get {
                 return ResourceManager.GetString("NG_DownloadingPackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to   Duplicate dependency: {0} version {1}.
+        /// </summary>
+        public static string NG_DuplicateDependency {
+            get {
+                return ResourceManager.GetString("NG_DuplicateDependency", resourceCulture);
             }
         }
         
@@ -299,6 +317,15 @@ namespace SonarQube.Plugins.Roslyn {
         public static string NG_ExtractingFile {
             get {
                 return ResourceManager.GetString("NG_ExtractingFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to resolve dependency: {0} version {1}.
+        /// </summary>
+        public static string NG_FailedToResolveDependency {
+            get {
+                return ResourceManager.GetString("NG_FailedToResolveDependency", resourceCulture);
             }
         }
         
@@ -381,6 +408,15 @@ namespace SonarQube.Plugins.Roslyn {
         public static string NG_PackageVersionListHeader {
             get {
                 return ResourceManager.GetString("NG_PackageVersionListHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Resolving dependencies for {0} version {1}....
+        /// </summary>
+        public static string NG_ResolvingPackageDependencies {
+            get {
+                return ResourceManager.GetString("NG_ResolvingPackageDependencies", resourceCulture);
             }
         }
         

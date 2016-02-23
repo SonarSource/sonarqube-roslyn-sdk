@@ -28,6 +28,12 @@ namespace SonarQube.Plugins.Roslyn
         IPackage FetchPackage(string packageId, SemanticVersion version);
 
         /// <summary>
+        /// Returns the closure of packages required by the specified package
+        /// that have been installed locally
+        /// </summary>
+        IEnumerable<IPackage> GetInstalledDependencies(IPackage package);
+
+        /// <summary>
         /// Returns the local directory containing the specified package
         /// </summary>
         /// <remarks>Assumes that the package has already been fetched</remarks>
