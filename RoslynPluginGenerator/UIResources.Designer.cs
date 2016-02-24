@@ -151,6 +151,24 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} v{1}: {2}.
+        /// </summary>
+        public static string APG_NG_PackageAndLicenseUrl {
+            get {
+                return ResourceManager.GetString("APG_NG_PackageAndLicenseUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {license URL not specified}.
+        /// </summary>
+        public static string APG_NG_UnspecifiedLicenseUrl {
+            get {
+                return ResourceManager.GetString("APG_NG_UnspecifiedLicenseUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You have accepted the licenses for the following packages:.
         /// </summary>
         public static string APG_NGAcceptedPackageLicenses {
@@ -160,7 +178,7 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot create a plugin for NuGet package {0} v{1} because the packages listed below require licenses to be accepted. Please check the licenses and then re-run the generator specifying the &quot;/acceptLicenses&quot; argument..
+        ///   Looks up a localized string similar to Cannot create a plugin for package {0} v{1} because the packages listed below require licenses to be accepted. Please check the licenses and then re-run the generator specifying the &quot;/acceptLicenses&quot; argument..
         /// </summary>
         public static string APG_NGPackageRequiresLicenseAcceptance {
             get {

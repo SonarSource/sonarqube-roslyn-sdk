@@ -151,7 +151,13 @@
     <value>You have accepted the licenses for the following packages:</value>
   </data>
   <data name="APG_NGPackageRequiresLicenseAcceptance" xml:space="preserve">
-    <value>Cannot create a plugin for NuGet package {0} v{1} because the packages listed below require licenses to be accepted. Please check the licenses and then re-run the generator specifying the "/acceptLicenses" argument.</value>
+    <value>Cannot create a plugin for package {0} v{1} because the packages listed below require licenses to be accepted. Please check the licenses and then re-run the generator specifying the "/acceptLicenses" argument.</value>
+  </data>
+  <data name="APG_NG_PackageAndLicenseUrl" xml:space="preserve">
+    <value>{0} v{1}: {2}</value>
+  </data>
+  <data name="APG_NG_UnspecifiedLicenseUrl" xml:space="preserve">
+    <value>{license URL not specified}</value>
   </data>
   <data name="APG_NoAnalyzersFound" xml:space="preserve">
     <value>No analyzers were found in the specified package</value>

@@ -81,19 +81,18 @@ namespace SonarQube.Plugins.Roslyn
                 return false;
             }
 
+            string packageDir = this.packageHandler.GetLocalPackageRootDirectory(package);
+            IEnumerable<DiagnosticAnalyzer> analyzers = GetAnalyzers(packageDir, this.packageHandler.LocalCacheRoot, args.Language);
+            if (!analyzers.Any())
+            {
+                return false;
+            }
+
             IEnumerable<IPackage> licenseAcceptancePackages = this.GetPackagesRequiringLicenseAcceptance(package);
             if (licenseAcceptancePackages.Any() && ! args.AcceptLicenses)
             {
                 this.logger.LogError(UIResources.APG_NGPackageRequiresLicenseAcceptance, package.Id, package.Version.ToString());
                 this.ListPackagesRequiringLicenseAcceptance(licenseAcceptancePackages);
-                return false;
-            }
-
-            string packageDir = this.packageHandler.GetLocalPackageRootDirectory(package);
-            IEnumerable<DiagnosticAnalyzer> analyzers = GetAnalyzers(packageDir, this.packageHandler.LocalCacheRoot, args.Language);
-
-            if (!analyzers.Any())
-            {
                 return false;
             }
 
@@ -165,13 +164,13 @@ namespace SonarQube.Plugins.Roslyn
                 string license;
                 if (package.LicenseUrl == null)
                 {
-                    license = "";
+                    license = UIResources.APG_NG_UnspecifiedLicenseUrl;
                 }
                 else
                 {
                     license = package.LicenseUrl.ToString();
                 }
-                this.logger.LogWarning("  {0} v{1}: {2}", package.Id, package.Version, license);
+                this.logger.LogWarning(UIResources.APG_NG_PackageAndLicenseUrl, package.Id, package.Version, license);
             }
         }
 

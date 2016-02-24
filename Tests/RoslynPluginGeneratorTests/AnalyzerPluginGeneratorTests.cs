@@ -196,6 +196,33 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         }
 
         [TestMethod]
+        public void Generate_LicenseAcceptanceNotRequestedIfNoAnalysers()
+        {
+            // No point in asking the user to accept licenses for packages that don't contain analyzers
+
+            // Arrange
+            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string dummyContentFile = TestUtils.CreateTextFile("dummy.txt", outputDir, "non-analyzer content file");
+
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+
+            // Parent only: requires license
+            remoteRepoBuilder.CreatePackage("non.analyzer.requireAccept.id", "1.0", dummyContentFile, License.Required);
+
+            TestLogger logger = new TestLogger();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, logger);
+
+            // 1. User does not accept, but no analyzers so no license prompt -> fails due absence of analyzers
+            ProcessedArgs args = CreateArgs("non.analyzer.requireAccept.id", "1.0", "cs", null, false /* accept licenses */ , outputDir);
+            bool result = apg.Generate(args);
+            Assert.IsFalse(result, "Expecting generator to fail");
+
+            logger.AssertSingleWarningExists(UIResources.APG_NoAnalyzersFound);
+            logger.AssertWarningsLogged(1);
+            logger.AssertErrorsLogged(0);
+        }
+
+        [TestMethod]
         public void Generate_SqaleFileNotSpecified_TemplateFileCreated()
         {
             // Arrange
