@@ -22,6 +22,11 @@ namespace SonarQube.Plugins.Roslyn
     public class AnalyzerPluginGenerator
     {
         /// <summary>
+        /// List of file extensions that should not be included in the zipped analyzer assembly
+        /// </summary>
+        private static readonly string[] excludedFileExtensions = { ".nupkg", ".nuspec" };
+
+        /// <summary>
         /// Specifies the format for the name of the placeholder SQALE file
         /// </summary>
         public const string SqaleTemplateFileNameFormat = "{0}.{1}.sqale.template.xml";
@@ -109,9 +114,8 @@ namespace SonarQube.Plugins.Roslyn
             definition.Manifest = CreatePluginManifest(package);
 
             // Create a zip containing the required analyzer files
-            definition.StaticResourceName = Path.GetFileName(packageDir) + ".zip";
-            definition.SourceZipFilePath = Path.Combine(baseDirectory, definition.StaticResourceName);
-            ZipFile.CreateFromDirectory(packageDir, definition.SourceZipFilePath, CompressionLevel.Optimal, false);
+            definition.SourceZipFilePath = this.CreateAnalyzerStaticPayloadFile(packageDir, baseDirectory);
+            definition.StaticResourceName = Path.GetFileName(definition.SourceZipFilePath);
 
             definition.RulesFilePath = GenerateRulesFile(analyzers, baseDirectory);
 
@@ -220,6 +224,21 @@ namespace SonarQube.Plugins.Roslyn
                 this.logger.LogWarning(UIResources.APG_NoAnalyzersFound);
             }
             return analyzers;
+        }
+
+        private string CreateAnalyzerStaticPayloadFile(string packageRootDir, string outputDir)
+        {
+            string zipFilePath = Path.GetFileName(packageRootDir) + ".zip";
+            zipFilePath = Path.Combine(outputDir, zipFilePath);
+            
+            ZipExtensions.CreateFromDirectory(packageRootDir, zipFilePath, IncludeFileInZip);
+
+            return zipFilePath;
+        }
+
+        private static bool IncludeFileInZip(string filePath)
+        {
+            return !excludedFileExtensions.Any(e => filePath.EndsWith(e, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>

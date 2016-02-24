@@ -47,5 +47,13 @@ namespace SonarQube.Plugins.Test.Common
             }
         }
 
+        public void AssertZipContainsOnlyExpectedFiles(params string[] expectedRelativePaths)
+        {
+            AssertZipContainsFiles(expectedRelativePaths);
+
+            string[] allFilesInZip = Directory.GetFiles(this.unzippedDir, "*.*", SearchOption.AllDirectories);
+            Assert.AreEqual(expectedRelativePaths.Length, allFilesInZip.Length, "Zip contains more files than expected");
+        }
+
     }
 }

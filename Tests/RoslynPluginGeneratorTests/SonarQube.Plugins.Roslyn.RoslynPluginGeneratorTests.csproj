@@ -122,6 +122,7 @@
     <Compile Include="RulesGeneratorTests.cs" />
     <Compile Include="NuGetPackageHandlerTests.cs" />
     <Compile Include="SupportedLanguagesTests.cs" />
+    <Compile Include="ZipExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\SonarQube.Plugins.Common.csproj">

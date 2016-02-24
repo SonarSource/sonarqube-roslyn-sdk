@@ -249,14 +249,14 @@ namespace SonarQube.Plugins.IntegrationTests
         private void AssertExpectedStaticZipFileExists(string jarFilePath, string staticResourceName,
             params string[] expectedZipContents)
         {
-            // Check the jar contains the expected zip file
+            // Check the jar contains the expected zip file (loose check - not worried about any other files)
             ZipFileChecker jarChecker = new ZipFileChecker(this.TestContext, jarFilePath);
             jarChecker.AssertZipContainsFiles(staticResourceName);
 
-            // Now create another checker to check the contents of the zip file
+            // Now create another checker to check the contents of the zip file (strict check this time)
             string embeddedZipFilePath = Path.Combine(jarChecker.UnzippedDirectoryPath, staticResourceName);
             ZipFileChecker embeddedFileChecker = new ZipFileChecker(this.TestContext, embeddedZipFilePath);
-            embeddedFileChecker.AssertZipContainsFiles(expectedZipContents);
+            embeddedFileChecker.AssertZipContainsOnlyExpectedFiles(expectedZipContents);
         }
 
         #endregion

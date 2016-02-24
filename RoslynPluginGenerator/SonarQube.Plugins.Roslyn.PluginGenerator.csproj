@@ -93,6 +93,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Reflection.Metadata, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Reflection.Metadata.1.1.0\lib\dotnet5.2\System.Reflection.Metadata.dll</HintPath>
@@ -135,6 +136,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>UIResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="ZipExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
