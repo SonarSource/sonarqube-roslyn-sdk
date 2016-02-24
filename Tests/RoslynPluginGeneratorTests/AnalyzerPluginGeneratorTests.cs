@@ -10,7 +10,6 @@ using SonarLint.XmlDescriptor;
 using SonarQube.Plugins.Roslyn.CommandLine;
 using SonarQube.Plugins.Test.Common;
 using System.IO;
-using System.Linq;
 using static SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests.RemoteRepoBuilder;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
@@ -48,197 +47,152 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             Assert.IsFalse(result, "Expecting generation to fail");
             logger.AssertWarningsLogged(1);
             AssertSqaleTemplateDoesNotExist(outputDir);
-
         }
 
         [TestMethod]
-        public void Generate_PackageNoAccept_NoDependencies_Succeeds()
+        public void Generate_LicenseAcceptanceNotRequired_Succeeds()
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
             RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder);
 
-            SetupTestGraph(remoteRepoBuilder);
+            // Multi-level dependencies: no package requires license acceptence
+            IPackage grandchild = CreatePackageWithAnalyzer(remoteRepoBuilder, "grandchild.id", "1.2", License.NotRequired /* no dependencies */);
+            IPackage child = CreatePackageWithAnalyzer(remoteRepoBuilder, "child.id", "1.1", License.NotRequired, grandchild);
+            CreatePackageWithAnalyzer(remoteRepoBuilder, "parent.id", "1.0", License.NotRequired, child);
 
-            ProcessedArgs args = CreateArgs(Node.Grandchild1_1.ToString(), "1.0", "cs", null, false, outputDir);
+            TestLogger logger = new TestLogger();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, logger);
 
-            // Act
+            // 1. Acceptance not required -> succeeds if accept = false
+            ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ , outputDir);
             bool result = apg.Generate(args);
-
-            // Assert
             Assert.IsTrue(result, "Generator should succeed if there are no licenses to accept");
-        }
 
-        [TestMethod]
-        public void Generate_PackageNoAccept_MultiLevel_DependenciesNoAccept_Succeeds()
-        {
-            // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder);
+            logger.AssertErrorsLogged(0);
+            logger.AssertWarningNotLogged("parent.id"); // not expecting warnings about packages that don't require acceptance
+            logger.AssertWarningNotLogged("child.id");
+            logger.AssertWarningNotLogged("grandchild.id");
 
-            SetupTestGraph(remoteRepoBuilder);
-
-            ProcessedArgs args = CreateArgs(Node.Root.ToString(), "1.0", "cs", null, false, outputDir);
-
-            // Act
-            bool result = apg.Generate(args);
-
-            // Assert
+            // 2. Acceptance not required -> succeeds if accept = true
+            args = CreateArgs("parent.id", "1.0", "cs", null, true /* accept licenses */ , outputDir);
+            result = apg.Generate(args);
             Assert.IsTrue(result, "Generator should succeed if there are no licenses to accept");
+
+            logger.AssertErrorsLogged(0);
+            logger.AssertWarningNotLogged("parent.id"); // not expecting warnings about packages that don't require acceptance
+            logger.AssertWarningNotLogged("child.id");
+            logger.AssertWarningNotLogged("grandchild.id");
         }
 
         [TestMethod]
-        public void Generate_PackageRequiresAccept_NoDependencies_Fails()
+        public void Generate_LicenseAcceptanceRequiredByMainPackage()
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
             RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder);
 
-            SetupTestGraph(remoteRepoBuilder, Node.Grandchild1_1);
+            // Parent and child: only parent requires license
+            IPackage child = CreatePackageWithAnalyzer(remoteRepoBuilder, "child.id", "1.1", License.NotRequired);
+            CreatePackageWithAnalyzer(remoteRepoBuilder, "parent.requiredAccept.id", "1.0", License.Required, child);
 
-            ProcessedArgs args = CreateArgs(Node.Grandchild1_1.ToString(), "1.0", "cs", null, false, outputDir);
+            TestLogger logger = new TestLogger();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, logger);
 
-            // Act
+            // 1. User does not accept -> fails with error
+            ProcessedArgs args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, false /* accept licenses */ , outputDir);
             bool result = apg.Generate(args);
+            Assert.IsFalse(result, "Generator should fail because license has not been accepted");
 
-            // Assert
-            Assert.IsFalse(result, "Generator should fail if the package requires license Accept");
+            logger.AssertSingleErrorExists("parent.requiredAccept.id", "1.0"); // error listing the main package
+            logger.AssertSingleWarningExists("parent.requiredAccept.id", "1.0"); // warning for each licensed package
+            logger.AssertWarningsLogged(1);
+
+            // 2. User accepts -> succeeds with warnings
+            logger.Reset();
+            args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, true /* accept licenses */ , outputDir);
+            result = apg.Generate(args);
+            Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
+
+            logger.AssertSingleWarningExists(UIResources.APG_NGAcceptedPackageLicenses); // warning that licenses accepted
+            logger.AssertSingleWarningExists("parent.requiredAccept.id", "1.0"); // warning for each licensed package
+            logger.AssertWarningsLogged(2);
+            logger.AssertErrorsLogged(0);
         }
 
         [TestMethod]
-        public void Generate_PackageNoAccept_OneDependency_DependencyRequiresAccept_Fails()
+        public void Generate_LicenseAcceptanceRequiredByDependency()
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
             RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder);
 
-            SetupTestGraph(remoteRepoBuilder, Node.Grandchild1_1);
+            // Parent and child: only child requires license
+            IPackage child = CreatePackageWithAnalyzer(remoteRepoBuilder, "child.requiredAccept.id", "2.0", License.Required);
+            CreatePackageWithAnalyzer(remoteRepoBuilder, "parent.id", "1.0", License.NotRequired, child);
 
-            ProcessedArgs args = CreateArgs(Node.Child1.ToString(), "1.0", "cs", null, false, outputDir);
+            TestLogger logger = new TestLogger();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, logger);
 
-            // Act
+            // 1. User does not accept -> fails with error
+            ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ , outputDir);
             bool result = apg.Generate(args);
+            Assert.IsFalse(result, "Generator should fail because license has not been accepted");
 
-            // Assert
-            Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
+            logger.AssertSingleErrorExists("parent.id", "1.0"); // error listing the main package
+            logger.AssertSingleWarningExists("child.requiredAccept.id", "2.0"); // warning for each licensed package
+            logger.AssertWarningsLogged(1);
+
+            // 2. User accepts -> succeeds with warnings
+            logger.Reset();
+            args = CreateArgs("parent.id", "1.0", "cs", null, true /* accept licenses */ , outputDir);
+            result = apg.Generate(args);
+            Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
+
+            logger.AssertSingleWarningExists(UIResources.APG_NGAcceptedPackageLicenses); // warning that licenses have been accepted
+            logger.AssertSingleWarningExists("child.requiredAccept.id", "2.0"); // warning for each licensed package
+            logger.AssertWarningsLogged(2);
+            logger.AssertErrorsLogged(0);
         }
 
         [TestMethod]
-        public void Generate_PackageRequiresAccept_OneDependency_DependencyRequiresAccept_Fails()
+        public void Generate_LicenseAcceptanceRequired_ByParentAndDependencies()
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
             RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder);
 
-            SetupTestGraph(remoteRepoBuilder, Node.Child1, Node.Grandchild1_1);
+            // Multi-level: parent and some but not all dependencies require license acceptance
+            IPackage grandchild1 = CreatePackageWithAnalyzer(remoteRepoBuilder, "grandchild1.requiredAccept.id", "3.0", License.Required);
+            IPackage child1 = CreatePackageWithAnalyzer(remoteRepoBuilder, "child1.requiredAccept.id", "2.1", License.Required);
+            IPackage child2 = CreatePackageWithAnalyzer(remoteRepoBuilder, "child2.id", "2.2", License.NotRequired, grandchild1);
+            CreatePackageWithAnalyzer(remoteRepoBuilder, "parent.requiredAccept.id", "1.0", License.Required, child1, child2);
 
-            ProcessedArgs args = CreateArgs(Node.Child1.ToString(), "1.0", "cs", null, false, outputDir);
+            TestLogger logger = new TestLogger();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, logger);
 
-            // Act
+            // 1. User does not accept -> fails with error
+            ProcessedArgs args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, false /* accept licenses */ , outputDir);
             bool result = apg.Generate(args);
+            Assert.IsFalse(result, "Generator should fail because license has not been accepted");
 
-            // Assert
-            Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
-        }
+            logger.AssertSingleErrorExists("parent.requiredAccept.id", "1.0"); // error referring to the main package
 
-        [TestMethod]
-        public void Generate_PackageNoAccept_MultipleDependencies_OneDependencyRequiresAccept_Fails()
-        {
-            // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder);
+            logger.AssertSingleWarningExists("grandchild1.requiredAccept.id", "3.0"); // warning for each licensed package
+            logger.AssertSingleWarningExists("child1.requiredAccept.id", "2.1");
+            logger.AssertSingleWarningExists("parent.requiredAccept.id", "1.0");
 
-            SetupTestGraph(remoteRepoBuilder, Node.Grandchild2_1);
+            // 2. User accepts -> succeeds with warnings
+            logger.Reset();
+            args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, true /* accept licenses */ , outputDir);
+            result = apg.Generate(args);
+            Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
 
-            ProcessedArgs args = CreateArgs(Node.Child2.ToString(), "1.0", "cs", null, false, outputDir);
-
-            // Act
-            bool result = apg.Generate(args);
-
-            // Assert
-            Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
-        }
-
-        [TestMethod]
-        public void Generate_PackageNoAccept_MultipleDependencies_SecondDependencyRequiresAccept_Fails()
-        {
-            // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder);
-
-            SetupTestGraph(remoteRepoBuilder, Node.Grandchild2_2);
-
-            ProcessedArgs args = CreateArgs(Node.Child2.ToString(), "1.0", "cs", null, false, outputDir);
-
-            // Act
-            bool result = apg.Generate(args);
-
-            // Assert
-            Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
-        }
-
-        [TestMethod]
-        public void Generate_PackageRequiresAccept_MultipleDependencies_AllDependenciesRequiresAccept_Fails()
-        {
-            // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder);
-
-            SetupTestGraph(remoteRepoBuilder, Node.Child2, Node.Grandchild2_1, Node.Grandchild2_2);
-
-            ProcessedArgs args = CreateArgs(Node.Child2.ToString(), "1.0", "cs", null, false, outputDir);
-
-            // Act
-            bool result = apg.Generate(args);
-
-            // Assert
-            Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
-        }
-
-        [TestMethod]
-        public void Generate_PackageNoAccept_MultiLevel_SecondLevelDependencyRequiresAccept_Fails()
-        {
-            // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder);
-
-            SetupTestGraph(remoteRepoBuilder, Node.Grandchild1_1);
-
-            ProcessedArgs args = CreateArgs(Node.Root.ToString(), "1.0", "cs", null, false, outputDir);
-
-            // Act
-            bool result = apg.Generate(args);
-
-            // Assert
-            Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
-        }
-
-        [TestMethod]
-        public void Generate_PackageNoAccept_MultiLevel_SecondLevelSecondDependencyRequiresAccept_Fails()
-        {
-            // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder);
-
-            SetupTestGraph(remoteRepoBuilder, Node.Grandchild2_1);
-
-            ProcessedArgs args = CreateArgs(Node.Root.ToString(), "1.0", "cs", null, false, outputDir);
-
-            // Act
-            bool result = apg.Generate(args);
-
-            // Assert
-            Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
+            logger.AssertSingleWarningExists(UIResources.APG_NGAcceptedPackageLicenses); // warning that licenses have been accepted
+            logger.AssertSingleWarningExists("grandchild1.requiredAccept.id", "3.0"); // warning for each licensed package
+            logger.AssertSingleWarningExists("child1.requiredAccept.id", "2.1");
+            logger.AssertSingleWarningExists("parent.requiredAccept.id", "1.0");
+            logger.AssertWarningsLogged(4);
         }
 
         [TestMethod]
@@ -342,55 +296,23 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
         private AnalyzerPluginGenerator CreateTestSubjectWithFakeRemoteRepo(RemoteRepoBuilder remoteRepoBuilder)
         {
-            TestLogger logger = new TestLogger();
+            return CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, new TestLogger());
+        }
+
+        private AnalyzerPluginGenerator CreateTestSubjectWithFakeRemoteRepo(RemoteRepoBuilder remoteRepoBuilder, TestLogger logger)
+        {
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
             return new AnalyzerPluginGenerator(nuGetHandler, logger);
         }
 
-        /// <summary>
-        /// Creates a graph used for testing, with nodes labelled in breadth-first order.
-        /// 
-        /// Visually:
-        /// Root--------
-        /// |            \
-        /// Child1       Child2---------
-        /// |             |             \
-        /// Grandchild1_1 GrandChild2_1 GrandChild2_2
-        /// </summary>
-        /// <param name="nodesRequireLicense">
-        /// Nodes in the graph that should be packages with the field requireLicenseAccept set to true
-        /// </param>
-        private void SetupTestGraph(RemoteRepoBuilder remoteRepoBuilder, params Node[] nodesRequireLicense)
+        private static IPackage CreatePackageWithAnalyzer(RemoteRepoBuilder remoteRepoBuilder, string packageId, string packageVersion, License acceptanceRequired, params IPackage[] dependencies)
         {
-            // leaf nodes
-            IPackage grandChild1_1 = CreatePackage(remoteRepoBuilder, Node.Grandchild1_1, nodesRequireLicense);
-            IPackage grandChild2_1 = CreatePackage(remoteRepoBuilder, Node.Grandchild2_1, nodesRequireLicense);
-            IPackage grandChild2_2 = CreatePackage(remoteRepoBuilder, Node.Grandchild2_2, nodesRequireLicense);
-
-            // non-leaf nodes
-            IPackage child1 = CreatePackage(remoteRepoBuilder, Node.Child1, nodesRequireLicense, grandChild1_1);
-            IPackage child2 = CreatePackage(remoteRepoBuilder, Node.Child2, nodesRequireLicense, grandChild2_1, grandChild2_2);
-
-            // root
-            CreatePackage(remoteRepoBuilder, Node.Root, nodesRequireLicense, child1, child2);
+            return remoteRepoBuilder.CreatePackage(packageId, packageVersion, typeof(RoslynAnalyzer11.CSharpAnalyzer).Assembly.Location, acceptanceRequired, dependencies);
         }
 
         private void CreatePackageInFakeRemoteRepo(RemoteRepoBuilder remoteRepoBuilder, string packageId, string packageVersion)
         {
             remoteRepoBuilder.CreatePackage(packageId, packageVersion, typeof(RoslynAnalyzer11.AbstractAnalyzer).Assembly.Location, License.NotRequired /* no dependencies */ );
-        }
-
-        private IPackage CreatePackage(RemoteRepoBuilder remoteRepoBuilder, Node packageNode, Node[] nodesRequireLicense, params IPackage[] dependencyNodes)
-        {
-            return remoteRepoBuilder.CreatePackage(packageNode.ToString(), "1.0",
-                typeof(RoslynAnalyzer11.CSharpAnalyzer).Assembly.Location, // generation will fail unless there are analyzers to process
-                IsLicenseRequiredFor(packageNode, nodesRequireLicense),
-                dependencyNodes);
-        }
-
-        private License IsLicenseRequiredFor(Node node, Node[] nodesRequireLicense)
-        {
-            return nodesRequireLicense.Contains(node) ? License.Required : License.NotRequired;
         }
         
         private string GetLocalNuGetDownloadDir()
