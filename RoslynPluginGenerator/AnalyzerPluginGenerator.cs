@@ -326,7 +326,7 @@ namespace SonarQube.Plugins.Roslyn
             pluginDefn.Homepage = GetValidManifestString(package.ProjectUrl?.ToString());
             pluginDefn.Key = PluginKeyUtilities.GetValidKey(package.Id);
 
-            if (package.Title != null)
+            if (!String.IsNullOrWhiteSpace(package.Title))
             {
                 pluginDefn.Name = GetValidManifestString(package.Title);
             }
@@ -360,7 +360,7 @@ namespace SonarQube.Plugins.Roslyn
 
             // Packages from the NuGet website may have friendly short licensenames heuristically assigned, but this requires a downcast
             DataServicePackage dataServicePackage = package as DataServicePackage;
-            if (dataServicePackage?.LicenseNames != null)
+            if (!String.IsNullOrWhiteSpace(dataServicePackage?.LicenseNames))
             {
                 pluginDefn.License = GetValidManifestString(dataServicePackage.LicenseNames);
             } 

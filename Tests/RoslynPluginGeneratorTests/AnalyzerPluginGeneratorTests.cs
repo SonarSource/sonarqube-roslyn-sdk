@@ -309,6 +309,45 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         }
 
         [TestMethod]
+        public void CreatePluginManifest_AllProperties()
+        {
+            // All properties present, all properties expected.
+
+            // Arrange
+            DataServicePackage testPackage = CreateTestDataServicePackage();
+
+            testPackage.Description = "Test Description";
+            testPackage.Authors = "TestAuthor1,TestAuthor2";
+            testPackage.ProjectUrl = new Uri("http://test.project.url");
+            testPackage.Id = "Test.Id";
+
+            testPackage.Title = "Test Title";
+            testPackage.Owners = "TestOwner1,TestOwner2";
+            testPackage.Version = "1.1.1-RC5";
+
+            testPackage.LicenseUrl = new Uri("http://test.license.url");
+            testPackage.LicenseNames = "Test License1;Test License2";
+
+            // Act
+            PluginManifest actualPluginManifest = AnalyzerPluginGenerator.CreatePluginManifest(testPackage);
+
+            // Assert
+            Assert.IsNotNull(actualPluginManifest);
+
+            Assert.AreEqual(testPackage.Description, actualPluginManifest.Description);
+            Assert.AreEqual(testPackage.Authors, actualPluginManifest.Developers);
+            Assert.AreEqual(testPackage.ProjectUrl.ToString(), actualPluginManifest.Homepage, false);
+            Assert.AreEqual(PluginKeyUtilities.GetValidKey(testPackage.Id), actualPluginManifest.Key);
+
+            Assert.AreEqual(testPackage.Title, actualPluginManifest.Name);
+            Assert.AreEqual(testPackage.Owners, actualPluginManifest.Organization);
+            Assert.AreEqual(testPackage.Version, actualPluginManifest.Version);
+
+            Assert.AreEqual(testPackage.LicenseUrl.ToString(), actualPluginManifest.TermsConditionsUrl, false);
+            Assert.AreEqual(testPackage.LicenseNames, actualPluginManifest.License);
+        }
+
+        [TestMethod]
         public void CreatePluginManifest_TitleMissing()
         {
             // When no title is available, ID should be used as a fallback, removing the dot separators for legibility.
@@ -342,7 +381,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // Assert
             Assert.IsNotNull(actualPluginManifest);
-            Assert.IsTrue(string.Equals(testPackage.LicenseNames, actualPluginManifest.License, StringComparison.InvariantCulture));
+            Assert.AreEqual(testPackage.LicenseNames, actualPluginManifest.License);
         }
 
         [TestMethod]
@@ -360,7 +399,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // Assert
             Assert.IsNotNull(actualPluginManifest);
-            Assert.IsTrue(string.Equals(testPackage.LicenseUrl.ToString(), actualPluginManifest.License, StringComparison.InvariantCultureIgnoreCase));
+            Assert.AreEqual(testPackage.LicenseUrl.ToString(), actualPluginManifest.License, false);
         }
 
         [TestMethod]
@@ -379,7 +418,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // Assert
             Assert.IsNotNull(actualPluginManifest);
-            Assert.IsTrue(string.Equals(testPackage.LicenseUrl.ToString(), actualPluginManifest.License, StringComparison.InvariantCultureIgnoreCase));
+            Assert.AreEqual(testPackage.LicenseUrl.ToString(), actualPluginManifest.License, false);
         }
 
         [TestMethod]
@@ -397,7 +436,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // Assert
             Assert.IsNotNull(actualPluginManifest);
-            Assert.IsTrue(string.Equals(testPackage.Authors, actualPluginManifest.Organization, StringComparison.InvariantCulture));
+            Assert.AreEqual(testPackage.Authors, actualPluginManifest.Organization);
         }
 
         #region Private methods
@@ -438,7 +477,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         /// <summary>
         /// Creates a blank DataServicePackage with the required field Id already filled in.
         /// </summary>
-        /// <returns></returns>
         private DataServicePackage CreateTestDataServicePackage()
         {
             DataServicePackage newDataServicePackage = new DataServicePackage()
