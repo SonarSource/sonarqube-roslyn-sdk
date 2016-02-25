@@ -14,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 
 namespace SonarQube.Plugins.Roslyn
@@ -314,7 +313,7 @@ namespace SonarQube.Plugins.Roslyn
             return true;
         }
 
-        private static PluginManifest CreatePluginManifest(IPackage package)
+        public /* for test */ static PluginManifest CreatePluginManifest(IPackage package)
         {
             // The manifest properties supported by SonarQube are documented at
             // http://docs.sonarqube.org/display/DEV/Build+plugin
@@ -327,19 +326,48 @@ namespace SonarQube.Plugins.Roslyn
             pluginDefn.Homepage = GetValidManifestString(package.ProjectUrl?.ToString());
             pluginDefn.Key = PluginKeyUtilities.GetValidKey(package.Id);
 
-            pluginDefn.Name = GetValidManifestString(package.Title) ?? pluginDefn.Key;
-            pluginDefn.Organization = GetValidManifestString(ListToString(package.Owners));
-            pluginDefn.Version = GetValidManifestString(package.Version.ToNormalizedString());
-
-            if (package.LicenseUrl != null)
+            if (package.Title != null)
             {
-                // The TermsConditionsUrl is only displayed in the "Update Center - Available" page
-                // i.e. for plugins that are available through the public Update Center.
-                // If the property has a value then the link will be displayed with a checkbox 
-                // for acceptance.
-                // It is not used when plugins are directly dropped into the extensions\plugins
-                // folder of the SonarQube server.
-                pluginDefn.TermsConditionsUrl = package.LicenseUrl.ToString();
+                pluginDefn.Name = GetValidManifestString(package.Title);
+            }
+            else
+            {
+                // Process the package ID to replace dot separators with spaces for use as a fallback
+                pluginDefn.Name = GetValidManifestString(package.Id.Replace(".", " "));
+            }
+
+            // Fall back to using the authors if owners is empty
+            string organisation;
+            if (package.Owners.Any())
+            {
+                organisation = ListToString(package.Owners);
+            }
+            else
+            {
+                organisation = ListToString(package.Authors);
+            }
+            pluginDefn.Organization = GetValidManifestString(organisation);
+
+            pluginDefn.Version = GetValidManifestString(package.Version?.ToNormalizedString());
+            
+            // The TermsConditionsUrl is only displayed in the "Update Center - Available" page
+            // i.e. for plugins that are available through the public Update Center.
+            // If the property has a value then the link will be displayed with a checkbox 
+            // for acceptance.
+            // It is not used when plugins are directly dropped into the extensions\plugins
+            // folder of the SonarQube server.
+            pluginDefn.TermsConditionsUrl = GetValidManifestString(package.LicenseUrl?.ToString());
+
+            // Packages from the NuGet website may have friendly short licensenames heuristically assigned, but this requires a downcast
+            DataServicePackage dataServicePackage = package as DataServicePackage;
+            if (dataServicePackage?.LicenseNames != null)
+            {
+                pluginDefn.License = GetValidManifestString(dataServicePackage.LicenseNames);
+            } 
+            else
+            {
+                // Fallback - use a raw URL. Not as nice-looking in the UI, but acceptable.
+                pluginDefn.License = pluginDefn.TermsConditionsUrl;
             }
 
             return pluginDefn;

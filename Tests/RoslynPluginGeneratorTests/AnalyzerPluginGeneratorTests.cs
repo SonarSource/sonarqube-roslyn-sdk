@@ -9,6 +9,7 @@ using NuGet;
 using SonarLint.XmlDescriptor;
 using SonarQube.Plugins.Roslyn.CommandLine;
 using SonarQube.Plugins.Test.Common;
+using System;
 using System.IO;
 using static SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests.RemoteRepoBuilder;
 
@@ -307,6 +308,98 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             logger.AssertSingleErrorExists("invalidSqale.xml"); // expecting an error containing the invalid sqale file name
         }
 
+        [TestMethod]
+        public void CreatePluginManifest_TitleMissing()
+        {
+            // When no title is available, ID should be used as a fallback, removing the dot separators for legibility.
+
+            // Arrange
+            DataServicePackage testPackage = CreateTestDataServicePackage();
+            testPackage.Title = null;
+            testPackage.Id = "Foo.Bar.Test";
+
+            // Act
+            PluginManifest actualPluginManifest = AnalyzerPluginGenerator.CreatePluginManifest(testPackage);
+
+            // Assert
+            Assert.IsNotNull(actualPluginManifest);
+            Assert.IsTrue(string.Equals("Foo Bar Test", actualPluginManifest.Name));
+        }
+
+        [TestMethod]
+        public void CreatePluginManifest_FriendlyLicenseName_Available()
+        {
+            // When available, a short licensename assigned by NuGet.org should be used.
+            // The license url is a fallback only.
+
+            // Arrange
+            DataServicePackage testPackage = CreateTestDataServicePackage();
+            testPackage.LicenseNames = "Foo Bar License";
+            testPackage.LicenseUrl = new System.Uri("http://foo.bar");
+
+            // Act
+            PluginManifest actualPluginManifest = AnalyzerPluginGenerator.CreatePluginManifest(testPackage);
+
+            // Assert
+            Assert.IsNotNull(actualPluginManifest);
+            Assert.IsTrue(string.Equals(testPackage.LicenseNames, actualPluginManifest.License, StringComparison.InvariantCulture));
+        }
+
+        [TestMethod]
+        public void CreatePluginManifest_FriendlyLicenseName_NotAvailable()
+        {
+            // When a short licensename is not assigned by NuGet.org, we should try to use the license URL instead.
+
+            // Arrange
+            DataServicePackage testPackage = CreateTestDataServicePackage();
+            testPackage.LicenseNames = null;
+            testPackage.LicenseUrl = new System.Uri("http://foo.bar");
+
+            // Act
+            PluginManifest actualPluginManifest = AnalyzerPluginGenerator.CreatePluginManifest(testPackage);
+
+            // Assert
+            Assert.IsNotNull(actualPluginManifest);
+            Assert.IsTrue(string.Equals(testPackage.LicenseUrl.ToString(), actualPluginManifest.License, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        [TestMethod]
+        public void CreatePluginManifest_FromLocalPackage()
+        {
+            // We should also be able to create a plugin manifest from an IPackage that is not a DataServicePackage
+
+            // Arrange
+            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            IPackage testPackage = remoteRepoBuilder.CreatePackage("Foo.Bar", "1.0.0", TestUtils.CreateTextFile("dummy.txt", outputDir), License.NotRequired);
+
+            // Act
+            PluginManifest actualPluginManifest = AnalyzerPluginGenerator.CreatePluginManifest(testPackage);
+
+            // Assert
+            Assert.IsNotNull(actualPluginManifest);
+            Assert.IsTrue(string.Equals(testPackage.LicenseUrl.ToString(), actualPluginManifest.License, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        [TestMethod]
+        public void CreatePluginManifest_Owners_NotAvailable()
+        {
+            // When the package.Owners field is null, we should fallback to Authors for setting the organisation.
+
+            // Arrange
+            DataServicePackage testPackage = CreateTestDataServicePackage();
+            testPackage.Owners = null;
+            testPackage.Authors = "Foo,Bar,Test";
+
+            // Act
+            PluginManifest actualPluginManifest = AnalyzerPluginGenerator.CreatePluginManifest(testPackage);
+
+            // Assert
+            Assert.IsNotNull(actualPluginManifest);
+            Assert.IsTrue(string.Equals(testPackage.Authors, actualPluginManifest.Organization, StringComparison.InvariantCulture));
+        }
+
         #region Private methods
 
         private static ProcessedArgs CreateArgs(string packageId, string packageVersion, string language, string sqaleFilePath, bool acceptLicenses, string outputDirectory)
@@ -341,7 +434,20 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         {
             remoteRepoBuilder.CreatePackage(packageId, packageVersion, typeof(RoslynAnalyzer11.AbstractAnalyzer).Assembly.Location, License.NotRequired /* no dependencies */ );
         }
-        
+
+        /// <summary>
+        /// Creates a blank DataServicePackage with the required field Id already filled in.
+        /// </summary>
+        /// <returns></returns>
+        private DataServicePackage CreateTestDataServicePackage()
+        {
+            DataServicePackage newDataServicePackage = new DataServicePackage()
+            {
+                Id = "Foo.Bar"
+            };
+            return newDataServicePackage;
+        }
+
         private string GetLocalNuGetDownloadDir()
         {
             return TestUtils.EnsureTestDirectoryExists(this.TestContext, ".localNuGetDownload");
