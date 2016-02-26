@@ -56,18 +56,21 @@ The NuGet package properties are documented [here](http://docs.nuget.org/Create/
 
 The NuGet package properties are mapped to plugin properties as follows:
 
-| NuGet property | Plugin property |
-|---|---|
-| title | Plugin-Name |
-| description | Plugin-Description |
-| version | Plugin-Version |
-| authors | Plugin-Developers |
-| owners | Plugin-Organisation |
-| projectUrl | Plugin-Homepage |
-| licenseUrl | Plugin-TermsConditionsUrl |
-| id | Key* |    
+| Plugin property           | NuGet property | Falls back to |
+|---------------------------|----------------|---------------|
+| Plugin-Name               | title          | id            |
+| Plugin-Description        | description    |               |
+| Plugin-Version            | version        |               |
+| Plugin-Developers         | authors        |               |
+| Plugin-Organisation       | owners         | authors       |
+| Plugin-Homepage           | projectUrl     |               |
+| Plugin-TermsConditionsUrl | licenseUrl     |               |
+| Plugin-License            | licenseNames** | licenseUrl    |
+| Key*                      | id             |               |
 
 \* This property is not visible to users, but must be unique. It is calculated from the package id.
+
+\*\* This property is assigned heuristically by the NuGet.org website based on the licenseUrl.
 
 #### Generating a jar for a private Roslyn analyzer
 If you want to create a jar for Roslyn analyzer that is not available from a public NuGet feed (e.g. an analyzer you have created on your local machine) you can generate a jar file for it by specifying a package source that points at a local directory containing the *.nupkg* file created by the standard Roslyn templates. See the [NuGet docs](https://docs.nuget.org/create/hosting-your-own-nuget-feeds) for more information.
