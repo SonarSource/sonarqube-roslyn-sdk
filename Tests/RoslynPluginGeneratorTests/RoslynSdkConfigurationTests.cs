@@ -74,13 +74,13 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
   <RulesXmlResourcePath>/org/sonar/plugins/roslynsdk/rules.xml</RulesXmlResourcePath>
   <SqaleXmlResourcePath>/org/sonar/plugins/roslynsdk/sqale.xml</SqaleXmlResourcePath>
   <PluginProperties>
-    <example.pluginKey>example</example.pluginKey>
-    <example.pluginVersion>example</example.pluginVersion>
-    <example.staticResourceName>example</example.staticResourceName>
-    <example.nuget.packageId>example</example.nuget.packageId>
-    <example.nuget.packageVersion>example</example.nuget.packageVersion>
-    <example.analyzerId>example</example.analyzerId>
-    <example.ruleNamespace>example</example.ruleNamespace>
+    <example.pluginKey>example.pluginKey.Value</example.pluginKey>
+    <example.pluginVersion>example.pluginVersion.Value</example.pluginVersion>
+    <example.staticResourceName>example.staticResourceName.Value</example.staticResourceName>
+    <example.nuget.packageId>example.nuget.packageId.Value</example.nuget.packageId>
+    <example.nuget.packageVersion>example.nuget.packageVersion.Value</example.nuget.packageVersion>
+    <example.analyzerId>example.analyzerId.Value</example.analyzerId>
+    <example.ruleNamespace>example.ruleNamespace.Value</example.ruleNamespace>
   </PluginProperties>
 </RoslynSdkConfiguration>
 ";
@@ -105,13 +105,13 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             Assert.AreEqual("/org/sonar/plugins/roslynsdk/rules.xml", loaded.RulesXmlResourcePath);
             Assert.AreEqual("/org/sonar/plugins/roslynsdk/sqale.xml", loaded.SqaleXmlResourcePath);
 
-            AssertPropertyExists("example.pluginKey", "example", loaded.Properties);
-            AssertPropertyExists("example.pluginVersion", "example", loaded.Properties);
-            AssertPropertyExists("example.staticResourceName", "example", loaded.Properties);
-            AssertPropertyExists("example.nuget.packageId", "example", loaded.Properties);
-            AssertPropertyExists("example.nuget.packageVersion", "example", loaded.Properties);
-            AssertPropertyExists("example.analyzerId", "example", loaded.Properties);
-            AssertPropertyExists("example.ruleNamespace", "example", loaded.Properties);
+            AssertPropertyExists("example.pluginKey", "example.pluginKey.Value", loaded.Properties);
+            AssertPropertyExists("example.pluginVersion", "example.pluginVersion.Value", loaded.Properties);
+            AssertPropertyExists("example.staticResourceName", "example.staticResourceName.Value", loaded.Properties);
+            AssertPropertyExists("example.nuget.packageId", "example.nuget.packageId.Value", loaded.Properties);
+            AssertPropertyExists("example.nuget.packageVersion", "example.nuget.packageVersion.Value", loaded.Properties);
+            AssertPropertyExists("example.analyzerId", "example.analyzerId.Value", loaded.Properties);
+            AssertPropertyExists("example.ruleNamespace", "example.ruleNamespace.Value", loaded.Properties);
         }
 
         #endregion
