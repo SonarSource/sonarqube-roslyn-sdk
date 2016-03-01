@@ -8,6 +8,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Test.Common;
 using System.IO;
+using System.Linq;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
@@ -35,8 +36,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             config.RulesXmlResourcePath = "rulesPath";
             config.SqaleXmlResourcePath = "sqalePath";
 
-            config.Properties["prop1.key"] = "value1";
-            config.Properties["prop2.key"] = "value2";
+            config.Properties["prop1.Key"] = "value1";
+            config.Properties["prop2.Key"] = "value2";
 
             // Save and check 
             config.Save(filePath);
@@ -56,8 +57,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             Assert.AreEqual("sqalePath", reloaded.SqaleXmlResourcePath);
 
             Assert.AreEqual(2, reloaded.Properties.Count);
-            AssertPropertyExists("prop1.key", "value1", reloaded.Properties);
-            AssertPropertyExists("prop2.key", "value2", reloaded.Properties);
+            AssertPropertyExists("prop1.Key", "value1", reloaded.Properties);
+            AssertPropertyExists("prop2.Key", "value2", reloaded.Properties);
         }
 
         [TestMethod]
@@ -120,7 +121,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
         private static void AssertPropertyExists(string expectedKey, string expectedValue, PluginProperties actualProperties)
         {
-            Assert.IsTrue(actualProperties.ContainsKey(expectedKey), "Expected key not found: {0}", expectedKey);
+            // Note: we're explicitly searching for the key using Linq so we can be sure a case-sensitive match is being used
+            string match = actualProperties.Keys.OfType<string>().FirstOrDefault(k => string.Equals(expectedKey, k, System.StringComparison.Ordinal));
+            Assert.IsNotNull(match, "Expected key not found: {0}", expectedKey);
+
             Assert.AreEqual(expectedValue, actualProperties[expectedKey], "Unexpected value for key '{0}'", expectedKey);
         }
 

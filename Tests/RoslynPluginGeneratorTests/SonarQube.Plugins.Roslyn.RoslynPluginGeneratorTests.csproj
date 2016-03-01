@@ -91,6 +91,8 @@
       <HintPath>..\..\packages\Microsoft.Composition.1.0.27\lib\portable-net45+win8+wp8+wpa81\System.Composition.TypedParts.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Reflection.Metadata, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Reflection.Metadata.1.1.0\lib\dotnet5.2\System.Reflection.Metadata.dll</HintPath>
       <Private>True</Private>
@@ -110,6 +112,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AnalyzerPluginGeneratorTests.cs" />
+    <Compile Include="ArchiveUpdaterTests.cs" />
     <Compile Include="ArgumentProcessorTests.cs" />
     <Compile Include="DiagnosticAssemblyScannerTests.cs" />
     <Compile Include="NuGetMachineWideSettingsTests.cs" />
@@ -119,6 +122,7 @@
     <Compile Include="..\..\AssemblyInfo.Shared.cs">
       <Link>Properties\AssemblyInfo.Shared.cs</Link>
     </Compile>
+    <Compile Include="RoslynPluginJarBuilderTests.cs" />
     <Compile Include="RoslynSdkConfigurationTests.cs" />
     <Compile Include="RulesGeneratorTests.cs" />
     <Compile Include="NuGetPackageHandlerTests.cs" />

@@ -10,7 +10,7 @@ namespace SonarQube.Plugins.Roslyn
     /// <summary>
     /// Data class: contains the information required to create a Roslyn analyzer plugin
     /// </summary>
-    internal class RoslynPluginDefinition
+    public class RoslynPluginDefinition
     {
         public string Language { get; set; }
         public string PackageId { get; set; }

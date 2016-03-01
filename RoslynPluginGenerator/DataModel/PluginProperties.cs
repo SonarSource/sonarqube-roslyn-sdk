@@ -5,6 +5,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Xml;
 using System.Xml.Schema;
@@ -16,21 +17,21 @@ namespace SonarQube.Plugins.Roslyn
     /// Describes a collection of Maven POM properties
     /// </summary>
     /// <remarks>This class is XML-serializable</remarks>
-    public class PluginProperties : StringDictionary, IXmlSerializable
+    public class PluginProperties : Dictionary<string, string>, IXmlSerializable
     {
         #region IXmlSerializable methods
 
         // Custom serialization to allow reading/writing to the following format:
-        //  <properties>
-        //      <sonarUpdateCenter.version>1.11</sonarUpdateCenter.version>
-        //      <sonarJava.version>2.4</sonarJava.version>
-        //      <h2.version>1.3.172</h2.version>
-        //      ...
-        //  </properties>
+        // <ContainingElement>
+        //   <example.pluginKey>example</example.pluginKey>
+        //   <example.pluginVersion>example</example.pluginVersion>
+        //   <example.staticResourceName>example</example.staticResourceName>
+        //   ...
+        // </ContainingElement>
+        //
+        // The name of the containing element is set by containing object
+        // using the XmlElement property e.g. [XmlElement("PluginProperties")]
 
-        // The name of the containing element (e.g. "properties") is set by
-        // containing object using the XmlElement property e.g. [XmlElement("PluginProperties")]
-        
         XmlSchema IXmlSerializable.GetSchema()
         {
             return null;

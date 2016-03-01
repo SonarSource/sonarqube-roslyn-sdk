@@ -255,6 +255,33 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The file path for the jar file to be created must be specified.
+        /// </summary>
+        public static string Builder_Error_OutputJarPathMustBeSpecified {
+            get {
+                return ResourceManager.GetString("Builder_Error_OutputJarPathMustBeSpecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Required plugin definition property is missing: {0}.
+        /// </summary>
+        public static string Builder_Error_RequiredPropertyMissing {
+            get {
+                return ResourceManager.GetString("Builder_Error_RequiredPropertyMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The existing jar file will be overwritten.
+        /// </summary>
+        public static string Builder_ExistingJarWillBeOvewritten {
+            get {
+                return ResourceManager.GetString("Builder_ExistingJarWillBeOvewritten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expecting one or two arguments:
         ///* NuGet package Id (mandatory), and
         ///* NuGet package version (optional).
@@ -554,6 +581,51 @@ namespace SonarQube.Plugins.Roslyn {
         public static string Scanner_NoAnalyzers {
             get {
                 return ResourceManager.GetString("Scanner_NoAnalyzers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deleting existing archive....
+        /// </summary>
+        public static string ZIP_DeletingExistingArchive {
+            get {
+                return ResourceManager.GetString("ZIP_DeletingExistingArchive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Inserting file {0}. Source: {1}.
+        /// </summary>
+        public static string ZIP_InsertingFile {
+            get {
+                return ResourceManager.GetString("ZIP_InsertingFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New archive created: {0}.
+        /// </summary>
+        public static string ZIP_NewArchiveCreated {
+            get {
+                return ResourceManager.GetString("ZIP_NewArchiveCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updating archive {0}.
+        /// </summary>
+        public static string ZIP_UpdatingArchive {
+            get {
+                return ResourceManager.GetString("ZIP_UpdatingArchive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Working directory: {0}.
+        /// </summary>
+        public static string ZIP_WorkingDirectory {
+            get {
+                return ResourceManager.GetString("ZIP_WorkingDirectory", resourceCulture);
             }
         }
     }

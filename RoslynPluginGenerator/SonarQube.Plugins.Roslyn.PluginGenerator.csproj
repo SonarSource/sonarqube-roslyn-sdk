@@ -107,6 +107,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArchiveUpdater.cs" />
     <Compile Include="CommandLine\ArgumentProcessor.cs" />
     <Compile Include="DataModel\PluginProperties.cs" />
     <Compile Include="DiagnosticAssemblyScanner.cs" />
@@ -130,6 +131,7 @@
     </Compile>
     <Compile Include="AnalyzerPluginGenerator.cs" />
     <Compile Include="RoslynPluginDefinition.cs" />
+    <Compile Include="RoslynPluginJarBuilder.cs" />
     <Compile Include="RuleGenerator.cs" />
     <Compile Include="HardcodedConstantSqaleGenerator.cs" />
     <Compile Include="SqaleModel.cs" />
@@ -177,6 +179,20 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\RoslynProperties.java" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\sonar-roslyn-sdk-template-plugin-1.0-empty.jar" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Shell32">
+      <Guid>{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

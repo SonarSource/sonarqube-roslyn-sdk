@@ -32,6 +32,13 @@ namespace SonarQube.Plugins.Test.Common
         /// </summary>
         public string UnzippedDirectoryPath {  get { return this.unzippedDir; } }
 
+        public string AssertFileExists(string relativeFilePath)
+        {
+            string absolutePath = Path.Combine(this.unzippedDir, relativeFilePath);
+            Assert.IsTrue(File.Exists(absolutePath), "File does not exist in the zip: {0}", relativeFilePath);
+            return absolutePath;
+        }
+
         public void AssertZipContainsFiles(params string[] expectedRelativePaths)
         {
             foreach (string relativePath in expectedRelativePaths)
