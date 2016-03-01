@@ -108,6 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandLine\ArgumentProcessor.cs" />
+    <Compile Include="DataModel\PluginProperties.cs" />
     <Compile Include="DiagnosticAssemblyScanner.cs" />
     <Compile Include="Interfaces\INuGetPackageHandler.cs" />
     <Compile Include="Interfaces\IRuleGenerator.cs" />
@@ -121,6 +122,7 @@
     </Compile>
     <Compile Include="NuGet\NuGetPackageHandler.cs" />
     <Compile Include="NuGet\NuGetRepositoryFactory.cs" />
+    <Compile Include="DataModel\RoslynSdkConfiguration.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\AssemblyInfo.Shared.cs">

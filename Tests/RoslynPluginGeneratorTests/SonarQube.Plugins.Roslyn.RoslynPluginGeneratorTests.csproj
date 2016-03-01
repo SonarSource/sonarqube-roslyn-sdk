@@ -119,6 +119,7 @@
     <Compile Include="..\..\AssemblyInfo.Shared.cs">
       <Link>Properties\AssemblyInfo.Shared.cs</Link>
     </Compile>
+    <Compile Include="RoslynSdkConfigurationTests.cs" />
     <Compile Include="RulesGeneratorTests.cs" />
     <Compile Include="NuGetPackageHandlerTests.cs" />
     <Compile Include="SupportedLanguagesTests.cs" />
