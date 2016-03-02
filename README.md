@@ -1,5 +1,7 @@
 ## Welcome to the SonarQube Roslyn SDK project
 
+[![Build status](https://ci.appveyor.com/api/projects/status/q2gc65s7n4wjusp8/branch/master?svg=true)](https://ci.appveyor.com/project/SonarSource/sonarqube-roslyn-sdk/branch/master)
+
 ### Overview
 This repo contains tools to help integrate Roslyn analyzers with SonarQube so that issues detected by the Roslyn analyzers are reported in SonarQube.
 Specifically, the tools will generate a Java SonarQube plugin that registers the rules with SonarQube. See this [blog post](https://blogs.msdn.microsoft.com/visualstudioalm/2016/01/04/sonarqube-scanner-for-msbuild-v1-1-released-static-analysis-now-executed-during-the-build/) for more information.
