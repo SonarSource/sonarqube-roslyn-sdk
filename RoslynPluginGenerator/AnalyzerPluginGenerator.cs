@@ -152,7 +152,7 @@ namespace SonarQube.Plugins.Roslyn
 
             if (licenseAcceptancePackages.Any())
             {
-                // If we got this far then the user must have accepted 
+                // If we got this far then the user must have accepted
                 this.logger.LogWarning(UIResources.APG_NGAcceptedPackageLicenses);
                 this.ListPackagesRequiringLicenseAcceptance(licenseAcceptancePackages);
             }
@@ -229,7 +229,7 @@ namespace SonarQube.Plugins.Roslyn
         {
             string zipFilePath = Path.GetFileName(packageRootDir) + ".zip";
             zipFilePath = Path.Combine(outputDir, zipFilePath);
-            
+
             ZipExtensions.CreateFromDirectory(packageRootDir, zipFilePath, IncludeFileInZip);
 
             return zipFilePath;
@@ -285,7 +285,7 @@ namespace SonarQube.Plugins.Roslyn
 
             HardcodedConstantSqaleGenerator generator = new HardcodedConstantSqaleGenerator(this.logger);
 
-            SqaleRoot sqale = generator.GenerateSqaleData(analyzers, DefaultRemediationCost);
+            SqaleModel sqale = generator.GenerateSqaleData(analyzers, DefaultRemediationCost);
 
             Serializer.SaveModel(sqale, outputFilePath);
             this.logger.LogDebug(UIResources.APG_SqaleGeneratedToFile, outputFilePath);
@@ -303,7 +303,7 @@ namespace SonarQube.Plugins.Roslyn
             try
             {
                 // TODO: consider adding further checks
-                Serializer.LoadModel<SqaleRoot>(sqaleFilePath);
+                Serializer.LoadModel<SqaleModel>(sqaleFilePath);
             }
             catch(InvalidOperationException) // will be thrown for invalid xml
             {
@@ -349,10 +349,10 @@ namespace SonarQube.Plugins.Roslyn
             pluginDefn.Organization = GetValidManifestString(organisation);
 
             pluginDefn.Version = GetValidManifestString(package.Version?.ToNormalizedString());
-            
+
             // The TermsConditionsUrl is only displayed in the "Update Center - Available" page
             // i.e. for plugins that are available through the public Update Center.
-            // If the property has a value then the link will be displayed with a checkbox 
+            // If the property has a value then the link will be displayed with a checkbox
             // for acceptance.
             // It is not used when plugins are directly dropped into the extensions\plugins
             // folder of the SonarQube server.
@@ -363,7 +363,7 @@ namespace SonarQube.Plugins.Roslyn
             if (!String.IsNullOrWhiteSpace(dataServicePackage?.LicenseNames))
             {
                 pluginDefn.License = GetValidManifestString(dataServicePackage.LicenseNames);
-            } 
+            }
             else
             {
                 // Fallback - use a raw URL. Not as nice-looking in the UI, but acceptable.

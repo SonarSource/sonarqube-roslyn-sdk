@@ -36,7 +36,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // Create a fake remote repo containing a package that does not contain analyzers
             RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
             remoteRepoBuilder.CreatePackage("no.analyzers.id", "0.9", TestUtils.CreateTextFile("dummy.txt", outputDir), License.NotRequired /* no dependencies */ );
-           
+
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
             ProcessedArgs args = CreateArgs("no.analyzers.id", "0.9", "cs", null, false, outputDir);
@@ -265,7 +265,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // Create a dummy sqale file
             string dummySqaleFilePath = Path.Combine(outputDir, "inputSqale.xml");
-            SqaleRoot dummySqale = new SqaleRoot();
+            SqaleModel dummySqale = new SqaleModel();
             Serializer.SaveModel(dummySqale, dummySqaleFilePath);
 
             ProcessedArgs args = CreateArgs("dummy.id", "1.1", "cs", dummySqaleFilePath, false, outputDir);

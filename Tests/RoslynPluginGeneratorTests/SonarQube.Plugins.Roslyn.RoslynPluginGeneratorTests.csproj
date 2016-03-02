@@ -138,10 +138,6 @@
       <Project>{ff1a3253-1888-412c-a870-922c08b29a1a}</Project>
       <Name>SonarQube.Plugins.Roslyn.PluginGenerator</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\SonarLint.Metadata\SonarLint.Metadata.csproj">
-      <Project>{fd1e676b-a621-494b-9e2f-083940100415}</Project>
-      <Name>SonarLint.Metadata</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Common\SonarQube.Plugins.Test.Common.csproj">
       <Project>{f60478ff-1eea-4fb4-9bf4-50d11f94fa57}</Project>
       <Name>SonarQube.Plugins.Test.Common</Name>

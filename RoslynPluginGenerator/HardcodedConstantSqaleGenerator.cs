@@ -6,7 +6,6 @@
 //-----------------------------------------------------------------------
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using SonarLint.Common.Sqale;
 using SonarLint.XmlDescriptor;
 using SonarQube.Plugins.Common;
 using System;
@@ -29,7 +28,7 @@ namespace SonarQube.Plugins.Roslyn
             this.logger = logger;
         }
 
-        public SqaleRoot GenerateSqaleData(IEnumerable<DiagnosticAnalyzer> analyzers, string remediationValue)
+        public SqaleModel GenerateSqaleData(IEnumerable<DiagnosticAnalyzer> analyzers, string remediationValue)
         {
             if (analyzers == null)
             {
@@ -39,7 +38,7 @@ namespace SonarQube.Plugins.Roslyn
             Debug.Assert(remediationValue.EndsWith("min"), "Expecting a remediation value in the form '15min'");
             this.remediationConstantValue = remediationValue;
 
-            SqaleRoot root = new SqaleRoot();
+            SqaleModel root = new SqaleModel();
 
             foreach(DiagnosticAnalyzer analyzer in analyzers)
             {
@@ -51,7 +50,7 @@ namespace SonarQube.Plugins.Roslyn
 
         #region Private methods
 
-        private void ProcessAnalyzer(DiagnosticAnalyzer analyzer, SqaleRoot root)
+        private void ProcessAnalyzer(DiagnosticAnalyzer analyzer, SqaleModel root)
         {
             foreach(DiagnosticDescriptor diagnostic in analyzer.SupportedDiagnostics)
             {
@@ -61,19 +60,19 @@ namespace SonarQube.Plugins.Roslyn
                     {
                         RuleKey = diagnostic.Id
                     },
-                    SubCharacteristic = SqaleSubCharacteristic.MaintainabilityCompliance.ToSonarQubeString()
+                    SubCharacteristic = "MAINTAINABILITY_COMPLIANCE"
                 };
 
                 sqaleDescriptor.Remediation.Properties.AddRange(new[]
                 {
                     new SqaleRemediationProperty
                     {
-                        Key = SonarLint.RuleDescriptors.SqaleRemediationProperty.RemediationFunctionKey,
-                        Text = SonarLint.RuleDescriptors.SqaleRemediationProperty.ConstantRemediationFunctionValue
+                        Key = "remediationFunction",
+                        Text = "CONSTANT_ISSUE"
                     },
                     new SqaleRemediationProperty
                     {
-                        Key = SonarLint.RuleDescriptors.SqaleRemediationProperty.OffsetKey,
+                        Key = "offset",
                         Value = this.remediationConstantValue,
                         Text = string.Empty
                     }
