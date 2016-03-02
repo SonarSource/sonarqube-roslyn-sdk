@@ -13,28 +13,6 @@ namespace SonarLint.XmlDescriptor
     [XmlType("chc")]
     public class SqaleDescriptor
     {
-        public static SqaleDescriptor Convert(RuleDescriptors.RuleDetail ruleDetail)
-        {
-            return ruleDetail.SqaleDescriptor == null
-                ? null
-                : new SqaleDescriptor
-                {
-                    Remediation = new SqaleRemediation
-                    {
-                        Properties =
-                            ruleDetail.SqaleDescriptor.Remediation.Properties.Select(
-                                property => new SqaleRemediationProperty
-                                {
-                                    Key = property.Key,
-                                    Value = property.Value,
-                                    Text = property.Text
-                                }).ToList(),
-                        RuleKey = ruleDetail.Key
-                    },
-                    SubCharacteristic = ruleDetail.SqaleDescriptor.SubCharacteristic
-                };
-        }
-
         public SqaleDescriptor()
         {
             Remediation = new SqaleRemediation();
