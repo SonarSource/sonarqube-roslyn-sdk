@@ -79,24 +79,6 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Creating Roslyn plugin specific sources in {0}.
-        /// </summary>
-        public static string APG_CreatingRoslynSources {
-            get {
-                return ResourceManager.GetString("APG_CreatingRoslynSources", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Extracting files from the package to {0}.
-        /// </summary>
-        public static string APG_ExtractingPackageFiles {
-            get {
-                return ResourceManager.GetString("APG_ExtractingPackageFiles", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Generating fixed remediation cost SQALE file....
         /// </summary>
         public static string APG_GeneratingConstantSqaleFile {
@@ -282,49 +264,11 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expecting one or two arguments:
-        ///* NuGet package Id (mandatory), and
-        ///* NuGet package version (optional).
-        /// </summary>
-        public static string CmdLine_ERROR_InvalidArgumentCount {
-            get {
-                return ResourceManager.GetString("CmdLine_ERROR_InvalidArgumentCount", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to   Adding new dependency: {0} version {1}.
         /// </summary>
         public static string NG_AddingNewDependency {
             get {
                 return ResourceManager.GetString("NG_AddingNewDependency", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Creating NuGet repository: {0}.
-        /// </summary>
-        public static string NG_CreatingRepository {
-            get {
-                return ResourceManager.GetString("NG_CreatingRepository", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to ... downloaded ({0} files).
-        /// </summary>
-        public static string NG_DownloadedPackage {
-            get {
-                return ResourceManager.GetString("NG_DownloadedPackage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Downloading package....
-        /// </summary>
-        public static string NG_DownloadingPackage {
-            get {
-                return ResourceManager.GetString("NG_DownloadingPackage", resourceCulture);
             }
         }
         
@@ -362,15 +306,6 @@ namespace SonarQube.Plugins.Roslyn {
         public static string NG_ERROR_PackageVersionNotFound {
             get {
                 return ResourceManager.GetString("NG_ERROR_PackageVersionNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Extracting file &apos;{0}&apos; to {1}.
-        /// </summary>
-        public static string NG_ExtractingFile {
-            get {
-                return ResourceManager.GetString("NG_ExtractingFile", resourceCulture);
             }
         }
         

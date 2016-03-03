@@ -178,9 +178,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\RoslynProperties.java" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\sonar-roslyn-sdk-template-plugin-1.0-empty.jar" />
   </ItemGroup>
   <ItemGroup>

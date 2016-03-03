@@ -16,8 +16,7 @@ There are two groups of target users:
    - If the analyzer author has not provided a SonarQube plugin for their analyzer then users will be able to generate a plugin from an analyzer NuGet package, although they won't be able to provide such rich metadata.
 
 ### Current status
-The tooling is at an early stage and only works in limited scenarios. Also, the generated jar file is not currently sufficient on its own to upload Roslyn issues. The complete solution requires the [C# plugin v4.5](http://docs.sonarqube.org/display/PLUG/C%23+Plugin) or higher and the [MSBuild SonarQube Scanner v2.0](http://docs.sonarqube.org/display/SONAR/Analyzing+with+SonarQube+Scanner+for+MSBuild) or higher.
-
+The generated jar file is not currently sufficient on its own to upload Roslyn issues. The complete solution requires the [C# plugin v4.5](http://docs.sonarqube.org/display/PLUG/C%23+Plugin) or higher and the [MSBuild SonarQube Scanner v2.0](http://docs.sonarqube.org/display/SONAR/Analyzing+with+SonarQube+Scanner+for+MSBuild) or higher.
 
 ### Getting started
 
@@ -25,12 +24,8 @@ The tooling is at an early stage and only works in limited scenarios. Also, the 
    - the analyzer must be available as a NuGet package
    - the analyzer must use Roslyn v1.0 or v1.1
    - only C# rules are supported
-   - the NuGet package must not require user acceptance of the license
 
 These limitations will be addressed at some point in the future.
-
-#### Pre-requisities
-The SDK uses the Java compiler and jar packaging tool so you will need to run the SDK exe on a machine with version 7 of the [Java SE development kit](http://www.oracle.com/technetwork/java/javase/overview/index.html). The SonarQube site [lists](http://docs.sonarqube.org/display/SONAR/Requirements) the supported Java implementations. However, for the plugin to work correctly it should target the correct Java version, currently version 7. See [SFSRAP-35](https://jira.sonarsource.com/browse/SFSRAP-35) for more information. We'll improve how the SDK handles Java version mismatches, but for now you will need to make sure you target the correct version.
 
 #### To generate a SonarQube plugin for an analyzer:
 1. Build the SDK

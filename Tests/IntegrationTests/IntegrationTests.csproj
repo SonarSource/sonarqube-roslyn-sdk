@@ -110,8 +110,6 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Infrastructure\JarInfo.cs" />
-    <Compile Include="Infrastructure\PluginInspector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\..\AssemblyInfo.Shared.cs">
       <Link>Properties\AssemblyInfo.Shared.cs</Link>
@@ -149,12 +147,6 @@
   <ItemGroup>
     <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers.1.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers.1.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Roslyn\Resources\PluginInspector.java" />
-    <EmbeddedResource Include="Roslyn\Resources\CompileTimeDependencies.pom" />
-    <EmbeddedResource Include="Roslyn\Resources\RuntimeDependencies.pom" />
-    <Content Include="Roslyn\Resources\pom.xml" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

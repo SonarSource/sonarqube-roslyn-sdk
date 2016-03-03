@@ -107,17 +107,10 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Framework\MockMavenartifactHandler.cs" />
-    <Compile Include="Framework\MockJdkWrapper.cs" />
-    <Compile Include="JarBuilderTests.cs" />
     <Compile Include="JarManifestBuilderTests.cs" />
-    <Compile Include="MavenPOMTests.cs" />
-    <Compile Include="PluginBuilderTests.cs" />
     <Compile Include="PluginDefinitionTests.cs" />
     <Compile Include="RepositoryKeyUtilitiesTests.cs" />
     <Compile Include="PluginKeyUtilitiesTests.cs" />
-    <Compile Include="RulesPluginBuilderTests.cs" />
-    <Compile Include="SourceGeneratorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\..\AssemblyInfo.Shared.cs">
       <Link>Properties\AssemblyInfo.Shared.cs</Link>
@@ -136,16 +129,6 @@
       <Project>{f60478ff-1eea-4fb4-9bf4-50d11f94fa57}</Project>
       <Name>SonarQube.Plugins.Test.Common</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="resources\myorg\myappClass1.java" />
-    <EmbeddedResource Include="resources\myorg\NotJavaCode.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="resources\myorg\myapp\myappClass2.java" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="resources\myorg\myapp\NotJavaCode2.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
