@@ -35,7 +35,6 @@ namespace SonarQube.Plugins.Roslyn
         private const string RelativeSqaleXmlResourcePath = "org\\sonar\\plugins\\roslynsdk\\sqale.xml";
 
         private readonly ILogger logger;
-        private readonly ISet<string> sourceFiles;
 
         private readonly IDictionary<string, string> pluginProperties;
         private readonly IDictionary<string, string> manifestProperties;
@@ -59,7 +58,6 @@ namespace SonarQube.Plugins.Roslyn
 
             this.logger = logger;
 
-            this.sourceFiles = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
             this.pluginProperties = new Dictionary<string, string>();
             this.manifestProperties = new Dictionary<string, string>();
             this.fileToRelativePathMap = new Dictionary<string, string>();

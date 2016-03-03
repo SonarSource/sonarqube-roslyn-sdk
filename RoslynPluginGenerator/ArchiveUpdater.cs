@@ -99,7 +99,16 @@ namespace SonarQube.Plugins.Roslyn
 
             this.logger.LogDebug(UIResources.ZIP_NewArchiveCreated, this.outputArchiveFilePath);
         }
-        
+
+        /// <summary>
+        /// Zips the folder using the shell
+        /// </summary>
+        /// <remarks>Re-zipping a jar file using the .Net ZipFile class creates an invalid jar
+        /// so we zip using the shell instead.
+        /// The code is doing effectively the same as the PowerShell script used by the 
+        /// packaging project in the SonarQube Scanner for MSBuild:
+        /// See https://github.com/SonarSource-VisualStudio/sonar-msbuild-runner/blob/master/PackagingProjects/CSharpPluginPayload/RepackageCSharpPlugin.ps1
+        /// </remarks>
         private static void ZipUsingShell(string sourceDir, string targetZipFilePath)
         {
             // The Folder.CopyHere method for Shell Objects allows configuration based on a combination of flags.

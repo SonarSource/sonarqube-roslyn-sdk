@@ -73,15 +73,15 @@ namespace SonarQube.Plugins
         {
             if (jdkWrapper == null)
             {
-                throw new ArgumentNullException("jdkWrapper");
+                throw new ArgumentNullException(nameof(jdkWrapper));
             }
             if (artifactHandler == null)
             {
-                throw new ArgumentNullException("artifactHandler");
+                throw new ArgumentNullException(nameof(artifactHandler));
             }
             if (logger == null)
             {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(logger));
             }
 
             this.jdkWrapper = jdkWrapper;
@@ -104,7 +104,7 @@ namespace SonarQube.Plugins
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(filePath));
             }
 
             this.outputJarFilePath = filePath;
@@ -119,7 +119,7 @@ namespace SonarQube.Plugins
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
             }
 
             this.properties[name] = value;
@@ -133,7 +133,7 @@ namespace SonarQube.Plugins
         {
             if (string.IsNullOrWhiteSpace(sourcePath))
             {
-                throw new ArgumentNullException("sourcePath");
+                throw new ArgumentNullException(nameof(sourcePath));
             }
             this.sourceFiles.Add(sourcePath);
             return this;
@@ -146,7 +146,7 @@ namespace SonarQube.Plugins
         {
             if (string.IsNullOrWhiteSpace(token))
             {
-                throw new ArgumentNullException("token");
+                throw new ArgumentNullException(nameof(token));
             }
 
             this.sourceFileReplacements[token] = value;
@@ -160,7 +160,7 @@ namespace SonarQube.Plugins
         {
             if (string.IsNullOrWhiteSpace(fullJarFilePath))
             {
-                throw new ArgumentNullException("fullJarFilePath");
+                throw new ArgumentNullException(nameof(fullJarFilePath));
             }
             this.referencedJars.Add(fullJarFilePath);
             return this;
@@ -177,7 +177,7 @@ namespace SonarQube.Plugins
         {
             if (string.IsNullOrWhiteSpace(extension))
             {
-                throw new ArgumentNullException("extension");
+                throw new ArgumentNullException(nameof(extension));
             }
 
             this.extensionClasses.Add(extension);
@@ -192,7 +192,7 @@ namespace SonarQube.Plugins
         {
             if (string.IsNullOrWhiteSpace(fullFilePath))
             {
-                throw new ArgumentNullException("fullFilePath");
+                throw new ArgumentNullException(nameof(fullFilePath));
             }
 
             this.fileToRelativePathMap[fullFilePath] = relativeJarPath;
