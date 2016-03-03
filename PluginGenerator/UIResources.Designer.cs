@@ -199,6 +199,24 @@ namespace SonarQube.Plugins {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The attribute name contains invalid characters. Valid characters are [0-9a-zA-Z_-]. Name: {0}.
+        /// </summary>
+        internal static string JMan_Error_InvalidCharsInName {
+            get {
+                return ResourceManager.GetString("JMan_Error_InvalidCharsInName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The attribute name is too long. Maximum 70 chars. Name: {0}.
+        /// </summary>
+        internal static string JMan_Error_NameTooLong {
+            get {
+                return ResourceManager.GetString("JMan_Error_NameTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The plugin key is not valid. It must be alphanumeric and not blank. Key: {0}.
         /// </summary>
         internal static string Misc_Error_InvalidPluginKey {

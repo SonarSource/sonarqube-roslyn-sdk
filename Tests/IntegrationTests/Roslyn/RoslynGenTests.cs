@@ -4,6 +4,7 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NuGet;
@@ -11,6 +12,7 @@ using SonarQube.Plugins.Roslyn;
 using SonarQube.Plugins.Roslyn.CommandLine;
 using SonarQube.Plugins.Test.Common;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -157,27 +159,27 @@ namespace SonarQube.Plugins.IntegrationTests
 
         private static void AssertExpectedRulesExist(DiagnosticAnalyzer analyzer, string actualRuleFilePath)
         {
-            //XDocument rulesXml = XDocument.Load(actualRuleFilePath);
+            Rules actualRules = Rules.Load(actualRuleFilePath);
 
-            //foreach(DiagnosticDescriptor descriptor in analyzer.SupportedDiagnostics)
-            //{
-            //    AssertRuleExists(descriptor, rulesXml);
-            //}
+            foreach (DiagnosticDescriptor descriptor in analyzer.SupportedDiagnostics)
+            {
+                AssertRuleExists(descriptor, actualRules);
+            }
         }
 
-        //private static void AssertRuleExists(DiagnosticDescriptor descriptor, XDocument repository)
-        //{
-            //TODO: fix-up following merge
-            //IEnumerable<JarInfo.Rule> matches = repository.Rules.Where(r => string.Equals(r.InternalKey, descriptor.Id, System.StringComparison.Ordinal));
+        private static void AssertRuleExists(DiagnosticDescriptor descriptor, Rules rules)
+        {
+            IEnumerable<Rule> matches = rules.Where(r => string.Equals(r.InternalKey, descriptor.Id, System.StringComparison.Ordinal));
 
-            //Assert.AreNotEqual(0, matches.Count(), "Failed to find expected rule: {0}", descriptor.Id);
-            //Assert.AreEqual(1, matches.Count(), "Multiple rules have the same id: {0}", descriptor.Id);
+            Assert.AreNotEqual(0, matches.Count(), "Failed to find expected rule: {0}", descriptor.Id);
+            Assert.AreEqual(1, matches.Count(), "Multiple rules have the same id: {0}", descriptor.Id);
 
-            //JarInfo.Rule actual = matches.Single();
-            //Assert.AreEqual(descriptor.Title.ToString(), actual.Name, "Unexpected rule name");
-            //Assert.AreEqual(descriptor.Id, actual.Key, "Unexpected rule key");
-            //AssertPropertyHasValue(actual.Severity, "Severity");
-        //}
+            Rule actual = matches.Single();
+            Assert.AreEqual(descriptor.Title.ToString(), actual.Name, "Unexpected rule name");
+            Assert.AreEqual(descriptor.Id, actual.Key, "Unexpected rule key");
+
+            Assert.IsNotNull(actual.Severity, "Severity should be specified");
+        }
 
         private static void AssertPackagePropertiesInManifest(IPackage package, string[] actualManifest)
         {            

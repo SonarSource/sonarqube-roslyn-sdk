@@ -398,7 +398,7 @@ namespace SonarQube.Plugins.Roslyn
                         .SetRepositoryKey(repoKey)
                         .SetRepositoryName(definition.Manifest.Name)
                         .SetRulesFilePath(definition.RulesFilePath)
-                        .SetManifestProperties(definition.Manifest)
+                        .SetPluginManifestProperties(definition.Manifest)
                         .SetJarFilePath(fullJarPath);
 
             if (!string.IsNullOrWhiteSpace(definition.SqaleFilePath))

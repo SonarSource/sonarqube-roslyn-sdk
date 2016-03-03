@@ -37,7 +37,7 @@ namespace SonarQube.Plugins.Roslyn
         private readonly ILogger logger;
 
         private readonly IDictionary<string, string> pluginProperties;
-        private readonly IDictionary<string, string> manifestProperties;
+        private readonly JarManifestBuilder jarManifestBuilder;
         private readonly IDictionary<string, string> fileToRelativePathMap;
         private string language;
         private string rulesFilePath;
@@ -53,23 +53,23 @@ namespace SonarQube.Plugins.Roslyn
         {
             if (logger == null)
             {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(logger));
             }
 
             this.logger = logger;
 
             this.pluginProperties = new Dictionary<string, string>();
-            this.manifestProperties = new Dictionary<string, string>();
+            this.jarManifestBuilder = new JarManifestBuilder();
             this.fileToRelativePathMap = new Dictionary<string, string>();
 
-            this.EnsureCoreManifestPropertiesExist();
+            this.SetFixedManifestProperties();
         }
 
         public RoslynPluginJarBuilder SetJarFilePath(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(filePath));
             }
 
             this.outputJarFilePath = filePath;
@@ -84,7 +84,7 @@ namespace SonarQube.Plugins.Roslyn
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
             }
 
             this.pluginProperties[name] = value;
@@ -96,20 +96,15 @@ namespace SonarQube.Plugins.Roslyn
         /// </summary>
         public RoslynPluginJarBuilder SetManifestProperty(string name, string value)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                throw new ArgumentNullException("name");
-            }
-
-            this.manifestProperties[name] = value;
+            this.jarManifestBuilder.SetProperty(name, value);
             return this;
         }
 
-        public RoslynPluginJarBuilder SetManifestProperties(PluginManifest definition)
+        public RoslynPluginJarBuilder SetPluginManifestProperties(PluginManifest definition)
         {
             if (definition == null)
             {
-                throw new ArgumentNullException("definition");
+                throw new ArgumentNullException(nameof(definition));
             }
 
             SetNonNullManifestProperty(WellKnownPluginProperties.License, definition.License);
@@ -147,7 +142,7 @@ namespace SonarQube.Plugins.Roslyn
         {
             if (string.IsNullOrWhiteSpace(fullFilePath))
             {
-                throw new ArgumentNullException("fullFilePath");
+                throw new ArgumentNullException(nameof(fullFilePath));
             }
 
             this.fileToRelativePathMap[fullFilePath] = relativeJarPath;
@@ -162,7 +157,7 @@ namespace SonarQube.Plugins.Roslyn
             // supplied language isn't null/empty.
             if (string.IsNullOrWhiteSpace(ruleLanguage))
             {
-                throw new ArgumentNullException("ruleLanguage");
+                throw new ArgumentNullException(nameof(ruleLanguage));
             }
             this.language = ruleLanguage;
             return this;
@@ -173,7 +168,7 @@ namespace SonarQube.Plugins.Roslyn
             // The existence of the file will be checked before building
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                throw new ArgumentNullException("filePath");
+                throw new ArgumentNullException(nameof(filePath));
             }
             this.rulesFilePath = filePath;
             return this;
@@ -184,7 +179,7 @@ namespace SonarQube.Plugins.Roslyn
             // The existence of the file will be checked before building
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                throw new ArgumentNullException("filePath");
+                throw new ArgumentNullException(nameof(filePath));
             }
             this.sqaleFilePath = filePath;
             return this;
@@ -201,7 +196,7 @@ namespace SonarQube.Plugins.Roslyn
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
             }
 
             this.repositoryName = name;
@@ -236,14 +231,14 @@ namespace SonarQube.Plugins.Roslyn
         {
             if (string.IsNullOrWhiteSpace(workingDirectory))
             {
-                throw new ArgumentNullException("workingDirectory");
+                throw new ArgumentNullException(nameof(workingDirectory));
             }
 
             this.ValidateConfiguration();
 
             // Create the config and manifest files
             string configFilePath = BuildConfigFile(workingDirectory);
-            string manifestFilePath = BuildManifestFile(workingDirectory);
+            string manifestFilePath = this.jarManifestBuilder.WriteManifest(workingDirectory);
 
             // Update the jar
             string templateJarFilePath = ExtractTemplateJarFile(workingDirectory);
@@ -284,7 +279,7 @@ namespace SonarQube.Plugins.Roslyn
         private string CheckPropertyIsSet(string propertyName)
         {
             string value;
-            this.manifestProperties.TryGetValue(propertyName, out value);
+            this.jarManifestBuilder.TryGetValue(propertyName, out value);
 
             if (string.IsNullOrWhiteSpace(value))
             {
@@ -329,46 +324,26 @@ namespace SonarQube.Plugins.Roslyn
         private string FindPluginKey()
         {
             string pluginKey;
-            this.manifestProperties.TryGetValue(WellKnownPluginProperties.Key, out pluginKey);
+            this.jarManifestBuilder.TryGetValue(WellKnownPluginProperties.Key, out pluginKey);
             if (pluginKey != null)
             {
                 pluginKey = PluginKeyUtilities.GetValidKey(pluginKey);
             }
             return pluginKey;
         }
-
-        private string BuildManifestFile(string workingDirectory)
-        {
-            // TODO: we don't currently handle long manifest properties correctly (over 72 bytes)
-            // See http://docs.oracle.com/javase/6/docs/technotes/guides/jar/jar.html#JAR%20Manifest
-            string filePath = Path.Combine(workingDirectory, "manifest.txt");
-
-            StringBuilder sb = new StringBuilder();
-            foreach (KeyValuePair<string, string> kvp in this.manifestProperties)
-            {
-                sb.AppendFormat("{0}: {1}", kvp.Key, kvp.Value);
-                sb.AppendLine();
-            }
-            sb.AppendLine();
-
-            File.WriteAllText(filePath, sb.ToString());
-            return filePath;
-        }
-
+        
         /// <summary>
         /// Sets the invariant, required manifest properties
         /// </summary>
-        private void EnsureCoreManifestPropertiesExist()
+        private void SetFixedManifestProperties()
         {
             // This property must appear first in the manifest.
             // See http://docs.oracle.com/javase/6/docs/technotes/guides/jar/jar.html#JAR%20Manifest
-            this.manifestProperties.Add("Manifest-Version", "1.0");
+            this.jarManifestBuilder.SetProperty("Sonar-Version", "4.5.2");
+            this.jarManifestBuilder.SetProperty("Plugin-Dependencies", "META-INF/lib/sslr-squid-bridge-2.6.jar");
+            this.jarManifestBuilder.SetProperty("Plugin-SourcesUrl", "https://github.com/SonarSource-VisualStudio/sonarqube-roslyn-sdk-template-plugin");
 
-            this.manifestProperties.Add("Sonar-Version", "4.5.2");
-            this.manifestProperties.Add("Plugin-Dependencies", "META-INF/lib/sslr-squid-bridge-2.6.jar");
-            this.manifestProperties.Add("Plugin-SourcesUrl", "https://github.com/SonarSource-VisualStudio/sonarqube-roslyn-sdk-template-plugin");
-
-            this.manifestProperties.Add("Plugin-Class", PluginClassName);
+            this.jarManifestBuilder.SetProperty("Plugin-Class", PluginClassName);
         }
 
         private static string ExtractTemplateJarFile(string workingDirectory)

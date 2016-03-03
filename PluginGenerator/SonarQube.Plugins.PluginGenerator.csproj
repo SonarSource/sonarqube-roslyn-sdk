@@ -52,6 +52,7 @@
     <Compile Include="Interfaces\IJdkWrapper.cs" />
     <Compile Include="Interfaces\IMavenArtifactHandler.cs" />
     <Compile Include="Interfaces\IMavenCoordinate.cs" />
+    <Compile Include="JarManifestBuilder.cs" />
     <Compile Include="Maven\DataModel\MavenCoordinate.cs" />
     <Compile Include="Maven\MavenArtifactHandler.cs" />
     <Compile Include="Maven\DataModel\MavenDependency.cs" />
