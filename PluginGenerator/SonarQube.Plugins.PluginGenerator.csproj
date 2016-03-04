@@ -85,7 +85,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="SonarQube\License.txt" />
+    <Content Include="License.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\SonarQube.Plugins.Common.csproj">
