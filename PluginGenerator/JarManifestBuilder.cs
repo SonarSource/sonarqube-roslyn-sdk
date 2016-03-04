@@ -57,7 +57,7 @@ namespace SonarQube.Plugins
         /// <summary>
         /// Builds and returns the manifest
         /// </summary>
-        public string GetManifest()
+        public string BuildManifest()
         {
             StringBuilder sb = new StringBuilder();
 
@@ -89,7 +89,7 @@ namespace SonarQube.Plugins
             Directory.CreateDirectory(directory);
             string filePath = Path.Combine(directory, ManifestFileName);
 
-            File.WriteAllText(filePath, this.GetManifest());
+            File.WriteAllText(filePath, this.BuildManifest());
 
             return filePath;
         }
@@ -146,15 +146,15 @@ namespace SonarQube.Plugins
             // for the continuation prefix
             const string continuationPrefix = " ";
             int maxActualCharsPerLine = MaxLineLength - continuationPrefix.Length;
-            
-            while (text.Length > maxActualCharsPerLine)
-            {
-                sb.AppendLine(continuationPrefix + text.Substring(0, maxActualCharsPerLine));
-                text = text.Substring(maxActualCharsPerLine);
-            }
 
-            // Write out whatever is left
-            sb.AppendLine(continuationPrefix + text);
+            while (text.Length > 0)
+            {
+                // Make sure we don't try to take too many characters
+                int charsToTake = Math.Min(text.Length, maxActualCharsPerLine);
+
+                sb.AppendLine(continuationPrefix + text.Substring(0, charsToTake));
+                text = text.Substring(charsToTake);
+            }
         }
 
         #endregion

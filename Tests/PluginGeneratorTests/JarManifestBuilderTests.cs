@@ -190,7 +190,7 @@ name2: 11111111112222222222333333333344444444445555555555666666666677777
                 builder.SetProperty(name, "valid.property");
             }
 
-            string manifest = builder.GetManifest();
+            string manifest = builder.BuildManifest();
 
         }
 
