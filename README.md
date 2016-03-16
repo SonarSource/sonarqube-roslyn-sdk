@@ -54,7 +54,7 @@ The generator will create a template SQALE file that contains placeholders for t
 
 If you want to provide SQALE information in the generated plugin, you can copy and manually edit the template file to contain the appropriate remediation information. Then generate the plugin again, this time specifying the */sqale:{filename}* option to tell the generator to embed the SQALE file in the plugin.
 
-See the [SonarQube documentation](http://docs.sonarqube.org/display/SONAR/Technical+Debt) for more information about how SonarQube uses the SQALE method.
+See the [SonarQube documentation](http://docs.sonarqube.org/x/_yBq) for more information about how SonarQube uses the SQALE method.
 
 
 #### Generating a jar for a private Roslyn analyzer
@@ -71,7 +71,7 @@ The SDK will look for NuGet.config files in the following locations:
 
 The SDK uses information from the NuGet package to populate the fields in the generated plugin that affect how the plugin is described in the Update Centre in the SonarQube UI. It is not currently possible to customise these values.
 
-The NuGet package properties are documented [here](http://docs.nuget.org/Create/Nuspec-Reference) and the SonarQube plugin properties are documented [here](http://docs.sonarqube.org/display/DEV/Build+plugin).
+The NuGet package properties are documented [here](http://docs.nuget.org/Create/Nuspec-Reference) and the SonarQube plugin properties are documented [here](http://docs.sonarqube.org/x/JQxq).
 
 The NuGet package properties are mapped to plugin properties as follows:
 
