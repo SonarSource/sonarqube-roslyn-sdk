@@ -31,7 +31,7 @@ namespace SonarQube.Plugins.Common
         public static string CreateTempDirectory(string dirName)
         {
             string newPath = Path.GetTempPath();
-            newPath = Path.Combine(newPath, ".sqsdk", dirName);
+            newPath = Path.Combine(newPath, ".sonarqube.sdk", dirName);
             Directory.CreateDirectory(newPath);
             return newPath;
         }

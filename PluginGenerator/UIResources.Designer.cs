@@ -61,176 +61,38 @@ namespace SonarQube.Plugins {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Rules Plugin Generator for SonarQube.
+        ///   Looks up a localized string similar to The attribute name contains invalid characters. Valid characters are [0-9a-zA-Z_-]. Name: {0}.
         /// </summary>
-        internal static string AssemblyDescription {
+        internal static string JMan_Error_InvalidCharsInName {
             get {
-                return ResourceManager.GetString("AssemblyDescription", resourceCulture);
+                return ResourceManager.GetString("JMan_Error_InvalidCharsInName", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid number of arguments. Expecting at least two arguments: 
-        ///(1) the name of the plugin definition file - required
-        ///(2) the rules xml file - required
-        ///(3) a SQALE xml file - optional..
+        ///   Looks up a localized string similar to The attribute name is too long. Maximum 70 chars. Name: {0}.
         /// </summary>
-        internal static string Cmd_Error_IncorrectArguments {
+        internal static string JMan_Error_NameTooLong {
             get {
-                return ResourceManager.GetString("Cmd_Error_IncorrectArguments", resourceCulture);
+                return ResourceManager.GetString("JMan_Error_NameTooLong", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The file path for the jar file to be created must be specified.
+        ///   Looks up a localized string similar to The plugin key is not valid. It must be alphanumeric and not blank. Key: {0}.
         /// </summary>
-        internal static string CoreBuilder_Error_OutputJarPathMustBeSpecified {
+        internal static string Misc_Error_InvalidPluginKey {
             get {
-                return ResourceManager.GetString("CoreBuilder_Error_OutputJarPathMustBeSpecified", resourceCulture);
+                return ResourceManager.GetString("Misc_Error_InvalidPluginKey", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Required plugin definition property is missing: {0}.
+        ///   Looks up a localized string similar to The repository key is not valid. It must be not blank and less than 255 characters. Characters must be alphanumeric, a period, dash or underscore. Key: {0}.
         /// </summary>
-        internal static string CoreBuilder_Error_RequiredPropertyMissing {
+        internal static string Misc_Error_InvalidRepositoryKey {
             get {
-                return ResourceManager.GetString("CoreBuilder_Error_RequiredPropertyMissing", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The existing jar file will be overwritten.
-        /// </summary>
-        internal static string CoreBuilder_ExistingJarWillBeOvewritten {
-            get {
-                return ResourceManager.GetString("CoreBuilder_ExistingJarWillBeOvewritten", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to At least one extension class must be specified.
-        /// </summary>
-        internal static string CoreBuilder_MustSpecifyAnExtensionClass {
-            get {
-                return ResourceManager.GetString("CoreBuilder_MustSpecifyAnExtensionClass", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This file has already been added to the jar: {0}.
-        /// </summary>
-        internal static string JarB_Error_FileAlreadySpecified {
-            get {
-                return ResourceManager.GetString("JarB_Error_FileAlreadySpecified", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Ths specified file to be included in the jar does not exist.
-        /// </summary>
-        internal static string JarB_Error_FileNotFound {
-            get {
-                return ResourceManager.GetString("JarB_Error_FileNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This jar output location has already been used: {0}. File: {1}.
-        /// </summary>
-        internal static string JarB_Error_RelativeJarPathAlreadySpecified {
-            get {
-                return ResourceManager.GetString("JarB_Error_RelativeJarPathAlreadySpecified", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to build jar file.
-        /// </summary>
-        internal static string JarB_JarBuildingFailed {
-            get {
-                return ResourceManager.GetString("JarB_JarBuildingFailed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Successfully built jar file: {0}.
-        /// </summary>
-        internal static string JarB_JarBuiltSuccessfully {
-            get {
-                return ResourceManager.GetString("JarB_JarBuiltSuccessfully", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The JDK is not installed or is not discoverable on this machine.
-        /// </summary>
-        internal static string JarB_JDK_NotInstalled {
-            get {
-                return ResourceManager.GetString("JarB_JDK_NotInstalled", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Java compilation failed.
-        /// </summary>
-        internal static string JComp_CompliationFailed {
-            get {
-                return ResourceManager.GetString("JComp_CompliationFailed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Java source code compilation failed.
-        /// </summary>
-        internal static string JComp_SourceCompilationFailed {
-            get {
-                return ResourceManager.GetString("JComp_SourceCompilationFailed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Successfully compiled Java source code.
-        /// </summary>
-        internal static string JComp_SourceCompilationSucceeded {
-            get {
-                return ResourceManager.GetString("JComp_SourceCompilationSucceeded", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The rule language must be specified.
-        /// </summary>
-        internal static string RulesBuilder_Error_RuleLanguageMustBeSpecified {
-            get {
-                return ResourceManager.GetString("RulesBuilder_Error_RuleLanguageMustBeSpecified", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The specified rules file does not exist.
-        /// </summary>
-        internal static string RulesBuilder_Error_RulesFileDoesNotExist {
-            get {
-                return ResourceManager.GetString("RulesBuilder_Error_RulesFileDoesNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The path to the rules file must be specified.
-        /// </summary>
-        internal static string RulesBuilder_Error_RulesFileMustBeSpecified {
-            get {
-                return ResourceManager.GetString("RulesBuilder_Error_RulesFileMustBeSpecified", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The specified sqale file does not exist.
-        /// </summary>
-        internal static string RulesBuilder_Error_SqaleFileDoesNotExist {
-            get {
-                return ResourceManager.GetString("RulesBuilder_Error_SqaleFileDoesNotExist", resourceCulture);
+                return ResourceManager.GetString("Misc_Error_InvalidRepositoryKey", resourceCulture);
             }
         }
     }

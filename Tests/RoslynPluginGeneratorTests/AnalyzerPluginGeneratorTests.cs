@@ -4,13 +4,15 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SonarQube.Plugins.Test.Common;
-using System.IO;
 using NuGet;
-using System.Linq;
-using System.Collections.Generic;
+using SonarLint.XmlDescriptor;
+using SonarQube.Plugins.Roslyn.CommandLine;
+using SonarQube.Plugins.Test.Common;
+using System;
+using System.IO;
+using static SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests.RemoteRepoBuilder;
+
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
     /// <summary>
@@ -21,272 +23,467 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
     {
         public TestContext TestContext { get; set; }
 
-        private enum License { Required, NotRequired };
         private enum Node { Root, Child1, Child2, Grandchild1_1, Grandchild2_1, Grandchild2_2 };
 
         [TestMethod]
-        public void Generate_PackageNoAccept_NoDependencies_Succeeds()
+        public void Generate_NoAnalyzersFoundInPackage_GenerateFails()
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
 
-            SetupTestGraph();
+            TestLogger logger = new TestLogger();
+
+            // Create a fake remote repo containing a package that does not contain analyzers
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            remoteRepoBuilder.CreatePackage("no.analyzers.id", "0.9", TestUtils.CreateTextFile("dummy.txt", outputDir), License.NotRequired /* no dependencies */ );
+
+            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
+            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
+            ProcessedArgs args = CreateArgs("no.analyzers.id", "0.9", "cs", null, false, outputDir);
 
             // Act
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Grandchild1_1.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
+            bool result = apg.Generate(args);
 
             // Assert
+            Assert.IsFalse(result, "Expecting generation to fail");
+            logger.AssertWarningsLogged(1);
+            AssertSqaleTemplateDoesNotExist(outputDir);
+        }
+
+        [TestMethod]
+        public void Generate_LicenseAcceptanceNotRequired_Succeeds()
+        {
+            // Arrange
+            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+
+            // Multi-level dependencies: no package requires license acceptence
+            IPackage grandchild = CreatePackageWithAnalyzer(remoteRepoBuilder, "grandchild.id", "1.2", License.NotRequired /* no dependencies */);
+            IPackage child = CreatePackageWithAnalyzer(remoteRepoBuilder, "child.id", "1.1", License.NotRequired, grandchild);
+            CreatePackageWithAnalyzer(remoteRepoBuilder, "parent.id", "1.0", License.NotRequired, child);
+
+            TestLogger logger = new TestLogger();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, logger);
+
+            // 1. Acceptance not required -> succeeds if accept = false
+            ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ , outputDir);
+            bool result = apg.Generate(args);
             Assert.IsTrue(result, "Generator should succeed if there are no licenses to accept");
-        }
 
-        [TestMethod]
-        public void Generate_PackageNoAccept_MultiLevel_DependenciesNoAccept_Succeeds()
-        {
-            // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
+            logger.AssertErrorsLogged(0);
+            logger.AssertWarningNotLogged("parent.id"); // not expecting warnings about packages that don't require acceptance
+            logger.AssertWarningNotLogged("child.id");
+            logger.AssertWarningNotLogged("grandchild.id");
 
-            SetupTestGraph();
-
-            // Act
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Root.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
-
-            // Assert
+            // 2. Acceptance not required -> succeeds if accept = true
+            args = CreateArgs("parent.id", "1.0", "cs", null, true /* accept licenses */ , outputDir);
+            result = apg.Generate(args);
             Assert.IsTrue(result, "Generator should succeed if there are no licenses to accept");
+
+            logger.AssertErrorsLogged(0);
+            logger.AssertWarningNotLogged("parent.id"); // not expecting warnings about packages that don't require acceptance
+            logger.AssertWarningNotLogged("child.id");
+            logger.AssertWarningNotLogged("grandchild.id");
         }
 
         [TestMethod]
-        public void Generate_PackageRequiresAccept_NoDependencies_Fails()
+        public void Generate_LicenseAcceptanceRequiredByMainPackage()
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
 
-            SetupTestGraph(Node.Grandchild1_1);
+            // Parent and child: only parent requires license
+            IPackage child = CreatePackageWithAnalyzer(remoteRepoBuilder, "child.id", "1.1", License.NotRequired);
+            CreatePackageWithAnalyzer(remoteRepoBuilder, "parent.requiredAccept.id", "1.0", License.Required, child);
 
-            // Act
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Grandchild1_1.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
+            TestLogger logger = new TestLogger();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, logger);
 
-            // Assert
-            Assert.IsFalse(result, "Generator should fail if the package requires license Accept");
+            // 1. User does not accept -> fails with error
+            ProcessedArgs args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, false /* accept licenses */ , outputDir);
+            bool result = apg.Generate(args);
+            Assert.IsFalse(result, "Generator should fail because license has not been accepted");
+
+            logger.AssertSingleErrorExists("parent.requiredAccept.id", "1.0"); // error listing the main package
+            logger.AssertSingleWarningExists("parent.requiredAccept.id", "1.0"); // warning for each licensed package
+            logger.AssertWarningsLogged(1);
+
+            // 2. User accepts -> succeeds with warnings
+            logger.Reset();
+            args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, true /* accept licenses */ , outputDir);
+            result = apg.Generate(args);
+            Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
+
+            logger.AssertSingleWarningExists(UIResources.APG_NGAcceptedPackageLicenses); // warning that licenses accepted
+            logger.AssertSingleWarningExists("parent.requiredAccept.id", "1.0"); // warning for each licensed package
+            logger.AssertWarningsLogged(2);
+            logger.AssertErrorsLogged(0);
         }
 
         [TestMethod]
-        public void Generate_PackageNoAccept_OneDependency_DependencyRequiresAccept_Fails()
+        public void Generate_LicenseAcceptanceRequiredByDependency()
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
 
-            SetupTestGraph(Node.Grandchild1_1);
+            // Parent and child: only child requires license
+            IPackage child = CreatePackageWithAnalyzer(remoteRepoBuilder, "child.requiredAccept.id", "2.0", License.Required);
+            CreatePackageWithAnalyzer(remoteRepoBuilder, "parent.id", "1.0", License.NotRequired, child);
 
-            // Act
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Child1.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
+            TestLogger logger = new TestLogger();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, logger);
 
-            // Assert
-            Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
+            // 1. User does not accept -> fails with error
+            ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ , outputDir);
+            bool result = apg.Generate(args);
+            Assert.IsFalse(result, "Generator should fail because license has not been accepted");
+
+            logger.AssertSingleErrorExists("parent.id", "1.0"); // error listing the main package
+            logger.AssertSingleWarningExists("child.requiredAccept.id", "2.0"); // warning for each licensed package
+            logger.AssertWarningsLogged(1);
+
+            // 2. User accepts -> succeeds with warnings
+            logger.Reset();
+            args = CreateArgs("parent.id", "1.0", "cs", null, true /* accept licenses */ , outputDir);
+            result = apg.Generate(args);
+            Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
+
+            logger.AssertSingleWarningExists(UIResources.APG_NGAcceptedPackageLicenses); // warning that licenses have been accepted
+            logger.AssertSingleWarningExists("child.requiredAccept.id", "2.0"); // warning for each licensed package
+            logger.AssertWarningsLogged(2);
+            logger.AssertErrorsLogged(0);
         }
 
         [TestMethod]
-        public void Generate_PackageRequiresAccept_OneDependency_DependencyRequiresAccept_Fails()
+        public void Generate_LicenseAcceptanceRequired_ByParentAndDependencies()
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
 
-            SetupTestGraph(Node.Child1, Node.Grandchild1_1);
+            // Multi-level: parent and some but not all dependencies require license acceptance
+            IPackage grandchild1 = CreatePackageWithAnalyzer(remoteRepoBuilder, "grandchild1.requiredAccept.id", "3.0", License.Required);
+            IPackage child1 = CreatePackageWithAnalyzer(remoteRepoBuilder, "child1.requiredAccept.id", "2.1", License.Required);
+            IPackage child2 = CreatePackageWithAnalyzer(remoteRepoBuilder, "child2.id", "2.2", License.NotRequired, grandchild1);
+            CreatePackageWithAnalyzer(remoteRepoBuilder, "parent.requiredAccept.id", "1.0", License.Required, child1, child2);
 
-            // Act
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Child1.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
+            TestLogger logger = new TestLogger();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, logger);
 
-            // Assert
-            Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
+            // 1. User does not accept -> fails with error
+            ProcessedArgs args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, false /* accept licenses */ , outputDir);
+            bool result = apg.Generate(args);
+            Assert.IsFalse(result, "Generator should fail because license has not been accepted");
+
+            logger.AssertSingleErrorExists("parent.requiredAccept.id", "1.0"); // error referring to the main package
+
+            logger.AssertSingleWarningExists("grandchild1.requiredAccept.id", "3.0"); // warning for each licensed package
+            logger.AssertSingleWarningExists("child1.requiredAccept.id", "2.1");
+            logger.AssertSingleWarningExists("parent.requiredAccept.id", "1.0");
+
+            // 2. User accepts -> succeeds with warnings
+            logger.Reset();
+            args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, true /* accept licenses */ , outputDir);
+            result = apg.Generate(args);
+            Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
+
+            logger.AssertSingleWarningExists(UIResources.APG_NGAcceptedPackageLicenses); // warning that licenses have been accepted
+            logger.AssertSingleWarningExists("grandchild1.requiredAccept.id", "3.0"); // warning for each licensed package
+            logger.AssertSingleWarningExists("child1.requiredAccept.id", "2.1");
+            logger.AssertSingleWarningExists("parent.requiredAccept.id", "1.0");
+            logger.AssertWarningsLogged(4);
         }
 
         [TestMethod]
-        public void Generate_PackageNoAccept_MultipleDependencies_OneDependencyRequiresAccept_Fails()
+        public void Generate_LicenseAcceptanceNotRequestedIfNoAnalysers()
         {
+            // No point in asking the user to accept licenses for packages that don't contain analyzers
+
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
+            string dummyContentFile = TestUtils.CreateTextFile("dummy.txt", outputDir, "non-analyzer content file");
 
-            SetupTestGraph(Node.Grandchild2_1);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
 
-            // Act
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Child2.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
+            // Parent only: requires license
+            remoteRepoBuilder.CreatePackage("non.analyzer.requireAccept.id", "1.0", dummyContentFile, License.Required);
 
-            // Assert
-            Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
+            TestLogger logger = new TestLogger();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, logger);
+
+            // 1. User does not accept, but no analyzers so no license prompt -> fails due absence of analyzers
+            ProcessedArgs args = CreateArgs("non.analyzer.requireAccept.id", "1.0", "cs", null, false /* accept licenses */ , outputDir);
+            bool result = apg.Generate(args);
+            Assert.IsFalse(result, "Expecting generator to fail");
+
+            logger.AssertSingleWarningExists(UIResources.APG_NoAnalyzersFound);
+            logger.AssertWarningsLogged(1);
+            logger.AssertErrorsLogged(0);
         }
 
         [TestMethod]
-        public void Generate_PackageNoAccept_MultipleDependencies_SecondDependencyRequiresAccept_Fails()
+        public void Generate_SqaleFileNotSpecified_TemplateFileCreated()
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
 
-            SetupTestGraph(Node.Grandchild2_2);
+            TestLogger logger = new TestLogger();
+
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            CreatePackageInFakeRemoteRepo(remoteRepoBuilder, "dummy.id", "1.1");
+
+            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
+
+            string expectedTemplateSqaleFilePath = Path.Combine(outputDir, "dummy.id.1.1.sqale.template.xml");
+
+            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
+
+            ProcessedArgs args = CreateArgs("dummy.id", "1.1", "cs", null, false, outputDir);
 
             // Act
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Child2.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
+            bool result = apg.Generate(args);
 
             // Assert
-            Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
+            Assert.IsTrue(result, "Expecting generation to have succeeded");
+            Assert.IsTrue(File.Exists(expectedTemplateSqaleFilePath), "Expecting a template sqale file to have been created");
+            this.TestContext.AddResultFile(expectedTemplateSqaleFilePath);
+            logger.AssertSingleInfoMessageExists(expectedTemplateSqaleFilePath); // should be a message about the generated file
         }
 
         [TestMethod]
-        public void Generate_PackageRequiresAccept_MultipleDependencies_AllDependenciesRequiresAccept_Fails()
+        public void Generate_ValidSqaleFileSpecified_TemplateFileNotCreated()
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
 
-            SetupTestGraph(Node.Child2, Node.Grandchild2_1, Node.Grandchild2_2);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder);
+
+            CreatePackageInFakeRemoteRepo(remoteRepoBuilder, "dummy.id", "1.1");
+
+            // Create a dummy sqale file
+            string dummySqaleFilePath = Path.Combine(outputDir, "inputSqale.xml");
+            SqaleModel dummySqale = new SqaleModel();
+            Serializer.SaveModel(dummySqale, dummySqaleFilePath);
+
+            ProcessedArgs args = CreateArgs("dummy.id", "1.1", "cs", dummySqaleFilePath, false, outputDir);
 
             // Act
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Child2.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
+            bool result = apg.Generate(args);
 
             // Assert
-            Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
+            Assert.IsTrue(result, "Expecting generation to have succeeded");
+            AssertSqaleTemplateDoesNotExist(outputDir);
         }
 
         [TestMethod]
-        public void Generate_PackageNoAccept_MultiLevel_SecondLevelDependencyRequiresAccept_Fails()
+        public void Generate_InvalidSqaleFileSpecified_GeneratorError()
         {
             // Arrange
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
 
-            SetupTestGraph(Node.Grandchild1_1);
+            TestLogger logger = new TestLogger();
+
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            CreatePackageInFakeRemoteRepo(remoteRepoBuilder, "dummy.id", "1.1");
+
+            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
+
+            // Create an invalid sqale file
+            string dummySqaleFilePath = Path.Combine(outputDir, "invalidSqale.xml");
+            File.WriteAllText(dummySqaleFilePath, "not valid xml");
+
+            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
+
+            ProcessedArgs args = CreateArgs("dummy.id", "1.1", "cs", dummySqaleFilePath, false, outputDir);
 
             // Act
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Root.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
+            bool result = apg.Generate(args);
 
             // Assert
-            Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
+            Assert.IsFalse(result, "Expecting generation to have failed");
+            AssertSqaleTemplateDoesNotExist(outputDir);
+            logger.AssertSingleErrorExists("invalidSqale.xml"); // expecting an error containing the invalid sqale file name
         }
 
         [TestMethod]
-        public void Generate_PackageNoAccept_MultiLevel_SecondLevelSecondDependencyRequiresAccept_Fails()
+        public void CreatePluginManifest_AllProperties()
         {
-            // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo();
+            // All properties present, all properties expected.
 
-            SetupTestGraph(Node.Grandchild2_1);
+            // Arrange
+            DataServicePackage testPackage = CreateTestDataServicePackage();
+
+            testPackage.Description = "Test Description";
+            testPackage.Authors = "TestAuthor1,TestAuthor2";
+            testPackage.ProjectUrl = new Uri("http://test.project.url");
+            testPackage.Id = "Test.Id";
+
+            testPackage.Title = "Test Title";
+            testPackage.Owners = "TestOwner1,TestOwner2";
+            testPackage.Version = "1.1.1-RC5";
+
+            testPackage.LicenseUrl = new Uri("http://test.license.url");
+            testPackage.LicenseNames = "Test License1;Test License2";
 
             // Act
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(Node.Root.ToString(), new SemanticVersion("1.0")), "cs", null, outputDir);
+            PluginManifest actualPluginManifest = AnalyzerPluginGenerator.CreatePluginManifest(testPackage);
 
             // Assert
-            Assert.IsFalse(result, "Generator should fail if a package dependency requires license accept");
+            Assert.IsNotNull(actualPluginManifest);
+
+            Assert.AreEqual(testPackage.Description, actualPluginManifest.Description);
+            Assert.AreEqual(testPackage.Authors, actualPluginManifest.Developers);
+            Assert.AreEqual(testPackage.ProjectUrl.ToString(), actualPluginManifest.Homepage, false);
+            Assert.AreEqual(PluginKeyUtilities.GetValidKey(testPackage.Id), actualPluginManifest.Key);
+
+            Assert.AreEqual(testPackage.Title, actualPluginManifest.Name);
+            Assert.AreEqual(testPackage.Owners, actualPluginManifest.Organization);
+            Assert.AreEqual(testPackage.Version, actualPluginManifest.Version);
+
+            Assert.AreEqual(testPackage.LicenseUrl.ToString(), actualPluginManifest.TermsConditionsUrl, false);
+            Assert.AreEqual(testPackage.LicenseNames, actualPluginManifest.License);
+        }
+
+        [TestMethod]
+        public void CreatePluginManifest_TitleMissing()
+        {
+            // When no title is available, ID should be used as a fallback, removing the dot separators for legibility.
+
+            // Arrange
+            DataServicePackage testPackage = CreateTestDataServicePackage();
+            testPackage.Title = null;
+            testPackage.Id = "Foo.Bar.Test";
+
+            // Act
+            PluginManifest actualPluginManifest = AnalyzerPluginGenerator.CreatePluginManifest(testPackage);
+
+            // Assert
+            Assert.IsNotNull(actualPluginManifest);
+            Assert.IsTrue(string.Equals("Foo Bar Test", actualPluginManifest.Name));
+        }
+
+        [TestMethod]
+        public void CreatePluginManifest_FriendlyLicenseName_Available()
+        {
+            // When available, a short licensename assigned by NuGet.org should be used.
+            // The license url is a fallback only.
+
+            // Arrange
+            DataServicePackage testPackage = CreateTestDataServicePackage();
+            testPackage.LicenseNames = "Foo Bar License";
+            testPackage.LicenseUrl = new System.Uri("http://foo.bar");
+
+            // Act
+            PluginManifest actualPluginManifest = AnalyzerPluginGenerator.CreatePluginManifest(testPackage);
+
+            // Assert
+            Assert.IsNotNull(actualPluginManifest);
+            Assert.AreEqual(testPackage.LicenseNames, actualPluginManifest.License);
+        }
+
+        [TestMethod]
+        public void CreatePluginManifest_FriendlyLicenseName_NotAvailable()
+        {
+            // When a short licensename is not assigned by NuGet.org, we should try to use the license URL instead.
+
+            // Arrange
+            DataServicePackage testPackage = CreateTestDataServicePackage();
+            testPackage.LicenseNames = null;
+            testPackage.LicenseUrl = new System.Uri("http://foo.bar");
+
+            // Act
+            PluginManifest actualPluginManifest = AnalyzerPluginGenerator.CreatePluginManifest(testPackage);
+
+            // Assert
+            Assert.IsNotNull(actualPluginManifest);
+            Assert.AreEqual(testPackage.LicenseUrl.ToString(), actualPluginManifest.License, false);
+        }
+
+        [TestMethod]
+        public void CreatePluginManifest_FromLocalPackage()
+        {
+            // We should also be able to create a plugin manifest from an IPackage that is not a DataServicePackage
+
+            // Arrange
+            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            IPackage testPackage = remoteRepoBuilder.CreatePackage("Foo.Bar", "1.0.0", TestUtils.CreateTextFile("dummy.txt", outputDir), License.NotRequired);
+
+            // Act
+            PluginManifest actualPluginManifest = AnalyzerPluginGenerator.CreatePluginManifest(testPackage);
+
+            // Assert
+            Assert.IsNotNull(actualPluginManifest);
+            Assert.AreEqual(testPackage.LicenseUrl.ToString(), actualPluginManifest.License, false);
+        }
+
+        [TestMethod]
+        public void CreatePluginManifest_Owners_NotAvailable()
+        {
+            // When the package.Owners field is null, we should fallback to Authors for setting the organisation.
+
+            // Arrange
+            DataServicePackage testPackage = CreateTestDataServicePackage();
+            testPackage.Owners = null;
+            testPackage.Authors = "Foo,Bar,Test";
+
+            // Act
+            PluginManifest actualPluginManifest = AnalyzerPluginGenerator.CreatePluginManifest(testPackage);
+
+            // Assert
+            Assert.IsNotNull(actualPluginManifest);
+            Assert.AreEqual(testPackage.Authors, actualPluginManifest.Organization);
         }
 
         #region Private methods
 
-        private AnalyzerPluginGenerator CreateTestSubjectWithFakeRemoteRepo()
+        private static ProcessedArgs CreateArgs(string packageId, string packageVersion, string language, string sqaleFilePath, bool acceptLicenses, string outputDirectory)
         {
-            TestLogger logger = new TestLogger();
-            IPackageRepository fakeRemoteRepo = new LocalPackageRepository(GetFakeRemoteNuGetSourceDir());
+            ProcessedArgs args = new ProcessedArgs(
+                packageId,
+                new SemanticVersion(packageVersion),
+                language,
+                sqaleFilePath,
+                acceptLicenses,
+                outputDirectory);
+            return args;
+        }
 
-            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
+        private AnalyzerPluginGenerator CreateTestSubjectWithFakeRemoteRepo(RemoteRepoBuilder remoteRepoBuilder)
+        {
+            return CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, new TestLogger());
+        }
+
+        private AnalyzerPluginGenerator CreateTestSubjectWithFakeRemoteRepo(RemoteRepoBuilder remoteRepoBuilder, TestLogger logger)
+        {
+            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
             return new AnalyzerPluginGenerator(nuGetHandler, logger);
         }
 
+        private static IPackage CreatePackageWithAnalyzer(RemoteRepoBuilder remoteRepoBuilder, string packageId, string packageVersion, License acceptanceRequired, params IPackage[] dependencies)
+        {
+            return remoteRepoBuilder.CreatePackage(packageId, packageVersion, typeof(RoslynAnalyzer11.CSharpAnalyzer).Assembly.Location, acceptanceRequired, dependencies);
+        }
+
+        private void CreatePackageInFakeRemoteRepo(RemoteRepoBuilder remoteRepoBuilder, string packageId, string packageVersion)
+        {
+            remoteRepoBuilder.CreatePackage(packageId, packageVersion, typeof(RoslynAnalyzer11.AbstractAnalyzer).Assembly.Location, License.NotRequired /* no dependencies */ );
+        }
+
         /// <summary>
-        /// Creates a graph used for testing, with nodes labelled in breadth-first order.
-        /// 
-        /// Visually:
-        /// Root--------
-        /// |            \
-        /// Child1       Child2---------
-        /// |             |             \
-        /// Grandchild1_1 GrandChild2_1 GrandChild2_2
+        /// Creates a blank DataServicePackage with the required field Id already filled in.
         /// </summary>
-        /// <param name="nodesRequireLicense">
-        /// Nodes in the graph that should be packages with the field requireLicenseAccept set to true
-        /// </param>
-        private void SetupTestGraph(params Node[] nodesRequireLicense)
+        private DataServicePackage CreateTestDataServicePackage()
         {
-            string packageSource = GetFakeRemoteNuGetSourceDir();
-            IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository(packageSource);
-            PackageManager mgr = new PackageManager(repo, packageSource);
-
-            // leaf nodes
-            CreatePackage(mgr, Node.Grandchild1_1, nodesRequireLicense);
-            CreatePackage(mgr, Node.Grandchild2_1, nodesRequireLicense);
-            CreatePackage(mgr, Node.Grandchild2_2, nodesRequireLicense);
-
-            // non-leaf nodes
-            CreatePackage(mgr, Node.Child1, nodesRequireLicense, Node.Grandchild1_1);
-            CreatePackage(mgr, Node.Child2, nodesRequireLicense, Node.Grandchild2_1, Node.Grandchild2_2);
-
-            // root
-            CreatePackage(mgr, Node.Root, nodesRequireLicense, Node.Child1, Node.Child2);
-        }
-
-        private void CreatePackage(IPackageManager manager, Node packageNode, Node[] nodesRequireLicense, params Node[] dependencyNodes)
-        {
-            CreatePackage(manager, packageNode, IsLicenseRequiredFor(packageNode, nodesRequireLicense), dependencyNodes);
-        }
-
-        private License IsLicenseRequiredFor(Node node, Node[] nodesRequireLicense)
-        {
-            return nodesRequireLicense.Contains(node) ? License.Required : License.NotRequired;
-        }
-        
-        private void CreatePackage(IPackageManager manager, Node packageNode, License requiresLicenseAccept, params Node[] dependencyNodes)
-        {
-            PackageBuilder builder = new PackageBuilder();
-            ManifestMetadata metadata = new ManifestMetadata()
+            DataServicePackage newDataServicePackage = new DataServicePackage()
             {
-                Authors = "dummy author",
-                Version = new SemanticVersion("1.0").ToString(),
-                Id = packageNode.ToString(),
-                Description = "dummy description",
-                LicenseUrl = "http://choosealicense.com/",
-                RequireLicenseAcceptance = (requiresLicenseAccept == License.Required)
+                Id = "Foo.Bar"
             };
-
-            List<ManifestDependency> dependencyList = new List<ManifestDependency>();
-            foreach (Node dependencyNode in dependencyNodes)
-            {
-                dependencyList.Add(new ManifestDependency()
-                {
-                    Id = dependencyNode.ToString(),
-                    Version = new SemanticVersion("1.0").ToString(),
-                });
-            }
-
-            List<ManifestDependencySet> dependencySetList = new List<ManifestDependencySet>()
-            {
-                new ManifestDependencySet()
-                {
-                    Dependencies = dependencyList
-                }
-            };
-            metadata.DependencySets = dependencySetList;
-
-            builder.Populate(metadata);
-
-            // dummy payload
-            string testDir = TestUtils.EnsureTestDirectoryExists(this.TestContext, "source");
-            string dummyTextFile = TestUtils.CreateTextFile("blank.txt", testDir, "content");
-
-            PhysicalPackageFile file = new PhysicalPackageFile();
-            file.SourcePath = dummyTextFile;
-            file.TargetPath = "dummy.txt";
-            builder.Files.Add(file);
-
-            string fileName = packageNode.ToString() + "." + metadata.Version + ".nupkg";
-            string destinationName = Path.Combine(manager.LocalRepository.Source.ToString(), fileName);
-            
-            using (Stream fileStream = File.Open(destinationName, FileMode.OpenOrCreate))
-            {
-                builder.Save(fileStream);
-            }
+            return newDataServicePackage;
         }
 
         private string GetLocalNuGetDownloadDir()
@@ -294,9 +491,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             return TestUtils.EnsureTestDirectoryExists(this.TestContext, ".localNuGetDownload");
         }
 
-        private string GetFakeRemoteNuGetSourceDir()
+        private static void AssertSqaleTemplateDoesNotExist(string outputDir)
         {
-            return TestUtils.EnsureTestDirectoryExists(this.TestContext, ".fakeRemoteNuGetSource");
+            string[] matches = Directory.GetFiles(outputDir, "*sqale*template*", SearchOption.AllDirectories);
+            Assert.AreEqual(0, matches.Length, "Not expecting any squale template files to exist");
         }
 
         #endregion

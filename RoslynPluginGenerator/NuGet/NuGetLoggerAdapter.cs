@@ -12,9 +12,11 @@ namespace SonarQube.Plugins.Roslyn
     /// <summary>
     /// Adapter between the NuGet logger interface and the SonarQube logger interface
     /// </summary>
-    internal class NuGetLoggerAdapter : NuGet.ILogger
+    public class NuGetLoggerAdapter : NuGet.ILogger
     {
         private readonly Common.ILogger logger;
+
+        public const string LogMessagePrefix = "[NuGet] "; // does not need to be localised
 
         public NuGetLoggerAdapter(Common.ILogger logger)
         {
@@ -27,19 +29,21 @@ namespace SonarQube.Plugins.Roslyn
 
         public void Log(MessageLevel level, string message, params object[] args)
         {
+            // Add a prefix to the message to make it easier to determine the source
+            string prefixedMessage = LogMessagePrefix + message;
             switch (level)
             {
                 case MessageLevel.Debug:
-                    this.logger.LogDebug(message, args);
+                    this.logger.LogDebug(prefixedMessage, args);
                     break;
                 case MessageLevel.Error:
-                    this.logger.LogError(message, args);
+                    this.logger.LogError(prefixedMessage, args);
                     break;
                 case MessageLevel.Warning:
-                    this.logger.LogWarning(message, args);
+                    this.logger.LogWarning(prefixedMessage, args);
                     break;
                 default:
-                    this.logger.LogInfo(message, args);
+                    this.logger.LogInfo(prefixedMessage, args);
                     break;
             }
         }

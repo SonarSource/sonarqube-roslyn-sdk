@@ -7,6 +7,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using NuGet;
+using SonarLint.XmlDescriptor;
 using SonarQube.Plugins.Common;
 using SonarQube.Plugins.Roslyn.CommandLine;
 using System;
@@ -19,23 +20,22 @@ namespace SonarQube.Plugins.Roslyn
 {
     public class AnalyzerPluginGenerator
     {
-        private const string RoslynResourcesRoot = "SonarQube.Plugins.Roslyn.Resources.";
+        /// <summary>
+        /// The prefix expected by the C# plugin; used to identify repositories
+        /// that contain Roslyn rules
+        /// </summary>
+        private const string RepositoryKeyPrefix = "roslyn.";
 
         /// <summary>
-        /// List of extensions (property definitions) that are added in the Java source code
+        /// List of file extensions that should not be included in the zipped analyzer assembly
         /// </summary>
-        private static readonly string[] Extensions = new string[]
-        {
-            "RoslynProperties.AnalyzerId",
-            "RoslynProperties.RuleNamespace",
-            "RoslynProperties.NuGetPackageId",
-            "RoslynProperties.NuGetPackageVersion"
-        };
+        private static readonly string[] excludedFileExtensions = { ".nupkg", ".nuspec" };
 
-        private const string AnalyzerId_Token = "[ROSLYN_ANALYZER_ID]";
-        private const string RuleNamespace_Token = "[ROSLYN_RULE_NAMESPACE]";
-        private const string PackageId_Token = "[ROSLYN_NUGET_PACKAGE_ID]";
-        private const string PackageVersion_Token = "[ROSLYN_NUGET_PACKAGE_VERSION]";
+        /// <summary>
+        /// Specifies the format for the name of the placeholder SQALE file
+        /// </summary>
+        public const string SqaleTemplateFileNameFormat = "{0}.{1}.sqale.template.xml";
+        private const string DefaultRemediationCost = "5min";
 
         private readonly INuGetPackageHandler packageHandler;
         private readonly SonarQube.Plugins.Common.ILogger logger;
@@ -54,146 +54,303 @@ namespace SonarQube.Plugins.Roslyn
             this.logger = logger;
         }
 
-        public bool Generate(NuGetReference analyzeRef, string language, string sqaleFilePath, string outputDirectory)
+        public bool Generate(ProcessedArgs args)
         {
-            // sqale file path is optional
-            if (analyzeRef == null)
+            if (args == null)
             {
-                throw new ArgumentNullException("analyzeRef");
+                throw new ArgumentNullException("args");
             }
-            if (string.IsNullOrWhiteSpace(language))
+
+            IPackage package = this.packageHandler.FetchPackage(args.PackageId, args.PackageVersion);
+            if (package == null)
             {
-                throw new ArgumentNullException("language");
+                return false;
             }
-            SupportedLanguages.ThrowIfNotSupported(language);
 
-            IPackage package = this.packageHandler.FetchPackage(analyzeRef.PackageId, analyzeRef.Version);
-
-            if (package != null)
+            string packageDir = this.packageHandler.GetLocalPackageRootDirectory(package);
+            IEnumerable<DiagnosticAnalyzer> analyzers = GetAnalyzers(packageDir, this.packageHandler.LocalCacheRoot, args.Language);
+            if (!analyzers.Any())
             {
-                // Build machines will need to install this package, it is not feasible to create plugins for packages requiring license acceptance
-                if (PackageRequiresLicenseAcceptance(package))
+                return false;
+            }
+
+            IEnumerable<IPackage> licenseAcceptancePackages = this.GetPackagesRequiringLicenseAcceptance(package);
+            if (licenseAcceptancePackages.Any() && ! args.AcceptLicenses)
+            {
+                this.logger.LogError(UIResources.APG_NGPackageRequiresLicenseAcceptance, package.Id, package.Version.ToString());
+                this.ListPackagesRequiringLicenseAcceptance(licenseAcceptancePackages);
+                return false;
+            }
+
+            string createdJarFilePath = null;
+
+            string baseDirectory = CreateBaseWorkingDirectory();
+
+            // Collect the remaining data required to build the plugin
+            RoslynPluginDefinition definition = new RoslynPluginDefinition();
+            definition.Language = args.Language;
+            definition.SqaleFilePath = args.SqaleFilePath;
+            definition.PackageId = package.Id;
+            definition.PackageVersion = package.Version.ToString();
+            definition.Manifest = CreatePluginManifest(package);
+
+            // Create a zip containing the required analyzer files
+            definition.SourceZipFilePath = this.CreateAnalyzerStaticPayloadFile(packageDir, baseDirectory);
+            definition.StaticResourceName = Path.GetFileName(definition.SourceZipFilePath);
+
+            definition.RulesFilePath = GenerateRulesFile(analyzers, baseDirectory);
+
+            string generatedSqaleFile = null;
+            bool generate = true;
+            if (definition.SqaleFilePath == null)
+            {
+                generatedSqaleFile = CalculateSqaleFileName(package, args.OutputDirectory);
+                GenerateFixedSqaleFile(analyzers, generatedSqaleFile);
+                Debug.Assert(File.Exists(generatedSqaleFile));
+            }
+            else
+            {
+                generate = IsValidSqaleFile(definition.SqaleFilePath);
+            }
+
+            if (generate)
+            {
+                createdJarFilePath = BuildPlugin(definition, args.OutputDirectory);
+            }
+
+            LogSummary(createdJarFilePath, generatedSqaleFile, licenseAcceptancePackages);
+
+            return createdJarFilePath != null;
+        }
+
+        private void LogSummary(string createdJarFilePath, string generatedSqaleFile, IEnumerable<IPackage> licenseAcceptancePackages)
+        {
+            if (generatedSqaleFile != null)
+            {
+                // Log a messsage about the generated sqale file at the end of the process: if we
+                // log it earlier it will be too easy to miss
+                this.logger.LogInfo(UIResources.APG_TemplateSqaleFileGenerated, generatedSqaleFile);
+            }
+
+            if (licenseAcceptancePackages.Any())
+            {
+                // If we got this far then the user must have accepted
+                this.logger.LogWarning(UIResources.APG_NGAcceptedPackageLicenses);
+                this.ListPackagesRequiringLicenseAcceptance(licenseAcceptancePackages);
+            }
+
+            this.logger.LogInfo(UIResources.APG_PluginGenerated, createdJarFilePath);
+        }
+
+        private void ListPackagesRequiringLicenseAcceptance(IEnumerable<IPackage> licensedPackages)
+        {
+            foreach (IPackage package in licensedPackages)
+            {
+                string license;
+                if (package.LicenseUrl == null)
                 {
-                    this.logger.LogError(UIResources.APG_NGPackageRequiresLicenseAcceptance);
-                    return false;
+                    license = UIResources.APG_NG_UnspecifiedLicenseUrl;
                 }
-
-                // Create a uniquely-named temp directory for this generation run
-                string baseDirectory = Utilities.CreateTempDirectory(".gen");
-                baseDirectory = Utilities.CreateSubDirectory(baseDirectory, Guid.NewGuid().ToString());
-                this.logger.LogDebug(UIResources.APG_CreatedTempWorkingDir, baseDirectory);
-
-                PluginManifest pluginDefn = CreatePluginDefinition(package);
-
-                string rulesFilePath = Path.Combine(baseDirectory, "rules.xml");
-
-                bool success = TryGenerateRulesFile(package, this.packageHandler.LocalCacheRoot, baseDirectory, rulesFilePath, language);
-
-                if (success)
+                else
                 {
-                    BuildPlugin(package, language, rulesFilePath, sqaleFilePath, pluginDefn, baseDirectory, outputDirectory);
+                    license = package.LicenseUrl.ToString();
                 }
+                this.logger.LogWarning(UIResources.APG_NG_PackageAndLicenseUrl, package.Id, package.Version, license);
             }
-
-            return package != null;
         }
 
         /// <summary>
-        /// Recursively checks a package and all dependencies for the presence of the RequireLicenseAcceptance flag.
+        /// Returns all of the packages from the supplied package and its dependencies that require license acceptance
         /// </summary>
-        /// <param name="package">The package to test.</param>
-        /// <returns>Returns true if any of the packages in the dependency tree require license acceptance.</returns>
-        private bool PackageRequiresLicenseAcceptance(IPackage package)
+        private IEnumerable<IPackage> GetPackagesRequiringLicenseAcceptance(IPackage package)
         {
+            List<IPackage> licensed = new List<IPackage>();
             if (package.RequireLicenseAcceptance)
             {
-                return true;
+                licensed.Add(package);
             }
-            foreach (PackageDependencySet dependencySet in package.DependencySets)
-            {
-                foreach (PackageDependency dependency in dependencySet.Dependencies)
-                {
-                    // Also check that no dependencies require license acceptance
-                    IPackage dependencyPkg = packageHandler.FetchPackage(dependency.Id, dependency.VersionSpec.MaxVersion);
-                    if (PackageRequiresLicenseAcceptance(dependencyPkg))
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
+
+            licensed.AddRange(this.packageHandler.GetInstalledDependencies(package).Where(d => d.RequireLicenseAcceptance));
+            return licensed;
         }
 
         /// <summary>
-        /// Attempts to generate a rules file for assemblies in the specified package.
+        /// Creates a uniquely-named temp directory for this generation run
         /// </summary>
-        /// <param name="additionalSearchFolder">Root directory to search when looking for analyzer dependencies</param>
-        /// <param name="baseTempDir">Base temporary working directory for this generation run</param>
-        /// <param name="rulesFilePath">Full name of the file to create</param>
-        private bool TryGenerateRulesFile(IPackage package, string additionalSearchFolder, string baseTempDir, string rulesFilePath, string language)
+        private string CreateBaseWorkingDirectory()
         {
-            bool success = false;
-            this.logger.LogInfo(UIResources.APG_GeneratingRules);
+            string baseDirectory = Utilities.CreateTempDirectory(".gen");
+            baseDirectory = Utilities.CreateSubDirectory(baseDirectory, Guid.NewGuid().ToString());
+            this.logger.LogDebug(UIResources.APG_CreatedTempWorkingDir, baseDirectory);
+            return baseDirectory;
+        }
 
+        private IEnumerable<DiagnosticAnalyzer> GetAnalyzers(string packageRootDir, string additionalSearchFolder, string language)
+        {
             this.logger.LogInfo(UIResources.APG_LocatingAnalyzers);
-
-            string[] files = GetFilesFromPackage(package, baseTempDir).ToArray();
+            string[] analyzerFiles = Directory.GetFiles(packageRootDir, "*.dll", SearchOption.AllDirectories);
 
             string roslynLanguageName = SupportedLanguages.GetRoslynLanguageName(language);
             this.logger.LogDebug(UIResources.APG_LogAnalyzerLanguage, roslynLanguageName);
 
             DiagnosticAssemblyScanner diagnosticAssemblyScanner = new DiagnosticAssemblyScanner(this.logger, additionalSearchFolder);
-            IEnumerable<DiagnosticAnalyzer> analyzers = diagnosticAssemblyScanner.InstantiateDiagnostics(roslynLanguageName, files.ToArray());
-
-            this.logger.LogInfo(UIResources.APG_AnalyzersLocated, analyzers.Count());
+            IEnumerable<DiagnosticAnalyzer> analyzers = diagnosticAssemblyScanner.InstantiateDiagnostics(roslynLanguageName, analyzerFiles.ToArray());
 
             if (analyzers.Any())
             {
-                RuleGenerator ruleGen = new RuleGenerator(this.logger);
-                Rules rules = ruleGen.GenerateRules(analyzers);
-
-                Debug.Assert(rules != null, "Not expecting the generated rules to be null");
-
-                if (rules != null)
-                {
-                    rules.Save(rulesFilePath, logger);
-                    this.logger.LogDebug(UIResources.APG_RulesGeneratedToFile, rules.Count, rulesFilePath);
-                    success = true;
-                }
+                this.logger.LogInfo(UIResources.APG_AnalyzersLocated, analyzers.Count());
             }
             else
             {
                 this.logger.LogWarning(UIResources.APG_NoAnalyzersFound);
             }
-            return success;
+            return analyzers;
         }
 
-        private IEnumerable<string> GetFilesFromPackage(IPackage package, string baseTempDir)
+        private string CreateAnalyzerStaticPayloadFile(string packageRootDir, string outputDir)
         {
-            // We can't directly get the paths to the files in package so
-            // we have to extract them first
-            string extractDir = Utilities.CreateSubDirectory(baseTempDir, ".extract");
-            this.logger.LogDebug(UIResources.APG_ExtractingPackageFiles, extractDir);
-            PhysicalFileSystem fileSystem = new PhysicalFileSystem(extractDir);
-            package.ExtractContents(fileSystem, ".");
+            string zipFilePath = Path.GetFileName(packageRootDir) + ".zip";
+            zipFilePath = Path.Combine(outputDir, zipFilePath);
 
-            string[] files = Directory.GetFiles(extractDir, "*.*", SearchOption.AllDirectories);
-            return files;
+            ZipExtensions.CreateFromDirectory(packageRootDir, zipFilePath, IncludeFileInZip);
+
+            return zipFilePath;
         }
 
-        private static PluginManifest CreatePluginDefinition(IPackage package)
+        private static bool IncludeFileInZip(string filePath)
         {
+            return !excludedFileExtensions.Any(e => filePath.EndsWith(e, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Generate a rules file for the specified analyzers
+        /// </summary>
+        /// <returns>The full path to the generated file</returns>
+        private string GenerateRulesFile(IEnumerable<DiagnosticAnalyzer> analyzers, string baseDirectory)
+        {
+            this.logger.LogInfo(UIResources.APG_GeneratingRules);
+
+            Debug.Assert(analyzers.Any(), "Expecting at least one analyzer");
+
+            string rulesFilePath = Path.Combine(baseDirectory, "rules.xml");
+
+            RuleGenerator ruleGen = new RuleGenerator(this.logger);
+            Rules rules = ruleGen.GenerateRules(analyzers);
+
+            Debug.Assert(rules != null, "Not expecting the generated rules to be null");
+
+            if (rules != null)
+            {
+                rules.Save(rulesFilePath, logger);
+                this.logger.LogDebug(UIResources.APG_RulesGeneratedToFile, rules.Count, rulesFilePath);
+            }
+
+            return rulesFilePath;
+        }
+
+        private static string CalculateSqaleFileName(IPackage package, string directory)
+        {
+            string filePath = string.Format(System.Globalization.CultureInfo.CurrentCulture,
+                SqaleTemplateFileNameFormat,
+                package.Id, package.Version.ToString());
+
+            filePath = Path.Combine(directory, filePath);
+            return filePath;
+        }
+
+        /// <summary>
+        /// Generates a SQALE file with fixed remediation costs for the specified analyzers
+        /// </summary>
+        private void GenerateFixedSqaleFile(IEnumerable<DiagnosticAnalyzer> analyzers, string outputFilePath)
+        {
+            this.logger.LogInfo(UIResources.APG_GeneratingConstantSqaleFile);
+
+            HardcodedConstantSqaleGenerator generator = new HardcodedConstantSqaleGenerator(this.logger);
+
+            SqaleModel sqale = generator.GenerateSqaleData(analyzers, DefaultRemediationCost);
+
+            Serializer.SaveModel(sqale, outputFilePath);
+            this.logger.LogDebug(UIResources.APG_SqaleGeneratedToFile, outputFilePath);
+        }
+
+        /// <summary>
+        /// Checks that the supplied sqale file has valid content
+        /// </summary>
+        private bool IsValidSqaleFile(string sqaleFilePath)
+        {
+            Debug.Assert(!string.IsNullOrWhiteSpace(sqaleFilePath));
+            // Existence is checked when parsing the arguments
+            Debug.Assert(File.Exists(sqaleFilePath), "Expecting the sqale file to exist: " + sqaleFilePath);
+
+            try
+            {
+                // TODO: consider adding further checks
+                Serializer.LoadModel<SqaleModel>(sqaleFilePath);
+            }
+            catch(InvalidOperationException) // will be thrown for invalid xml
+            {
+                this.logger.LogError(UIResources.APG_InvalidSqaleFile, sqaleFilePath);
+                return false;
+            }
+            return true;
+        }
+
+        public /* for test */ static PluginManifest CreatePluginManifest(IPackage package)
+        {
+            // The manifest properties supported by SonarQube are documented at
+            // http://docs.sonarqube.org/display/DEV/Build+plugin
+
             PluginManifest pluginDefn = new PluginManifest();
 
             pluginDefn.Description = GetValidManifestString(package.Description);
             pluginDefn.Developers = GetValidManifestString(ListToString(package.Authors));
 
             pluginDefn.Homepage = GetValidManifestString(package.ProjectUrl?.ToString());
-            pluginDefn.Key = GetValidManifestString(package.Id);
+            pluginDefn.Key = PluginKeyUtilities.GetValidKey(package.Id);
 
-            pluginDefn.Name = GetValidManifestString(package.Title) ?? pluginDefn.Key;
-            pluginDefn.Organization = GetValidManifestString(ListToString(package.Owners));
-            pluginDefn.Version = GetValidManifestString(package.Version.ToNormalizedString());
+            if (!String.IsNullOrWhiteSpace(package.Title))
+            {
+                pluginDefn.Name = GetValidManifestString(package.Title);
+            }
+            else
+            {
+                // Process the package ID to replace dot separators with spaces for use as a fallback
+                pluginDefn.Name = GetValidManifestString(package.Id.Replace(".", " "));
+            }
+
+            // Fall back to using the authors if owners is empty
+            string organisation;
+            if (package.Owners.Any())
+            {
+                organisation = ListToString(package.Owners);
+            }
+            else
+            {
+                organisation = ListToString(package.Authors);
+            }
+            pluginDefn.Organization = GetValidManifestString(organisation);
+
+            pluginDefn.Version = GetValidManifestString(package.Version?.ToNormalizedString());
+
+            // The TermsConditionsUrl is only displayed in the "Update Center - Available" page
+            // i.e. for plugins that are available through the public Update Center.
+            // If the property has a value then the link will be displayed with a checkbox
+            // for acceptance.
+            // It is not used when plugins are directly dropped into the extensions\plugins
+            // folder of the SonarQube server.
+            pluginDefn.TermsConditionsUrl = GetValidManifestString(package.LicenseUrl?.ToString());
+
+            // Packages from the NuGet website may have friendly short licensenames heuristically assigned, but this requires a downcast
+            DataServicePackage dataServicePackage = package as DataServicePackage;
+            if (!String.IsNullOrWhiteSpace(dataServicePackage?.LicenseNames))
+            {
+                pluginDefn.License = GetValidManifestString(dataServicePackage.LicenseNames);
+            }
+            else
+            {
+                // Fallback - use a raw URL. Not as nice-looking in the UI, but acceptable.
+                pluginDefn.License = pluginDefn.TermsConditionsUrl;
+            }
 
             return pluginDefn;
         }
@@ -219,7 +376,10 @@ namespace SonarQube.Plugins.Roslyn
             return string.Join(",", args);
         }
 
-        private void BuildPlugin(IPackage package, string language, string rulesFilePath, string sqaleFilePath, PluginManifest pluginDefn, string baseTempDirectory, string outputDirectory)
+        /// <summary>
+        /// Builds the plugin and returns the name of the jar that was created
+        /// </summary>
+        private string BuildPlugin(RoslynPluginDefinition definition, string outputDirectory)
         {
             this.logger.LogInfo(UIResources.APG_GeneratingPlugin);
 
@@ -227,50 +387,44 @@ namespace SonarQube.Plugins.Roslyn
             // i.e. the format expected by Maven
             Directory.CreateDirectory(outputDirectory);
             string fullJarPath = Path.Combine(outputDirectory,
-                package.Id + "-plugin-" + pluginDefn.Version + ".jar");
+                definition.Manifest.Key + "-plugin-" + definition.Manifest.Version + ".jar");
 
-            RulesPluginBuilder builder = new RulesPluginBuilder(logger);
-            builder.SetLanguage(language)
-                            .SetRulesFilePath(rulesFilePath)
-                            .SetProperties(pluginDefn)
-                            .SetJarFilePath(fullJarPath);
+            string repositoryId = RepositoryKeyUtilities.GetValidKey(definition.PackageId + "." + definition.Language);
 
-            if (!string.IsNullOrWhiteSpace(sqaleFilePath))
+            string repoKey = RepositoryKeyPrefix + repositoryId;
+
+            RoslynPluginJarBuilder builder = new RoslynPluginJarBuilder(logger);
+            builder.SetLanguage(definition.Language)
+                        .SetRepositoryKey(repoKey)
+                        .SetRepositoryName(definition.Manifest.Name)
+                        .SetRulesFilePath(definition.RulesFilePath)
+                        .SetPluginManifestProperties(definition.Manifest)
+                        .SetJarFilePath(fullJarPath);
+
+            if (!string.IsNullOrWhiteSpace(definition.SqaleFilePath))
             {
-                builder.SetSqaleFilePath(sqaleFilePath);
+                builder.SetSqaleFilePath(definition.SqaleFilePath);
             }
 
-            AddRoslynMetadata(baseTempDirectory, builder, package);
-            
-            builder.Build();
+            AddRoslynMetadata(builder, definition, repositoryId);
 
-            this.logger.LogInfo(UIResources.APG_PluginGenerated, fullJarPath);
+            string relativeStaticFilePath = "static/" + Path.GetFileName(definition.StaticResourceName);
+            builder.AddResourceFile(definition.SourceZipFilePath, relativeStaticFilePath);
+
+            builder.Build();
+            return fullJarPath;
         }
 
-        private void AddRoslynMetadata(string baseTempDirectory, PluginBuilder builder, IPackage package)
+        private void AddRoslynMetadata(RoslynPluginJarBuilder builder, RoslynPluginDefinition definition, string repositoryId)
         {
-            string sourcesDir = Utilities.CreateSubDirectory(baseTempDirectory, "src");
-            this.logger.LogDebug(UIResources.APG_CreatingRoslynSources, sourcesDir);
+            builder.SetPluginProperty(repositoryId + ".nuget.packageId", definition.PackageId);
+            builder.SetPluginProperty(repositoryId + ".nuget.packageVersion", definition.PackageVersion);
 
-            SourceGenerator.CreateSourceFiles(typeof(AnalyzerPluginGenerator).Assembly, RoslynResourcesRoot, sourcesDir, new Dictionary<string, string>());
-
-            string[] sourceFiles = Directory.GetFiles(sourcesDir, "*.java", SearchOption.AllDirectories);
-            Debug.Assert(sourceFiles.Any(), "Failed to correctly unpack the Roslyn analyzer specific source files");
-
-            foreach (string sourceFile in sourceFiles)
-            {
-                builder.AddSourceFile(sourceFile);
-            }
-
-            builder.SetSourceCodeTokenReplacement(PackageId_Token, package.Id);
-            builder.SetSourceCodeTokenReplacement(PackageVersion_Token, package.Version.ToString());
-            builder.SetSourceCodeTokenReplacement(AnalyzerId_Token, package.Id);
-            builder.SetSourceCodeTokenReplacement(RuleNamespace_Token, package.Id);
-
-            foreach (string extension in Extensions)
-            {
-                builder.AddExtension(extension);
-            }
+            builder.SetPluginProperty(repositoryId + ".analyzerId", definition.PackageId);
+            builder.SetPluginProperty(repositoryId + ".ruleNamespace", definition.PackageId);
+            builder.SetPluginProperty(repositoryId + ".staticResourceName", definition.StaticResourceName);
+            builder.SetPluginProperty(repositoryId + ".pluginKey", definition.Manifest.Key);
+            builder.SetPluginProperty(repositoryId + ".pluginVersion", definition.Manifest.Version);
         }
     }
 }

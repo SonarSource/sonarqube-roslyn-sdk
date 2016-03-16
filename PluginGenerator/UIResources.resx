@@ -117,64 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Cmd_Error_IncorrectArguments" xml:space="preserve">
-    <value>Invalid number of arguments. Expecting at least two arguments: 
-(1) the name of the plugin definition file - required
-(2) the rules xml file - required
-(3) a SQALE xml file - optional.</value>
+  <data name="Misc_Error_InvalidPluginKey" xml:space="preserve">
+    <value>The plugin key is not valid. It must be alphanumeric and not blank. Key: {0}</value>
   </data>
-  <data name="JarB_Error_FileAlreadySpecified" xml:space="preserve">
-    <value>This file has already been added to the jar: {0}</value>
+  <data name="Misc_Error_InvalidRepositoryKey" xml:space="preserve">
+    <value>The repository key is not valid. It must be not blank and less than 255 characters. Characters must be alphanumeric, a period, dash or underscore. Key: {0}</value>
   </data>
-  <data name="JarB_Error_FileNotFound" xml:space="preserve">
-    <value>Ths specified file to be included in the jar does not exist</value>
+  <data name="JMan_Error_InvalidCharsInName" xml:space="preserve">
+    <value>The attribute name contains invalid characters. Valid characters are [0-9a-zA-Z_-]. Name: {0}</value>
   </data>
-  <data name="JarB_Error_RelativeJarPathAlreadySpecified" xml:space="preserve">
-    <value>This jar output location has already been used: {0}. File: {1}</value>
-  </data>
-  <data name="JarB_JarBuildingFailed" xml:space="preserve">
-    <value>Failed to build jar file</value>
-  </data>
-  <data name="JarB_JarBuiltSuccessfully" xml:space="preserve">
-    <value>Successfully built jar file: {0}</value>
-  </data>
-  <data name="JarB_JDK_NotInstalled" xml:space="preserve">
-    <value>The JDK is not installed or is not discoverable on this machine</value>
-  </data>
-  <data name="CoreBuilder_Error_RequiredPropertyMissing" xml:space="preserve">
-    <value>Required plugin definition property is missing: {0}</value>
-  </data>
-  <data name="JComp_SourceCompilationFailed" xml:space="preserve">
-    <value>Java source code compilation failed</value>
-  </data>
-  <data name="JComp_SourceCompilationSucceeded" xml:space="preserve">
-    <value>Successfully compiled Java source code</value>
-  </data>
-  <data name="JComp_CompliationFailed" xml:space="preserve">
-    <value>Java compilation failed</value>
-  </data>
-  <data name="RulesBuilder_Error_RulesFileDoesNotExist" xml:space="preserve">
-    <value>The specified rules file does not exist</value>
-  </data>
-  <data name="AssemblyDescription" xml:space="preserve">
-    <value>Rules Plugin Generator for SonarQube</value>
-  </data>
-  <data name="CoreBuilder_ExistingJarWillBeOvewritten" xml:space="preserve">
-    <value>The existing jar file will be overwritten</value>
-  </data>
-  <data name="CoreBuilder_MustSpecifyAnExtensionClass" xml:space="preserve">
-    <value>At least one extension class must be specified</value>
-  </data>
-  <data name="RulesBuilder_Error_SqaleFileDoesNotExist" xml:space="preserve">
-    <value>The specified sqale file does not exist</value>
-  </data>
-  <data name="CoreBuilder_Error_OutputJarPathMustBeSpecified" xml:space="preserve">
-    <value>The file path for the jar file to be created must be specified</value>
-  </data>
-  <data name="RulesBuilder_Error_RuleLanguageMustBeSpecified" xml:space="preserve">
-    <value>The rule language must be specified</value>
-  </data>
-  <data name="RulesBuilder_Error_RulesFileMustBeSpecified" xml:space="preserve">
-    <value>The path to the rules file must be specified</value>
+  <data name="JMan_Error_NameTooLong" xml:space="preserve">
+    <value>The attribute name is too long. Maximum 70 chars. Name: {0}</value>
   </data>
 </root>

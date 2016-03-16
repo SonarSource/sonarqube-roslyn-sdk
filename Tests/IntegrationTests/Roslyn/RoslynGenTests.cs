@@ -4,12 +4,12 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
-
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NuGet;
 using SonarQube.Plugins.Roslyn;
+using SonarQube.Plugins.Roslyn.CommandLine;
 using SonarQube.Plugins.Test.Common;
 using System;
 using System.Collections.Generic;
@@ -29,12 +29,11 @@ namespace SonarQube.Plugins.IntegrationTests
             // Arrange
             TestLogger logger = new TestLogger();
             string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            PluginInspector inspector = CreatePluginInspector(logger);
 
             // Create a valid analyzer package
-            ExampleAnalyzer1.CSharpAnalyzer analyzer = new ExampleAnalyzer1.CSharpAnalyzer();
+            RoslynAnalyzer11.CSharpAnalyzer analyzer = new RoslynAnalyzer11.CSharpAnalyzer();
 
-            string packageId = "analyzer1.pkgid1";
+            string packageId = "Analyzer1.Pkgid1"; // package id is not all lowercase
             string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".fakeRemoteNuGet");
             IPackageManager fakeRemotePkgMgr = CreatePackageManager(fakeRemoteNuGetDir);
             IPackage analyzerPkg =  AddPackage(fakeRemotePkgMgr, packageId, "1.0.2", analyzer.GetType().Assembly.Location);
@@ -44,49 +43,56 @@ namespace SonarQube.Plugins.IntegrationTests
             // Act
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
-            bool result = apg.Generate(new Roslyn.CommandLine.NuGetReference(packageId, new SemanticVersion("1.0.2")), "cs", null, outputDir);
+            ProcessedArgs args = new ProcessedArgs(packageId, new SemanticVersion("1.0.2"), "cs", null, false, outputDir);
+            bool result = apg.Generate(args);
 
             // Assert
             Assert.IsTrue(result);
             string jarFilePath = AssertPluginJarExists(outputDir);
 
-            JarInfo jarInfo = inspector.GetPluginDescription(jarFilePath);
+            // Check the content of the files embedded in the jar
+            ZipFileChecker jarChecker = new ZipFileChecker(this.TestContext, jarFilePath);
 
-            if (jarInfo != null)
-            {
-                this.TestContext.AddResultFile(jarInfo.FileName);
-            }
 
-            Assert.IsNotNull(jarInfo, "Failed to process the generated jar successfully");
+            // Check the contents of the embedded config file
+            string embeddedConfigFile = jarChecker.AssertFileExists("org\\sonar\\plugins\\roslynsdk\\configuration.xml");
+            RoslynSdkConfiguration config = RoslynSdkConfiguration.Load(embeddedConfigFile);
 
-            AssertExpectedManifestValue(WellKnownPluginProperties.Key, "analyzer1.pkgid1", jarInfo);
-
-            // Check that NuGet package properties have been correctly mapped to the plugin manifest
-            AssertPackagePropertiesInManifest(analyzerPkg, jarInfo);
-
+            // Check the config settings
+            Assert.AreEqual("analyzer1pkgid1", config.PluginKeyDifferentiator, "Unexpected repository differentiator");
+            Assert.AreEqual("roslyn.analyzer1.pkgid1.cs", config.RepositoryKey, "Unexpected repository key");
+            Assert.AreEqual("cs", config.RepositoryLanguage, "Unexpected language");
+            Assert.AreEqual("dummy title", config.RepositoryName, "Unexpected repository name");
+            
             // Check for the expected property values required by the C# plugin
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.analyzerId", "analyzer1.pkgid1", jarInfo);
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.ruleNamespace", "analyzer1.pkgid1", jarInfo);
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.nuget.packageId", "analyzer1.pkgid1", jarInfo);
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.nuget.packageVersion", "1.0.2", jarInfo);
+            // Property name prefixes should be lower case; the case of the value should be the same as the package id
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.analyzerId", "Analyzer1.Pkgid1", config);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.ruleNamespace", "Analyzer1.Pkgid1", config);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.nuget.packageId", "Analyzer1.Pkgid1", config);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.nuget.packageVersion", "1.0.2", config);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.staticResourceName", "Analyzer1.Pkgid1.1.0.2.zip", config);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.pluginKey", "analyzer1pkgid1", config);
+            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.pluginVersion", "1.0.2", config);
 
-            JarInfo.RulesDefinition rulesDefn = AssertRulesDefinitionExists(jarInfo);
-            AssertRepositoryIsValid(rulesDefn.Repository);
-            AssertExpectedRulesExist(analyzer, rulesDefn.Repository);
-            Assert.AreEqual("roslyn.analyzer1.pkgid1", rulesDefn.Repository.Key, "Unexpected repository key");
+            // Check the contents of the manifest
+            string actualManifestFilePath = jarChecker.AssertFileExists("META-INF\\MANIFEST.MF");
+            string[] actualManifest = File.ReadAllLines(actualManifestFilePath);
+            AssertExpectedManifestValue(WellKnownPluginProperties.Key, "analyzer1pkgid1", actualManifest);
+            AssertExpectedManifestValue("Plugin-Key", "analyzer1pkgid1", actualManifest); // plugin-key should be lowercase and alphanumeric
+            AssertPackagePropertiesInManifest(analyzerPkg, actualManifest);
 
-            Assert.AreEqual(5, jarInfo.Extensions.Count, "Unexpected number of extensions");
+
+            // Check the rules
+            string actualRuleFilePath = jarChecker.AssertFileExists("." + config.RulesXmlResourcePath);
+            AssertExpectedRulesExist(analyzer, actualRuleFilePath);
+
+            // Now create another checker to check the contents of the zip file (strict check this time)
+            CheckEmbeddedAnalyzerPayload(jarChecker, "static\\analyzer1.pkgid1.1.0.2.zip",
+                /* zip file contents */
+                "analyzers\\RoslynAnalyzer11.dll");
         }
 
         #region Private methods
-
-        private PluginInspector CreatePluginInspector(Common.ILogger logger)
-        {
-            string tempDir = TestUtils.CreateTestDirectory(this.TestContext, "pluginInsp");
-            PluginInspector inspector = new PluginInspector(logger, tempDir);
-
-            return inspector;
-        }
 
         private IPackageManager CreatePackageManager(string rootDir)
         {
@@ -111,6 +117,8 @@ namespace SonarQube.Plugins.IntegrationTests
             builder.Owners.Add("dummy owner 2");
 
             builder.ProjectUrl = new System.Uri("http://dummyurl/");
+            builder.LicenseUrl = new Uri("http://my.license/readme.txt");
+
 
             PhysicalPackageFile file = new PhysicalPackageFile();
             file.SourcePath = payloadAssemblyFilePath;
@@ -139,99 +147,71 @@ namespace SonarQube.Plugins.IntegrationTests
             Assert.AreEqual(1, files.Length, "Expecting one and only one jar file to be created");
             return files.First();
         }
-
-        private static void AssertExpectedPropertyDefinitionValue(string propertyName, string expected, JarInfo jarInfo)
+        
+        private static void AssertExpectedPropertyDefinitionValue(string propertyName, string expectedValue, RoslynSdkConfiguration actualConfig)
         {
-            JarInfo.PropertyDefinition actual = AssertPropertyDefinitionExists(propertyName, jarInfo);
-            Assert.AreEqual(expected, actual.DefaultValue, "Property definition does not have the expected value. Property: {0}", propertyName);
+            Assert.IsNotNull(actualConfig.Properties, "Configuration Properties should not be null");
+
+            Assert.IsTrue(actualConfig.Properties.ContainsKey(propertyName), "Expected property is not set: {0}", propertyName);
+
+            Assert.AreEqual(expectedValue, actualConfig.Properties[propertyName], "Property does not have the expected value. Property: {0}", propertyName);
         }
 
-        private static JarInfo.PropertyDefinition AssertPropertyDefinitionExists(string propertyName, JarInfo jarInfo)
+        private static void AssertExpectedRulesExist(DiagnosticAnalyzer analyzer, string actualRuleFilePath)
         {
-            Assert.IsNotNull(jarInfo.Extensions, "Extensions should not be null");
+            Rules actualRules = Rules.Load(actualRuleFilePath);
 
-            JarInfo.PropertyDefinition actual = jarInfo.Extensions
-                .OfType<JarInfo.PropertyDefinition>()
-                .FirstOrDefault(pd => string.Equals(pd.Key, propertyName, System.StringComparison.Ordinal));
-
-            Assert.IsNotNull(actual, "Failed to find expected property: {0}", propertyName);
-            AssertPropertyHasValue(actual.DefaultValue, propertyName);
-            return actual;
-        }
-
-        private static JarInfo.RulesDefinition AssertRulesDefinitionExists(JarInfo jarInfo)
-        {
-            Assert.IsNotNull(jarInfo.Extensions, "Extensions should not be null");
-
-            IEnumerable<JarInfo.RulesDefinition> defns = jarInfo.Extensions.OfType<JarInfo.RulesDefinition>();
-
-            Assert.AreNotEqual(0, defns.Count(), "RulesDefinition extension does not exist");
-            Assert.AreEqual(1, defns.Count(), "Multiple rules definitions exist");
-
-            JarInfo.RulesDefinition defn = defns.Single();
-
-            return defn;
-        }
-
-        private static void AssertRepositoryIsValid(JarInfo.Repository repository)
-        {
-            Assert.IsNotNull(repository, "Repository should not be null");
-
-            AssertPropertyHasValue(repository.Key, "Repository Key");
-            AssertPropertyHasValue(repository.Name, "Repository Name");
-
-            Assert.AreEqual(SupportedLanguages.CSharp, repository.Language, "Unexpected repository language");
-
-            Assert.IsNotNull(repository.Rules, "Repository rules should not be null");
-            Assert.AreNotEqual(0, repository.Rules.Count, "Repository should have at least one rule");
-        }
-
-        private static void AssertPropertyHasValue(string value, string propertyName)
-        {
-            Assert.IsFalse(string.IsNullOrWhiteSpace(value), "Property should have a value: {0}", propertyName);
-        }
-
-        private static void AssertExpectedRulesExist(DiagnosticAnalyzer analyzer, JarInfo.Repository repository)
-        {
-            foreach(DiagnosticDescriptor descriptor in analyzer.SupportedDiagnostics)
+            foreach (DiagnosticDescriptor descriptor in analyzer.SupportedDiagnostics)
             {
-                AssertRuleExists(descriptor, repository);
+                AssertRuleExists(descriptor, actualRules);
             }
         }
 
-        private static void AssertRuleExists(DiagnosticDescriptor descriptor, JarInfo.Repository repository)
+        private static void AssertRuleExists(DiagnosticDescriptor descriptor, Rules rules)
         {
-            IEnumerable<JarInfo.Rule> matches = repository.Rules.Where(r => string.Equals(r.InternalKey, descriptor.Id, System.StringComparison.Ordinal));
+            IEnumerable<Rule> matches = rules.Where(r => string.Equals(r.InternalKey, descriptor.Id, System.StringComparison.Ordinal));
 
             Assert.AreNotEqual(0, matches.Count(), "Failed to find expected rule: {0}", descriptor.Id);
             Assert.AreEqual(1, matches.Count(), "Multiple rules have the same id: {0}", descriptor.Id);
 
-            JarInfo.Rule actual = matches.Single();
+            Rule actual = matches.Single();
             Assert.AreEqual(descriptor.Title.ToString(), actual.Name, "Unexpected rule name");
             Assert.AreEqual(descriptor.Id, actual.Key, "Unexpected rule key");
-            AssertPropertyHasValue(actual.Severity, "Severity");
+
+            Assert.IsNotNull(actual.Severity, "Severity should be specified");
         }
 
-        private static void AssertPackagePropertiesInManifest(IPackage package, JarInfo jarInfo)
+        private static void AssertPackagePropertiesInManifest(IPackage package, string[] actualManifest)
         {            
-            AssertExpectedManifestValue("Plugin-Key", package.Id, jarInfo);
-            AssertExpectedManifestValue("Plugin-Name", package.Title, jarInfo);
-            AssertExpectedManifestValue("Plugin-Version", package.Version.ToString(), jarInfo);
-            AssertExpectedManifestValue("Plugin-Description", package.Description, jarInfo);
-            AssertExpectedManifestValue("Plugin-Organization", String.Join(",", package.Owners), jarInfo);
-            AssertExpectedManifestValue("Plugin-Homepage", package.ProjectUrl.ToString(), jarInfo);
-            AssertExpectedManifestValue("Plugin-Developers", String.Join(",", package.Authors), jarInfo);
+            AssertExpectedManifestValue("Plugin-Name", package.Title, actualManifest);
+            AssertExpectedManifestValue("Plugin-Version", package.Version.ToString(), actualManifest);
+            AssertExpectedManifestValue("Plugin-Description", package.Description, actualManifest);
+            AssertExpectedManifestValue("Plugin-Organization", String.Join(",", package.Owners), actualManifest);
+            AssertExpectedManifestValue("Plugin-Homepage", package.ProjectUrl.ToString(), actualManifest);
+            AssertExpectedManifestValue("Plugin-Developers", String.Join(",", package.Authors), actualManifest);
+            AssertExpectedManifestValue("Plugin-TermsConditionsUrl", package.LicenseUrl.ToString(), actualManifest);
         }
 
-        private static void AssertExpectedManifestValue(string propertyName, string expectedValue, JarInfo jarInfo)
+        private static void AssertExpectedManifestValue(string propertyName, string expectedValue, string[] actualManifest)
         {
-            Assert.IsNotNull(jarInfo.Manifest, "Manifest should not be null");
+            string expectedPrefix = propertyName + ": ";
 
-            JarInfo.ManifestItem actual = jarInfo.Manifest
-                .FirstOrDefault(item => string.Equals(item.Key, propertyName, System.StringComparison.OrdinalIgnoreCase));
+            string match = actualManifest.SingleOrDefault(a => a.StartsWith(expectedPrefix, StringComparison.Ordinal));
+            Assert.IsNotNull(match, "Failed to find expected manifest property: {0}", propertyName);
 
-            Assert.IsNotNull(actual, "Failed to find expected manifest property: {0}", propertyName);
-            Assert.AreEqual(expectedValue, actual.Value, "Unexpected manifest value for {0}", propertyName);
+            // TODO: handle multi-line values
+            string actualValue = match.Substring(expectedPrefix.Length);
+            Assert.AreEqual(expectedValue, actualValue, "Unexpected manifest property value. Property: {0}", propertyName);
+        }
+
+        private void CheckEmbeddedAnalyzerPayload(ZipFileChecker jarChecker, string staticResourceName,
+            params string[] expectedZipContents)
+        {
+            // Now create another checker to check the contents of the zip file (strict check this time)
+            string embeddedZipFilePath = jarChecker.AssertFileExists(staticResourceName);
+
+            ZipFileChecker embeddedFileChecker = new ZipFileChecker(this.TestContext, embeddedZipFilePath);
+            embeddedFileChecker.AssertZipContainsOnlyExpectedFiles(expectedZipContents);
         }
 
         #endregion

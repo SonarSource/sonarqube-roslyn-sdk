@@ -36,12 +36,31 @@ namespace SonarQube.Plugins.Roslyn
         /// <returns>Enumerable with instances of DiagnosticAnalyzer from discovered assemblies</returns>
         public IEnumerable<DiagnosticAnalyzer> InstantiateDiagnostics(string language, params string[] files)
         {
-            List<DiagnosticAnalyzer> analyzers = new List<DiagnosticAnalyzer>();
-            foreach (string assemblyPath in files.Where(f => Utilities.IsAssemblyLibraryFileName(f)))
+            // If there were any additional assembly search directories specified in the constructor, use them
+            AssemblyResolver additionalAssemblyResolver = null;
+            if (additionalSearchFolders.Any())
             {
-                analyzers.AddRange(InstantiateDiagnosticsFromAssembly(assemblyPath, language));
+                additionalAssemblyResolver = new AssemblyResolver(this.logger, additionalSearchFolders.ToArray());
             }
 
+            List<DiagnosticAnalyzer> analyzers = new List<DiagnosticAnalyzer>();
+
+            try
+            {
+                foreach (string assemblyPath in files.Where(f => Utilities.IsAssemblyLibraryFileName(f)))
+                {
+                    analyzers.AddRange(InstantiateDiagnosticsFromAssembly(assemblyPath, language));
+                }
+
+            }
+            finally
+            {
+                // Dispose of the AssemblyResolver instance, if applicable
+                if (additionalAssemblyResolver != null)
+                {
+                    additionalAssemblyResolver.Dispose();
+                }
+            }
             return analyzers;
         }
 
@@ -71,7 +90,7 @@ namespace SonarQube.Plugins.Roslyn
                     }
                     else
                     {
-                        this.logger.LogWarning(UIResources.Scanner_NoAnalyzers, analyzerAssembly.ToString());
+                        this.logger.LogInfo(UIResources.Scanner_NoAnalyzers, analyzerAssembly.ToString());
                     }
                 }
                 catch (Exception ex)
@@ -88,26 +107,8 @@ namespace SonarQube.Plugins.Roslyn
         /// </summary>
         private Assembly LoadAnalyzerAssembly(string assemblyPath)
         {
-            // If there were any additional assembly search directories specified in the constructor, use them
-            AssemblyResolver additionalAssemblyResolver = null;
-            if (additionalSearchFolders.Any())
-            {
-                additionalAssemblyResolver = new AssemblyResolver(this.logger, additionalSearchFolders.ToArray());
-            }
-
-            Assembly analyzerAssembly = null;
-            try
-            {
-                analyzerAssembly = Assembly.LoadFrom(assemblyPath);
-            }
-            finally
-            {
-                // Dispose of the AssemblyResolver instance, if applicable
-                if (additionalAssemblyResolver != null)
-                {
-                    additionalAssemblyResolver.Dispose();
-                }
-            }
+            Assembly analyzerAssembly;
+            analyzerAssembly = Assembly.LoadFrom(assemblyPath);
 
             this.logger.LogInfo(UIResources.Scanner_AssemblyLoadSuccess, analyzerAssembly.FullName);
             return analyzerAssembly;
@@ -120,7 +121,7 @@ namespace SonarQube.Plugins.Roslyn
             List<DiagnosticAnalyzer> analyzers = new List<DiagnosticAnalyzer>();
 
             // It is assumed that analyserAssembly is valid. FileNotFoundException will be thrown if dependency resolution fails.
-            foreach (Type type in analyserAssembly.GetExportedTypes())
+            foreach (Type type in analyserAssembly.GetTypes())
             {
                 if (!type.IsAbstract &&
                     type.IsSubclassOf(typeof(DiagnosticAnalyzer)) &&
@@ -141,6 +142,11 @@ namespace SonarQube.Plugins.Roslyn
             DiagnosticAnalyzerAttribute analyzerAttribute =
                 (DiagnosticAnalyzerAttribute)Attribute.GetCustomAttribute(type, typeof(DiagnosticAnalyzerAttribute));
 
+            // Analyzer must have a [DiagnosticAnalyzerAttribute] to be recognised as a valid analyzer
+            if (analyzerAttribute == null)
+            {
+                return false;
+            }
             return analyzerAttribute.Languages.Any(l => String.Equals(l, language, StringComparison.OrdinalIgnoreCase));
         }
     }

@@ -25,6 +25,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
         {
             public const string AnalyzerRef = "analyzer.ref";
             public const string SqaleXmlFile = "sqale.xml";
+            public const string AcceptLicenses = "accept.licenses";
         }
 
         private static IList<ArgumentDescriptor> Descriptors;
@@ -38,13 +39,35 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             Descriptors.Add(new ArgumentDescriptor(
                 id: KeywordIds.AnalyzerRef, prefixes: new string[] { "/analyzer:", "/a:" }, required: true, allowMultiple: false, description: CmdLineResources.ArgDescription_AnalzyerRef));
             Descriptors.Add(new ArgumentDescriptor(
-                id: KeywordIds.SqaleXmlFile, prefixes: new string[] { "/sqale:", "/s:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_SqaleXmlFile));
+                id: KeywordIds.SqaleXmlFile, prefixes: new string[] { "/sqale:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_SqaleXmlFile));
+            Descriptors.Add(new ArgumentDescriptor(
+                id: KeywordIds.AcceptLicenses, prefixes: new string[] { "/acceptLicenses" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_AcceptLicenses, isVerb: true));
 
             Debug.Assert(Descriptors.All(d => d.Prefixes != null && d.Prefixes.Any()), "All descriptors must provide at least one prefix");
             Debug.Assert(Descriptors.Select(d => d.Id).Distinct().Count() == Descriptors.Count, "All descriptors must have a unique id");
         }
 
         #endregion Argument definitions
+
+        private class NuGetReference
+        {
+            private readonly string packageId;
+            private readonly NuGet.SemanticVersion version;
+
+            public NuGetReference(string packageId, NuGet.SemanticVersion version)
+            {
+                if (string.IsNullOrWhiteSpace(packageId))
+                {
+                    throw new ArgumentNullException("packageId");
+                }
+                this.packageId = packageId;
+                this.version = version;
+            }
+
+            public string PackageId { get { return this.packageId; } }
+            public NuGet.SemanticVersion Version { get { return this.version; } }
+        }
+
 
         public static ProcessedArgs TryProcessArguments(string[] commandLineArgs, ILogger logger)
         {
@@ -79,13 +102,18 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             string sqaleFilePath;
             parsedOk &= TryParseSqaleFile(arguments, out sqaleFilePath);
 
+            bool acceptLicense = GetLicenseAcceptance(arguments);
+
             if (parsedOk)
             {
                 Debug.Assert(analyzerRef != null, "Expecting to have a valid analyzer reference");
-                processed = new ProcessedArgs(analyzerRef,
+                processed = new ProcessedArgs(
+                    analyzerRef.PackageId,
+                    analyzerRef.Version,
+                    SupportedLanguages.CSharp, /* TODO: support multiple languages */
                     sqaleFilePath,
-                    SupportedLanguages.CSharp /* TODO: support multiple languages */
-                    );
+                    acceptLicense,
+                    System.IO.Directory.GetCurrentDirectory());
             }
 
             return processed;
@@ -159,6 +187,12 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                 }
             }
             return sucess;
+        }
+
+        private static bool GetLicenseAcceptance(IEnumerable<ArgumentInstance> arguments)
+        {
+            ArgumentInstance arg = arguments.SingleOrDefault(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.AcceptLicenses, a.Descriptor.Id));
+            return arg != null;
         }
 
     }

@@ -123,11 +123,8 @@
   <data name="APG_CreatedTempWorkingDir" xml:space="preserve">
     <value>Temporary working folder for this run: {0}</value>
   </data>
-  <data name="APG_CreatingRoslynSources" xml:space="preserve">
-    <value>Creating Roslyn plugin specific sources in {0}</value>
-  </data>
-  <data name="APG_ExtractingPackageFiles" xml:space="preserve">
-    <value>Extracting files from the package to {0}</value>
+  <data name="APG_GeneratingConstantSqaleFile" xml:space="preserve">
+    <value>Generating fixed remediation cost SQALE file...</value>
   </data>
   <data name="APG_GeneratingPlugin" xml:space="preserve">
     <value>Generating plugin...</value>
@@ -135,14 +132,26 @@
   <data name="APG_GeneratingRules" xml:space="preserve">
     <value>Generating rules...</value>
   </data>
+  <data name="APG_InvalidSqaleFile" xml:space="preserve">
+    <value>The specified SQALE file is invalid: {0}</value>
+  </data>
   <data name="APG_LocatingAnalyzers" xml:space="preserve">
     <value>Looking for analyzers in the package...</value>
   </data>
   <data name="APG_LogAnalyzerLanguage" xml:space="preserve">
     <value>Looking for {0} analyzers</value>
   </data>
+  <data name="APG_NGAcceptedPackageLicenses" xml:space="preserve">
+    <value>You have accepted the licenses for the following packages:</value>
+  </data>
   <data name="APG_NGPackageRequiresLicenseAcceptance" xml:space="preserve">
-    <value>Package {0} (version {1}) requires the user to accept a license.</value>
+    <value>Cannot create a plugin for package {0} v{1} because the packages listed below require licenses to be accepted. Please check the licenses and then re-run the generator specifying the "/acceptLicenses" argument.</value>
+  </data>
+  <data name="APG_NG_PackageAndLicenseUrl" xml:space="preserve">
+    <value>{0} v{1}: {2}</value>
+  </data>
+  <data name="APG_NG_UnspecifiedLicenseUrl" xml:space="preserve">
+    <value>{license URL not specified}</value>
   </data>
   <data name="APG_NoAnalyzersFound" xml:space="preserve">
     <value>No analyzers were found in the specified package</value>
@@ -153,25 +162,37 @@
   <data name="APG_RulesGeneratedToFile" xml:space="preserve">
     <value>{0} rules generated to {1}</value>
   </data>
+  <data name="APG_SqaleGeneratedToFile" xml:space="preserve">
+    <value>SQALE generated to file {0}</value>
+  </data>
+  <data name="APG_TemplateSqaleFileGenerated" xml:space="preserve">
+    <value>
+SQALE: an empty SQALE file for the analyzer was saved to {0}. To provide SQALE remediation information for the analyzer:
+ * rename the file
+ * fill in the appropriate remediation information for each diagnostic
+ * re-run this generator specifying the sqale file to use with the /sqale:[filename] argument.
+</value>
+  </data>
   <data name="APG_UnsupportedLanguage" xml:space="preserve">
     <value>The language '{0}' is not supported. Valid options are 'cs' or 'vb'.</value>
   </data>
   <data name="AssemblyDescription" xml:space="preserve">
     <value>Roslyn Analyzer Plugin Generator for SonarQube</value>
   </data>
-  <data name="CmdLine_ERROR_InvalidArgumentCount" xml:space="preserve">
-    <value>Expecting one or two arguments:
-* NuGet package Id (mandatory), and
-* NuGet package version (optional)</value>
+  <data name="Builder_Error_OutputJarPathMustBeSpecified" xml:space="preserve">
+    <value>The file path for the jar file to be created must be specified</value>
   </data>
-  <data name="NG_CreatingRepository" xml:space="preserve">
-    <value>Creating NuGet repository: {0}</value>
+  <data name="Builder_Error_RequiredPropertyMissing" xml:space="preserve">
+    <value>Required plugin definition property is missing: {0}</value>
   </data>
-  <data name="NG_DownloadedPackage" xml:space="preserve">
-    <value>... downloaded ({0} files)</value>
+  <data name="Builder_ExistingJarWillBeOvewritten" xml:space="preserve">
+    <value>The existing jar file will be overwritten</value>
   </data>
-  <data name="NG_DownloadingPackage" xml:space="preserve">
-    <value>Downloading package...</value>
+  <data name="NG_AddingNewDependency" xml:space="preserve">
+    <value>  Adding new dependency: {0} version {1}</value>
+  </data>
+  <data name="NG_DuplicateDependency" xml:space="preserve">
+    <value>  Duplicate dependency: {0} version {1}</value>
   </data>
   <data name="NG_ERROR_PackageInstallFail" xml:space="preserve">
     <value>Failed to install package: {0}
@@ -183,8 +204,8 @@ Check that there are released versions of the package, or specify a pre-release 
   <data name="NG_ERROR_PackageVersionNotFound" xml:space="preserve">
     <value>Package version was not found: {0}</value>
   </data>
-  <data name="NG_ExtractingFile" xml:space="preserve">
-    <value>Extracting file '{0}' to {1}</value>
+  <data name="NG_FailedToResolveDependency" xml:space="preserve">
+    <value>Failed to resolve dependency: {0} version {1}</value>
   </data>
   <data name="NG_FetchingConfigFiles" xml:space="preserve">
     <value>Fetching NuGet config files...</value>
@@ -213,6 +234,9 @@ The conflict will be ignored.</value>
   </data>
   <data name="NG_PackageVersionListHeader" xml:space="preserve">
     <value>Package versions:</value>
+  </data>
+  <data name="NG_ResolvingPackageDependencies" xml:space="preserve">
+    <value>Resolving dependencies for {0} version {1}...</value>
   </data>
   <data name="NG_SelectedPackageVersion" xml:space="preserve">
     <value>Version was not specified. Using version {0}.</value>
@@ -251,5 +275,20 @@ Error: {1}</value>
   </data>
   <data name="Scanner_NoAnalyzers" xml:space="preserve">
     <value>No analyzers found in assembly {0}</value>
+  </data>
+  <data name="ZIP_DeletingExistingArchive" xml:space="preserve">
+    <value>Deleting existing archive...</value>
+  </data>
+  <data name="ZIP_InsertingFile" xml:space="preserve">
+    <value>Inserting file {0}. Source: {1}</value>
+  </data>
+  <data name="ZIP_NewArchiveCreated" xml:space="preserve">
+    <value>New archive created: {0}</value>
+  </data>
+  <data name="ZIP_UpdatingArchive" xml:space="preserve">
+    <value>Updating archive {0}</value>
+  </data>
+  <data name="ZIP_WorkingDirectory" xml:space="preserve">
+    <value>Working directory: {0}</value>
   </data>
 </root>

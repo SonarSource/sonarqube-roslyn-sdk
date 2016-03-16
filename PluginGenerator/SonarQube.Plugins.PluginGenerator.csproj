@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{DB16CCFA-B97F-4C5E-A99A-A6062ECF5D98}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SonarQube.Plugins</RootNamespace>
     <AssemblyName>SonarQube.Plugins.PluginGenerator</AssemblyName>
@@ -32,44 +32,27 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataModel\Rule.cs" />
     <Compile Include="DataModel\Rules.cs" />
-    <Compile Include="Exceptions\JavaCompilerException.cs" />
-    <Compile Include="Interfaces\IJdkWrapper.cs" />
-    <Compile Include="Interfaces\IMavenArtifactHandler.cs" />
-    <Compile Include="Interfaces\IMavenCoordinate.cs" />
-    <Compile Include="Maven\DataModel\MavenCoordinate.cs" />
-    <Compile Include="Maven\MavenArtifactHandler.cs" />
-    <Compile Include="Maven\DataModel\MavenDependency.cs" />
-    <Compile Include="Maven\DataModel\MavenPartialPOM.cs" />
-    <Compile Include="Maven\MavenResources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>MavenResources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Maven\MavenArtifactHandlerExtensions.cs" />
-    <Compile Include="NuGet\DataModel.cs" />
-    <Compile Include="NuGet\NuGetSpecReader.cs" />
-    <Compile Include="RulesPluginBuilder.cs" />
-    <Compile Include="JarBuilder.cs" />
-    <Compile Include="JavaCompilationBuilder.cs" />
-    <Compile Include="JdkWrapper.cs" />
-    <Compile Include="PluginBuilder.cs" />
-    <Compile Include="PluginBuilderExtensions.cs" />
+    <Compile Include="JarManifestBuilder.cs" />
+    <Compile Include="PluginKeyUtilities.cs" />
+    <Compile Include="RepositoryKeyUtilities.cs" />
     <Compile Include="PluginDefinition.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\AssemblyInfo.Shared.cs">
+      <Link>Properties\AssemblyInfo.Shared.cs</Link>
+    </Compile>
     <Compile Include="SonarQube\NativeMethods.cs" />
     <Compile Include="SonarQube\ProcessRunner.cs" />
     <Compile Include="SonarQube\ProcessRunnerArguments.cs" />
@@ -79,29 +62,17 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SonarQube\Serializer.cs" />
-    <Compile Include="SourceGenerator.cs" />
     <Compile Include="UIResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>UIResources.resx</DependentUpon>
     </Compile>
     <Compile Include="WellKnownPluginProperties.cs" />
-    <Compile Include="WellKnownSourceCodeTokens.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <EmbeddedResource Include="Resources\Core\Core.pom">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Rules\Rules.pom">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Maven\MavenResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>MavenResources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <EmbeddedResource Include="SonarQube\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -110,12 +81,11 @@
     <EmbeddedResource Include="UIResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>UIResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Core\Plugin.java" />
-    <EmbeddedResource Include="Resources\Rules\PluginRulesDefinition.java" />
-    <Content Include="SonarQube\License.txt" />
+    <Content Include="License.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\SonarQube.Plugins.Common.csproj">

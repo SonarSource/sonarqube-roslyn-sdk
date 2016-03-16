@@ -62,17 +62,20 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             TestLogger logger = new TestLogger();
             DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger, this.TestContext.DeploymentDirectory);
 
-            string exampleAnalyzer1DllPath = typeof(ExampleAnalyzer1.CSharpAnalyzer).Assembly.Location;
+            string roslynAnalyzer11DllPath = typeof(RoslynAnalyzer11.CSharpAnalyzer).Assembly.Location;
 
             // Act
-            IEnumerable<DiagnosticAnalyzer> result = scanner.InstantiateDiagnostics(LanguageNames.CSharp, exampleAnalyzer1DllPath);
+            IEnumerable<DiagnosticAnalyzer> result = scanner.InstantiateDiagnostics(LanguageNames.CSharp, roslynAnalyzer11DllPath);
 
             // Assert
-            Assert_AnalyzerIsPresent(result, typeof(ExampleAnalyzer1.CSharpAnalyzer));
-            Assert_AnalyzerIsPresent(result, typeof(ExampleAnalyzer1.ConfigurableAnalyzer));
-            Assert_AnalyzerNotPresent(result, typeof(ExampleAnalyzer1.AbstractAnalyzer)); // not expecting abstract analyzers
+            Assert_AnalyzerIsPresent(result, typeof(RoslynAnalyzer11.CSharpAnalyzer));
+            Assert_AnalyzerIsPresent(result, typeof(RoslynAnalyzer11.ConfigurableAnalyzer));
+            Assert_AnalyzerIsPresent(result, "RoslynAnalyzer11.InternalAnalyzer");
 
-            Assert.AreEqual(2, result.Count(), "Expecting 2 C# analyzers");
+            Assert_AnalyzerNotPresent(result, typeof(RoslynAnalyzer11.AbstractAnalyzer)); // not expecting abstract analyzers
+            Assert_AnalyzerNotPresent(result, typeof(RoslynAnalyzer11.UnattributedAnalyzer)); // not expecting analyzers without attributes
+
+            Assert.AreEqual(3, result.Count(), "Expecting 3 C# analyzers");
         }
 
         [TestMethod]
@@ -82,15 +85,15 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             TestLogger logger = new TestLogger();
             DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
 
-            string exampleAnalyzer1DllPath = typeof(ExampleAnalyzer1.CSharpAnalyzer).Assembly.Location;
+            string roslynAnalyzer11DllPath = typeof(RoslynAnalyzer11.CSharpAnalyzer).Assembly.Location;
 
             // Act
-            IEnumerable<DiagnosticAnalyzer> result = scanner.InstantiateDiagnostics(LanguageNames.VisualBasic, exampleAnalyzer1DllPath);
+            IEnumerable<DiagnosticAnalyzer> result = scanner.InstantiateDiagnostics(LanguageNames.VisualBasic, roslynAnalyzer11DllPath);
 
             // Assert
-            Assert_AnalyzerIsPresent(result, typeof(ExampleAnalyzer1.VBAnalyzer));
-            Assert_AnalyzerIsPresent(result, typeof(ExampleAnalyzer1.ConfigurableAnalyzer));
-            Assert_AnalyzerNotPresent(result, typeof(ExampleAnalyzer1.AbstractAnalyzer)); // not expecting abstract analyzers
+            Assert_AnalyzerIsPresent(result, typeof(RoslynAnalyzer11.VBAnalyzer));
+            Assert_AnalyzerIsPresent(result, typeof(RoslynAnalyzer11.ConfigurableAnalyzer));
+            Assert_AnalyzerNotPresent(result, typeof(RoslynAnalyzer11.AbstractAnalyzer)); // not expecting abstract analyzers
 
             Assert.AreEqual(2, result.Count(), "Expecting 2 VB analyzers");
         }
@@ -98,39 +101,50 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
         [TestMethod]
         public void InstantiateDiags_MultipleAssemblies_AnalyzersFound()
         {
+            // This test expects that we can load analyzers from multiple paths at once.
+            // SFSRAP-26: We should be able to load analyzers compiled using both Roslyn 1.1 and 1.0
+            // (RoslynAnalyzer11 and RoslynAnalyzer10, respectively)
+
             // Arrange
             TestLogger logger = new TestLogger();
             DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
 
-            string exampleAnalyzer1DllPath = typeof(ExampleAnalyzer1.CSharpAnalyzer).Assembly.Location;
+            string roslynAnalyzer11DllPath = typeof(RoslynAnalyzer11.CSharpAnalyzer).Assembly.Location;
             string nonAnalyzerAssemblyPath = this.GetType().Assembly.Location;
-            string exampleAnalyzer2DllPath = typeof(ExampleAnalyzer2.ExampleAnalyzer2).Assembly.Location;
+            string roslynAnalyzer10DllPath = typeof(RoslynAnalyzer10.ExampleAnalyzer2).Assembly.Location;
 
             // Act
             IEnumerable<DiagnosticAnalyzer> result = scanner.InstantiateDiagnostics(LanguageNames.CSharp,
-                exampleAnalyzer1DllPath,
+                roslynAnalyzer11DllPath,
                 nonAnalyzerAssemblyPath,
-                exampleAnalyzer2DllPath);
+                roslynAnalyzer10DllPath);
 
             // Assert
-            Assert_AnalyzerIsPresent(result, typeof(ExampleAnalyzer1.CSharpAnalyzer));
-            Assert_AnalyzerIsPresent(result, typeof(ExampleAnalyzer1.ConfigurableAnalyzer));
-            Assert_AnalyzerNotPresent(result, typeof(ExampleAnalyzer1.AbstractAnalyzer)); // not expecting abstract analyzers
+            Assert_AnalyzerIsPresent(result, typeof(RoslynAnalyzer11.CSharpAnalyzer));
+            Assert_AnalyzerIsPresent(result, typeof(RoslynAnalyzer11.ConfigurableAnalyzer));
+            Assert_AnalyzerIsPresent(result, "RoslynAnalyzer11.InternalAnalyzer");
 
-            Assert_AnalyzerIsPresent(result, typeof(ExampleAnalyzer2.ExampleAnalyzer2));
+            Assert_AnalyzerNotPresent(result, typeof(RoslynAnalyzer11.AbstractAnalyzer)); // not expecting abstract analyzers
 
-            Assert.AreEqual(3, result.Count(), "Unexpected number of C# analyzers returned");
+            Assert_AnalyzerIsPresent(result, typeof(RoslynAnalyzer10.ExampleAnalyzer2));
+
+            Assert.AreEqual(4, result.Count(), "Unexpected number of C# analyzers returned");
         }
 
         #region Private Methods
 
+        private void Assert_AnalyzerIsPresent(IEnumerable<DiagnosticAnalyzer> analyzers, string fullExpectedTypeName)
+        {
+            Assert.IsNotNull(
+                analyzers.SingleOrDefault(d => d.GetType().FullName == fullExpectedTypeName),
+                "Expected an analyzer with name: " + fullExpectedTypeName);
+        }
+
         private void Assert_AnalyzerIsPresent(IEnumerable<DiagnosticAnalyzer> analyzers, Type expected)
         {
-            string analyzerName = expected.FullName;
-            Assert.IsNotNull(
-                analyzers.SingleOrDefault(d => d.GetType().FullName == analyzerName),
-                "Expected an analyzer with name: " + analyzerName);
+            Assert_AnalyzerIsPresent(analyzers, expected.FullName);
         }
+
         private void Assert_AnalyzerNotPresent(IEnumerable<DiagnosticAnalyzer> analyzers, Type expected)
         {
             string analyzerName = expected.FullName;

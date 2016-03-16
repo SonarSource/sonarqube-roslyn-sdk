@@ -6,7 +6,6 @@
 //-----------------------------------------------------------------------
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SonarQube.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,11 +19,6 @@ namespace SonarQube.Plugins.Test.Common
         public List<string> Warnings { get; private set; }
         public List<string> Errors { get; private set; }
 
-        //public LoggerVerbosity Verbosity
-        //{
-        //    get; set;
-        //}
-
         public bool IncludeTimestamp
         {
             get; set;
@@ -32,21 +26,15 @@ namespace SonarQube.Plugins.Test.Common
 
         public TestLogger()
         {
-            // Write out a separator. Many tests create more than one TestLogger.
-            // This helps separate the results of the different cases.
-            WriteLine("");
-            WriteLine("------------------------------------------------------------- (new TestLogger created)");
-            WriteLine("");
-
-            DebugMessages = new List<string>();
-            InfoMessages = new List<string>();
-            Warnings = new List<string>();
-            Errors = new List<string>();
-
-            //this.Verbosity = LoggerVerbosity.Debug;
+            this.DoReset("------------------------------------------------------------- (new TestLogger created)");
         }
 
         #region Public methods
+
+        public void Reset()
+        {
+            this.DoReset("------------------------------------------------------------- (TestLogger reset)");
+        }
 
         public void AssertErrorsLogged()
         {
@@ -83,17 +71,23 @@ namespace SonarQube.Plugins.Test.Common
             bool found = this.Errors.Any(s => expected.Equals(s, System.StringComparison.CurrentCulture));
             Assert.IsTrue(found, "Expected error was not found: '{0}'", expected);
         }
-
-        public void AssertMessageNotLogged(string message)
+        
+        /// <summary>
+        /// Checks that no message contain all of the specified strings
+        /// </summary>
+        public void AssertMessageNotLogged(params string[] text)
         {
-            bool found = this.InfoMessages.Any(s => message.Equals(s, System.StringComparison.CurrentCulture));
-            Assert.IsFalse(found, "Not expecting the message to have been logged: '{0}'", message);
+            IEnumerable<string> matches = this.InfoMessages.Where(w => text.All(t => w.Contains(t)));
+            Assert.AreEqual(0, matches.Count(), "Not expecting messages to exist that contains the specified strings: {0}", string.Join(",", text));
         }
 
-        public void AssertWarningNotLogged(string warning)
+        /// <summary>
+        /// Checks that no warnings contain all of the specified strings
+        /// </summary>
+        public void AssertWarningNotLogged(params string[] text)
         {
-            bool found = this.Warnings.Any(s => warning.Equals(s, System.StringComparison.CurrentCulture));
-            Assert.IsFalse(found, "Not expecting the warning to have been logged: '{0}'", warning);
+            IEnumerable<string> matches = this.Warnings.Where(w => text.All(t => w.Contains(t)));
+            Assert.AreEqual(0, matches.Count(), "Not expecting warnings to exist that contains the specified strings: {0}", string.Join(",", text));
         }
 
         /// <summary>
@@ -165,11 +159,6 @@ namespace SonarQube.Plugins.Test.Common
             Assert.AreEqual(0, matches.Count(), "Not expecting any errors to contain the specified strings: {0}", string.Join(",", expected));
         }
 
-        //public void AssertVerbosity(LoggerVerbosity expected)
-        //{
-        //    Assert.AreEqual(expected, this.Verbosity, "Logger verbosity mismatch");
-        //}
-
         #endregion
 
         #region ILogger interface
@@ -202,6 +191,21 @@ namespace SonarQube.Plugins.Test.Common
         #endregion
 
         #region Private methods
+
+        private void DoReset(string message)
+        {
+            // Write out a separator. Many tests create more than one TestLogger,
+            // or re-use the same logger instance
+            // This helps separate the results of the different cases.
+            WriteLine("");
+            WriteLine(message);
+            WriteLine("");
+
+            DebugMessages = new List<string>();
+            InfoMessages = new List<string>();
+            Warnings = new List<string>();
+            Errors = new List<string>();
+        }
 
         private static void WriteLine(string message, params object[] args)
         {

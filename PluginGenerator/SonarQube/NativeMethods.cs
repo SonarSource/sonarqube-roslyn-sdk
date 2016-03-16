@@ -38,7 +38,7 @@ namespace SonarQube.Common
                 throw new ArgumentNullException("fileName");
             }
 
-            Debug.Assert(fileName.Equals(Path.GetFileName(fileName)), "Parameter should be a file name i.e. should not include any path elements");
+            Debug.Assert(fileName.Equals(Path.GetFileName(fileName), StringComparison.OrdinalIgnoreCase), "Parameter should be a file name i.e. should not include any path elements");
 
             StringBuilder sb = new StringBuilder(fileName, MAXPATH);
 

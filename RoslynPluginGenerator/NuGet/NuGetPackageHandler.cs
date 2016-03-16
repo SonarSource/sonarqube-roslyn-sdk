@@ -19,6 +19,7 @@ namespace SonarQube.Plugins.Roslyn
         private readonly IPackageRepository remoteRepository;
         private readonly string localCacheRoot;
         private readonly Common.ILogger logger;
+        private readonly IPackageManager packageManager;
 
         public NuGetPackageHandler(IPackageRepository remoteRepository, string localCacheRoot, Common.ILogger logger)
         {
@@ -38,6 +39,10 @@ namespace SonarQube.Plugins.Roslyn
             this.logger = logger;
             this.remoteRepository = remoteRepository;
             this.localCacheRoot = localCacheRoot;
+
+            Directory.CreateDirectory(localCacheRoot);
+            this.packageManager = new PackageManager(remoteRepository, localCacheRoot);
+            this.packageManager.Logger = new NuGetLoggerAdapter(logger);
         }
 
         #region INuGetPackageHandler
@@ -69,15 +74,10 @@ namespace SonarQube.Plugins.Roslyn
 
             if (package != null)
             {
-                Directory.CreateDirectory(localCacheRoot);
-
-                IPackageManager manager = new PackageManager(this.remoteRepository, localCacheRoot);
-                manager.Logger = new NuGetLoggerAdapter(this.logger);
-
                 try
                 {
                     // Prerelease packages enabled by default
-                    manager.InstallPackage(package, false, true, false);
+                    this.packageManager.InstallPackage(package, false, true, false);                   
                 }
                 catch (InvalidOperationException e)
                 {
@@ -87,6 +87,34 @@ namespace SonarQube.Plugins.Roslyn
             }
 
             return package;
+        }
+                
+        public IEnumerable<IPackage> GetInstalledDependencies(IPackage package)
+        {
+            if (package == null)
+            {
+                throw new ArgumentNullException("package");
+            }
+
+            List<IPackage> dependencies = new List<IPackage>();
+            GetAllDependencies(package, dependencies);
+
+            return dependencies;
+        }
+
+        public string GetLocalPackageRootDirectory(IPackage package)
+        {
+            if (package == null)
+            {
+                throw new ArgumentNullException("package");
+            }
+
+            Debug.Assert(this.packageManager.FileSystem != null);
+            Debug.Assert(this.packageManager.PathResolver != null);
+            string packageDirectory = this.packageManager.FileSystem.GetFullPath(this.packageManager.PathResolver.GetPackageDirectory(package));
+
+            Debug.Assert(Directory.Exists(packageDirectory), "Expecting the package directory to exist: {0}", packageDirectory);
+            return packageDirectory;
         }
 
         #endregion
@@ -163,5 +191,36 @@ namespace SonarQube.Plugins.Roslyn
 
             return package;
         }
+
+        private void GetAllDependencies(IPackage current, List<IPackage> collectedDependencies)
+        {
+            this.logger.LogDebug(UIResources.NG_ResolvingPackageDependencies, current.Id, current.Version);
+            Debug.Assert(current != null);
+
+            foreach (PackageDependency dependency in current.GetCompatiblePackageDependencies(null))
+            {
+                IPackage dependencyPackage = this.packageManager.LocalRepository.ResolveDependency(dependency, true, true);
+
+                if (dependencyPackage == null)
+                {
+                    this.logger.LogWarning(UIResources.NG_FailedToResolveDependency, dependency.Id, dependency.VersionSpec.ToString());
+                }
+                else
+                {
+                    if (collectedDependencies.Contains(dependencyPackage))
+                    {
+                        this.logger.LogDebug(UIResources.NG_DuplicateDependency, dependencyPackage.Id, dependencyPackage.Version);
+                    }
+                    else
+                    {
+                        this.logger.LogDebug(UIResources.NG_AddingNewDependency, dependencyPackage.Id, dependencyPackage.Version);
+                        collectedDependencies.Add(dependencyPackage);
+
+                        GetAllDependencies(dependencyPackage, collectedDependencies);
+                    }
+                }
+            }
+        }
+
     }
 }

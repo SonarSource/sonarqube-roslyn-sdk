@@ -74,9 +74,14 @@ namespace SonarQube.Plugins.Test.Common
             Assert.IsFalse(File.Exists(fullPath), "Not expecting file to exist: {0}", fullPath);
         }
 
-        public static string CreateTextFile(string fileName, string directory, string content = null)
+        public static string CreateTextFile(string relativeFileName, string directory, string content = null)
         {
-            string fullPath = Path.Combine(directory, fileName);
+            string fullPath = Path.Combine(directory, relativeFileName);
+
+            // Ensure the directory exists
+            string fullDirectory = Path.GetDirectoryName(fullPath);
+            Directory.CreateDirectory(fullDirectory);
+
             File.WriteAllText(fullPath, content ?? string.Empty);
             return fullPath;
         }

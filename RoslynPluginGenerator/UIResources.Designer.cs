@@ -79,20 +79,11 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Creating Roslyn plugin specific sources in {0}.
+        ///   Looks up a localized string similar to Generating fixed remediation cost SQALE file....
         /// </summary>
-        public static string APG_CreatingRoslynSources {
+        public static string APG_GeneratingConstantSqaleFile {
             get {
-                return ResourceManager.GetString("APG_CreatingRoslynSources", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Extracting files from the package to {0}.
-        /// </summary>
-        public static string APG_ExtractingPackageFiles {
-            get {
-                return ResourceManager.GetString("APG_ExtractingPackageFiles", resourceCulture);
+                return ResourceManager.GetString("APG_GeneratingConstantSqaleFile", resourceCulture);
             }
         }
         
@@ -115,6 +106,15 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The specified SQALE file is invalid: {0}.
+        /// </summary>
+        public static string APG_InvalidSqaleFile {
+            get {
+                return ResourceManager.GetString("APG_InvalidSqaleFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Looking for analyzers in the package....
         /// </summary>
         public static string APG_LocatingAnalyzers {
@@ -133,7 +133,34 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Package {0} (version {1}) requires the user to accept a license..
+        ///   Looks up a localized string similar to {0} v{1}: {2}.
+        /// </summary>
+        public static string APG_NG_PackageAndLicenseUrl {
+            get {
+                return ResourceManager.GetString("APG_NG_PackageAndLicenseUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {license URL not specified}.
+        /// </summary>
+        public static string APG_NG_UnspecifiedLicenseUrl {
+            get {
+                return ResourceManager.GetString("APG_NG_UnspecifiedLicenseUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have accepted the licenses for the following packages:.
+        /// </summary>
+        public static string APG_NGAcceptedPackageLicenses {
+            get {
+                return ResourceManager.GetString("APG_NGAcceptedPackageLicenses", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot create a plugin for package {0} v{1} because the packages listed below require licenses to be accepted. Please check the licenses and then re-run the generator specifying the &quot;/acceptLicenses&quot; argument..
         /// </summary>
         public static string APG_NGPackageRequiresLicenseAcceptance {
             get {
@@ -169,6 +196,29 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SQALE generated to file {0}.
+        /// </summary>
+        public static string APG_SqaleGeneratedToFile {
+            get {
+                return ResourceManager.GetString("APG_SqaleGeneratedToFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 
+        ///SQALE: an empty SQALE file for the analyzer was saved to {0}. To provide SQALE remediation information for the analyzer:
+        /// * rename the file
+        /// * fill in the appropriate remediation information for each diagnostic
+        /// * re-run this generator specifying the sqale file to use with the /sqale:[filename] argument.
+        ///.
+        /// </summary>
+        public static string APG_TemplateSqaleFileGenerated {
+            get {
+                return ResourceManager.GetString("APG_TemplateSqaleFileGenerated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The language &apos;{0}&apos; is not supported. Valid options are &apos;cs&apos; or &apos;vb&apos;..
         /// </summary>
         public static string APG_UnsupportedLanguage {
@@ -187,40 +237,47 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expecting one or two arguments:
-        ///* NuGet package Id (mandatory), and
-        ///* NuGet package version (optional).
+        ///   Looks up a localized string similar to The file path for the jar file to be created must be specified.
         /// </summary>
-        public static string CmdLine_ERROR_InvalidArgumentCount {
+        public static string Builder_Error_OutputJarPathMustBeSpecified {
             get {
-                return ResourceManager.GetString("CmdLine_ERROR_InvalidArgumentCount", resourceCulture);
+                return ResourceManager.GetString("Builder_Error_OutputJarPathMustBeSpecified", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Creating NuGet repository: {0}.
+        ///   Looks up a localized string similar to Required plugin definition property is missing: {0}.
         /// </summary>
-        public static string NG_CreatingRepository {
+        public static string Builder_Error_RequiredPropertyMissing {
             get {
-                return ResourceManager.GetString("NG_CreatingRepository", resourceCulture);
+                return ResourceManager.GetString("Builder_Error_RequiredPropertyMissing", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ... downloaded ({0} files).
+        ///   Looks up a localized string similar to The existing jar file will be overwritten.
         /// </summary>
-        public static string NG_DownloadedPackage {
+        public static string Builder_ExistingJarWillBeOvewritten {
             get {
-                return ResourceManager.GetString("NG_DownloadedPackage", resourceCulture);
+                return ResourceManager.GetString("Builder_ExistingJarWillBeOvewritten", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Downloading package....
+        ///   Looks up a localized string similar to   Adding new dependency: {0} version {1}.
         /// </summary>
-        public static string NG_DownloadingPackage {
+        public static string NG_AddingNewDependency {
             get {
-                return ResourceManager.GetString("NG_DownloadingPackage", resourceCulture);
+                return ResourceManager.GetString("NG_AddingNewDependency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to   Duplicate dependency: {0} version {1}.
+        /// </summary>
+        public static string NG_DuplicateDependency {
+            get {
+                return ResourceManager.GetString("NG_DuplicateDependency", resourceCulture);
             }
         }
         
@@ -253,11 +310,11 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Extracting file &apos;{0}&apos; to {1}.
+        ///   Looks up a localized string similar to Failed to resolve dependency: {0} version {1}.
         /// </summary>
-        public static string NG_ExtractingFile {
+        public static string NG_FailedToResolveDependency {
             get {
-                return ResourceManager.GetString("NG_ExtractingFile", resourceCulture);
+                return ResourceManager.GetString("NG_FailedToResolveDependency", resourceCulture);
             }
         }
         
@@ -340,6 +397,15 @@ namespace SonarQube.Plugins.Roslyn {
         public static string NG_PackageVersionListHeader {
             get {
                 return ResourceManager.GetString("NG_PackageVersionListHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Resolving dependencies for {0} version {1}....
+        /// </summary>
+        public static string NG_ResolvingPackageDependencies {
+            get {
+                return ResourceManager.GetString("NG_ResolvingPackageDependencies", resourceCulture);
             }
         }
         
@@ -450,6 +516,51 @@ namespace SonarQube.Plugins.Roslyn {
         public static string Scanner_NoAnalyzers {
             get {
                 return ResourceManager.GetString("Scanner_NoAnalyzers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deleting existing archive....
+        /// </summary>
+        public static string ZIP_DeletingExistingArchive {
+            get {
+                return ResourceManager.GetString("ZIP_DeletingExistingArchive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Inserting file {0}. Source: {1}.
+        /// </summary>
+        public static string ZIP_InsertingFile {
+            get {
+                return ResourceManager.GetString("ZIP_InsertingFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New archive created: {0}.
+        /// </summary>
+        public static string ZIP_NewArchiveCreated {
+            get {
+                return ResourceManager.GetString("ZIP_NewArchiveCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updating archive {0}.
+        /// </summary>
+        public static string ZIP_UpdatingArchive {
+            get {
+                return ResourceManager.GetString("ZIP_UpdatingArchive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Working directory: {0}.
+        /// </summary>
+        public static string ZIP_WorkingDirectory {
+            get {
+                return ResourceManager.GetString("ZIP_WorkingDirectory", resourceCulture);
             }
         }
     }

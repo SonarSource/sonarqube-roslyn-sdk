@@ -7,6 +7,8 @@
 using NuGet;
 using SonarQube.Plugins.Common;
 using SonarQube.Plugins.Roslyn.CommandLine;
+using System.IO;
+using System.Reflection;
 
 namespace SonarQube.Plugins.Roslyn
 {
@@ -28,14 +30,14 @@ namespace SonarQube.Plugins.Roslyn
             bool success = false;
             if (processedArgs != null)
             {
-                ISettings nuGetSettings = NuGetRepositoryFactory.GetSettingsFromConfigFiles();
+                string exeDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                ISettings nuGetSettings = NuGetRepositoryFactory.GetSettingsFromConfigFiles(exeDir);
                 IPackageRepository repo = NuGetRepositoryFactory.CreateRepository(nuGetSettings, logger);
                 string localNuGetCache = Utilities.CreateTempDirectory(".nuget");
                 NuGetPackageHandler packageHandler = new NuGetPackageHandler(repo, localNuGetCache, logger);
 
                 AnalyzerPluginGenerator generator = new AnalyzerPluginGenerator(packageHandler, logger);
-                success = generator.Generate(processedArgs.AnalyzerRef, processedArgs.Language, processedArgs.SqaleFilePath,
-                    System.IO.Directory.GetCurrentDirectory());
+                success = generator.Generate(processedArgs);
             }
 
             return success ? SUCCESS_CODE : ERROR_CODE;
