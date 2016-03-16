@@ -4,7 +4,8 @@
 
 ### Overview
 This repo contains tools to help integrate Roslyn analyzers with SonarQube so that issues detected by the Roslyn analyzers are reported in SonarQube.
-Specifically, the tools will generate a Java SonarQube plugin that registers the rules with SonarQube. See this [blog post](https://blogs.msdn.microsoft.com/visualstudioalm/2016/01/04/sonarqube-scanner-for-msbuild-v1-1-released-static-analysis-now-executed-during-the-build/) for more information.
+Specifically, the tools will generate a Java SonarQube plugin that registers the rules with SonarQube. The generated plugin works with the [C# plugin](http://docs.sonarqube.org/x/bAAW) (v4.5 or higher) and the [SonarQube Scanner for MSBuild](http://docs.sonarqube.org/x/Lx9q) (v2.0 or higher) to handle executing the analyzer and uploading any issues.
+See this [blog post](https://blogs.msdn.microsoft.com/visualstudioalm/2016/02/18/sonarqube-scanner-for-msbuild-v2-0-released-support-for-third-party-roslyn-analyzers/) for more information.
 
 ### Download latest release
 The latest release version (v1.0) is available [here](https://github.com/SonarSource-VisualStudio/sonarqube-roslyn-sdk/releases/download/1.0/SonarQube.Roslyn.SDK-1.0.zip).
@@ -17,9 +18,6 @@ There are two groups of target users:
 
 2. Roslyn analyzer users
    - If the analyzer author has not provided a SonarQube plugin for their analyzer then users will be able to generate a plugin from an analyzer NuGet package, although they won't be able to provide such rich metadata.
-
-### Current status
-The generated jar file is not  sufficient on its own to upload Roslyn issues. The complete solution requires the [C# plugin v4.5](http://docs.sonarqube.org/display/PLUG/C%23+Plugin) or higher and the [MSBuild SonarQube Scanner v2.0](http://docs.sonarqube.org/display/SONAR/Analyzing+with+SonarQube+Scanner+for+MSBuild) or higher. See [this](https://blogs.msdn.microsoft.com/visualstudioalm/2016/02/18/sonarqube-scanner-for-msbuild-v2-0-released-support-for-third-party-roslyn-analyzers/) blog post for more information on how the various components cooperate to handle issues from Roslyn analyzers.
 
 ### Getting started
 
