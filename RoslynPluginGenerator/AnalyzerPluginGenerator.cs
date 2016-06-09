@@ -61,26 +61,96 @@ namespace SonarQube.Plugins.Roslyn
                 throw new ArgumentNullException("args");
             }
 
-            IPackage package = this.packageHandler.FetchPackage(args.PackageId, args.PackageVersion);
-            if (package == null)
+            IPackage targetPackage = this.packageHandler.FetchPackage(args.PackageId, args.PackageVersion);
+            IEnumerable<IPackage> dependencyPackages = this.packageHandler.GetInstalledDependencies(targetPackage);
+
+            if (targetPackage == null)
             {
                 return false;
             }
 
-            string packageDir = this.packageHandler.GetLocalPackageRootDirectory(package);
-            IEnumerable<DiagnosticAnalyzer> analyzers = GetAnalyzers(packageDir, this.packageHandler.LocalCacheRoot, args.Language);
-            if (!analyzers.Any())
+            // Check that there are analyzers in the target package from which information can be extracted
+            if (!HasAnalyzers(targetPackage, args.Language))
             {
-                return false;
+                this.logger.LogWarning(UIResources.APG_NoAnalyzersFound, targetPackage.Id);
+
+                if (!args.RecurseDependencies || !dependencyPackages.Any())
+                {
+                    return false;
+                }
+                else
+                {
+                    // Possible sub-case - target package has dependencies that contain analyzers
+                    bool dependencyPackagesHaveAnalyzers = false;
+                    foreach (IPackage dependencyPackage in dependencyPackages)
+                    {
+                        bool dependencyPackageHasAnalyzers = HasAnalyzers(dependencyPackage, args.Language);
+
+                        if (!dependencyPackageHasAnalyzers)
+                        {
+                            this.logger.LogWarning(UIResources.APG_NoAnalyzersFound, dependencyPackage.Id);
+                        }
+
+                        dependencyPackagesHaveAnalyzers = dependencyPackagesHaveAnalyzers || dependencyPackageHasAnalyzers;
+                    }
+
+                    if (!dependencyPackagesHaveAnalyzers)
+                    {
+                        return false;
+                    }
+                }
             }
 
-            IEnumerable<IPackage> licenseAcceptancePackages = this.GetPackagesRequiringLicenseAcceptance(package);
-            if (licenseAcceptancePackages.Any() && ! args.AcceptLicenses)
+            // Check for packages that require the user to accept a license
+            IEnumerable<IPackage> licenseAcceptancePackages = this.GetPackagesRequiringLicenseAcceptance(targetPackage);
+            if (licenseAcceptancePackages.Any() && !args.AcceptLicenses)
             {
-                this.logger.LogError(UIResources.APG_NGPackageRequiresLicenseAcceptance, package.Id, package.Version.ToString());
+                this.logger.LogError(UIResources.APG_NGPackageRequiresLicenseAcceptance, targetPackage.Id, targetPackage.Version.ToString());
                 this.ListPackagesRequiringLicenseAcceptance(licenseAcceptancePackages);
                 return false;
             }
+
+            // Initial run with the user-targeted package and arguments
+            bool result = GeneratePluginForPackage(args, targetPackage);
+            if (!result)
+            {
+                return false;
+            }
+
+            // Dependent package generation changes the arguments
+            if (args.RecurseDependencies)
+            {
+                this.logger.LogWarning(UIResources.APG_RecurseEnabled_SQALENotEnabled);
+
+                foreach (IPackage currentPackage in dependencyPackages)
+                {
+                    // No way to specify the SQALE file for any but the user-targeted package at this time
+                    ProcessedArgs currentArgs = new ProcessedArgs(currentPackage.Id, currentPackage.Version, 
+                        args.Language, null, args.AcceptLicenses, args.RecurseDependencies, args.OutputDirectory);
+
+                    result = GeneratePluginForPackage(currentArgs, currentPackage);
+                    if (!result)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            LogAcceptedPackageLicenses(licenseAcceptancePackages);
+
+            return true;
+        }
+
+        private bool GeneratePluginForPackage(ProcessedArgs args, IPackage package)
+        {
+            IEnumerable<DiagnosticAnalyzer> analyzers = GetAnalyzers(package, args.Language);
+
+            if (!analyzers.Any())
+            {
+                return true;
+            }
+
+            this.logger.LogInfo(UIResources.APG_AnalyzersLocated, analyzers.Count());
 
             string createdJarFilePath = null;
 
@@ -95,6 +165,7 @@ namespace SonarQube.Plugins.Roslyn
             definition.Manifest = CreatePluginManifest(package);
 
             // Create a zip containing the required analyzer files
+            string packageDir = this.packageHandler.GetLocalPackageRootDirectory(package);
             definition.SourceZipFilePath = this.CreateAnalyzerStaticPayloadFile(packageDir, baseDirectory);
             definition.StaticResourceName = Path.GetFileName(definition.SourceZipFilePath);
 
@@ -118,28 +189,31 @@ namespace SonarQube.Plugins.Roslyn
                 createdJarFilePath = BuildPlugin(definition, args.OutputDirectory);
             }
 
-            LogSummary(createdJarFilePath, generatedSqaleFile, licenseAcceptancePackages);
+            LogSummary(createdJarFilePath, generatedSqaleFile);
 
             return createdJarFilePath != null;
         }
 
-        private void LogSummary(string createdJarFilePath, string generatedSqaleFile, IEnumerable<IPackage> licenseAcceptancePackages)
+        private void LogSummary(string createdJarFilePath, string generatedSqaleFile)
         {
             if (generatedSqaleFile != null)
             {
-                // Log a messsage about the generated sqale file at the end of the process: if we
+                // Log a message about the generated sqale file at the end of the process: if we
                 // log it earlier it will be too easy to miss
                 this.logger.LogInfo(UIResources.APG_TemplateSqaleFileGenerated, generatedSqaleFile);
             }
 
+            this.logger.LogInfo(UIResources.APG_PluginGenerated, createdJarFilePath);
+        }
+
+        private void LogAcceptedPackageLicenses(IEnumerable<IPackage> licenseAcceptancePackages)
+        {
             if (licenseAcceptancePackages.Any())
             {
                 // If we got this far then the user must have accepted
                 this.logger.LogWarning(UIResources.APG_NGAcceptedPackageLicenses);
                 this.ListPackagesRequiringLicenseAcceptance(licenseAcceptancePackages);
             }
-
-            this.logger.LogInfo(UIResources.APG_PluginGenerated, createdJarFilePath);
         }
 
         private void ListPackagesRequiringLicenseAcceptance(IEnumerable<IPackage> licensedPackages)
@@ -185,6 +259,20 @@ namespace SonarQube.Plugins.Roslyn
             return baseDirectory;
         }
 
+        private bool HasAnalyzers(IPackage package, string language)
+        {
+            return GetAnalyzers(package, language).Any();
+        }
+
+        /// <summary>
+        /// Retrieves the analyzers contained within a given NuGet package corresponding to a given language
+        /// </summary>
+        private IEnumerable<DiagnosticAnalyzer> GetAnalyzers(IPackage package, string language)
+        {
+            string packageDir = this.packageHandler.GetLocalPackageRootDirectory(package);
+            return GetAnalyzers(packageDir, this.packageHandler.LocalCacheRoot, language);
+        }
+
         private IEnumerable<DiagnosticAnalyzer> GetAnalyzers(string packageRootDir, string additionalSearchFolder, string language)
         {
             this.logger.LogInfo(UIResources.APG_LocatingAnalyzers);
@@ -196,14 +284,6 @@ namespace SonarQube.Plugins.Roslyn
             DiagnosticAssemblyScanner diagnosticAssemblyScanner = new DiagnosticAssemblyScanner(this.logger, additionalSearchFolder);
             IEnumerable<DiagnosticAnalyzer> analyzers = diagnosticAssemblyScanner.InstantiateDiagnostics(roslynLanguageName, analyzerFiles.ToArray());
 
-            if (analyzers.Any())
-            {
-                this.logger.LogInfo(UIResources.APG_AnalyzersLocated, analyzers.Count());
-            }
-            else
-            {
-                this.logger.LogWarning(UIResources.APG_NoAnalyzersFound);
-            }
             return analyzers;
         }
 

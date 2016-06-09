@@ -169,7 +169,7 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No analyzers were found in the specified package.
+        ///   Looks up a localized string similar to No analyzers were found in package: {0}.
         /// </summary>
         public static string APG_NoAnalyzersFound {
             get {
@@ -183,6 +183,15 @@ namespace SonarQube.Plugins.Roslyn {
         public static string APG_PluginGenerated {
             get {
                 return ResourceManager.GetString("APG_PluginGenerated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SQALE information cannot currently be embedded into plugins generated from package dependencies..
+        /// </summary>
+        public static string APG_RecurseEnabled_SQALENotEnabled {
+            get {
+                return ResourceManager.GetString("APG_RecurseEnabled_SQALENotEnabled", resourceCulture);
             }
         }
         

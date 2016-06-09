@@ -79,6 +79,15 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to /recurse - search for analyzers in target package and, additionally, all dependencies.
+        /// </summary>
+        internal static string ArgDescription_RecurseDependencies {
+            get {
+                return ResourceManager.GetString("ArgDescription_RecurseDependencies", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to /s:[path to sqale xml file].
         /// </summary>
         internal static string ArgDescription_SqaleXmlFile {

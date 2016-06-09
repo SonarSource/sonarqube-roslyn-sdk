@@ -16,9 +16,10 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
         private readonly string sqaleFilePath;
         private readonly string language;
         private readonly bool acceptLicenses;
+        private readonly bool recurseDependencies;
         private readonly string outputDirectory;
 
-        public ProcessedArgs(string packageId, SemanticVersion packageVersion, string language, string sqaleFilePath, bool acceptLicenses, string outputDirectory)
+        public ProcessedArgs(string packageId, SemanticVersion packageVersion, string language, string sqaleFilePath, bool acceptLicenses, bool recurseDependencies, string outputDirectory)
         {
             if (string.IsNullOrWhiteSpace(packageId))
             {
@@ -36,6 +37,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             this.sqaleFilePath = sqaleFilePath; // can be null
             this.language = language;
             this.acceptLicenses = acceptLicenses;
+            this.recurseDependencies = recurseDependencies;
             this.outputDirectory = outputDirectory;
         }
 
@@ -48,6 +50,8 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
         public string Language { get { return this.language; } }
 
         public bool AcceptLicenses { get { return this.acceptLicenses; } }
+
+        public bool RecurseDependencies { get { return this.recurseDependencies; } }
 
         public string OutputDirectory { get { return this.outputDirectory; } }
     }

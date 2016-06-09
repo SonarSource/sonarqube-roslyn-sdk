@@ -43,12 +43,12 @@ namespace SonarQube.Plugins.IntegrationTests
             // Act
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
-            ProcessedArgs args = new ProcessedArgs(packageId, new SemanticVersion("1.0.2"), "cs", null, false, outputDir);
+            ProcessedArgs args = new ProcessedArgs(packageId, new SemanticVersion("1.0.2"), "cs", null, false, false, outputDir);
             bool result = apg.Generate(args);
 
             // Assert
             Assert.IsTrue(result);
-            string jarFilePath = AssertPluginJarExists(outputDir);
+            string jarFilePath = AssertPluginJarsExist(outputDir, 1).First();
 
             // Check the content of the files embedded in the jar
             ZipFileChecker jarChecker = new ZipFileChecker(this.TestContext, jarFilePath);
@@ -92,6 +92,92 @@ namespace SonarQube.Plugins.IntegrationTests
                 "analyzers\\RoslynAnalyzer11.dll");
         }
 
+        // Test verifies https://jira.sonarsource.com/browse/SFSRAP-32
+        [TestMethod]
+        public void RoslynPlugin_GenerateForDependencyAnalyzers_Succeeds()
+        {
+            // Arrange
+            TestLogger logger = new TestLogger();
+            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string dummyContentFile = TestUtils.CreateTextFile("dummy.txt", outputDir, "non-analyzer content file");
+
+            // Create a valid analyzer package
+            RoslynAnalyzer11.CSharpAnalyzer analyzer = new RoslynAnalyzer11.CSharpAnalyzer();
+
+            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".fakeRemoteNuGet");
+            IPackageManager fakeRemotePkgMgr = CreatePackageManager(fakeRemoteNuGetDir);
+            IPackage child1 = AddPackage(fakeRemotePkgMgr, "Analyzer.Child1", "1.1.0", analyzer.GetType().Assembly.Location);
+            IPackage child2 = AddPackage(fakeRemotePkgMgr, "Analyzer.Child2", "1.2.0", analyzer.GetType().Assembly.Location);
+            IPackage targetPkg = AddPackage(fakeRemotePkgMgr, "Empty.Parent", "1.0.0", dummyContentFile, child1, child2);
+
+            string localPackageDestination = TestUtils.CreateTestDirectory(this.TestContext, ".localpackages");
+
+            // Act
+            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
+            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
+            ProcessedArgs args = new ProcessedArgs(targetPkg.Id, targetPkg.Version, "cs", null, false, 
+                true /* generate plugins for dependencies with analyzers*/, outputDir);
+            bool result = apg.Generate(args);
+
+            // Assert
+            Assert.IsTrue(result);
+            string[] jarFilePaths = AssertPluginJarsExist(outputDir, 2); // Expecting one plugin per dependency with analyzers
+
+            foreach (string jarFilePath in jarFilePaths)
+            {
+                // Check the content of the files embedded in the jar
+                ZipFileChecker jarChecker = new ZipFileChecker(this.TestContext, jarFilePath);
+
+                // Check the contents of the embedded config file
+                string embeddedConfigFile = jarChecker.AssertFileExists("org\\sonar\\plugins\\roslynsdk\\configuration.xml");
+                RoslynSdkConfiguration config = RoslynSdkConfiguration.Load(embeddedConfigFile);
+
+                // Check the config settings, find which of the dependencies the jar is for (so that we can check the correct strings)
+                IPackage originalPkg = null;
+                if (config.PluginKeyDifferentiator.Equals("analyzerchild1"))
+                {
+                    originalPkg = child1;
+                }
+                if (config.PluginKeyDifferentiator.Equals("analyzerchild2"))
+                {
+                    originalPkg = child2;
+                }
+                Assert.IsNotNull(originalPkg, "Unexpected repository differentiator");
+
+                string pluginId = originalPkg.Id.ToLower();
+                Assert.AreEqual("roslyn." + pluginId + ".cs", config.RepositoryKey, "Unexpected repository key");
+                Assert.AreEqual("cs", config.RepositoryLanguage, "Unexpected language");
+                Assert.AreEqual("dummy title", config.RepositoryName, "Unexpected repository name");
+
+                // Check for the expected property values required by the C# plugin
+                // Property name prefixes should be lower case; the case of the value should be the same as the package id
+                AssertExpectedPropertyDefinitionValue(pluginId + ".cs.analyzerId", originalPkg.Id, config);
+                AssertExpectedPropertyDefinitionValue(pluginId + ".cs.ruleNamespace", originalPkg.Id, config);
+                AssertExpectedPropertyDefinitionValue(pluginId + ".cs.nuget.packageId", originalPkg.Id, config);
+                AssertExpectedPropertyDefinitionValue(pluginId + ".cs.nuget.packageVersion", originalPkg.Version.ToString(), config);
+                AssertExpectedPropertyDefinitionValue(pluginId + ".cs.staticResourceName", originalPkg.Id + "." + originalPkg.Version + ".zip", config);
+                AssertExpectedPropertyDefinitionValue(pluginId + ".cs.pluginKey", pluginId.Replace(".", ""), config);
+                AssertExpectedPropertyDefinitionValue(pluginId + ".cs.pluginVersion", originalPkg.Version.ToString(), config);
+
+                // Check the contents of the manifest
+                string actualManifestFilePath = jarChecker.AssertFileExists("META-INF\\MANIFEST.MF");
+                string[] actualManifest = File.ReadAllLines(actualManifestFilePath);
+                AssertExpectedManifestValue(WellKnownPluginProperties.Key, pluginId.Replace(".", ""), actualManifest);
+                AssertExpectedManifestValue("Plugin-Key", pluginId.Replace(".", ""), actualManifest); // plugin-key should be lowercase and alphanumeric
+                AssertPackagePropertiesInManifest(originalPkg, actualManifest);
+
+
+                // Check the rules
+                string actualRuleFilePath = jarChecker.AssertFileExists("." + config.RulesXmlResourcePath);
+                AssertExpectedRulesExist(analyzer, actualRuleFilePath);
+
+                // Now create another checker to check the contents of the zip file (strict check this time)
+                CheckEmbeddedAnalyzerPayload(jarChecker, "static\\" + pluginId + "." + originalPkg.Version + ".zip",
+                    /* zip file contents */
+                    "analyzers\\RoslynAnalyzer11.dll");
+            }
+        }
+
         #region Private methods
 
         private IPackageManager CreatePackageManager(string rootDir)
@@ -102,23 +188,42 @@ namespace SonarQube.Plugins.IntegrationTests
             return mgr;
         }
 
-        private IPackage AddPackage(IPackageManager manager, string id, string version, string payloadAssemblyFilePath)
+        private IPackage AddPackage(IPackageManager manager, string id, string version, string payloadAssemblyFilePath, params IPackage[] dependencies)
         {
             PackageBuilder builder = new PackageBuilder();
-            builder.Id = id;
-            builder.Title = "dummy title";
-            builder.Version = new SemanticVersion(version);
-            builder.Description = "dummy description";
 
-            builder.Authors.Add("dummy author 1");
-            builder.Authors.Add("dummy author 2");
+            ManifestMetadata metadata = new ManifestMetadata()
+            {
+                Authors = "dummy author 1,dummy author 2",
+                Owners = "dummy owner 1,dummy owner 2",
+                Title = "dummy title",
+                Version = new SemanticVersion(version).ToString(),
+                Id = id,
+                Description = "dummy description",
+                LicenseUrl = "http://my.license/readme.txt",
+                ProjectUrl = "http://dummyurl/"
+            };
 
-            builder.Owners.Add("dummy owner 1");
-            builder.Owners.Add("dummy owner 2");
+            List<ManifestDependency> dependencyList = new List<ManifestDependency>();
+            foreach (IPackage dependencyNode in dependencies)
+            {
+                dependencyList.Add(new ManifestDependency()
+                {
+                    Id = dependencyNode.Id,
+                    Version = dependencyNode.Version.ToString(),
+                });
+            }
 
-            builder.ProjectUrl = new System.Uri("http://dummyurl/");
-            builder.LicenseUrl = new Uri("http://my.license/readme.txt");
+            List<ManifestDependencySet> dependencySetList = new List<ManifestDependencySet>()
+            {
+                new ManifestDependencySet()
+                {
+                    Dependencies = dependencyList
+                }
+            };
+            metadata.DependencySets = dependencySetList;
 
+            builder.Populate(metadata);
 
             PhysicalPackageFile file = new PhysicalPackageFile();
             file.SourcePath = payloadAssemblyFilePath;
@@ -141,11 +246,11 @@ namespace SonarQube.Plugins.IntegrationTests
 
         #region Checks
 
-        private static string AssertPluginJarExists(string rootDir)
+        private static string[] AssertPluginJarsExist(string rootDir, int numberOfJars)
         {
             string[] files = Directory.GetFiles(rootDir, "*.jar", SearchOption.TopDirectoryOnly);
-            Assert.AreEqual(1, files.Length, "Expecting one and only one jar file to be created");
-            return files.First();
+            Assert.AreEqual(numberOfJars, files.Length, "Expecting only " + numberOfJars + "jar file to be created");
+            return files;
         }
         
         private static void AssertExpectedPropertyDefinitionValue(string propertyName, string expectedValue, RoslynSdkConfiguration actualConfig)

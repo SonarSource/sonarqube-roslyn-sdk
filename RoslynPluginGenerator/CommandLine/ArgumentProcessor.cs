@@ -19,13 +19,14 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
         #region Argument definitions
 
         /// <summary>
-        /// Ids for supported arguments
+        /// Unique IDs for supported arguments that may have multiple aliases.
         /// </summary>
         private static class KeywordIds
         {
             public const string AnalyzerRef = "analyzer.ref";
             public const string SqaleXmlFile = "sqale.xml";
             public const string AcceptLicenses = "accept.licenses";
+            public const string RecurseDependencies = "recurse.dependencies";
         }
 
         private static IList<ArgumentDescriptor> Descriptors;
@@ -42,6 +43,8 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                 id: KeywordIds.SqaleXmlFile, prefixes: new string[] { "/sqale:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_SqaleXmlFile));
             Descriptors.Add(new ArgumentDescriptor(
                 id: KeywordIds.AcceptLicenses, prefixes: new string[] { "/acceptLicenses" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_AcceptLicenses, isVerb: true));
+            Descriptors.Add(new ArgumentDescriptor(
+                id: KeywordIds.RecurseDependencies, prefixes: new string[] { "/recurse" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_RecurseDependencies, isVerb: true));
 
             Debug.Assert(Descriptors.All(d => d.Prefixes != null && d.Prefixes.Any()), "All descriptors must provide at least one prefix");
             Debug.Assert(Descriptors.Select(d => d.Id).Distinct().Count() == Descriptors.Count, "All descriptors must have a unique id");
@@ -103,6 +106,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             parsedOk &= TryParseSqaleFile(arguments, out sqaleFilePath);
 
             bool acceptLicense = GetLicenseAcceptance(arguments);
+            bool recurseDependencies = GetRecursion(arguments);
 
             if (parsedOk)
             {
@@ -113,6 +117,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                     SupportedLanguages.CSharp, /* TODO: support multiple languages */
                     sqaleFilePath,
                     acceptLicense,
+                    recurseDependencies,
                     System.IO.Directory.GetCurrentDirectory());
             }
 
@@ -192,6 +197,12 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
         private static bool GetLicenseAcceptance(IEnumerable<ArgumentInstance> arguments)
         {
             ArgumentInstance arg = arguments.SingleOrDefault(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.AcceptLicenses, a.Descriptor.Id));
+            return arg != null;
+        }
+
+        private static bool GetRecursion(IEnumerable<ArgumentInstance> arguments)
+        {
+            ArgumentInstance arg = arguments.SingleOrDefault(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.RecurseDependencies, a.Descriptor.Id));
             return arg != null;
         }
 

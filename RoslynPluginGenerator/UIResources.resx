@@ -154,10 +154,13 @@
     <value>{license URL not specified}</value>
   </data>
   <data name="APG_NoAnalyzersFound" xml:space="preserve">
-    <value>No analyzers were found in the specified package</value>
+    <value>No analyzers were found in package: {0}</value>
   </data>
   <data name="APG_PluginGenerated" xml:space="preserve">
     <value>Plugin generated: {0}</value>
+  </data>
+  <data name="APG_RecurseEnabled_SQALENotEnabled" xml:space="preserve">
+    <value>SQALE information cannot currently be embedded into plugins generated from package dependencies.</value>
   </data>
   <data name="APG_RulesGeneratedToFile" xml:space="preserve">
     <value>{0} rules generated to {1}</value>
