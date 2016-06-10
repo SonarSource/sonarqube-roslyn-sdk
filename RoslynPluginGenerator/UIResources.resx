@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="APG_AnalyzersLocated" xml:space="preserve">
-    <value>Number of analyzers located in package: {0}</value>
+    <value>Number of analyzers located in package {0}: {1}</value>
   </data>
   <data name="APG_CreatedTempWorkingDir" xml:space="preserve">
     <value>Temporary working folder for this run: {0}</value>
@@ -155,6 +155,9 @@
   </data>
   <data name="APG_NoAnalyzersFound" xml:space="preserve">
     <value>No analyzers were found in package: {0}</value>
+  </data>
+  <data name="APG_NoAnalyzersInTargetSuggestRecurse" xml:space="preserve">
+    <value>Re-run this generator with /recurse if plugins should be generated for the dependencies of this package.</value>
   </data>
   <data name="APG_PluginGenerated" xml:space="preserve">
     <value>Plugin generated: {0}</value>

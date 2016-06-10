@@ -61,7 +61,7 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Number of analyzers located in package: {0}.
+        ///   Looks up a localized string similar to Number of analyzers located in package {0}: {1}.
         /// </summary>
         public static string APG_AnalyzersLocated {
             get {
@@ -174,6 +174,15 @@ namespace SonarQube.Plugins.Roslyn {
         public static string APG_NoAnalyzersFound {
             get {
                 return ResourceManager.GetString("APG_NoAnalyzersFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Re-run this generator with /recurse if plugins should be generated for the dependencies of this package..
+        /// </summary>
+        public static string APG_NoAnalyzersInTargetSuggestRecurse {
+            get {
+                return ResourceManager.GetString("APG_NoAnalyzersInTargetSuggestRecurse", resourceCulture);
             }
         }
         

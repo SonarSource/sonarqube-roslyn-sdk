@@ -48,48 +48,10 @@ namespace SonarQube.Plugins.IntegrationTests
 
             // Assert
             Assert.IsTrue(result);
-            string jarFilePath = AssertPluginJarsExist(outputDir, 1).First();
 
-            // Check the content of the files embedded in the jar
-            ZipFileChecker jarChecker = new ZipFileChecker(this.TestContext, jarFilePath);
-
-
-            // Check the contents of the embedded config file
-            string embeddedConfigFile = jarChecker.AssertFileExists("org\\sonar\\plugins\\roslynsdk\\configuration.xml");
-            RoslynSdkConfiguration config = RoslynSdkConfiguration.Load(embeddedConfigFile);
-
-            // Check the config settings
-            Assert.AreEqual("analyzer1pkgid1", config.PluginKeyDifferentiator, "Unexpected repository differentiator");
-            Assert.AreEqual("roslyn.analyzer1.pkgid1.cs", config.RepositoryKey, "Unexpected repository key");
-            Assert.AreEqual("cs", config.RepositoryLanguage, "Unexpected language");
-            Assert.AreEqual("dummy title", config.RepositoryName, "Unexpected repository name");
-            
-            // Check for the expected property values required by the C# plugin
-            // Property name prefixes should be lower case; the case of the value should be the same as the package id
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.analyzerId", "Analyzer1.Pkgid1", config);
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.ruleNamespace", "Analyzer1.Pkgid1", config);
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.nuget.packageId", "Analyzer1.Pkgid1", config);
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.nuget.packageVersion", "1.0.2", config);
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.staticResourceName", "Analyzer1.Pkgid1.1.0.2.zip", config);
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.pluginKey", "analyzer1pkgid1", config);
-            AssertExpectedPropertyDefinitionValue("analyzer1.pkgid1.cs.pluginVersion", "1.0.2", config);
-
-            // Check the contents of the manifest
-            string actualManifestFilePath = jarChecker.AssertFileExists("META-INF\\MANIFEST.MF");
-            string[] actualManifest = File.ReadAllLines(actualManifestFilePath);
-            AssertExpectedManifestValue(WellKnownPluginProperties.Key, "analyzer1pkgid1", actualManifest);
-            AssertExpectedManifestValue("Plugin-Key", "analyzer1pkgid1", actualManifest); // plugin-key should be lowercase and alphanumeric
-            AssertPackagePropertiesInManifest(analyzerPkg, actualManifest);
-
-
-            // Check the rules
-            string actualRuleFilePath = jarChecker.AssertFileExists("." + config.RulesXmlResourcePath);
-            AssertExpectedRulesExist(analyzer, actualRuleFilePath);
-
-            // Now create another checker to check the contents of the zip file (strict check this time)
-            CheckEmbeddedAnalyzerPayload(jarChecker, "static\\analyzer1.pkgid1.1.0.2.zip",
-                /* zip file contents */
-                "analyzers\\RoslynAnalyzer11.dll");
+            // Expecting one plugin per dependency with analyzers
+            CheckJarGeneratedForPackage(outputDir, analyzer, analyzerPkg);
+            AssertJarsGenerated(outputDir, 1);
         }
 
         // Test verifies https://jira.sonarsource.com/browse/SFSRAP-32
@@ -121,61 +83,11 @@ namespace SonarQube.Plugins.IntegrationTests
 
             // Assert
             Assert.IsTrue(result);
-            string[] jarFilePaths = AssertPluginJarsExist(outputDir, 2); // Expecting one plugin per dependency with analyzers
 
-            foreach (string jarFilePath in jarFilePaths)
-            {
-                // Check the content of the files embedded in the jar
-                ZipFileChecker jarChecker = new ZipFileChecker(this.TestContext, jarFilePath);
-
-                // Check the contents of the embedded config file
-                string embeddedConfigFile = jarChecker.AssertFileExists("org\\sonar\\plugins\\roslynsdk\\configuration.xml");
-                RoslynSdkConfiguration config = RoslynSdkConfiguration.Load(embeddedConfigFile);
-
-                // Check the config settings, find which of the dependencies the jar is for (so that we can check the correct strings)
-                IPackage originalPkg = null;
-                if (config.PluginKeyDifferentiator.Equals("analyzerchild1"))
-                {
-                    originalPkg = child1;
-                }
-                if (config.PluginKeyDifferentiator.Equals("analyzerchild2"))
-                {
-                    originalPkg = child2;
-                }
-                Assert.IsNotNull(originalPkg, "Unexpected repository differentiator");
-
-                string pluginId = originalPkg.Id.ToLower();
-                Assert.AreEqual("roslyn." + pluginId + ".cs", config.RepositoryKey, "Unexpected repository key");
-                Assert.AreEqual("cs", config.RepositoryLanguage, "Unexpected language");
-                Assert.AreEqual("dummy title", config.RepositoryName, "Unexpected repository name");
-
-                // Check for the expected property values required by the C# plugin
-                // Property name prefixes should be lower case; the case of the value should be the same as the package id
-                AssertExpectedPropertyDefinitionValue(pluginId + ".cs.analyzerId", originalPkg.Id, config);
-                AssertExpectedPropertyDefinitionValue(pluginId + ".cs.ruleNamespace", originalPkg.Id, config);
-                AssertExpectedPropertyDefinitionValue(pluginId + ".cs.nuget.packageId", originalPkg.Id, config);
-                AssertExpectedPropertyDefinitionValue(pluginId + ".cs.nuget.packageVersion", originalPkg.Version.ToString(), config);
-                AssertExpectedPropertyDefinitionValue(pluginId + ".cs.staticResourceName", originalPkg.Id + "." + originalPkg.Version + ".zip", config);
-                AssertExpectedPropertyDefinitionValue(pluginId + ".cs.pluginKey", pluginId.Replace(".", ""), config);
-                AssertExpectedPropertyDefinitionValue(pluginId + ".cs.pluginVersion", originalPkg.Version.ToString(), config);
-
-                // Check the contents of the manifest
-                string actualManifestFilePath = jarChecker.AssertFileExists("META-INF\\MANIFEST.MF");
-                string[] actualManifest = File.ReadAllLines(actualManifestFilePath);
-                AssertExpectedManifestValue(WellKnownPluginProperties.Key, pluginId.Replace(".", ""), actualManifest);
-                AssertExpectedManifestValue("Plugin-Key", pluginId.Replace(".", ""), actualManifest); // plugin-key should be lowercase and alphanumeric
-                AssertPackagePropertiesInManifest(originalPkg, actualManifest);
-
-
-                // Check the rules
-                string actualRuleFilePath = jarChecker.AssertFileExists("." + config.RulesXmlResourcePath);
-                AssertExpectedRulesExist(analyzer, actualRuleFilePath);
-
-                // Now create another checker to check the contents of the zip file (strict check this time)
-                CheckEmbeddedAnalyzerPayload(jarChecker, "static\\" + pluginId + "." + originalPkg.Version + ".zip",
-                    /* zip file contents */
-                    "analyzers\\RoslynAnalyzer11.dll");
-            }
+            // Expecting one plugin per dependency with analyzers
+            CheckJarGeneratedForPackage(outputDir, analyzer, child1);
+            CheckJarGeneratedForPackage(outputDir, analyzer, child2);
+            AssertJarsGenerated(outputDir, 2);
         }
 
         #region Private methods
@@ -246,11 +158,64 @@ namespace SonarQube.Plugins.IntegrationTests
 
         #region Checks
 
-        private static string[] AssertPluginJarsExist(string rootDir, int numberOfJars)
+        private static string[] GetGeneratedJars(string rootDir)
+        {
+            return Directory.GetFiles(rootDir, "*.jar", SearchOption.TopDirectoryOnly);
+        }
+
+        private void CheckJarGeneratedForPackage(string rootDir, DiagnosticAnalyzer analyzer, IPackage package)
+        {
+            string jarFilePath = GetGeneratedJars(rootDir).SingleOrDefault(r => r.Contains(package.Id.Replace(".", "").ToLower()));
+            Assert.IsNotNull(jarFilePath);
+
+            // Check the content of the files embedded in the jar
+            ZipFileChecker jarChecker = new ZipFileChecker(this.TestContext, jarFilePath);
+            
+            // Check the contents of the embedded config file
+            string embeddedConfigFile = jarChecker.AssertFileExists("org\\sonar\\plugins\\roslynsdk\\configuration.xml");
+            RoslynSdkConfiguration config = RoslynSdkConfiguration.Load(embeddedConfigFile);
+
+            // Check the config settings
+            Assert.IsNotNull(package, "Unexpected repository differentiator");
+
+            string pluginId = package.Id.ToLower();
+            Assert.AreEqual("roslyn." + pluginId + ".cs", config.RepositoryKey, "Unexpected repository key");
+            Assert.AreEqual("cs", config.RepositoryLanguage, "Unexpected language");
+            Assert.AreEqual("dummy title", config.RepositoryName, "Unexpected repository name");
+
+            // Check for the expected property values required by the C# plugin
+            // Property name prefixes should be lower case; the case of the value should be the same as the package id
+            AssertExpectedPropertyDefinitionValue(pluginId + ".cs.analyzerId", package.Id, config);
+            AssertExpectedPropertyDefinitionValue(pluginId + ".cs.ruleNamespace", package.Id, config);
+            AssertExpectedPropertyDefinitionValue(pluginId + ".cs.nuget.packageId", package.Id, config);
+            AssertExpectedPropertyDefinitionValue(pluginId + ".cs.nuget.packageVersion", package.Version.ToString(), config);
+            AssertExpectedPropertyDefinitionValue(pluginId + ".cs.staticResourceName", package.Id + "." + package.Version + ".zip", config);
+            AssertExpectedPropertyDefinitionValue(pluginId + ".cs.pluginKey", pluginId.Replace(".", ""), config);
+            AssertExpectedPropertyDefinitionValue(pluginId + ".cs.pluginVersion", package.Version.ToString(), config);
+
+            // Check the contents of the manifest
+            string actualManifestFilePath = jarChecker.AssertFileExists("META-INF\\MANIFEST.MF");
+            string[] actualManifest = File.ReadAllLines(actualManifestFilePath);
+            AssertExpectedManifestValue(WellKnownPluginProperties.Key, pluginId.Replace(".", ""), actualManifest);
+            AssertExpectedManifestValue("Plugin-Key", pluginId.Replace(".", ""), actualManifest); // plugin-key should be lowercase and alphanumeric
+            AssertPackagePropertiesInManifest(package, actualManifest);
+
+
+            // Check the rules
+            string actualRuleFilePath = jarChecker.AssertFileExists("." + config.RulesXmlResourcePath);
+            AssertExpectedRulesExist(analyzer, actualRuleFilePath);
+
+            // Now create another checker to check the contents of the zip file (strict check this time)
+            CheckEmbeddedAnalyzerPayload(jarChecker, "static\\" + pluginId + "." + package.Version + ".zip",
+                /* zip file contents */
+                "analyzers\\RoslynAnalyzer11.dll");
+
+        }
+
+        private static void AssertJarsGenerated(string rootDir, int expectedCount)
         {
             string[] files = Directory.GetFiles(rootDir, "*.jar", SearchOption.TopDirectoryOnly);
-            Assert.AreEqual(numberOfJars, files.Length, "Expecting only " + numberOfJars + "jar file to be created");
-            return files;
+            Assert.AreEqual(expectedCount, files.Length, "Unexpected number of JAR files generated");
         }
         
         private static void AssertExpectedPropertyDefinitionValue(string propertyName, string expectedValue, RoslynSdkConfiguration actualConfig)

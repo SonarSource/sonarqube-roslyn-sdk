@@ -65,8 +65,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             TestLogger logger = new TestLogger();
             AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, logger);
 
-            // 1. a) Acceptance not required -> succeeds if accept = false, generate dependencies = false
-            ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ , 
+            // 1. Acceptance not required -> succeeds if accept = false
+            ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ ,
                 false, outputDir);
             bool result = apg.Generate(args);
             Assert.IsTrue(result, "Generator should succeed if there are no licenses to accept");
@@ -76,31 +76,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             logger.AssertWarningNotLogged("child.id");
             logger.AssertWarningNotLogged("grandchild.id");
 
-            // 1. b) Acceptance not required -> succeeds if accept = false, generate dependencies = true
-            args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ ,
-                true /* generate plugins for dependencies */, outputDir);
-            result = apg.Generate(args);
-            Assert.IsTrue(result, "Generator should succeed if there are no licenses to accept");
-
-            logger.AssertErrorsLogged(0);
-            logger.AssertWarningNotLogged("parent.id"); // not expecting warnings about packages that don't require acceptance
-            logger.AssertWarningNotLogged("child.id");
-            logger.AssertWarningNotLogged("grandchild.id");
-
-            // 2. a) Acceptance not required -> succeeds if accept = true, generate dependencies = false
-            args = CreateArgs("parent.id", "1.0", "cs", null, true /* accept licenses */ , 
-                false, outputDir);
-            result = apg.Generate(args);
-            Assert.IsTrue(result, "Generator should succeed if there are no licenses to accept");
-
-            logger.AssertErrorsLogged(0);
-            logger.AssertWarningNotLogged("parent.id"); // not expecting warnings about packages that don't require acceptance
-            logger.AssertWarningNotLogged("child.id");
-            logger.AssertWarningNotLogged("grandchild.id");
-
-            // 2. b) Acceptance not required -> succeeds if accept = true, generate dependencies = true
-            args = CreateArgs("parent.id", "1.0", "cs", null, true /* accept licenses */ ,
-                true /* generate plugins for dependencies */, outputDir);
+            // 2. Acceptance not required -> succeeds if accept = true
+            args = CreateArgs("parent.id", "1.0", "cs", null, true /* accept licenses */, false, outputDir);
             result = apg.Generate(args);
             Assert.IsTrue(result, "Generator should succeed if there are no licenses to accept");
 
@@ -149,8 +126,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                 true /* generate plugins for dependencies */, outputDir);
             result = apg.Generate(args);
             Assert.IsTrue(result, "Generator should succeed if there are no licenses to accept");
-            
-            logger.AssertSingleWarningExists(UIResources.APG_RecurseEnabled_SQALENotEnabled); 
+
+            logger.AssertSingleWarningExists(UIResources.APG_RecurseEnabled_SQALENotEnabled);
             logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, "parent.id"));
             logger.AssertWarningNotLogged("child.id");
             logger.AssertWarningNotLogged("grandchild.id");
@@ -172,8 +149,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             TestLogger logger = new TestLogger();
             AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, logger);
 
-            // 1. a) Only target package. User does not accept -> fails with error
-            ProcessedArgs args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, false /* accept licenses */ , 
+            // 1. User does not accept -> fails with error
+            ProcessedArgs args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, false /* accept licenses */ ,
                 false, outputDir);
             bool result = apg.Generate(args);
             Assert.IsFalse(result, "Generator should fail because license has not been accepted");
@@ -182,41 +159,16 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             logger.AssertSingleWarningExists("parent.requiredAccept.id", "1.0"); // warning for each licensed package
             logger.AssertWarningsLogged(1);
 
-            // 1. b) Target package and dependencies. User does not accept -> fails with error
+            // 2. User accepts -> succeeds with warnings
             logger.Reset();
-            args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, false /* accept licenses */ ,
-                true /* generate plugins for dependencies */, outputDir);
-            result = apg.Generate(args);
-            Assert.IsFalse(result, "Generator should fail because license has not been accepted");
-
-            logger.AssertSingleErrorExists("parent.requiredAccept.id", "1.0"); // error listing the main package
-            logger.AssertSingleWarningExists("parent.requiredAccept.id", "1.0"); // warning for each licensed package
-            logger.AssertWarningsLogged(1);
-
-            // 2. a) Only target package. User accepts -> succeeds with warnings
-            logger.Reset();
-            args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, true /* accept licenses */ , 
-                false, outputDir);
+            args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, true /* accept licenses */ ,
+                false /* generate plugins for dependencies */, outputDir);
             result = apg.Generate(args);
             Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
 
             logger.AssertSingleWarningExists(UIResources.APG_NGAcceptedPackageLicenses); // warning that licenses accepted
             logger.AssertSingleWarningExists("parent.requiredAccept.id", "1.0"); // warning for each licensed package
             logger.AssertWarningsLogged(2);
-            logger.AssertErrorsLogged(0);
-
-            // 2. b) Target package and dependencies. User accepts -> succeeds with warnings
-            clearDirectory(outputDir);
-            logger.Reset();
-            args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, true /* accept licenses */ ,
-                true /* generate plugins for dependencies */, outputDir);
-            result = apg.Generate(args);
-            Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
-
-            logger.AssertSingleWarningExists(UIResources.APG_RecurseEnabled_SQALENotEnabled); // warning that licenses accepted
-            logger.AssertSingleWarningExists(UIResources.APG_NGAcceptedPackageLicenses); // warning that licenses accepted
-            logger.AssertSingleWarningExists("parent.requiredAccept.id", "1.0"); // warning for each licensed package
-            logger.AssertWarningsLogged(3);
             logger.AssertErrorsLogged(0);
         }
 
@@ -234,8 +186,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             TestLogger logger = new TestLogger();
             AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, logger);
 
-            // 1. a) Only target package. User does not accept -> fails with error
-            ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ , 
+            // 1. User does not accept -> fails with error
+            ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ ,
                 false, outputDir);
             bool result = apg.Generate(args);
             Assert.IsFalse(result, "Generator should fail because license has not been accepted");
@@ -244,20 +196,9 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             logger.AssertSingleWarningExists("child.requiredAccept.id", "2.0"); // warning for each licensed package
             logger.AssertWarningsLogged(1);
 
-            // 1. b) Target package and dependencies. User does not accept -> fails with error
+            // 2. User accepts -> succeeds with warnings
             logger.Reset();
-            args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ ,
-                true /* generate plugins for dependencies */, outputDir);
-            result = apg.Generate(args);
-            Assert.IsFalse(result, "Generator should fail because license has not been accepted");
-
-            logger.AssertSingleErrorExists("parent.id", "1.0"); // error listing the main package
-            logger.AssertSingleWarningExists("child.requiredAccept.id", "2.0"); // warning for each licensed package
-            logger.AssertWarningsLogged(1);
-
-            // 2. a) Only target package. User accepts -> succeeds with warnings
-            logger.Reset();
-            args = CreateArgs("parent.id", "1.0", "cs", null, true /* accept licenses */ , 
+            args = CreateArgs("parent.id", "1.0", "cs", null, true /* accept licenses */ ,
                 false, outputDir);
             result = apg.Generate(args);
             Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
@@ -265,20 +206,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             logger.AssertSingleWarningExists(UIResources.APG_NGAcceptedPackageLicenses); // warning that licenses have been accepted
             logger.AssertSingleWarningExists("child.requiredAccept.id", "2.0"); // warning for each licensed package
             logger.AssertWarningsLogged(2);
-            logger.AssertErrorsLogged(0);
-
-            // 2. b) Target package and dependencies. User accepts -> succeeds with warnings
-            clearDirectory(outputDir);
-            logger.Reset();
-            args = CreateArgs("parent.id", "1.0", "cs", null, true /* accept licenses */ ,
-                true /* generate plugins for dependencies */, outputDir);
-            result = apg.Generate(args);
-            Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
-
-            logger.AssertSingleWarningExists(UIResources.APG_RecurseEnabled_SQALENotEnabled); 
-            logger.AssertSingleWarningExists(UIResources.APG_NGAcceptedPackageLicenses); // warning that licenses have been accepted
-            logger.AssertSingleWarningExists("child.requiredAccept.id", "2.0"); // warning for each licensed package
-            logger.AssertWarningsLogged(3);
             logger.AssertErrorsLogged(0);
         }
 
@@ -299,7 +226,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, logger);
 
             // 1. a) Only target package. User does not accept -> fails with error
-            ProcessedArgs args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, false /* accept licenses */ , 
+            ProcessedArgs args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, false /* accept licenses */ ,
                 false, outputDir);
             bool result = apg.Generate(args);
             Assert.IsFalse(result, "Generator should fail because license has not been accepted");
@@ -310,22 +237,9 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             logger.AssertSingleWarningExists("child1.requiredAccept.id", "2.1");
             logger.AssertSingleWarningExists("parent.requiredAccept.id", "1.0");
 
-            // 1. b) Target package and dependencies. User does not accept -> fails with error
+            // 2. User accepts -> succeeds with warnings
             logger.Reset();
-            args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, false /* accept licenses */ ,
-                true /* generate plugins for dependencies */, outputDir);
-            result = apg.Generate(args);
-            Assert.IsFalse(result, "Generator should fail because license has not been accepted");
-
-            logger.AssertSingleErrorExists("parent.requiredAccept.id", "1.0"); // error referring to the main package
-
-            logger.AssertSingleWarningExists("grandchild1.requiredAccept.id", "3.0"); // warning for each licensed package
-            logger.AssertSingleWarningExists("child1.requiredAccept.id", "2.1");
-            logger.AssertSingleWarningExists("parent.requiredAccept.id", "1.0");
-
-            // 2. a) Only target package. User accepts -> succeeds with warnings
-            logger.Reset();
-            args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, true /* accept licenses */ , 
+            args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, true /* accept licenses */ ,
                 false, outputDir);
             result = apg.Generate(args);
             Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
@@ -335,21 +249,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             logger.AssertSingleWarningExists("child1.requiredAccept.id", "2.1");
             logger.AssertSingleWarningExists("parent.requiredAccept.id", "1.0");
             logger.AssertWarningsLogged(4);
-
-            // 2. b) Target package and dependencies. User accepts -> succeeds with warnings
-            clearDirectory(outputDir);
-            logger.Reset();
-            args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, true /* accept licenses */ ,
-                true /* generate plugins for dependencies */, outputDir);
-            result = apg.Generate(args);
-            Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
-
-            logger.AssertSingleWarningExists(UIResources.APG_RecurseEnabled_SQALENotEnabled); // warning that licenses accepted
-            logger.AssertSingleWarningExists(UIResources.APG_NGAcceptedPackageLicenses); // warning that licenses have been accepted
-            logger.AssertSingleWarningExists("grandchild1.requiredAccept.id", "3.0"); // warning for each licensed package
-            logger.AssertSingleWarningExists("child1.requiredAccept.id", "2.1");
-            logger.AssertSingleWarningExists("parent.requiredAccept.id", "1.0");
-            logger.AssertWarningsLogged(5);
         }
 
         [TestMethod]
@@ -363,36 +262,20 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
 
-            // Multi-level: parent and some but not all dependencies require license acceptance
-            // Parent and dependencies have no analyzers
-            IPackage child1 = remoteRepoBuilder.CreatePackage("child1.requiredAccept.id", "2.1", dummyContentFile, License.Required);
-            IPackage child2 = remoteRepoBuilder.CreatePackage("child2.id", "2.2", dummyContentFile, License.NotRequired);
-            remoteRepoBuilder.CreatePackage("non-analyzer.parent.requireAccept.id", "1.0", dummyContentFile, License.Required, child1, child2);
+            // Parent only: requires license
+            remoteRepoBuilder.CreatePackage("non-analyzer.requireAccept.id", "1.0", dummyContentFile, License.Required);
 
             TestLogger logger = new TestLogger();
             AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, logger);
 
-            // 1. a) Only target package. User does not accept, but no analyzers so no license prompt -> fails due to absence of analyzers
-            ProcessedArgs args = CreateArgs("non-analyzer.parent.requireAccept.id", "1.0", "cs", null, false /* accept licenses */ , 
+            // 1. User does not accept, but no analyzers so no license prompt -> fails due absence of analyzers
+            ProcessedArgs args = CreateArgs("non-analyzer.requireAccept.id", "1.0", "cs", null, false /* accept licenses */ ,
                 false, outputDir);
             bool result = apg.Generate(args);
             Assert.IsFalse(result, "Expecting generator to fail");
 
-            logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, "non-analyzer.parent.requireAccept.id"));
+            logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, "non-analyzer.requireAccept.id"));
             logger.AssertWarningsLogged(1);
-            logger.AssertErrorsLogged(0);
-
-            // 1. b) Target package and dependencies. User does not accept, but no analyzers in any package so no license prompt -> fails due to absence of analyzers
-            logger.Reset();
-            args = CreateArgs("non-analyzer.parent.requireAccept.id", "1.0", "cs", null, false /* accept licenses */ ,
-                true /* generate plugins for dependencies */, outputDir);
-            result = apg.Generate(args);
-            Assert.IsFalse(result, "Expecting generator to fail");
-
-            logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, "non-analyzer.parent.requireAccept.id"));
-            logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, child1.Id));
-            logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, child2.Id));
-            logger.AssertWarningsLogged(3);
             logger.AssertErrorsLogged(0);
         }
 
@@ -453,7 +336,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             result = apg.Generate(args);
             Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
 
-            logger.AssertSingleWarningExists(UIResources.APG_RecurseEnabled_SQALENotEnabled); 
+            logger.AssertSingleWarningExists(UIResources.APG_RecurseEnabled_SQALENotEnabled);
             logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, "non-analyzer.parent.requireAccept.id"));
             logger.AssertSingleWarningExists(UIResources.APG_NGAcceptedPackageLicenses); // warning that licenses have been accepted
             logger.AssertSingleWarningExists("non-analyzer.parent.requireAccept.id", "1.0"); // warning for each licensed package
@@ -692,21 +575,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                 outputDirectory);
             return args;
         }
-
-        private void clearDirectory(string path)
-        {
-            System.IO.DirectoryInfo di = new DirectoryInfo(path);
-
-            foreach (FileInfo file in di.GetFiles())
-            {
-                file.Delete();
-            }
-            foreach (DirectoryInfo dir in di.GetDirectories())
-            {
-                dir.Delete(true);
-            }
-        }
-
+        
         private AnalyzerPluginGenerator CreateTestSubjectWithFakeRemoteRepo(RemoteRepoBuilder remoteRepoBuilder)
         {
             return CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, new TestLogger());

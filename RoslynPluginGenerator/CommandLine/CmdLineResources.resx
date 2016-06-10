@@ -124,7 +124,7 @@
     <value>/a:[NuGet package id]  or  /a:[NuGet package id]:[version]</value>
   </data>
   <data name="ArgDescription_RecurseDependencies" xml:space="preserve">
-    <value>/recurse - search for analyzers in target package and, additionally, all dependencies</value>
+    <value>/recurse - search for analyzers in target package and any dependencies</value>
   </data>
   <data name="ArgDescription_SqaleXmlFile" xml:space="preserve">
     <value>/s:[path to sqale xml file]</value>
