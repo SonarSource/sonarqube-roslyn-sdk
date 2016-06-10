@@ -77,7 +77,7 @@ namespace SonarQube.Plugins.Roslyn
                 packagesContainingAnalyzers.Add(targetPackage);
             }
             else
-            { 
+            {
                 this.logger.LogWarning(UIResources.APG_NoAnalyzersFound, targetPackage.Id);
 
                 if (!args.RecurseDependencies || !dependencyPackages.Any())
@@ -85,26 +85,27 @@ namespace SonarQube.Plugins.Roslyn
                     this.logger.LogWarning(UIResources.APG_NoAnalyzersInTargetSuggestRecurse);
                     return false;
                 }
-                else
+            }
+
+            if (args.RecurseDependencies)
+            {
+                // Possible sub-case - target package has dependencies that contain analyzers
+                foreach (IPackage dependencyPackage in dependencyPackages)
                 {
-                    // Possible sub-case - target package has dependencies that contain analyzers
-                    foreach (IPackage dependencyPackage in dependencyPackages)
-                    {
 
-                        if (HasAnalyzers(dependencyPackage, args.Language))
-                        {
-                            packagesContainingAnalyzers.Add(dependencyPackage);
-                        }
-                        else
-                        { 
-                            this.logger.LogWarning(UIResources.APG_NoAnalyzersFound, dependencyPackage.Id);
-                        }
-                    }
-
-                    if (!packagesContainingAnalyzers.Any())
+                    if (HasAnalyzers(dependencyPackage, args.Language))
                     {
-                        return false;
+                        packagesContainingAnalyzers.Add(dependencyPackage);
                     }
+                    else
+                    { 
+                        this.logger.LogWarning(UIResources.APG_NoAnalyzersFound, dependencyPackage.Id);
+                    }
+                }
+
+                if (!packagesContainingAnalyzers.Any())
+                {
+                    return false;
                 }
             }
 
@@ -125,7 +126,7 @@ namespace SonarQube.Plugins.Roslyn
             if (packagesContainingAnalyzers.Contains(targetPackage))
             {
                 string generatedJarPath = GeneratePluginForPackage(targetPackage, args.Language, args.OutputDirectory, args.SqaleFilePath);
-                if (generatedJarFiles == null)
+                if (generatedJarPath == null)
                 {
                     return false;
                 }

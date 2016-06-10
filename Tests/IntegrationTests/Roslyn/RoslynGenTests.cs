@@ -89,6 +89,42 @@ namespace SonarQube.Plugins.IntegrationTests
             CheckJarGeneratedForPackage(outputDir, analyzer, child2);
             AssertJarsGenerated(outputDir, 2);
         }
+        
+        [TestMethod]
+        public void RoslynPlugin_GenerateForMultiLevelAnalyzers_Succeeds()
+        {
+            // Arrange
+            TestLogger logger = new TestLogger();
+            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+
+            // Create a valid analyzer package
+            RoslynAnalyzer11.CSharpAnalyzer analyzer = new RoslynAnalyzer11.CSharpAnalyzer();
+
+            // Parent and children all have analyzers, expecting plugins for all three
+            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".fakeRemoteNuGet");
+            IPackageManager fakeRemotePkgMgr = CreatePackageManager(fakeRemoteNuGetDir);
+            IPackage child1 = AddPackage(fakeRemotePkgMgr, "Analyzer.Child1", "1.1.0", analyzer.GetType().Assembly.Location);
+            IPackage child2 = AddPackage(fakeRemotePkgMgr, "Analyzer.Child2", "1.2.0", analyzer.GetType().Assembly.Location);
+            IPackage targetPkg = AddPackage(fakeRemotePkgMgr, "Empty.Parent", "1.0.0", analyzer.GetType().Assembly.Location, child1, child2);
+
+            string localPackageDestination = TestUtils.CreateTestDirectory(this.TestContext, ".localpackages");
+
+            // Act
+            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
+            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
+            ProcessedArgs args = new ProcessedArgs(targetPkg.Id, targetPkg.Version, "cs", null, false,
+                true /* generate plugins for dependencies with analyzers*/, outputDir);
+            bool result = apg.Generate(args);
+
+            // Assert
+            Assert.IsTrue(result);
+
+            // Expecting one plugin per dependency with analyzers
+            CheckJarGeneratedForPackage(outputDir, analyzer, targetPkg);
+            CheckJarGeneratedForPackage(outputDir, analyzer, child1);
+            CheckJarGeneratedForPackage(outputDir, analyzer, child2);
+            AssertJarsGenerated(outputDir, 3);
+        }
 
         #region Private methods
 
