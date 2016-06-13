@@ -57,6 +57,12 @@ If you want to provide SQALE information in the generated plugin, you can copy a
 See the [SonarQube documentation](http://docs.sonarqube.org/x/_yBq) for more information about how SonarQube uses the SQALE method.
 
 
+#### Generating plugins for aggregating packages
+Some NuGet packages exist to associate several related packages together. To simplify the process of creating plugins for such aggregating packages, the */recurse* flag can be used e.g. *RoslynSonarQubeGenerator CodeCracker /recurse*. The tool will search the dependencies of the given package and create plugins for any dependencies that contain Roslyn analyzers.
+
+NB: It is not currently possible to add SQALE information to packages generated from dependencies in this way.
+
+
 #### Generating a jar for a private Roslyn analyzer
 If you want to create a jar for Roslyn analyzer that is not available from a public NuGet feed (e.g. an analyzer you have created on your local machine) you can generate a jar file for it by specifying a package source that points at a local directory containing the *.nupkg* file created by the standard Roslyn templates. See the [NuGet docs](https://docs.nuget.org/create/hosting-your-own-nuget-feeds) for more information.
 
