@@ -88,6 +88,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             logger.AssertWarningNotLogged("parent.id"); // not expecting warnings about packages that don't require acceptance
             logger.AssertWarningNotLogged("child.id");
             logger.AssertWarningNotLogged("grandchild.id");
+            AssertJarsGenerated(outputDir, 1);
         }
 
         [TestMethod]
@@ -115,54 +116,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             logger.AssertWarningNotLogged("child.id");
             logger.AssertWarningNotLogged("grandchild.id");
             logger.AssertErrorsLogged(0);
-        }
-
-        [TestMethod]
-        public void Generate_LicenseAcceptanceNotRequired_NoAnalyzersInTarget()
-        {
-            // If there are:
-            // No required licenses
-            // No analyzers in the targeted package, but analyzers in the dependencies
-            // We should fail due to the absence of analyzers if we are only generating a plugin for the targeted package
-            // We should succeed if we are generating plugins for the targeted package and its dependencies
-
-            // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            string dummyContentFile = TestUtils.CreateTextFile("dummy.txt", outputDir, "non-analyzer content file");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
-
-            // Multi-level dependencies: no package requires license acceptence
-            // Parent has no analyzers, but dependencies do
-            IPackage grandchild = CreatePackageWithAnalyzer(remoteRepoBuilder, "grandchild.id", "1.2", License.NotRequired /* no dependencies */);
-            IPackage child = CreatePackageWithAnalyzer(remoteRepoBuilder, "child.id", "1.1", License.NotRequired, grandchild);
-            remoteRepoBuilder.CreatePackage("parent.id", "1.0", dummyContentFile, License.NotRequired, child);
-
-            TestLogger logger = new TestLogger();
-            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, logger);
-
-            // 1. a) Only target package. Acceptance not required -> fails due to absence of analyzers
-            ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ ,
-                false, outputDir);
-            bool result = apg.Generate(args);
-            Assert.IsFalse(result, "Expecting generator to fail");
-
-            logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, "parent.id"));
-            logger.AssertSingleWarningExists(UIResources.APG_NoAnalyzersInTargetSuggestRecurse);
-            logger.AssertWarningsLogged(2);
-            logger.AssertErrorsLogged(0);
-
-            // 1. b) Target package and dependencies. Acceptance not required -> succeeds if generate dependencies = true
-            logger.Reset();
-            args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ ,
-                true /* generate plugins for dependencies */, outputDir);
-            result = apg.Generate(args);
-            Assert.IsTrue(result, "Generator should succeed if there are no licenses to accept");
-
-            logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, "parent.id"));
-            logger.AssertWarningNotLogged("child.id");
-            logger.AssertWarningNotLogged("grandchild.id");
-            logger.AssertWarningsLogged(2);
-            logger.AssertErrorsLogged(0);
+            AssertJarsGenerated(outputDir, 3);
         }
 
         [TestMethod]
@@ -311,7 +265,55 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         }
 
         [TestMethod]
-        public void Generate_LicenseAcceptanceRequested_NoAnalysersInTarget()
+        public void Generate_LicenseAcceptanceNotRequired_NoAnalyzersInTarget()
+        {
+            // If there are:
+            // No required licenses
+            // No analyzers in the targeted package, but analyzers in the dependencies
+            // We should fail due to the absence of analyzers if we are only generating a plugin for the targeted package
+            // We should succeed if we are generating plugins for the targeted package and its dependencies
+
+            // Arrange
+            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string dummyContentFile = TestUtils.CreateTextFile("dummy.txt", outputDir, "non-analyzer content file");
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+
+            // Multi-level dependencies: no package requires license acceptence
+            // Parent has no analyzers, but dependencies do
+            IPackage grandchild = CreatePackageWithAnalyzer(remoteRepoBuilder, "grandchild.id", "1.2", License.NotRequired /* no dependencies */);
+            IPackage child = CreatePackageWithAnalyzer(remoteRepoBuilder, "child.id", "1.1", License.NotRequired, grandchild);
+            remoteRepoBuilder.CreatePackage("parent.id", "1.0", dummyContentFile, License.NotRequired, child);
+
+            TestLogger logger = new TestLogger();
+            AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, logger);
+
+            // 1. a) Only target package. Acceptance not required -> fails due to absence of analyzers
+            ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ ,
+                false, outputDir);
+            bool result = apg.Generate(args);
+            Assert.IsFalse(result, "Expecting generator to fail");
+
+            logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, "parent.id"));
+            logger.AssertSingleWarningExists(UIResources.APG_NoAnalyzersInTargetSuggestRecurse);
+            logger.AssertWarningsLogged(2);
+            logger.AssertErrorsLogged(0);
+
+            // 1. b) Target package and dependencies. Acceptance not required -> succeeds if generate dependencies = true
+            logger.Reset();
+            args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ ,
+                true /* generate plugins for dependencies */, outputDir);
+            result = apg.Generate(args);
+            Assert.IsTrue(result, "Generator should succeed if there are no licenses to accept");
+
+            logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, "parent.id"));
+            logger.AssertWarningNotLogged("child.id");
+            logger.AssertWarningNotLogged("grandchild.id");
+            logger.AssertWarningsLogged(2);
+            logger.AssertErrorsLogged(0);
+        }
+
+        [TestMethod]
+        public void Generate_LicenseAcceptanceRequired_NoAnalysersInTarget()
         {
             // If there are:
             // Required licenses
@@ -670,6 +672,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         {
             string[] matches = Directory.GetFiles(outputDir, "*sqale*template*", SearchOption.AllDirectories);
             Assert.AreEqual(0, matches.Length, "Not expecting any squale template files to exist");
+        }
+
+        private static void AssertJarsGenerated(string rootDir, int expectedCount)
+        {
+            string[] files = Directory.GetFiles(rootDir, "*.jar", SearchOption.TopDirectoryOnly);
+            Assert.AreEqual(expectedCount, files.Length, "Unexpected number of JAR files generated");
         }
 
         #endregion

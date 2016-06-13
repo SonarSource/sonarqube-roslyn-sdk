@@ -71,16 +71,19 @@ namespace SonarQube.Plugins.Roslyn
             IEnumerable<IPackage> dependencyPackages = this.packageHandler.GetInstalledDependencies(targetPackage);
 
             // Check that there are analyzers in the target package from which information can be extracted
-            List<IPackage> packagesContainingAnalyzers = new List<IPackage>();
-            if (HasAnalyzers(targetPackage, args.Language))
+
+            // Create a mapping of packages to analyzers to avoid having to search for analyzers more than once
+            Dictionary<IPackage, IEnumerable<DiagnosticAnalyzer>> analyzersByPackage = new Dictionary<IPackage, IEnumerable<DiagnosticAnalyzer>>();
+            IEnumerable<DiagnosticAnalyzer> targetAnalyzers = GetAnalyzers(targetPackage, args.Language);
+            if (targetAnalyzers.Any())
             {
-                packagesContainingAnalyzers.Add(targetPackage);
+                analyzersByPackage.Add(targetPackage, targetAnalyzers);
             }
             else
             {
                 this.logger.LogWarning(UIResources.APG_NoAnalyzersFound, targetPackage.Id);
 
-                if (!args.RecurseDependencies || !dependencyPackages.Any())
+                if (!args.RecurseDependencies)
                 {
                     this.logger.LogWarning(UIResources.APG_NoAnalyzersInTargetSuggestRecurse);
                     return false;
@@ -92,10 +95,10 @@ namespace SonarQube.Plugins.Roslyn
                 // Possible sub-case - target package has dependencies that contain analyzers
                 foreach (IPackage dependencyPackage in dependencyPackages)
                 {
-
-                    if (HasAnalyzers(dependencyPackage, args.Language))
+                    IEnumerable<DiagnosticAnalyzer> dependencyAnalyzers = GetAnalyzers(dependencyPackage, args.Language);
+                    if (dependencyAnalyzers.Any())
                     {
-                        packagesContainingAnalyzers.Add(dependencyPackage);
+                        analyzersByPackage.Add(dependencyPackage, dependencyAnalyzers);
                     }
                     else
                     { 
@@ -103,7 +106,7 @@ namespace SonarQube.Plugins.Roslyn
                     }
                 }
 
-                if (!packagesContainingAnalyzers.Any())
+                if (!analyzersByPackage.Any())
                 {
                     return false;
                 }
@@ -120,19 +123,18 @@ namespace SonarQube.Plugins.Roslyn
                 return false;
             }
 
-            IEnumerable<IPackage> dependencyPackagesContainingAnalyzers = packagesContainingAnalyzers;
             List<string> generatedJarFiles = new List<string>();
             // Initial run with the user-targeted package and arguments
-            if (packagesContainingAnalyzers.Contains(targetPackage))
+            if (analyzersByPackage.ContainsKey(targetPackage))
             {
-                string generatedJarPath = GeneratePluginForPackage(targetPackage, args.Language, args.OutputDirectory, args.SqaleFilePath);
+                string generatedJarPath = GeneratePluginForPackage(args.OutputDirectory, args.Language, args.SqaleFilePath, targetPackage, analyzersByPackage[targetPackage]);
                 if (generatedJarPath == null)
                 {
                     return false;
                 }
 
                 generatedJarFiles.Add(generatedJarPath);
-                dependencyPackagesContainingAnalyzers = dependencyPackagesContainingAnalyzers.Skip(1);
+                analyzersByPackage.Remove(targetPackage);
             }
 
             // Dependent package generation changes the arguments
@@ -140,10 +142,10 @@ namespace SonarQube.Plugins.Roslyn
             {
                 this.logger.LogWarning(UIResources.APG_RecurseEnabled_SQALENotEnabled);
 
-                foreach (IPackage currentPackage in dependencyPackagesContainingAnalyzers)
+                foreach (IPackage currentPackage in analyzersByPackage.Keys)
                 {
                     // No way to specify the SQALE file for any but the user-targeted package at this time
-                    string generatedJarPath = GeneratePluginForPackage(currentPackage, args.Language, args.OutputDirectory, null);
+                    string generatedJarPath = GeneratePluginForPackage(args.OutputDirectory, args.Language, null, currentPackage, analyzersByPackage[currentPackage]);
                     if (generatedJarFiles == null)
                     {
                         return false;
@@ -163,11 +165,9 @@ namespace SonarQube.Plugins.Roslyn
             return true;
         }
 
-        private string GeneratePluginForPackage(IPackage package, string language, string outputDir, string SqaleFilePath)
+        private string GeneratePluginForPackage(string outputDir, string language, string sqaleFilePath, IPackage package, IEnumerable<DiagnosticAnalyzer> analyzers)
         {
-            IEnumerable<DiagnosticAnalyzer> analyzers = GetAnalyzers(package, language);
-
-            Debug.Assert(analyzers.Any(), "There should be analyzers in the package passed to this method.");
+            Debug.Assert(analyzers.Any(), "The method must be called with a populated list of DiagnosticAnalyzers.");
 
             this.logger.LogInfo(UIResources.APG_AnalyzersLocated, package.Id, analyzers.Count());
 
@@ -178,7 +178,7 @@ namespace SonarQube.Plugins.Roslyn
             // Collect the remaining data required to build the plugin
             RoslynPluginDefinition definition = new RoslynPluginDefinition();
             definition.Language = language;
-            definition.SqaleFilePath = SqaleFilePath;
+            definition.SqaleFilePath = sqaleFilePath;
             definition.PackageId = package.Id;
             definition.PackageVersion = package.Version.ToString();
             definition.Manifest = CreatePluginManifest(package);
@@ -217,8 +217,7 @@ namespace SonarQube.Plugins.Roslyn
         {
             if (generatedSqaleFile != null)
             {
-                // Log a message about the generated sqale file at the end of the process: if we
-                // log it earlier it will be too easy to miss
+                // Log a message about the generated SQALE file for every plugin generated
                 this.logger.LogInfo(UIResources.APG_TemplateSqaleFileGenerated, generatedSqaleFile);
             }
         }
@@ -274,11 +273,6 @@ namespace SonarQube.Plugins.Roslyn
             baseDirectory = Utilities.CreateSubDirectory(baseDirectory, Guid.NewGuid().ToString());
             this.logger.LogDebug(UIResources.APG_CreatedTempWorkingDir, baseDirectory);
             return baseDirectory;
-        }
-
-        private bool HasAnalyzers(IPackage package, string language)
-        {
-            return GetAnalyzers(package, language).Any();
         }
 
         /// <summary>
