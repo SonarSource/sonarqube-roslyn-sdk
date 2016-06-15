@@ -10,6 +10,14 @@ See this [blog post](https://blogs.msdn.microsoft.com/visualstudioalm/2016/02/18
 ### Download latest release
 The latest release version (v1.0) is available [here](https://github.com/SonarSource-VisualStudio/sonarqube-roslyn-sdk/releases/download/1.0/SonarQube.Roslyn.SDK-1.0.zip).
 
+#### Current limitations:
+   - the analyzer must be available as a NuGet package
+   - the analyzer must use __Roslyn v1.0 or v1.1__ (newer versions of Roslyn are not yet supported - see issue [SFSRAP-45](https://jira.sonarsource.com/browse/SFSRAP-45) for a workaround)
+   - only C# rules are supported
+
+These limitations will be addressed at some point in the future.
+
+
 ### Target users
 There are two groups of target users:
 
@@ -20,13 +28,6 @@ There are two groups of target users:
    - If the analyzer author has not provided a SonarQube plugin for their analyzer then users will be able to generate a plugin from an analyzer NuGet package, although they won't be able to provide such rich metadata.
 
 ### Getting started
-
-#### Current limitations:
-   - the analyzer must be available as a NuGet package
-   - the analyzer must use Roslyn v1.0 or v1.1
-   - only C# rules are supported
-
-These limitations will be addressed at some point in the future.
 
 #### To generate a SonarQube plugin for an analyzer:
 1. Download and install the latest [released version](https://github.com/SonarSource-VisualStudio/sonarqube-roslyn-sdk/releases/download/1.0/SonarQube.Roslyn.SDK-1.0.zip)
@@ -57,15 +58,17 @@ If you want to provide SQALE information in the generated plugin, you can copy a
 See the [SonarQube documentation](http://docs.sonarqube.org/x/_yBq) for more information about how SonarQube uses the SQALE method.
 
 
-#### Generating a jar for a private Roslyn analyzer
-If you want to create a jar for Roslyn analyzer that is not available from a public NuGet feed (e.g. an analyzer you have created on your local machine) you can generate a jar file for it by specifying a package source that points at a local directory containing the *.nupkg* file created by the standard Roslyn templates. See the [NuGet docs](https://docs.nuget.org/create/hosting-your-own-nuget-feeds) for more information.
-
 #### Configuring NuGet feeds
 The SDK will look for NuGet.config files in the following locations:
 - in the directory containing *RoslynSonarQubeGenerator.exe*
 - %AppData%\NuGet (i.e. the standard pre-user location)
 - %ProgramData%\NuGet\Config\SonarQube (a custom machine-wide location
 - %ProgramData%\NuGet\Config (i.e. the standard machine-wide location)
+
+If the analyzer you want to package is available in a private NuGet feed then you will need to create an appropriate NuGet.config file to point to the private feed.
+
+#### Generating a jar for an analyzer that is not available from a NuGet feed
+If you want to create a jar for Roslyn analyzer that is not available from a NuGet feed (e.g. an analyzer you have created on your local machine) you can specify a package source that points at a local directory containing the *.nupkg* file created by the standard Roslyn templates. See the [NuGet docs](https://docs.nuget.org/create/hosting-your-own-nuget-feeds) for more information.
 
 #### NuGet packaging information
 
