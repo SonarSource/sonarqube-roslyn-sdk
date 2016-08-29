@@ -67,6 +67,9 @@ The SDK will look for NuGet.config files in the following locations:
 
 If the analyzer you want to package is available in a private NuGet feed then you will need to create an appropriate NuGet.config file to point to the private feed.
 
+#### Generating plugins for aggregating packages
+Some NuGet packages exist to associate several related packages together. To simplify the process of creating plugins for such aggregating packages, the */recurse* flag can be used e.g. *RoslynSonarQubeGenerator CodeCracker /recurse*. The tool will search the dependencies of the given package and create plugins for any dependencies that contain Roslyn analyzers.
+
 #### Generating a jar for an analyzer that is not available from a NuGet feed
 If you want to create a jar for Roslyn analyzer that is not available from a NuGet feed (e.g. an analyzer you have created on your local machine) you can specify a package source that points at a local directory containing the *.nupkg* file created by the standard Roslyn templates. See the [NuGet docs](https://docs.nuget.org/create/hosting-your-own-nuget-feeds) for more information.
 
