@@ -185,6 +185,11 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                     sqaleFilePath = arg.Value;
                     this.logger.LogDebug(CmdLineResources.DEBUG_UsingSqaleFile, sqaleFilePath);
                 }
+                else if (Directory.Exists(arg.Value))
+                {
+                    sqaleFilePath = arg.Value;
+                    this.logger.LogDebug(CmdLineResources.DEBUG_UsingSqalePath, sqaleFilePath);
+                }
                 else
                 {
                     sucess = false;

@@ -135,6 +135,9 @@
   <data name="DEBUG_UsingSqaleFile" xml:space="preserve">
     <value>Using SQALE file '{0}'</value>
   </data>
+  <data name="DEBUG_UsingSqalePath" xml:space="preserve">
+    <value>Using SQALE files in path '{0}'</value>
+  </data>
   <data name="ERROR_InvalidVersion" xml:space="preserve">
     <value>Invalid NuGet package version: {0}</value>
   </data>

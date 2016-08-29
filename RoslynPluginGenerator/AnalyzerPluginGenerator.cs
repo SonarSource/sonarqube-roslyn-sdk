@@ -190,13 +190,21 @@ namespace SonarQube.Plugins.Roslyn
 
             definition.RulesFilePath = GenerateRulesFile(analyzers, baseDirectory);
 
-            string generatedSqaleFile = null;
+            string generatedSqaleFile = CalculateSqaleFileName(package, outputDir);
             bool generate = true;
+
+            // check if the path provided is a directory
+            if (definition.SqaleFilePath != null 
+                && Directory.Exists(definition.SqaleFilePath))
+            {
+                definition.SqaleFilePath = Path.Combine(definition.SqaleFilePath, generatedSqaleFile);
+            }
+
             if (definition.SqaleFilePath == null)
             {
-                generatedSqaleFile = CalculateSqaleFileName(package, outputDir);
                 GenerateFixedSqaleFile(analyzers, generatedSqaleFile);
                 Debug.Assert(File.Exists(generatedSqaleFile));
+                LogMessageForGeneratedSqale(generatedSqaleFile);
             }
             else
             {
@@ -207,8 +215,6 @@ namespace SonarQube.Plugins.Roslyn
             {
                 createdJarFilePath = BuildPlugin(definition, outputDir);
             }
-
-            LogMessageForGeneratedSqale(generatedSqaleFile);
 
             return createdJarFilePath;
         }
@@ -368,14 +374,19 @@ namespace SonarQube.Plugins.Roslyn
         {
             Debug.Assert(!string.IsNullOrWhiteSpace(sqaleFilePath));
             // Existence is checked when parsing the arguments
-            Debug.Assert(File.Exists(sqaleFilePath), "Expecting the sqale file to exist: " + sqaleFilePath);
+            
+            if (!File.Exists(sqaleFilePath))
+            {
+                this.logger.LogError(UIResources.APG_InvalidSqaleFile, sqaleFilePath);
+                return false;
+            }
 
             try
             {
                 // TODO: consider adding further checks
                 Serializer.LoadModel<SqaleModel>(sqaleFilePath);
             }
-            catch(InvalidOperationException) // will be thrown for invalid xml
+            catch (InvalidOperationException) // will be thrown for invalid xml
             {
                 this.logger.LogError(UIResources.APG_InvalidSqaleFile, sqaleFilePath);
                 return false;
