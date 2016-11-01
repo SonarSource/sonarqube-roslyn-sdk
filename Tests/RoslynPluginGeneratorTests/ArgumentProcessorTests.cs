@@ -164,14 +164,14 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
 
             AssertArgumentsNotProcessed(actualArgs, logger);
 
-            // 2. Unrecognised argument -> invalid
+            // 2. Unrecognized argument -> invalid
             logger = new TestLogger();
             rawArgs = new string[] { "/a:validId", "/acceptLicenses=true" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             AssertArgumentsNotProcessed(actualArgs, logger);
 
-            // 3. Unrecognised argument -> invalid
+            // 3. Unrecognized argument -> invalid
             logger = new TestLogger();
             rawArgs = new string[] { "/a:validId", "/acceptLicensesXXX" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);

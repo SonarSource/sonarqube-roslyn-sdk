@@ -4,6 +4,7 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
+
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -40,7 +41,7 @@ namespace SonarQube.Plugins.Common
             }
             this.ResolverCalled = true;
 
-            this.rootSearchPaths = rootSearchPaths;            
+            this.rootSearchPaths = rootSearchPaths;
             this.logger = logger;
 
             // This line required to resolve the Resources object before additional assembly resolution is added
@@ -54,14 +55,14 @@ namespace SonarQube.Plugins.Common
         {
             // This line causes a StackOverflowException unless Resources has already been called upon previously
             this.logger.LogDebug(Resources.Resolver_ResolvingAssembly, args.Name, args?.RequestingAssembly?.FullName ?? Resources.Resolver_UnspecifiedRequestingAssembly);
-            Assembly asm = null;
+            Assembly asm;
 
             // The supplied assembly name could be a file name or an assembly full name. Work out which it is
             bool isFileName = Utilities.IsAssemblyLibraryFileName(args.Name);
 
             // Now work out the file name we are looking for
             string fileName = GetAssemblyFileName(args.Name);
-            
+
 
             foreach (string rootSearchPath in rootSearchPaths)
             {

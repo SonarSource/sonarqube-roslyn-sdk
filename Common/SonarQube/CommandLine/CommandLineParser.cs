@@ -4,6 +4,7 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
+
 using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
@@ -15,9 +16,9 @@ namespace SonarQube.Common
     /// <summary>
     /// Process and validates the command line arguments and reports any errors
     /// </summary>
-    /// <remarks>The command line parsing makes a number of simplying assumptions:
+    /// <remarks>The command line parsing makes a number of simplifying assumptions:
     /// * order is unimportant
-    /// * all arguments have a recognisable prefix e.g. /key= 
+    /// * all arguments have a recognizable prefix e.g. /key=
     /// * the first matching prefix will be used (so if descriptors have overlapping prefixes they need
     ///   to be supplied to the parser in the correct order on construction)
     /// * the command line arguments are those supplied in Main(args) i.e. they have been converted
@@ -72,7 +73,7 @@ namespace SonarQube.Common
 
 
             bool parsedOk = true;
-            
+
             // List of values that have been recognized
             IList<ArgumentInstance> recognized = new List<ArgumentInstance>();
 
@@ -152,7 +153,7 @@ namespace SonarQube.Common
             Debug.Assert(descriptor.Prefixes.Count(p => argument.StartsWith(p, ArgumentDescriptor.IdComparison)) < 2,
                 "Not expecting the argument to match multiple prefixes");
 
-            string match = null;
+            string match;
             if (descriptor.IsVerb)
             {
                 // Verbs match the whole argument
@@ -193,6 +194,6 @@ namespace SonarQube.Common
             }
             return allExist;
         }
-        
+
     }
 }

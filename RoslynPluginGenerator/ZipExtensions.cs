@@ -42,7 +42,7 @@ namespace SonarQube.Plugins.Roslyn
                 {
                     archive.CreateEntryFromFile(file, file.Substring(pathPrefixLength), CompressionLevel.Optimal);
                 }
-            };
+            }
         }
     }
 }

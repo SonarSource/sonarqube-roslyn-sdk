@@ -4,6 +4,7 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
+
 using SonarQube.Plugins.Common;
 using SonarQube.Common;
 using System;
@@ -33,7 +34,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
 
         static ArgumentProcessor()
         {
-            // Initialise the set of valid descriptors.
+            // Initialize the set of valid descriptors.
             // To add a new argument, just add it to the list.
             Descriptors = new List<ArgumentDescriptor>();
 

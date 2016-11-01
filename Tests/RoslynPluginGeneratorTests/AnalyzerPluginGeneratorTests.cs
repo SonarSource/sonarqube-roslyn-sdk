@@ -586,7 +586,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         [TestMethod]
         public void CreatePluginManifest_Owners_NotAvailable()
         {
-            // When the package.Owners field is null, we should fallback to Authors for setting the organisation.
+            // When the package.Owners field is null, we should fallback to Authors for setting the organization.
 
             // Arrange
             DataServicePackage testPackage = CreateTestDataServicePackage();

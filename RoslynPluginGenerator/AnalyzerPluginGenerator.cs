@@ -101,7 +101,7 @@ namespace SonarQube.Plugins.Roslyn
                         analyzersByPackage.Add(dependencyPackage, dependencyAnalyzers);
                     }
                     else
-                    { 
+                    {
                         this.logger.LogWarning(UIResources.APG_NoAnalyzersFound, dependencyPackage.Id);
                     }
                 }
@@ -146,7 +146,7 @@ namespace SonarQube.Plugins.Roslyn
                 {
                     // No way to specify the SQALE file for any but the user-targeted package at this time
                     string generatedJarPath = GeneratePluginForPackage(args.OutputDirectory, args.Language, null, currentPackage, analyzersByPackage[currentPackage]);
-                    if (generatedJarFiles == null)
+                    if (generatedJarPath == null)
                     {
                         return false;
                     }
@@ -325,12 +325,14 @@ namespace SonarQube.Plugins.Roslyn
             RuleGenerator ruleGen = new RuleGenerator(this.logger);
             Rules rules = ruleGen.GenerateRules(analyzers);
 
-            Debug.Assert(rules != null, "Not expecting the generated rules to be null");
-
             if (rules != null)
             {
                 rules.Save(rulesFilePath, logger);
                 this.logger.LogDebug(UIResources.APG_RulesGeneratedToFile, rules.Count, rulesFilePath);
+            }
+            else
+            {
+                Debug.Fail("Not expecting the generated rules to be null");
             }
 
             return rulesFilePath;
@@ -339,8 +341,7 @@ namespace SonarQube.Plugins.Roslyn
         private static string CalculateSqaleFileName(IPackage package, string directory)
         {
             string filePath = string.Format(System.Globalization.CultureInfo.CurrentCulture,
-                SqaleTemplateFileNameFormat,
-                package.Id, package.Version.ToString());
+                SqaleTemplateFileNameFormat, package.Id, package.Version);
 
             filePath = Path.Combine(directory, filePath);
             return filePath;
@@ -353,7 +354,7 @@ namespace SonarQube.Plugins.Roslyn
         {
             this.logger.LogInfo(UIResources.APG_GeneratingConstantSqaleFile);
 
-            HardcodedConstantSqaleGenerator generator = new HardcodedConstantSqaleGenerator(this.logger);
+            HardcodedConstantSqaleGenerator generator = new HardcodedConstantSqaleGenerator();
 
             SqaleModel sqale = generator.GenerateSqaleData(analyzers, DefaultRemediationCost);
 

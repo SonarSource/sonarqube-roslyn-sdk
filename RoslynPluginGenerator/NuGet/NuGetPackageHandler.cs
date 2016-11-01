@@ -4,6 +4,7 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
+
 using NuGet;
 using System;
 using System.Collections.Generic;
@@ -77,7 +78,7 @@ namespace SonarQube.Plugins.Roslyn
                 try
                 {
                     // Prerelease packages enabled by default
-                    this.packageManager.InstallPackage(package, false, true, false);                   
+                    this.packageManager.InstallPackage(package, false, true, false);
                 }
                 catch (InvalidOperationException e)
                 {
@@ -88,7 +89,7 @@ namespace SonarQube.Plugins.Roslyn
 
             return package;
         }
-                
+
         public IEnumerable<IPackage> GetInstalledDependencies(IPackage package)
         {
             if (package == null)
@@ -146,7 +147,7 @@ namespace SonarQube.Plugins.Roslyn
                     }
                 }
             }
-            
+
             return package;
         }
 
@@ -194,8 +195,8 @@ namespace SonarQube.Plugins.Roslyn
 
         private void GetAllDependencies(IPackage current, List<IPackage> collectedDependencies)
         {
-            this.logger.LogDebug(UIResources.NG_ResolvingPackageDependencies, current.Id, current.Version);
             Debug.Assert(current != null);
+            this.logger.LogDebug(UIResources.NG_ResolvingPackageDependencies, current.Id, current.Version);
 
             foreach (PackageDependency dependency in current.GetCompatiblePackageDependencies(null))
             {

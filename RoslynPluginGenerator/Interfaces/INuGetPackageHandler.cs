@@ -4,13 +4,14 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
+
 using NuGet;
 using System.Collections.Generic;
 
 namespace SonarQube.Plugins.Roslyn
 {
     /// <summary>
-    /// Enacapsulates the interactions with NuGet
+    /// Encapsulates the interactions with NuGet
     /// </summary>
     public interface INuGetPackageHandler
     {
@@ -21,9 +22,8 @@ namespace SonarQube.Plugins.Roslyn
         /// </summary>
         /// <param name="packageId">The package identifier</param>
         /// <param name="version">The version of the package to download. Can be null,
-        /// in which case the most recent version will be downloaded (which could be 
-        /// a pre-release version).</param>
-        /// 
+        /// in which case the most recent version will be downloaded (which could be a pre-release version).
+        /// </param>
         /// <returns>A reference to the package, or null if the package could not be located</returns>
         IPackage FetchPackage(string packageId, SemanticVersion version);
 

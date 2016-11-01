@@ -4,10 +4,10 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using SonarLint.XmlDescriptor;
-using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,14 +19,7 @@ namespace SonarQube.Plugins.Roslyn
     /// </summary>
     public class HardcodedConstantSqaleGenerator
     {
-        private readonly ILogger logger;
-
         private string remediationConstantValue;
-
-        public HardcodedConstantSqaleGenerator(ILogger logger)
-        {
-            this.logger = logger;
-        }
 
         public SqaleModel GenerateSqaleData(IEnumerable<DiagnosticAnalyzer> analyzers, string remediationValue)
         {
@@ -54,9 +47,9 @@ namespace SonarQube.Plugins.Roslyn
         {
             foreach(DiagnosticDescriptor diagnostic in analyzer.SupportedDiagnostics)
             {
-                SqaleDescriptor sqaleDescriptor = new SqaleDescriptor()
+                SqaleDescriptor sqaleDescriptor = new SqaleDescriptor
                 {
-                    Remediation = new SqaleRemediation()
+                    Remediation = new SqaleRemediation
                     {
                         RuleKey = diagnostic.Id
                     },

@@ -4,6 +4,7 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using SonarQube.Plugins.Common;
@@ -74,7 +75,7 @@ namespace SonarQube.Plugins.Roslyn
             Assembly analyzerAssembly = LoadAnalyzerAssembly(assemblyPath);
             IEnumerable<DiagnosticAnalyzer> analyzers = null;
 
-            Debug.Assert(String.Equals(language, LanguageNames.CSharp, StringComparison.Ordinal) 
+            Debug.Assert(String.Equals(language, LanguageNames.CSharp, StringComparison.Ordinal)
                 || String.Equals(language, LanguageNames.VisualBasic, StringComparison.Ordinal));
 
             if (analyzerAssembly != null)
@@ -142,7 +143,7 @@ namespace SonarQube.Plugins.Roslyn
             DiagnosticAnalyzerAttribute analyzerAttribute =
                 (DiagnosticAnalyzerAttribute)Attribute.GetCustomAttribute(type, typeof(DiagnosticAnalyzerAttribute));
 
-            // Analyzer must have a [DiagnosticAnalyzerAttribute] to be recognised as a valid analyzer
+            // Analyzer must have a [DiagnosticAnalyzerAttribute] to be recognized as a valid analyzer
             if (analyzerAttribute == null)
             {
                 return false;

@@ -131,7 +131,7 @@ namespace SonarQube.Common
 
             // If an argument contains a quote then we assume it has been correctly quoted.
             // Otherwise, quote strings that contain spaces.
-            if (quotedArg != null && arg.Contains(' ') && !arg.Contains('"'))
+            if (arg.Contains(' ') && !arg.Contains('"'))
             {
                 quotedArg = "\"" + arg + "\"";
             }

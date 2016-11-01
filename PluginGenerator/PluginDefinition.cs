@@ -4,8 +4,8 @@
 //   Licensed under the MIT License. See License.txt in the project root for license information.
 // </copyright>
 //-----------------------------------------------------------------------
+
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
 
@@ -17,13 +17,6 @@ namespace SonarQube.Plugins
     /// </summary>
     public class PluginManifest
     {
-        private readonly IDictionary<string, string> relativePathToFileMap;
-
-        public PluginManifest()
-        {
-            this.relativePathToFileMap = new Dictionary<string, string>();
-        }
-
         /// <summary>
         /// Provide a unique identifier for the plugin
         /// </summary>
@@ -67,7 +60,7 @@ namespace SonarQube.Plugins
 
             XmlSerializer serializer = new XmlSerializer(typeof(PluginManifest));
 
-            PluginManifest defn = null;
+            PluginManifest defn;
             using (Stream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 defn = serializer.Deserialize(stream) as PluginManifest;
