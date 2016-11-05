@@ -391,7 +391,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             IPackage parent = CreatePackageWithAnalyzer(remoteRepoBuilder, "parent.id", "1.0", License.NotRequired, child1, child2);
 
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
-            
+
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
 
             // 1. Generate a plugin for the target package only. Expecting a plugin and a template SQALE file.
@@ -412,6 +412,55 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             AssertSqaleFileExistsForPackage(logger, outputDir, child1);
             AssertSqaleFileExistsForPackage(logger, outputDir, child2);
 
+        }
+
+        [TestMethod]
+        public void Generate_SqaleFolderSpecified_TemplateFileNotCreated()
+        {
+            // Arrange
+            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+
+            TestLogger logger = new TestLogger();
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            IPackage child1 = CreatePackageWithAnalyzer(remoteRepoBuilder, "child1.requiredAccept.id", "2.1", License.NotRequired);
+            IPackage child2 = CreatePackageWithAnalyzer(remoteRepoBuilder, "child2.id", "2.2", License.NotRequired);
+            IPackage parent = CreatePackageWithAnalyzer(remoteRepoBuilder, "parent.id", "1.0", License.NotRequired, child1, child2);
+
+            Func<IPackage, string> packageNameFunc =
+                new Func<IPackage, string>(
+                    package => string.Format("{0}.{1}.sqale.template.xml", package.Id, package.Version));
+
+            // Create a dummy sqale files
+            string dummySqaleFilePath = Path.Combine(outputDir, packageNameFunc(child1));
+            SqaleModel dummySqale = new SqaleModel();
+            Serializer.SaveModel(dummySqale, dummySqaleFilePath);
+            
+            dummySqaleFilePath = Path.Combine(outputDir, packageNameFunc(child2));
+            dummySqale = new SqaleModel();
+            Serializer.SaveModel(dummySqale, dummySqaleFilePath);
+            
+            dummySqaleFilePath = Path.Combine(outputDir, packageNameFunc(parent));
+            dummySqale = new SqaleModel();
+            Serializer.SaveModel(dummySqale, dummySqaleFilePath);
+
+            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
+
+            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
+
+            // 1. Generate a plugin for the target package only. Expecting a plugin and a template SQALE file.
+            ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", ".", false, false, outputDir);
+            bool result = apg.Generate(args);
+
+            Assert.IsTrue(result, "Expecting generation to have succeeded");
+            logger.AssertWarningNotLogged(".id");
+
+            // 2. Generate a plugin for target package and all dependencies. Expecting three plugins and associated SQALE files.
+            logger.Reset();
+            args = CreateArgs("parent.id", "1.0", "cs", ".", false, true /* /recurse = true */, outputDir);
+            result = apg.Generate(args);
+
+            Assert.IsTrue(result, "Expecting generation to have succeeded");
+            logger.AssertWarningNotLogged(".id");
         }
 
         [TestMethod]

@@ -115,6 +115,15 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Using SQALE files in path &apos;{0}&apos;.
+        /// </summary>
+        internal static string DEBUG_UsingSqalePath {
+            get {
+                return ResourceManager.GetString("DEBUG_UsingSqalePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid NuGet package version: {0}.
         /// </summary>
         internal static string ERROR_InvalidVersion {
