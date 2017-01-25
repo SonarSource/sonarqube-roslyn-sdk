@@ -22,7 +22,7 @@ These limitations will be addressed at some point in the future.
 There are two groups of target users:
 
 1. Roslyn analyzer authors
-   - Analyzer authors will be able to use the tools during development to provide additional metadata about their rules (e.g. SonarQube severity, tags, a richer description, SQALE information) and generate the SonarQube plugin.
+   - Analyzer authors will be able to use the tools during development to provide additional metadata about their rules (e.g. SonarQube severity, tags, a richer description, ...) and generate the SonarQube plugin.
 
 2. Roslyn analyzer users
    - If the analyzer author has not provided a SonarQube plugin for their analyzer then users will be able to generate a plugin from an analyzer NuGet package, although they won't be able to provide such rich metadata.
@@ -48,14 +48,6 @@ e.g. *wintellectanalyzers-plugin-1.0.5.jar*
 
 The generated jar can be installed to SonarQube as normal (e.g. by dropping it in the SonarQube server *extensions\plugins* folder and restarting the SonarQube server).
 You will see a new repository containing all of the rules defined by the analyzer. The rules can be added to Quality Profiles just like any other SonarQube rule.
-
-#### Adding SQALE information to the generated plugin
-The generator will create a template SQALE file that contains placeholders for the each rule in the analyzer being packaged. The template file will be created in the same folder as the generater .jar and will be named
-*{package id}.{package version}.sqale.template.xml*.
-
-If you want to provide SQALE information in the generated plugin, you can copy and manually edit the template file to contain the appropriate remediation information. Then generate the plugin again, this time specifying the */sqale:{filename}* option to tell the generator to embed the SQALE file in the plugin.
-
-See the [SonarQube documentation](http://docs.sonarqube.org/x/_yBq) for more information about how SonarQube uses the SQALE method.
 
 
 #### Configuring NuGet feeds
