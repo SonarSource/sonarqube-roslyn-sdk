@@ -40,7 +40,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
-            ProcessedArgs args = CreateArgs("no.analyzers.id", "0.9", "cs", null, false, false, outputDir);
+            ProcessedArgs args = CreateArgs("no.analyzers.id", "0.9", "cs", null, false, false, outputDir, false);
 
             // Act
             bool result = apg.Generate(args);
@@ -70,7 +70,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // 1. Acceptance not required -> succeeds if accept = false
             ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ ,
-                false, outputDir);
+                false, outputDir, false);
             bool result = apg.Generate(args);
             Assert.IsTrue(result, "Generator should succeed if there are no licenses to accept");
 
@@ -80,7 +80,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             logger.AssertWarningNotLogged("grandchild.id");
 
             // 2. Acceptance not required -> succeeds if accept = true
-            args = CreateArgs("parent.id", "1.0", "cs", null, true /* accept licenses */, false, outputDir);
+            args = CreateArgs("parent.id", "1.0", "cs", null, true /* accept licenses */, false, outputDir, false);
             result = apg.Generate(args);
             Assert.IsTrue(result, "Generator should succeed if there are no licenses to accept");
 
@@ -107,7 +107,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, logger);
 
             // Act
-            ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false, true /* /recurse = true */, outputDir);
+            ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false, true /* /recurse = true */, outputDir, false);
             bool result = apg.Generate(args);
 
             // Assert
@@ -135,7 +135,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // 1. User does not accept -> fails with error
             ProcessedArgs args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, false /* accept licenses */ ,
-                false, outputDir);
+                false, outputDir, false);
             bool result = apg.Generate(args);
             Assert.IsFalse(result, "Generator should fail because license has not been accepted");
 
@@ -146,7 +146,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // 2. User accepts -> succeeds with warnings
             logger.Reset();
             args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, true /* accept licenses */ ,
-                false /* generate plugins for dependencies */, outputDir);
+                false /* generate plugins for dependencies */, outputDir, false);
             result = apg.Generate(args);
             Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
 
@@ -172,7 +172,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // 1. User does not accept -> fails with error
             ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ ,
-                false, outputDir);
+                false, outputDir, false);
             bool result = apg.Generate(args);
             Assert.IsFalse(result, "Generator should fail because license has not been accepted");
 
@@ -183,7 +183,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // 2. User accepts -> succeeds with warnings
             logger.Reset();
             args = CreateArgs("parent.id", "1.0", "cs", null, true /* accept licenses */ ,
-                false, outputDir);
+                false, outputDir, false);
             result = apg.Generate(args);
             Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
 
@@ -211,7 +211,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // 1. a) Only target package. User does not accept -> fails with error
             ProcessedArgs args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, false /* accept licenses */ ,
-                false, outputDir);
+                false, outputDir, false);
             bool result = apg.Generate(args);
             Assert.IsFalse(result, "Generator should fail because license has not been accepted");
 
@@ -224,7 +224,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // 2. User accepts -> succeeds with warnings
             logger.Reset();
             args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, true /* accept licenses */ ,
-                false, outputDir);
+                false, outputDir, false);
             result = apg.Generate(args);
             Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
 
@@ -254,7 +254,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // 1. User does not accept, but no analyzers so no license prompt -> fails due absence of analyzers
             ProcessedArgs args = CreateArgs("non-analyzer.requireAccept.id", "1.0", "cs", null, false /* accept licenses */ ,
-                false, outputDir);
+                false, outputDir, false);
             bool result = apg.Generate(args);
             Assert.IsFalse(result, "Expecting generator to fail");
 
@@ -289,7 +289,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // 1. a) Only target package. Acceptance not required -> fails due to absence of analyzers
             ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ ,
-                false, outputDir);
+                false, outputDir, false);
             bool result = apg.Generate(args);
             Assert.IsFalse(result, "Expecting generator to fail");
 
@@ -301,7 +301,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // 1. b) Target package and dependencies. Acceptance not required -> succeeds if generate dependencies = true
             logger.Reset();
             args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ ,
-                true /* generate plugins for dependencies */, outputDir);
+                true /* generate plugins for dependencies */, outputDir, false);
             result = apg.Generate(args);
             Assert.IsTrue(result, "Generator should succeed if there are no licenses to accept");
 
@@ -338,7 +338,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // 1. a) Only target package. User does not accept, but no analyzers so no license prompt -> fails due to absence of analyzers
             ProcessedArgs args = CreateArgs("non-analyzer.parent.requireAccept.id", "1.0", "cs", null, false /* accept licenses */ ,
-                false, outputDir);
+                false, outputDir, false);
             bool result = apg.Generate(args);
             Assert.IsFalse(result, "Expecting generator to fail");
 
@@ -351,7 +351,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // No analyzers in the target package, but analyzers in the dependencies -> fails with error
             logger.Reset();
             args = CreateArgs("non-analyzer.parent.requireAccept.id", "1.0", "cs", null, false /* accept licenses */ ,
-                true /* generate plugins for dependencies */, outputDir);
+                true /* generate plugins for dependencies */, outputDir, false);
             result = apg.Generate(args);
             Assert.IsFalse(result, "Generator should fail because license has not been accepted");
 
@@ -366,7 +366,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // No analyzers in the target package, but analyzers in the dependencies -> succeeds with warnings
             logger.Reset();
             args = CreateArgs("non-analyzer.parent.requireAccept.id", "1.0", "cs", null, true /* accept licenses */ ,
-                true /* generate plugins for dependencies */, outputDir);
+                true /* generate plugins for dependencies */, outputDir, false);
             result = apg.Generate(args);
             Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
 
@@ -395,7 +395,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
 
             // 1. Generate a plugin for the target package only. Expecting a plugin and a template SQALE file.
-            ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false, false, outputDir);
+            ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false, false, outputDir, false);
             bool result = apg.Generate(args);
 
             Assert.IsTrue(result, "Expecting generation to have succeeded");
@@ -403,7 +403,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // 2. Generate a plugin for target package and all dependencies. Expecting three plugins and associated SQALE files.
             logger.Reset();
-            args = CreateArgs("parent.id", "1.0", "cs", null, false, true /* /recurse = true */, outputDir);
+            args = CreateArgs("parent.id", "1.0", "cs", null, false, true /* /recurse = true */, outputDir, false);
             result = apg.Generate(args);
 
             Assert.IsTrue(result, "Expecting generation to have succeeded");
@@ -430,7 +430,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             SqaleModel dummySqale = new SqaleModel();
             Serializer.SaveModel(dummySqale, dummySqaleFilePath);
 
-            ProcessedArgs args = CreateArgs("dummy.id", "1.1", "cs", dummySqaleFilePath, false, false, outputDir);
+            ProcessedArgs args = CreateArgs("dummy.id", "1.1", "cs", dummySqaleFilePath, false, false, outputDir, false);
 
             // Act
             bool result = apg.Generate(args);
@@ -459,7 +459,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
 
-            ProcessedArgs args = CreateArgs("dummy.id", "1.1", "cs", dummySqaleFilePath, false, false, outputDir);
+            ProcessedArgs args = CreateArgs("dummy.id", "1.1", "cs", dummySqaleFilePath, false, false, outputDir, false);
 
             // Act
             bool result = apg.Generate(args);
@@ -603,7 +603,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
         #region Private methods
 
-        private static ProcessedArgs CreateArgs(string packageId, string packageVersion, string language, string sqaleFilePath, bool acceptLicenses, bool recurseDependencies, string outputDirectory)
+        private static ProcessedArgs CreateArgs(string packageId, string packageVersion, string language, string sqaleFilePath, bool acceptLicenses, bool recurseDependencies, string outputDirectory, bool combineIdAndName)
         {
             ProcessedArgs args = new ProcessedArgs(
                 packageId,
@@ -612,7 +612,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                 sqaleFilePath,
                 acceptLicenses,
                 recurseDependencies,
-                outputDirectory);
+                outputDirectory,
+                combineIdAndName);
             return args;
         }
         

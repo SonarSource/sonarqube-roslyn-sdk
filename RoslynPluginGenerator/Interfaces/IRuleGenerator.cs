@@ -17,6 +17,6 @@ namespace SonarQube.Plugins.Roslyn
         /// <summary>
         /// Generates SonarQube rules from a collection of Roslyn rules (aka diagnostics)
         /// </summary>
-        Rules GenerateRules(IEnumerable<DiagnosticAnalyzer> diagnostics);
+        Rules GenerateRules(IEnumerable<DiagnosticAnalyzer> diagnostics, UserOptions userOptions);
     }
 }

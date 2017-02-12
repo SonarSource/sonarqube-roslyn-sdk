@@ -79,6 +79,15 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to /combineIdAndName - indicates that you can combine Id and Name when you get rule name.
+        /// </summary>
+        internal static string ArgDescription_CombineIdAndName {
+            get {
+                return ResourceManager.GetString("ArgDescription_CombineIdAndName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to /recurse - search for analyzers in target package and any dependencies.
         /// </summary>
         internal static string ArgDescription_RecurseDependencies {

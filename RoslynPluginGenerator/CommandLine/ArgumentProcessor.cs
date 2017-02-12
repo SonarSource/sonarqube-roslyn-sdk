@@ -28,6 +28,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             public const string SqaleXmlFile = "sqale.xml";
             public const string AcceptLicenses = "accept.licenses";
             public const string RecurseDependencies = "recurse.dependencies";
+            public const string CombineIdAndName = "combine.id.and.name";
         }
 
         private static IList<ArgumentDescriptor> Descriptors;
@@ -44,6 +45,8 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                 id: KeywordIds.SqaleXmlFile, prefixes: new string[] { "/sqale:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_SqaleXmlFile));
             Descriptors.Add(new ArgumentDescriptor(
                 id: KeywordIds.AcceptLicenses, prefixes: new string[] { "/acceptLicenses" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_AcceptLicenses, isVerb: true));
+            Descriptors.Add(new ArgumentDescriptor(
+                id: KeywordIds.CombineIdAndName, prefixes: new string[] { "/combineIdAndName" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_CombineIdAndName, isVerb: true));
             Descriptors.Add(new ArgumentDescriptor(
                 id: KeywordIds.RecurseDependencies, prefixes: new string[] { "/recurse" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_RecurseDependencies, isVerb: true));
 
@@ -107,6 +110,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             parsedOk &= TryParseSqaleFile(arguments, out sqaleFilePath);
 
             bool acceptLicense = GetLicenseAcceptance(arguments);
+            bool combineIdAndName = GetCombineIdAndName(arguments);
             bool recurseDependencies = GetRecursion(arguments);
 
             if (parsedOk)
@@ -119,7 +123,8 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                     sqaleFilePath,
                     acceptLicense,
                     recurseDependencies,
-                    System.IO.Directory.GetCurrentDirectory());
+                    System.IO.Directory.GetCurrentDirectory(),
+                    combineIdAndName);
             }
 
             return processed;
@@ -198,6 +203,12 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
         private static bool GetLicenseAcceptance(IEnumerable<ArgumentInstance> arguments)
         {
             ArgumentInstance arg = arguments.SingleOrDefault(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.AcceptLicenses, a.Descriptor.Id));
+            return arg != null;
+        }
+
+        private static bool GetCombineIdAndName(IEnumerable<ArgumentInstance> arguments)
+        {
+            ArgumentInstance arg = arguments.SingleOrDefault(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.CombineIdAndName, a.Descriptor.Id));
             return arg != null;
         }
 

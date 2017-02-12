@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
 using SonarQube.Plugins.Test.Common;
+using Microsoft.CodeAnalysis;
 
 namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
 {
@@ -31,7 +32,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             IRuleGenerator generator = new RuleGenerator(logger);
 
             // Act
-            Rules rules = generator.GenerateRules(new[] { analyzer });
+            Rules rules = generator.GenerateRules(new[] { analyzer }, new UserOptions(combineIdAndName:false));
 
             // Assert
             AssertExpectedRuleCount(2, rules);
@@ -61,7 +62,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             IRuleGenerator generator = new RuleGenerator(logger);
 
             // Act
-            Rules rules = generator.GenerateRules(new[] { analyzer });
+            Rules rules = generator.GenerateRules(new[] { analyzer }, new UserOptions(combineIdAndName: false));
 
             // Assert
             foreach (Rule rule in rules)
@@ -85,7 +86,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             IRuleGenerator generator = new RuleGenerator(logger);
 
             // Act
-            Rules rules = generator.GenerateRules(new[] { analyzer });
+            Rules rules = generator.GenerateRules(new[] { analyzer }, new UserOptions(combineIdAndName: false));
 
             // Assert
             foreach (Rule rule in rules)
@@ -94,6 +95,64 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
 
                 Assert.AreEqual(rule.Description, UIResources.RuleGen_NoDescription);
             }
+        }
+
+        [TestMethod]
+        public void When_CombineIdAndName_Is_True_Then_Rules_Have_IdAndName_As_Name()
+        {
+            // Arrange
+            TestLogger logger = new TestLogger();
+            ConfigurableAnalyzer analyzer = new ConfigurableAnalyzer();
+            string expectedNameDiagnosticID1 = "DiagnosticID1: Title DiagnosticID1";
+            DiagnosticDescriptor expectedDiagnosticID1 = analyzer.RegisterDiagnostic(key: "DiagnosticID1", description: "Description DiagnosticID1", title: "Title DiagnosticID1");
+
+            string expectedNameDiagnosticID2 = "DiagnosticID2: Title DiagnosticID2";
+            DiagnosticDescriptor expectedDiagnosticID2 = analyzer.RegisterDiagnostic(key: "DiagnosticID2", description: "Description DiagnosticID2", title: "Title DiagnosticID2");
+
+            IRuleGenerator generator = new RuleGenerator(logger);
+
+            // Act
+            Rules rules = generator.GenerateRules(new[] { analyzer }, new UserOptions(combineIdAndName: true));
+
+            // Assert
+            Rule actualRuleDiagnosticID1 = rules[0];
+            Rule actualRuleDiagnosticID2 = rules[1];
+
+            Assert.AreEqual(expectedDiagnosticID1.Id, actualRuleDiagnosticID1.InternalKey, "Invalid DiagnosticID1 internal key");
+            Assert.AreEqual(expectedNameDiagnosticID1, actualRuleDiagnosticID1.Name, "Invalid DiagnosticID1 Name");
+
+
+            Assert.AreEqual(expectedDiagnosticID2.Id, actualRuleDiagnosticID2.InternalKey, "Invalid DiagnosticID2 internal key");
+            Assert.AreEqual(expectedNameDiagnosticID2, actualRuleDiagnosticID2.Name, "Invalid DiagnosticID2 Name");
+        }
+
+        [TestMethod]
+        public void When_CombineIdAndName_Is_False_Then_Rules_Have_Name_Without_Id_As_Name()
+        {
+            // Arrange
+            TestLogger logger = new TestLogger();
+            ConfigurableAnalyzer analyzer = new ConfigurableAnalyzer();
+            string expectedNameDiagnosticID1 = "Title DiagnosticID1";
+            DiagnosticDescriptor expectedDiagnosticID1 = analyzer.RegisterDiagnostic(key: "DiagnosticID1", description: "Description DiagnosticID1", title: "Title DiagnosticID1");
+
+            string expectedNameDiagnosticID2 = "Title DiagnosticID2";
+            DiagnosticDescriptor expectedDiagnosticID2 = analyzer.RegisterDiagnostic(key: "DiagnosticID2", description: "Description DiagnosticID2", title: "Title DiagnosticID2");
+
+            IRuleGenerator generator = new RuleGenerator(logger);
+
+            // Act
+            Rules rules = generator.GenerateRules(new[] { analyzer }, new UserOptions(combineIdAndName: false));
+
+            // Assert
+            Rule actualRuleDiagnosticID1 = rules[0];
+            Rule actualRuleDiagnosticID2 = rules[1];
+
+            Assert.AreEqual(expectedDiagnosticID1.Id, actualRuleDiagnosticID1.InternalKey, "Invalid DiagnosticID1 internal key");
+            Assert.AreEqual(expectedNameDiagnosticID1, actualRuleDiagnosticID1.Name, "Invalid DiagnosticID1 Name");
+
+
+            Assert.AreEqual(expectedDiagnosticID2.Id, actualRuleDiagnosticID2.InternalKey, "Invalid DiagnosticID2 internal key");
+            Assert.AreEqual(expectedNameDiagnosticID2, actualRuleDiagnosticID2.Name, "Invalid DiagnosticID2 Name");
         }
 
         #endregion Tests

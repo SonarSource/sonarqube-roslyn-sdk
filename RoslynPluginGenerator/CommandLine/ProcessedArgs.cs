@@ -18,8 +18,9 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
         private readonly bool acceptLicenses;
         private readonly bool recurseDependencies;
         private readonly string outputDirectory;
+        private readonly bool combineIdAndName;
 
-        public ProcessedArgs(string packageId, SemanticVersion packageVersion, string language, string sqaleFilePath, bool acceptLicenses, bool recurseDependencies, string outputDirectory)
+        public ProcessedArgs(string packageId, SemanticVersion packageVersion, string language, string sqaleFilePath, bool acceptLicenses, bool recurseDependencies, string outputDirectory, bool combineIdAndName)
         {
             if (string.IsNullOrWhiteSpace(packageId))
             {
@@ -39,6 +40,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             this.acceptLicenses = acceptLicenses;
             this.recurseDependencies = recurseDependencies;
             this.outputDirectory = outputDirectory;
+            this.combineIdAndName = combineIdAndName;
         }
 
         public string PackageId { get { return this.packageId; } }
@@ -54,5 +56,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
         public bool RecurseDependencies { get { return this.recurseDependencies; } }
 
         public string OutputDirectory { get { return this.outputDirectory; } }
+
+        public bool CombineIdAndName { get { return this.combineIdAndName; } }
     }
 }

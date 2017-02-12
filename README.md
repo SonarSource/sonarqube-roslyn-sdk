@@ -43,6 +43,10 @@ There are two groups of target users:
 It is possible to specify an optional package version
 e.g. */a:Wintellect.Analyzers:1.0.5.0*
 
+Using the */combineIdAndName* you can combine the Id and the Name of the rule to see it in SonarQube.
+e.g. rule name without */combineIdAndName* -> Opening braces must be spaced correctly
+e.g. rule name with */combineIdAndName* -> SA1012: Opening braces must be spaced correctly
+
 The tool will create a .jar file called based on the package name and version in the current directory
 e.g. *wintellectanalyzers-plugin-1.0.5.jar*
 

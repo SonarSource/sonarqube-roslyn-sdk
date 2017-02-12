@@ -120,6 +120,9 @@
   <data name="ArgDescription_AcceptLicenses" xml:space="preserve">
     <value>/acceptLicenses - indicates that you accept the licenses for any packages that required license acceptance</value>
   </data>
+  <data name="ArgDescription_CombineIdAndName" xml:space="preserve">
+    <value>/combineIdAndName - indicates that you can combine Id and Name when you get rule name</value>
+  </data>
   <data name="ArgDescription_AnalzyerRef" xml:space="preserve">
     <value>/a:[NuGet package id]  or  /a:[NuGet package id]:[version]</value>
   </data>

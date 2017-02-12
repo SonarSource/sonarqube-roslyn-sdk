@@ -82,21 +82,21 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             rawArgs = new string[] { "/a:testing.id.no.version" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
-            AssertArgumentsProcessed(actualArgs, logger, "testing.id.no.version", null, null, false);
+            AssertArgumentsProcessed(actualArgs, logger, "testing.id.no.version", null, null, false, false);
 
             // 2. Id and version
             logger = new TestLogger();
             rawArgs = new string[] { "/analyzer:testing.id.with.version:1.0.0-rc1" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
-            AssertArgumentsProcessed(actualArgs, logger, "testing.id.with.version", "1.0.0-rc1", null, false);
+            AssertArgumentsProcessed(actualArgs, logger, "testing.id.with.version", "1.0.0-rc1", null, false, false);
 
             // 3. Id containing a colon, with version
             logger = new TestLogger();
             rawArgs = new string[] { "/analyzer:id.with:colon:2.1.0" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
-            AssertArgumentsProcessed(actualArgs, logger, "id.with:colon", "2.1.0", null, false);
+            AssertArgumentsProcessed(actualArgs, logger, "id.with:colon", "2.1.0", null, false, false);
         }
 
         [TestMethod]
@@ -112,7 +112,7 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             rawArgs = new string[] { "/a:validId" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
-            AssertArgumentsProcessed(actualArgs, logger, "validId", null, null, false);
+            AssertArgumentsProcessed(actualArgs, logger, "validId", null, null, false, false);
 
             // 2. Missing sqale file
             logger = new TestLogger();
@@ -130,7 +130,7 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             rawArgs = new string[] { "/sqale:" + filePath,  "/a:valid:1.0" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
-            AssertArgumentsProcessed(actualArgs, logger, "valid", "1.0", filePath, false);
+            AssertArgumentsProcessed(actualArgs, logger, "valid", "1.0", filePath, false, false);
         }
 
         [TestMethod]
@@ -146,7 +146,7 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             rawArgs = new string[] { "/a:validId", "/acceptLicenses" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
-            AssertArgumentsProcessed(actualArgs, logger, "validId", null, null, true);
+            AssertArgumentsProcessed(actualArgs, logger, "validId", null, null, true, false);
         }
 
         [TestMethod]
@@ -179,6 +179,52 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             AssertArgumentsNotProcessed(actualArgs, logger);
         }
 
+        [TestMethod]
+        public void ArgProc_Combine_Id_And_Name_Rule_Valid()
+        {
+            // 0. Setup
+            TestLogger logger;
+            string[] rawArgs;
+            ProcessedArgs actualArgs;
+
+            // 1. Correct argument -> valid and combineIdAndName is true
+            logger = new TestLogger();
+            rawArgs = new string[] { "/a:validId", "/combineIdAndName" };
+            actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
+
+            AssertArgumentsProcessed(actualArgs, logger, "validId", null, null, false, true);
+        }
+
+        [TestMethod]
+        public void ArgProc_Id_And_Name_Rule_Invalid()
+        {
+            // 0. Setup
+            TestLogger logger;
+            string[] rawArgs;
+            ProcessedArgs actualArgs;
+
+            // 1. Correct text, wrong case -> invalid
+            logger = new TestLogger();
+            rawArgs = new string[] { "/a:validId", "/combineIdName" };
+            actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
+
+            AssertArgumentsNotProcessed(actualArgs, logger);
+
+            // 2. Unrecognized argument -> invalid
+            logger = new TestLogger();
+            rawArgs = new string[] { "/a:validId", "/combineIdAndName=true" };
+            actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
+
+            AssertArgumentsNotProcessed(actualArgs, logger);
+
+            // 3. Unrecognized argument -> invalid
+            logger = new TestLogger();
+            rawArgs = new string[] { "/a:validId", "/combineIdAndNameXXX" };
+            actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
+
+            AssertArgumentsNotProcessed(actualArgs, logger);
+        }
+
         #endregion
 
         #region Checks
@@ -189,7 +235,7 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             logger.AssertErrorsLogged();
         }
 
-        private static void AssertArgumentsProcessed(ProcessedArgs actualArgs, TestLogger logger, string expectedId, string expectedVersion, string expectedSqale, bool expectedAcceptLicenses)
+        private static void AssertArgumentsProcessed(ProcessedArgs actualArgs, TestLogger logger, string expectedId, string expectedVersion, string expectedSqale, bool expectedAcceptLicenses, bool expectedCombineIdAndName)
         {
             Assert.IsNotNull(actualArgs, "Expecting the arguments to have been processed successfully");
 
@@ -212,6 +258,7 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             }
 
             Assert.AreEqual(expectedAcceptLicenses, actualArgs.AcceptLicenses, "Unexpected value for AcceptLicenses");
+            Assert.AreEqual(expectedCombineIdAndName, actualArgs.CombineIdAndName, "Unexpected value for CombineIdAndName");
 
             logger.AssertErrorsLogged(0);
         }
