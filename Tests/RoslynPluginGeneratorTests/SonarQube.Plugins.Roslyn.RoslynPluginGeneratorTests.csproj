@@ -71,6 +71,7 @@
       <HintPath>..\..\packages\System.Collections.Immutable.1.1.37\lib\dotnet\System.Collections.Immutable.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Composition.AttributedModel, Version=1.0.27.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Composition.1.0.27\lib\portable-net45+win8+wp8+wpa81\System.Composition.AttributedModel.dll</HintPath>
       <Private>True</Private>
@@ -97,6 +98,7 @@
       <HintPath>..\..\packages\System.Reflection.Metadata.1.1.0\lib\dotnet5.2\System.Reflection.Metadata.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.XML" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -115,6 +117,7 @@
     <Compile Include="ArchiveUpdaterTests.cs" />
     <Compile Include="ArgumentProcessorTests.cs" />
     <Compile Include="DiagnosticAssemblyScannerTests.cs" />
+    <Compile Include="Infrastructure\MockedAnalyzer.cs" />
     <Compile Include="NuGetMachineWideSettingsTests.cs" />
     <Compile Include="NuGetRepositoryFactoryTests.cs" />
     <Compile Include="Infrastructure\RemoteRepoBuilder.cs" />
@@ -169,6 +172,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="LICENSE.txt" />
+    <EmbeddedResource Include="Rules.Descriptions\DiagnosticID1.html" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

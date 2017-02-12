@@ -179,6 +179,18 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             AssertArgumentsNotProcessed(actualArgs, logger);
         }
 
+        [TestMethod]
+        public void ArgProc_HtmlDescriptionNamespaceProcessed()
+        {
+            var logger = new TestLogger();
+            var htmlDescriptionNamespace = "Some.Namespace";
+            string[] rawArgs = {"/a:validId", $"/d:{htmlDescriptionNamespace}"};
+
+            ProcessedArgs actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
+
+            Assert.AreEqual(actualArgs.HtmlDescriptionResourceNamespace, htmlDescriptionNamespace);
+        }
+
         #endregion
 
         #region Checks

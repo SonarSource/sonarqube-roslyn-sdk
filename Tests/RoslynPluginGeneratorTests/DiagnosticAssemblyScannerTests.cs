@@ -128,7 +128,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
 
             Assert_AnalyzerIsPresent(result, typeof(RoslynAnalyzer10.ExampleAnalyzer2));
 
-            Assert.AreEqual(4, result.Count(), "Unexpected number of C# analyzers returned");
+            Assert.AreEqual(5, result.Count(), "Unexpected number of C# analyzers returned");
         }
 
         #region Private Methods

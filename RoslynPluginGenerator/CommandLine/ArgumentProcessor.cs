@@ -28,6 +28,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             public const string SqaleXmlFile = "sqale.xml";
             public const string AcceptLicenses = "accept.licenses";
             public const string RecurseDependencies = "recurse.dependencies";
+            public const string HtmlDescriptionResourceNamespace = "description.resource.namespace";
         }
 
         private static IList<ArgumentDescriptor> Descriptors;
@@ -46,6 +47,9 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                 id: KeywordIds.AcceptLicenses, prefixes: new string[] { "/acceptLicenses" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_AcceptLicenses, isVerb: true));
             Descriptors.Add(new ArgumentDescriptor(
                 id: KeywordIds.RecurseDependencies, prefixes: new string[] { "/recurse" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_RecurseDependencies, isVerb: true));
+            Descriptors.Add(new ArgumentDescriptor(
+                id: KeywordIds.HtmlDescriptionResourceNamespace, prefixes: new string[] { "/descriptionNamespace:", "/d:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_DescriptionResourceNamespace));
+
 
             Debug.Assert(Descriptors.All(d => d.Prefixes != null && d.Prefixes.Any()), "All descriptors must provide at least one prefix");
             Debug.Assert(Descriptors.Select(d => d.Id).Distinct().Count() == Descriptors.Count, "All descriptors must have a unique id");
@@ -119,10 +123,17 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                     sqaleFilePath,
                     acceptLicense,
                     recurseDependencies,
-                    System.IO.Directory.GetCurrentDirectory());
+                    System.IO.Directory.GetCurrentDirectory(), 
+                    ParseHtmlDescriptionResourceNamespace(arguments));
             }
 
             return processed;
+        }
+
+        private string ParseHtmlDescriptionResourceNamespace(IEnumerable<ArgumentInstance> arguments)
+        {
+            ArgumentInstance argument = arguments.SingleOrDefault(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.HtmlDescriptionResourceNamespace, a.Descriptor.Id));
+            return argument?.Value;
         }
 
         private bool TryParseAnalyzerRef(IEnumerable<ArgumentInstance> arguments, out NuGetReference analyzerRef)

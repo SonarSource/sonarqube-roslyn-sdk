@@ -8,6 +8,8 @@ using RoslynAnalyzer11;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
+using SonarQube.Plugins.Roslyn.CommandLine;
+using SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests.Infrastructure;
 using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
@@ -94,6 +96,33 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
 
                 Assert.AreEqual(rule.Description, UIResources.RuleGen_NoDescription);
             }
+        }
+
+        [TestMethod]
+        public void LoadsHtmlDescriptionsFromResourcesWithoutResourceNamespace()
+        {
+            var logger = new TestLogger();
+            var analyzer = new MockedAnalyzer();
+            analyzer.RegisterDiagnostic(key: "DiagnosticID1", description: "Some plain text description");
+            IRuleGenerator generator = new RuleGenerator(logger);
+
+            Rules rules = generator.GenerateRules(new[] { analyzer });
+
+            Assert.AreEqual(rules.First().Description, "<p>Some html description</p>");
+        }
+
+
+        [TestMethod]
+        public void LoadsHtmlDescriptionsFromResourcesByGivenResourceNamespace()
+        {
+            var logger = new TestLogger();
+            var analyzer = new MockedAnalyzer();
+            analyzer.RegisterDiagnostic(key: "DiagnosticID1", description: "Some plain text description");
+            IRuleGenerator generator = new RuleGenerator(logger, "SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests.Rules.Descriptions");
+
+            Rules rules = generator.GenerateRules(new[] {analyzer});
+
+            Assert.AreEqual(rules.First().Description, "<p>Some html description</p>");
         }
 
         #endregion Tests

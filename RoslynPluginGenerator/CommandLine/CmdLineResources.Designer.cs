@@ -79,6 +79,15 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to /d:[Namespace] or /descriptionNamespace:[Namespace] - Specifies the resource namespace where the html description are embedded..
+        /// </summary>
+        internal static string ArgDescription_DescriptionResourceNamespace {
+            get {
+                return ResourceManager.GetString("ArgDescription_DescriptionResourceNamespace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to /recurse - search for analyzers in target package and any dependencies.
         /// </summary>
         internal static string ArgDescription_RecurseDependencies {

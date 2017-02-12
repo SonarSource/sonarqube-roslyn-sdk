@@ -612,7 +612,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                 sqaleFilePath,
                 acceptLicenses,
                 recurseDependencies,
-                outputDirectory);
+                outputDirectory, 
+                null);
             return args;
         }
         
