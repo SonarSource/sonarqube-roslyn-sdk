@@ -1,5 +1,11 @@
 ## Welcome to the SonarQube Roslyn SDK project
 
+### License
+
+Copyright 2015-2017 SonarSource.
+
+Licensed under the [GNU Lesser General Public License, Version 3.0](http://www.gnu.org/licenses/lgpl.txt)
+
 [![Build status](https://ci.appveyor.com/api/projects/status/q2gc65s7n4wjusp8/branch/master?svg=true)](https://ci.appveyor.com/project/SonarSource/sonarqube-roslyn-sdk/branch/master)
 
 ### Overview
