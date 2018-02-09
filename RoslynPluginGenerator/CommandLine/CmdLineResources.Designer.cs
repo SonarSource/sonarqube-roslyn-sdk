@@ -19,7 +19,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class CmdLineResources {
@@ -70,6 +70,15 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to /addTag:[tag] - add this tag to all rules .
+        /// </summary>
+        internal static string ArgDescription_AddTag {
+            get {
+                return ResourceManager.GetString("ArgDescription_AddTag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to /a:[NuGet package id]  or  /a:[NuGet package id]:[version].
         /// </summary>
         internal static string ArgDescription_AnalzyerRef {
@@ -84,6 +93,15 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
         internal static string ArgDescription_RecurseDependencies {
             get {
                 return ResourceManager.GetString("ArgDescription_RecurseDependencies", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /ruleType:[&quot;CODE_SMELL&quot; (default) or &quot;BUG&quot; or &quot;VULNERABILITY&quot;] - set all rule&apos;s type to Code smell or Bug or Vulnerabilty.
+        /// </summary>
+        internal static string ArgDescription_RuleType {
+            get {
+                return ResourceManager.GetString("ArgDescription_RuleType", resourceCulture);
             }
         }
         

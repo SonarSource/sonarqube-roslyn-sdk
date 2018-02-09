@@ -71,7 +71,10 @@ namespace SonarQube.Plugins.Roslyn
 
         [XmlElement(ElementName = "status")]
         public string Status { get; set; }
-        
+
+        [XmlElement(ElementName = "type")]
+        public string Type { get; set; }
+
         [XmlElement(ElementName = "tag")]
         public string[] Tags { get; set; }
 

@@ -41,6 +41,8 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             public const string SqaleXmlFile = "sqale.xml";
             public const string AcceptLicenses = "accept.licenses";
             public const string RecurseDependencies = "recurse.dependencies";
+            public const string AddTag = "add.tag";
+            public const string RuleType = "rule.type";
         }
 
         private static IList<ArgumentDescriptor> Descriptors;
@@ -59,6 +61,10 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                 id: KeywordIds.AcceptLicenses, prefixes: new string[] { "/acceptLicenses" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_AcceptLicenses, isVerb: true));
             Descriptors.Add(new ArgumentDescriptor(
                 id: KeywordIds.RecurseDependencies, prefixes: new string[] { "/recurse" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_RecurseDependencies, isVerb: true));
+            Descriptors.Add(new ArgumentDescriptor(
+                id: KeywordIds.AddTag, prefixes: new string[] { "/addTag:" }, required: false, allowMultiple: true, description: CmdLineResources.ArgDescription_AddTag));
+            Descriptors.Add(new ArgumentDescriptor(
+                id: KeywordIds.RuleType, prefixes: new string[] { "/ruleType:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_RuleType));
 
             Debug.Assert(Descriptors.All(d => d.Prefixes != null && d.Prefixes.Any()), "All descriptors must provide at least one prefix");
             Debug.Assert(Descriptors.Select(d => d.Id).Distinct().Count() == Descriptors.Count, "All descriptors must have a unique id");
@@ -121,6 +127,8 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
 
             bool acceptLicense = GetLicenseAcceptance(arguments);
             bool recurseDependencies = GetRecursion(arguments);
+            string[] tagsToAdd = GetTagsToAdd(arguments);
+            string ruleType = GetRuleType(arguments);
 
             if (parsedOk)
             {
@@ -132,7 +140,9 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                     sqaleFilePath,
                     acceptLicense,
                     recurseDependencies,
-                    System.IO.Directory.GetCurrentDirectory());
+                    System.IO.Directory.GetCurrentDirectory(),
+                    tagsToAdd,
+                    ruleType);
             }
 
             return processed;
@@ -220,5 +230,17 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             return arg != null;
         }
 
+        private static string[] GetTagsToAdd(IEnumerable<ArgumentInstance> arguments)
+        {
+            ArgumentInstance[] args = arguments.Where(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.AddTag, a.Descriptor.Id)).ToArray();
+            string[] tags = args.Select(x => x.Value).ToArray();
+            return tags;
+        }
+
+        private static string GetRuleType(IEnumerable<ArgumentInstance> arguments)
+        {
+            ArgumentInstance arg = arguments.SingleOrDefault(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.RuleType, a.Descriptor.Id));
+            return arg == null ? null : arg.Value;
+        }
     }
 }
