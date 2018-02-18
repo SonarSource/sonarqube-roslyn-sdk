@@ -21,6 +21,7 @@
 using System.IO;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FluentAssertions;
 using SonarQube.Plugins.Roslyn.CommandLine;
 using SonarQube.Plugins.Test.Common;
 
@@ -146,6 +147,41 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             AssertArgumentsProcessed(actualArgs, logger, "valid", "1.0", filePath, false);
+        }
+
+        [TestMethod]
+        public void ArgProc_RuleFile()
+        {
+            // 0. Setup
+            TestLogger logger;
+            string[] rawArgs;
+            ProcessedArgs actualArgs;
+
+            // 1. No rule file value -> valid
+            logger = new TestLogger();
+            rawArgs = new string[] { "/a:validId" };
+            actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
+
+            actualArgs.RuleFilePath.Should().BeNull();
+
+            // 2. Missing rule file
+            logger = new TestLogger();
+            rawArgs = new string[] { "/rules:missingFile.txt", "/a:validId" };
+            actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
+
+            AssertArgumentsNotProcessed(actualArgs, logger);
+            logger.AssertSingleErrorExists("missingFile.txt"); // should be an error containing the missing file name
+
+            // 3. Existing rule file
+            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string filePath = TestUtils.CreateTextFile("valid.rules.txt", testDir, "rule file contents");
+
+            logger = new TestLogger();
+            rawArgs = new string[] { $"/rules:{filePath}", "/a:valid:1.0" };
+            actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
+
+            actualArgs.Should().NotBeNull();
+            actualArgs.RuleFilePath.Should().Be(filePath);
         }
 
         [TestMethod]

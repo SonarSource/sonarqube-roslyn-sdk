@@ -126,11 +126,17 @@
   <data name="ArgDescription_RecurseDependencies" xml:space="preserve">
     <value>/recurse - search for analyzers in target package and any dependencies</value>
   </data>
+  <data name="ArgDescription_RuleXmlFile" xml:space="preserve">
+    <value>/rules:[path to rules xml file]</value>
+  </data>
   <data name="ArgDescription_SqaleXmlFile" xml:space="preserve">
-    <value>/s:[path to sqale xml file]</value>
+    <value>/sqale:[path to sqale xml file]</value>
   </data>
   <data name="DEBUG_ParsedReference" xml:space="preserve">
     <value>Parsed NuGet reference. Id: {0}, version: {1}</value>
+  </data>
+  <data name="DEBUG_UsingRuleFile" xml:space="preserve">
+    <value>Using rules xml file '{0}'</value>
   </data>
   <data name="DEBUG_UsingSqaleFile" xml:space="preserve">
     <value>Using SQALE file '{0}'</value>
@@ -140,6 +146,9 @@
   </data>
   <data name="ERROR_MissingPackageId" xml:space="preserve">
     <value>NuGet package id must be specified</value>
+  </data>
+  <data name="ERROR_RuleFileNotFound" xml:space="preserve">
+    <value>The specified rules xml file could not found: {0}</value>
   </data>
   <data name="ERROR_SqaleFileNotFound" xml:space="preserve">
     <value>The specified SQALE file could not found: {0}</value>

@@ -421,7 +421,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             result = apg.Generate(args);
 
             result.Should().BeTrue("Expecting generation to have succeeded");
-            logger.AssertSingleWarningExists(UIResources.APG_RecurseEnabled_SQALENotEnabled);
+            logger.AssertSingleWarningExists(UIResources.APG_RecurseEnabled_SQALEandRuleCustomisationNotEnabled);
             AssertSqaleFileExistsForPackage(logger, outputDir, parent);
             AssertSqaleFileExistsForPackage(logger, outputDir, child1);
             AssertSqaleFileExistsForPackage(logger, outputDir, child2);
@@ -481,6 +481,108 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             result.Should().BeFalse("Expecting generation to have failed");
             AssertSqaleTemplateDoesNotExist(outputDir);
             logger.AssertSingleErrorExists("invalidSqale.xml"); // expecting an error containing the invalid sqale file name
+        }
+
+        [TestMethod]
+        public void Generate_RulesFileNotSpecified_TemplateFileCreated()
+        {
+            // Arrange
+            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+
+            var logger = new TestLogger();
+            var remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            var child1 = CreatePackageWithAnalyzer(remoteRepoBuilder, "child1.requiredAccept.id", "2.1", License.NotRequired);
+            var child2 = CreatePackageWithAnalyzer(remoteRepoBuilder, "child2.id", "2.2", License.NotRequired);
+            var parent = CreatePackageWithAnalyzer(remoteRepoBuilder, "parent.id", "1.0", License.NotRequired, child1, child2);
+
+            var nuGetHandler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
+
+            var testSubject = new AnalyzerPluginGenerator(nuGetHandler, logger);
+
+            // 1. Generate a plugin for the target package only. Expecting a plugin and a template rule file.
+            var args = new ProcessedArgsBuilder("parent.id", outputDir)
+                .SetLanguage("cs")
+                .SetPackageVersion("1.0")
+                .SetRecurseDependencies(true)
+                .Build();
+            bool result = testSubject.Generate(args);
+
+            Assert.IsTrue(result, "Expecting generation to have succeeded");
+            AssertRuleTemplateFileExistsForPackage(logger, outputDir, parent);
+
+            // 2. Generate a plugin for target package and all dependencies. Expecting three plugins and associated rule files.
+            logger.Reset();
+            args = CreateArgs("parent.id", "1.0", "cs", null, false, true /* /recurse = true */, outputDir);
+            result = testSubject.Generate(args);
+
+            Assert.IsTrue(result, "Expecting generation to have succeeded");
+            logger.AssertSingleWarningExists(UIResources.APG_RecurseEnabled_SQALEandRuleCustomisationNotEnabled);
+            AssertRuleTemplateFileExistsForPackage(logger, outputDir, parent);
+            AssertRuleTemplateFileExistsForPackage(logger, outputDir, child1);
+            AssertRuleTemplateFileExistsForPackage(logger, outputDir, child2);
+        }
+
+        [TestMethod]
+        public void Generate_ValidRuleFileSpecified_TemplateFileNotCreated()
+        {
+            // Arrange
+            var outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+
+            var remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            var apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder);
+
+            CreatePackageInFakeRemoteRepo(remoteRepoBuilder, "dummy.id", "1.1");
+
+            // Create a dummy rule file
+            var dummyRuleFilePath = Path.Combine(outputDir, "inputRule.xml");
+            Serializer.SaveModel(new Rules(), dummyRuleFilePath);
+
+            var args = new ProcessedArgsBuilder("dummy.id", outputDir)
+                .SetLanguage("cs")
+                .SetPackageVersion("1.1")
+                .SetRuleFilePath(dummyRuleFilePath)
+                .Build();
+
+            // Act
+            bool result = apg.Generate(args);
+
+            // Assert
+            Assert.IsTrue(result, "Expecting generation to have succeeded");
+            AssertRuleTemplateDoesNotExist(outputDir);
+        }
+
+        [TestMethod]
+        public void Generate_InvalidRuleFileSpecified_GeneratorError()
+        {
+            // Arrange
+            var outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+
+            var logger = new TestLogger();
+
+            var remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            CreatePackageInFakeRemoteRepo(remoteRepoBuilder, "dummy.id", "1.1");
+
+            var nuGetHandler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
+
+            // Create an invalid rule file
+            var dummyRuleFilePath = Path.Combine(outputDir, "invalidRule.xml");
+            File.WriteAllText(dummyRuleFilePath, "not valid xml");
+
+            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
+
+            var args = new ProcessedArgsBuilder("dummy.id", outputDir)
+                .SetLanguage("cs")
+                .SetPackageVersion("1.1")
+                .SetRuleFilePath(dummyRuleFilePath)
+                .Build();
+
+            // Act
+            bool result = apg.Generate(args);
+
+            // Assert
+            Assert.IsFalse(result, "Expecting generation to have failed");
+            AssertRuleTemplateDoesNotExist(outputDir);
+            logger.AssertSingleErrorExists("invalidRule.xml"); // expecting an error containing the invalid rule file name
         }
 
         [TestMethod]
@@ -623,6 +725,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                 new SemanticVersion(packageVersion),
                 language,
                 sqaleFilePath,
+                null /* rule xml path */,
                 acceptLicenses,
                 recurseDependencies,
                 outputDirectory);
@@ -684,7 +787,27 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         private static void AssertSqaleTemplateDoesNotExist(string outputDir)
         {
             string[] matches = Directory.GetFiles(outputDir, "*sqale*template*", SearchOption.AllDirectories);
-            matches.Length.Should().Be(0, "Not expecting any squale template files to exist");
+            matches.Length.Should().Be(0, "Not expecting any sqale template files to exist");
+        }
+
+        private static string GetExpectedRuleTemplateFilePath(string outputDir, IPackage package)
+        {
+            return Path.Combine(outputDir, String.Format("{0}.{1}.rules.template.xml", package.Id, package.Version.ToString()));
+        }
+
+        private void AssertRuleTemplateFileExistsForPackage(TestLogger logger, string outputDir, IPackage package)
+        {
+            string expectedFilePath = GetExpectedRuleTemplateFilePath(outputDir, package);
+
+            Assert.IsTrue(File.Exists(expectedFilePath), "Expecting a template rule file to have been created");
+            this.TestContext.AddResultFile(expectedFilePath);
+            logger.AssertSingleInfoMessageExists(expectedFilePath); // should be a message about the generated file
+        }
+
+        private static void AssertRuleTemplateDoesNotExist(string outputDir)
+        {
+            string[] matches = Directory.GetFiles(outputDir, "*rules*template*", SearchOption.AllDirectories);
+            Assert.AreEqual(0, matches.Length, "Not expecting any rules template files to exist");
         }
 
         private static void AssertJarsGenerated(string rootDir, int expectedCount)

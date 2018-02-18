@@ -39,6 +39,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
         {
             public const string AnalyzerRef = "analyzer.ref";
             public const string SqaleXmlFile = "sqale.xml";
+            public const string RuleXmlFile = "rules.xml";
             public const string AcceptLicenses = "accept.licenses";
             public const string RecurseDependencies = "recurse.dependencies";
         }
@@ -55,6 +56,8 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                     id: KeywordIds.AnalyzerRef, prefixes: new string[] { "/analyzer:", "/a:" }, required: true, allowMultiple: false, description: CmdLineResources.ArgDescription_AnalzyerRef),
                 new ArgumentDescriptor(
                     id: KeywordIds.SqaleXmlFile, prefixes: new string[] { "/sqale:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_SqaleXmlFile),
+                new ArgumentDescriptor(
+                    id: KeywordIds.RuleXmlFile, prefixes: new string[] { "/rules:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_RuleXmlFile),
                 new ArgumentDescriptor(
                     id: KeywordIds.AcceptLicenses, prefixes: new string[] { "/acceptLicenses" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_AcceptLicenses, isVerb: true),
                 new ArgumentDescriptor(
@@ -113,6 +116,9 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
 
             parsedOk &= TryParseSqaleFile(arguments, out string sqaleFilePath);
 
+            string ruleFilePath;
+            parsedOk &= TryParseRuleFile(arguments, out ruleFilePath);
+
             bool acceptLicense = GetLicenseAcceptance(arguments);
             bool recurseDependencies = GetRecursion(arguments);
 
@@ -124,6 +130,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                     analyzerRef.Version,
                     SupportedLanguages.CSharp, /* TODO: support multiple languages */
                     sqaleFilePath,
+                    ruleFilePath,
                     acceptLicense,
                     recurseDependencies,
                     System.IO.Directory.GetCurrentDirectory());
@@ -197,6 +204,28 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                 {
                     sucess = false;
                     logger.LogError(CmdLineResources.ERROR_SqaleFileNotFound, arg.Value);
+                }
+            }
+            return sucess;
+        }
+
+        private bool TryParseRuleFile(IEnumerable<ArgumentInstance> arguments, out string ruleFilePath)
+        {
+            bool sucess = true;
+            ruleFilePath = null;
+            ArgumentInstance arg = arguments.SingleOrDefault(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.RuleXmlFile, a.Descriptor.Id));
+
+            if (arg != null)
+            {
+                if (File.Exists(arg.Value))
+                {
+                    ruleFilePath = arg.Value;
+                    this.logger.LogDebug(CmdLineResources.DEBUG_UsingRuleFile, ruleFilePath);
+                }
+                else
+                {
+                    sucess = false;
+                    this.logger.LogError(CmdLineResources.ERROR_RuleFileNotFound, arg.Value);
                 }
             }
             return sucess;
