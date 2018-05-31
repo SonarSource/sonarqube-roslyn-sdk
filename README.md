@@ -8,6 +8,10 @@ Licensed under the [GNU Lesser General Public License, Version 3.0](http://www.g
 
 [![Build status](https://ci.appveyor.com/api/projects/status/q2gc65s7n4wjusp8/branch/master?svg=true)](https://ci.appveyor.com/project/SonarSource/sonarqube-roslyn-sdk/branch/master)
 
+[![Build Status](https://sonarsource.visualstudio.com/_apis/public/build/definitions/399fb241-ecc7-4802-8697-dcdd01fbb832/17/badge)](https://sonarsource.visualstudio.com/DotNetTeam%20Project/_build/index?definitionId=17)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=sonarqube-roslyn-sdk&metric=alert_status)](https://sonarcloud.io/dashboard?id=sonarqube-roslyn-sdk)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=sonarqube-roslyn-sdk&metric=coverage)](https://sonarcloud.io/component_measures?id=sonarqube-roslyn-sdk&metric=coverage)
+
 ### Overview
 This repo contains tools to help integrate Roslyn analyzers with SonarQube so that issues detected by the Roslyn analyzers are reported in SonarQube.
 Specifically, the tools will generate a Java SonarQube plugin that registers the rules with SonarQube. The generated plugin works with the [C# plugin](http://docs.sonarqube.org/x/bAAW) (v4.5 or higher) and the [SonarQube Scanner for MSBuild](http://docs.sonarqube.org/x/Lx9q) (v2.0 or higher) to handle executing the analyzer and uploading any issues.
