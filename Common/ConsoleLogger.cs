@@ -32,6 +32,9 @@ namespace SonarQube.Plugins.Common
         public const ConsoleColor WarningColor = ConsoleColor.Yellow;  
         public const ConsoleColor ErrorColor = ConsoleColor.Red;
 
+public string field1;
+public static void Unused(){}
+
         #region ILogger interface
 
         public void LogDebug(string message, params object[] args)
