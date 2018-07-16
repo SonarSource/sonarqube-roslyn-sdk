@@ -27,15 +27,15 @@ namespace SonarQube.Common
     /// Utility class that changes the console text color for the lifetime of the instance
     /// </summary>
     /// <remarks>This will have no effect if the console output streams have been re-directed</remarks>
-    internal class ConsoleColorScope : IDisposable
+    internal sealed class ConsoleColorScope : IDisposable
     {
         private readonly ConsoleColor originalForeground;
         private readonly ConsoleColor originalBackground;
 
         public ConsoleColorScope(ConsoleColor textColor)
         {
-            this.originalForeground = Console.ForegroundColor;
-            this.originalBackground = Console.BackgroundColor;
+            originalForeground = Console.ForegroundColor;
+            originalBackground = Console.BackgroundColor;
 
             // Check the text doesn't clash with the background color
             ConsoleColor newBackground = Console.BackgroundColor;
@@ -61,15 +61,16 @@ namespace SonarQube.Common
         }
 
         #region IDisposable Support
+
         private bool disposedValue = false; // To detect redundant calls
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
                 if (disposing)
                 {
-                    SetColors(this.originalForeground, this.originalBackground);
+                    SetColors(originalForeground, originalBackground);
                 }
                 disposedValue = true;
             }
@@ -82,7 +83,6 @@ namespace SonarQube.Common
             Dispose(true);
         }
 
-        #endregion
+        #endregion IDisposable Support
     }
 }
-

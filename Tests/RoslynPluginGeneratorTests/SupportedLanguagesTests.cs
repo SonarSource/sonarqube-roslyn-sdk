@@ -18,9 +18,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Test.Common;
-using System;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
@@ -60,10 +60,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void GetRoslynName_Recognised_ReturnsExpected()
         {
             string result = SupportedLanguages.GetRoslynLanguageName("cs");
-            Assert.AreEqual(result, "C#");
+            Assert.AreEqual("C#", result);
 
             result = SupportedLanguages.GetRoslynLanguageName("vb");
-            Assert.AreEqual(result, "Visual Basic");
+            Assert.AreEqual("Visual Basic", result);
         }
     }
 }

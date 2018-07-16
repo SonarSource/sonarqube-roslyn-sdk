@@ -18,10 +18,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using RoslynAnalyzer11;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RoslynAnalyzer11;
 using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
@@ -81,7 +81,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             foreach (Rule rule in rules)
             {
                 VerifyRuleValid(rule);
-                
+
                 Assert.IsNull(rule.Tags);
             }
         }
@@ -133,7 +133,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             VerifyRuleValid(rule);
         }
 
-        /// <summary> 
+        /// <summary>
         /// Verifies that the rule will be accepted by SonarQube validation when rendered into XML.
         /// </summary>
         private static void VerifyRuleValid(Rule rule)

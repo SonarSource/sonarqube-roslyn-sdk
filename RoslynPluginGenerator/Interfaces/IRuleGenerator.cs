@@ -18,8 +18,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Generic;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace SonarQube.Plugins.Roslyn
 {

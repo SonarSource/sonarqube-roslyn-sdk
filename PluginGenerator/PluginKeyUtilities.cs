@@ -37,9 +37,9 @@ namespace SonarQube.Plugins
         {
             if (key == null)
             {
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
             }
-            
+
             StringBuilder sb = new StringBuilder();
 
             foreach (char c in key)
@@ -55,7 +55,7 @@ namespace SonarQube.Plugins
             ThrowIfInvalid(retVal);
             return retVal;
         }
-        
+
         public static void ThrowIfInvalid(string key)
         {
             if (string.IsNullOrWhiteSpace(key) || key.Any(c => !IsValidChar(c)))
@@ -69,6 +69,5 @@ namespace SonarQube.Plugins
         {
             return char.IsLetterOrDigit(c);
         }
-
     }
 }

@@ -18,10 +18,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SonarQube.Plugins.Test.Common;
 using System.IO;
 using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
@@ -36,26 +36,26 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void SdkConfig_SaveAndReload_Succeeds()
         {
             // Arrange
-            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string testDir = TestUtils.CreateTestDirectory(TestContext);
             string filePath = Path.Combine(testDir, "original.txt");
 
-
-            RoslynSdkConfiguration config = new RoslynSdkConfiguration();
-
-            config.PluginKeyDifferentiator = "diff";
-            config.RepositoryKey = "key";
-            config.RepositoryName = "repo.name";
-            config.RepositoryLanguage = "language";
-            config.RulesXmlResourcePath = "rulesPath";
-            config.SqaleXmlResourcePath = "sqalePath";
+            RoslynSdkConfiguration config = new RoslynSdkConfiguration
+            {
+                PluginKeyDifferentiator = "diff",
+                RepositoryKey = "key",
+                RepositoryName = "repo.name",
+                RepositoryLanguage = "language",
+                RulesXmlResourcePath = "rulesPath",
+                SqaleXmlResourcePath = "sqalePath"
+            };
 
             config.Properties["prop1.Key"] = "value1";
             config.Properties["prop2.Key"] = "value2";
 
-            // Save and check 
+            // Save and check
             config.Save(filePath);
             Assert.AreEqual(filePath, config.FileName);
-            this.TestContext.AddResultFile(filePath);
+            TestContext.AddResultFile(filePath);
 
             // Reload and check
             RoslynSdkConfiguration reloaded = RoslynSdkConfiguration.Load(filePath);
@@ -78,6 +78,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void SdkConfig_LoadRealExample_Succeeds()
         {
             // Arrange
+
             #region File content
 
             string exampleConfig = @"<RoslynSdkConfiguration>
@@ -99,17 +100,17 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 </RoslynSdkConfiguration>
 ";
 
-            #endregion
+            #endregion File content
 
-            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string testDir = TestUtils.CreateTestDirectory(TestContext);
             string filePath = TestUtils.CreateTextFile("realPluginProperties.txt", testDir, exampleConfig);
-            this.TestContext.AddResultFile(filePath);
+            TestContext.AddResultFile(filePath);
 
             // Act
             RoslynSdkConfiguration loaded = RoslynSdkConfiguration.Load(filePath);
             string resavedFilePath = Path.Combine(testDir, "resaved.txt");
             loaded.Save(resavedFilePath);
-            this.TestContext.AddResultFile(resavedFilePath);
+            TestContext.AddResultFile(resavedFilePath);
 
             // Assert
             Assert.AreEqual("example", loaded.PluginKeyDifferentiator);
@@ -128,7 +129,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             AssertPropertyExists("example.ruleNamespace", "example.ruleNamespace.Value", loaded.Properties);
         }
 
-        #endregion
+        #endregion Tests
 
         #region Private methods
 
@@ -141,7 +142,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             Assert.AreEqual(expectedValue, actualProperties[expectedKey], "Unexpected value for key '{0}'", expectedKey);
         }
 
-        #endregion
-
+        #endregion Private methods
     }
 }

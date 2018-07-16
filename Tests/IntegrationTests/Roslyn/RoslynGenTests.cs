@@ -18,6 +18,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -25,10 +29,6 @@ using NuGet;
 using SonarQube.Plugins.Roslyn;
 using SonarQube.Plugins.Roslyn.CommandLine;
 using SonarQube.Plugins.Test.Common;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace SonarQube.Plugins.IntegrationTests
 {
@@ -42,17 +42,17 @@ namespace SonarQube.Plugins.IntegrationTests
         {
             // Arrange
             TestLogger logger = new TestLogger();
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
 
             // Create a valid analyzer package
             RoslynAnalyzer11.CSharpAnalyzer analyzer = new RoslynAnalyzer11.CSharpAnalyzer();
 
             string packageId = "Analyzer1.Pkgid1"; // package id is not all lowercase
-            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".fakeRemoteNuGet");
+            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(TestContext, ".fakeRemoteNuGet");
             IPackageManager fakeRemotePkgMgr = CreatePackageManager(fakeRemoteNuGetDir);
             IPackage analyzerPkg =  AddPackage(fakeRemotePkgMgr, packageId, "1.0.2", analyzer.GetType().Assembly.Location);
 
-            string localPackageDestination = TestUtils.CreateTestDirectory(this.TestContext, ".localpackages");
+            string localPackageDestination = TestUtils.CreateTestDirectory(TestContext, ".localpackages");
 
             // Act
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
@@ -74,24 +74,24 @@ namespace SonarQube.Plugins.IntegrationTests
         {
             // Arrange
             TestLogger logger = new TestLogger();
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
             string dummyContentFile = TestUtils.CreateTextFile("dummy.txt", outputDir, "non-analyzer content file");
 
             // Create a valid analyzer package
             RoslynAnalyzer11.CSharpAnalyzer analyzer = new RoslynAnalyzer11.CSharpAnalyzer();
 
-            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".fakeRemoteNuGet");
+            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(TestContext, ".fakeRemoteNuGet");
             IPackageManager fakeRemotePkgMgr = CreatePackageManager(fakeRemoteNuGetDir);
             IPackage child1 = AddPackage(fakeRemotePkgMgr, "Analyzer.Child1", "1.1.0", analyzer.GetType().Assembly.Location);
             IPackage child2 = AddPackage(fakeRemotePkgMgr, "Analyzer.Child2", "1.2.0", analyzer.GetType().Assembly.Location);
             IPackage targetPkg = AddPackage(fakeRemotePkgMgr, "Empty.Parent", "1.0.0", dummyContentFile, child1, child2);
 
-            string localPackageDestination = TestUtils.CreateTestDirectory(this.TestContext, ".localpackages");
+            string localPackageDestination = TestUtils.CreateTestDirectory(TestContext, ".localpackages");
 
             // Act
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
-            ProcessedArgs args = new ProcessedArgs(targetPkg.Id, targetPkg.Version, "cs", null, false, 
+            ProcessedArgs args = new ProcessedArgs(targetPkg.Id, targetPkg.Version, "cs", null, false,
                 true /* generate plugins for dependencies with analyzers*/, outputDir);
             bool result = apg.Generate(args);
 
@@ -103,25 +103,25 @@ namespace SonarQube.Plugins.IntegrationTests
             CheckJarGeneratedForPackage(outputDir, analyzer, child2);
             AssertJarsGenerated(outputDir, 2);
         }
-        
+
         [TestMethod]
         public void RoslynPlugin_GenerateForMultiLevelAnalyzers_Succeeds()
         {
             // Arrange
             TestLogger logger = new TestLogger();
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
 
             // Create a valid analyzer package
             RoslynAnalyzer11.CSharpAnalyzer analyzer = new RoslynAnalyzer11.CSharpAnalyzer();
 
             // Parent and children all have analyzers, expecting plugins for all three
-            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(this.TestContext, ".fakeRemoteNuGet");
+            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(TestContext, ".fakeRemoteNuGet");
             IPackageManager fakeRemotePkgMgr = CreatePackageManager(fakeRemoteNuGetDir);
             IPackage child1 = AddPackage(fakeRemotePkgMgr, "Analyzer.Child1", "1.1.0", analyzer.GetType().Assembly.Location);
             IPackage child2 = AddPackage(fakeRemotePkgMgr, "Analyzer.Child2", "1.2.0", analyzer.GetType().Assembly.Location);
             IPackage targetPkg = AddPackage(fakeRemotePkgMgr, "Empty.Parent", "1.0.0", analyzer.GetType().Assembly.Location, child1, child2);
 
-            string localPackageDestination = TestUtils.CreateTestDirectory(this.TestContext, ".localpackages");
+            string localPackageDestination = TestUtils.CreateTestDirectory(TestContext, ".localpackages");
 
             // Act
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
@@ -187,9 +187,11 @@ namespace SonarQube.Plugins.IntegrationTests
 
             builder.Populate(metadata);
 
-            PhysicalPackageFile file = new PhysicalPackageFile();
-            file.SourcePath = payloadAssemblyFilePath;
-            file.TargetPath = "analyzers/" + Path.GetFileName(payloadAssemblyFilePath);
+            PhysicalPackageFile file = new PhysicalPackageFile
+            {
+                SourcePath = payloadAssemblyFilePath,
+                TargetPath = "analyzers/" + Path.GetFileName(payloadAssemblyFilePath)
+            };
             builder.Files.Add(file);
 
             using (MemoryStream stream = new MemoryStream())
@@ -204,7 +206,7 @@ namespace SonarQube.Plugins.IntegrationTests
             }
         }
 
-        #endregion
+        #endregion Private methods
 
         #region Checks
 
@@ -219,8 +221,8 @@ namespace SonarQube.Plugins.IntegrationTests
             Assert.IsNotNull(jarFilePath);
 
             // Check the content of the files embedded in the jar
-            ZipFileChecker jarChecker = new ZipFileChecker(this.TestContext, jarFilePath);
-            
+            ZipFileChecker jarChecker = new ZipFileChecker(TestContext, jarFilePath);
+
             // Check the contents of the embedded config file
             string embeddedConfigFile = jarChecker.AssertFileExists("org\\sonar\\plugins\\roslynsdk\\configuration.xml");
             RoslynSdkConfiguration config = RoslynSdkConfiguration.Load(embeddedConfigFile);
@@ -250,7 +252,6 @@ namespace SonarQube.Plugins.IntegrationTests
             AssertExpectedManifestValue("Plugin-Key", pluginId.Replace(".", ""), actualManifest); // plugin-key should be lowercase and alphanumeric
             AssertPackagePropertiesInManifest(package, actualManifest);
 
-
             // Check the rules
             string actualRuleFilePath = jarChecker.AssertFileExists("." + config.RulesXmlResourcePath);
             AssertExpectedRulesExist(analyzer, actualRuleFilePath);
@@ -259,7 +260,6 @@ namespace SonarQube.Plugins.IntegrationTests
             CheckEmbeddedAnalyzerPayload(jarChecker, "static\\" + pluginId + "." + package.Version + ".zip",
                 /* zip file contents */
                 "analyzers\\RoslynAnalyzer11.dll");
-
         }
 
         private static void AssertJarsGenerated(string rootDir, int expectedCount)
@@ -267,7 +267,7 @@ namespace SonarQube.Plugins.IntegrationTests
             string[] files = Directory.GetFiles(rootDir, "*.jar", SearchOption.TopDirectoryOnly);
             Assert.AreEqual(expectedCount, files.Length, "Unexpected number of JAR files generated");
         }
-        
+
         private static void AssertExpectedPropertyDefinitionValue(string propertyName, string expectedValue, RoslynSdkConfiguration actualConfig)
         {
             Assert.IsNotNull(actualConfig.Properties, "Configuration Properties should not be null");
@@ -302,7 +302,7 @@ namespace SonarQube.Plugins.IntegrationTests
         }
 
         private static void AssertPackagePropertiesInManifest(IPackage package, string[] actualManifest)
-        {            
+        {
             AssertExpectedManifestValue("Plugin-Name", package.Title, actualManifest);
             AssertExpectedManifestValue("Plugin-Version", package.Version.ToString(), actualManifest);
             AssertExpectedManifestValue("Plugin-Description", package.Description, actualManifest);
@@ -330,10 +330,10 @@ namespace SonarQube.Plugins.IntegrationTests
             // Now create another checker to check the contents of the zip file (strict check this time)
             string embeddedZipFilePath = jarChecker.AssertFileExists(staticResourceName);
 
-            ZipFileChecker embeddedFileChecker = new ZipFileChecker(this.TestContext, embeddedZipFilePath);
+            ZipFileChecker embeddedFileChecker = new ZipFileChecker(TestContext, embeddedZipFilePath);
             embeddedFileChecker.AssertZipContainsOnlyExpectedFiles(expectedZipContents);
         }
 
-        #endregion
+        #endregion Checks
     }
 }

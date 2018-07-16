@@ -18,11 +18,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using System.IO;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NuGet;
 using SonarQube.Plugins.Test.Common;
-using System.IO;
-using System.Linq;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
@@ -154,7 +154,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             logger.AssertErrorsLogged(0);
         }
 
-        #endregion
+        #endregion Tests
 
         #region Private methods
 
@@ -167,12 +167,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // from an XML file on disk
 
             // Note: it's best to use local package sources for enabled packages
-            // i.e. references to local directories. The directories do not have 
+            // i.e. references to local directories. The directories do not have
             // to exist.
             // If you reference a remote package source such as https://www.nuget.org/api/v2/
             // then the repository factory will attempt to contact the remote repo
             // (which is slow) and will fail if it cannot be reached.
-            string testDir = TestUtils.CreateTestDirectory(this.TestContext);            
+            string testDir = TestUtils.CreateTestDirectory(TestContext);
             string fullConfigFilePath = Path.Combine(testDir, "validConfig.txt");
             File.WriteAllText(fullConfigFilePath, configXml);
 
@@ -191,8 +191,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             Assert.AreEqual(expectedSources.Length, actualRepo.Repositories.Count(), "Too many repositories returned");
         }
 
-        #endregion
-
-
+        #endregion Private methods
     }
 }

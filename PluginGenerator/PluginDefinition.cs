@@ -68,7 +68,7 @@ namespace SonarQube.Plugins
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                throw new ArgumentNullException("filePath");
+                throw new ArgumentNullException(nameof(filePath));
             }
 
             XmlSerializer serializer = new XmlSerializer(typeof(PluginManifest));
@@ -86,7 +86,7 @@ namespace SonarQube.Plugins
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                throw new ArgumentNullException("filePath");
+                throw new ArgumentNullException(nameof(filePath));
             }
 
             XmlSerializer serializer = new XmlSerializer(typeof(PluginManifest));
@@ -95,9 +95,9 @@ namespace SonarQube.Plugins
             {
                 serializer.Serialize(stream, this);
             }
-            this.FilePath = FilePath;
+            FilePath = filePath;
         }
 
-        #endregion
+        #endregion Serialization
     }
 }

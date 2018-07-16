@@ -18,13 +18,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using SonarQube.Plugins.Common;
 
 namespace SonarQube.Common
 {
@@ -33,36 +33,28 @@ namespace SonarQube.Common
     /// </summary>
     public class ProcessRunnerArguments
     {
-        private readonly string exeName;
-        private readonly ILogger logger;
-
         /// <summary>
         /// Strings that are used to indicate arguments that contain
         /// sensitive data that should not be logged
         /// </summary>
-        public static readonly string[] SensitivePropertyKeys = new string[] { };
-
+        public static IEnumerable<string> SensitivePropertyKeys { get; }  = new string[] { };
 
         public ProcessRunnerArguments(string exeName, ILogger logger)
         {
             if (string.IsNullOrWhiteSpace(exeName))
             {
-                throw new ArgumentNullException("exeName");
-            }
-            if (logger == null)
-            {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(exeName));
             }
 
-            this.exeName = exeName;
-            this.logger = logger;
+            ExeName = exeName;
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            this.TimeoutInMilliseconds = Timeout.Infinite;
+            TimeoutInMilliseconds = Timeout.Infinite;
         }
 
         #region Public properties
 
-        public string ExeName { get { return this.exeName; } }
+        public string ExeName { get; }
 
         /// <summary>
         /// Non-sensitive command line arguments (i.e. ones that can safely be logged). Optional.
@@ -78,13 +70,13 @@ namespace SonarQube.Common
         /// </summary>
         public IDictionary<string, string> EnvironmentVariables { get; set; }
 
-        public ILogger Logger { get { return this.logger; } }
+        public ILogger Logger { get; }
 
         public string GetQuotedCommandLineArgs()
         {
-            if (this.CmdLineArgs == null) { return null; }
+            if (CmdLineArgs == null) { return null; }
 
-            return string.Join(" ", this.CmdLineArgs.Select(a => GetQuotedArg(a)));
+            return string.Join(" ", CmdLineArgs.Select(a => GetQuotedArg(a)));
         }
 
         /// <summary>
@@ -93,13 +85,13 @@ namespace SonarQube.Common
         /// </summary>
         public string GetCommandLineArgsLogText()
         {
-            if (this.CmdLineArgs == null) { return null; }
+            if (CmdLineArgs == null) { return null; }
 
             bool hasSensitiveData = false;
 
             StringBuilder sb = new StringBuilder();
 
-            foreach (string arg in this.CmdLineArgs)
+            foreach (string arg in CmdLineArgs)
             {
                 if (ContainsSensitiveData(arg))
                 {
@@ -152,7 +144,6 @@ namespace SonarQube.Common
             return quotedArg;
         }
 
-        #endregion
-
+        #endregion Public properties
     }
 }
