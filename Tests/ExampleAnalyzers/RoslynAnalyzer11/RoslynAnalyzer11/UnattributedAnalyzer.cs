@@ -18,26 +18,25 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using System.Collections.Immutable;
 
 namespace RoslynAnalyzer11
 {
     // Test class for SFSRAP-29: analyzers that don't have an [DiagnosticAnalyzer] attribute should be ignored
     // [DiagnosticAnalyzer(LanguageNames.CSharp)]
 #pragma warning disable RS1001 // Missing diagnostic analyzer attribute - deliberately omitted: used in a test
+
     public class UnattributedAnalyzer : DiagnosticAnalyzer
 #pragma warning restore RS1001 // Missing diagnostic analyzer attribute.
     {
-
-        private static DiagnosticDescriptor Rule = new DiagnosticDescriptor("unattributed", "Title", "MessageFormat", "Testing", DiagnosticSeverity.Warning, isEnabledByDefault: true, description: "Description");
+        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor("unattributed", "Title", "MessageFormat", "Testing", DiagnosticSeverity.Warning, isEnabledByDefault: true, description: "Description");
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
 
         public override void Initialize(AnalysisContext context)
         {
         }
-
     }
 }

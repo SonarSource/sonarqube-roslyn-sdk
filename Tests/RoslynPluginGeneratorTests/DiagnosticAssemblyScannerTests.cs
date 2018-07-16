@@ -18,14 +18,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
-using System.Linq;
 using SonarQube.Plugins.Test.Common;
-using System.IO;
-using System;
 
 namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
 {
@@ -57,7 +56,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
 
             string corLibDllPath = typeof(object).Assembly.Location;
-            string thisDllPath = this.GetType().Assembly.Location;
+            string thisDllPath = GetType().Assembly.Location;
 
             // Act
             IEnumerable<DiagnosticAnalyzer> result = scanner.InstantiateDiagnostics(LanguageNames.VisualBasic,
@@ -74,7 +73,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
         {
             // Arrange
             TestLogger logger = new TestLogger();
-            DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger, this.TestContext.DeploymentDirectory);
+            DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger, TestContext.DeploymentDirectory);
 
             string roslynAnalyzer11DllPath = typeof(RoslynAnalyzer11.CSharpAnalyzer).Assembly.Location;
 
@@ -124,7 +123,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger);
 
             string roslynAnalyzer11DllPath = typeof(RoslynAnalyzer11.CSharpAnalyzer).Assembly.Location;
-            string nonAnalyzerAssemblyPath = this.GetType().Assembly.Location;
+            string nonAnalyzerAssemblyPath = GetType().Assembly.Location;
             string roslynAnalyzer10DllPath = typeof(RoslynAnalyzer10.ExampleAnalyzer2).Assembly.Location;
 
             // Act
@@ -167,6 +166,6 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
                 "Expected no analyzers with name: " + analyzerName);
         }
 
-        #endregion
+        #endregion Private Methods
     }
 }

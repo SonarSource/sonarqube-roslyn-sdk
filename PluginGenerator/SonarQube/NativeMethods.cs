@@ -48,7 +48,7 @@ namespace SonarQube.Common
         {
             if (fileName == null)
             {
-                throw new ArgumentNullException("fileName");
+                throw new ArgumentNullException(nameof(fileName));
             }
 
             Debug.Assert(fileName.Equals(Path.GetFileName(fileName), StringComparison.OrdinalIgnoreCase), "Parameter should be a file name i.e. should not include any path elements");
@@ -63,6 +63,6 @@ namespace SonarQube.Common
             return null;
         }
 
-        #endregion
+        #endregion Public methods
     }
 }

@@ -18,9 +18,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.IO.Compression;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SonarQube.Plugins.Test.Common
 {
@@ -29,7 +29,6 @@ namespace SonarQube.Plugins.Test.Common
     /// </summary>
     public class ZipFileChecker
     {
-        private readonly string unzippedDir;
         private readonly TestContext testContext;
 
         public ZipFileChecker(TestContext testContext, string zipFilePath)
@@ -37,18 +36,18 @@ namespace SonarQube.Plugins.Test.Common
             this.testContext = testContext;
             TestUtils.AssertFileExists(zipFilePath);
 
-            this.unzippedDir = TestUtils.CreateTestDirectory(testContext, "unzipped." + Path.GetFileNameWithoutExtension(zipFilePath));
-            ZipFile.ExtractToDirectory(zipFilePath, this.unzippedDir);
+            UnzippedDirectoryPath = TestUtils.CreateTestDirectory(testContext, "unzipped." + Path.GetFileNameWithoutExtension(zipFilePath));
+            ZipFile.ExtractToDirectory(zipFilePath, UnzippedDirectoryPath);
         }
 
         /// <summary>
         /// Returns the folder into which the zip was unpacked
         /// </summary>
-        public string UnzippedDirectoryPath {  get { return this.unzippedDir; } }
+        public string UnzippedDirectoryPath { get; }
 
         public string AssertFileExists(string relativeFilePath)
         {
-            string absolutePath = Path.Combine(this.unzippedDir, relativeFilePath);
+            string absolutePath = Path.Combine(UnzippedDirectoryPath, relativeFilePath);
             Assert.IsTrue(File.Exists(absolutePath), "File does not exist in the zip: {0}", relativeFilePath);
             return absolutePath;
         }
@@ -57,14 +56,14 @@ namespace SonarQube.Plugins.Test.Common
         {
             foreach (string relativePath in expectedRelativePaths)
             {
-                this.testContext.WriteLine("ZipFileChecker: checking for file '{0}'", relativePath);
+                testContext.WriteLine("ZipFileChecker: checking for file '{0}'", relativePath);
 
-                string[] matchingFiles = Directory.GetFiles(this.unzippedDir, relativePath, SearchOption.TopDirectoryOnly);
+                string[] matchingFiles = Directory.GetFiles(UnzippedDirectoryPath, relativePath, SearchOption.TopDirectoryOnly);
 
                 Assert.IsTrue(matchingFiles.Length < 2, "Test error: supplied relative path should not match multiple files");
                 Assert.AreEqual(1, matchingFiles.Length, "Zip file does not contain expected file: {0}", relativePath);
 
-                this.testContext.WriteLine("ZipFileChecker: found at '{0}'", matchingFiles[0]);
+                testContext.WriteLine("ZipFileChecker: found at '{0}'", matchingFiles[0]);
             }
         }
 
@@ -72,9 +71,8 @@ namespace SonarQube.Plugins.Test.Common
         {
             AssertZipContainsFiles(expectedRelativePaths);
 
-            string[] allFilesInZip = Directory.GetFiles(this.unzippedDir, "*.*", SearchOption.AllDirectories);
+            string[] allFilesInZip = Directory.GetFiles(UnzippedDirectoryPath, "*.*", SearchOption.AllDirectories);
             Assert.AreEqual(expectedRelativePaths.Length, allFilesInZip.Length, "Zip contains more files than expected");
         }
-
     }
 }

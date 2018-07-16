@@ -19,13 +19,13 @@
  */
 
 using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.IO;
-using SonarQube.Plugins.Test.Common;
-using System.Reflection;
-using SonarQube.Plugins.Common;
-using Microsoft.CSharp;
 using System.CodeDom.Compiler;
+using System.IO;
+using System.Reflection;
+using Microsoft.CSharp;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SonarQube.Plugins.Common;
+using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.CommonTests
 {
@@ -40,7 +40,7 @@ namespace SonarQube.Plugins.CommonTests
         public void AssemblyResolver_Creation()
         {
             // 1. Null logger
-            AssertException.Expect<ArgumentNullException>(() => new AssemblyResolver(null, new string[] { this.TestContext.TestDeploymentDir }));
+            AssertException.Expect<ArgumentNullException>(() => new AssemblyResolver(null, new string[] { TestContext.TestDeploymentDir }));
 
             // 2. Null paths
             AssertException.Expect<ArgumentException>(() => new AssemblyResolver(new TestLogger(), null));
@@ -57,7 +57,7 @@ namespace SonarQube.Plugins.CommonTests
         {
             // Arrange
             TestLogger logger = new TestLogger();
-            string testFolder = TestUtils.CreateTestDirectory(this.TestContext);
+            string testFolder = TestUtils.CreateTestDirectory(TestContext);
             CompileSimpleAssembly("SimpleAssembly.dll", testFolder, logger);
 
             object simpleObject = null;
@@ -69,7 +69,7 @@ namespace SonarQube.Plugins.CommonTests
                 foreach (string assemblyPath in Directory.GetFiles(testFolder, "*.dll", SearchOption.AllDirectories))
                 {
                     Assembly assembly = Assembly.LoadFile(assemblyPath);
-                    
+
                     foreach (Type type in assembly.GetExportedTypes())
                     {
                         if (!type.IsAbstract)
@@ -83,7 +83,6 @@ namespace SonarQube.Plugins.CommonTests
                 Assert.IsNotNull(simpleObject);
                 Assert.AreEqual<string>("SimpleProgram", simpleObject.GetType().ToString());
                 AssertResolverCaller(resolver);
-
             }
         }
 
@@ -95,7 +94,7 @@ namespace SonarQube.Plugins.CommonTests
         {
             // Arrange
             TestLogger logger = new TestLogger();
-            string testFolder = TestUtils.CreateTestDirectory(this.TestContext);
+            string testFolder = TestUtils.CreateTestDirectory(TestContext);
 
             // Act
             using (AssemblyResolver resolver = new AssemblyResolver(logger, testFolder))
@@ -114,7 +113,7 @@ namespace SonarQube.Plugins.CommonTests
         public void AssemblyResolver_ResolutionByFullAssemblyName_Succeeds()
         {
             // Arrange
-            string testFolder = TestUtils.CreateTestDirectory(this.TestContext);
+            string testFolder = TestUtils.CreateTestDirectory(TestContext);
             Assembly testAssembly = CompileSimpleAssembly("SimpleAssemblyByFullName.dll", testFolder, new TestLogger());
 
             // Act
@@ -131,7 +130,7 @@ namespace SonarQube.Plugins.CommonTests
         public void AssemblyResolver_ResolutionByFileName_Succeeds()
         {
             // Arrante
-            string testFolder = TestUtils.CreateTestDirectory(this.TestContext);
+            string testFolder = TestUtils.CreateTestDirectory(TestContext);
             Assembly testAssembly = CompileSimpleAssembly("SimpleAssemblyByFileName.dll", testFolder, new TestLogger());
 
             // Act
@@ -148,7 +147,7 @@ namespace SonarQube.Plugins.CommonTests
         public void AssemblyResolver_ResolutionByFullAssemblyNameWithSpace_Succeeds()
         {
             // Arrange
-            string testFolder = TestUtils.CreateTestDirectory(this.TestContext);
+            string testFolder = TestUtils.CreateTestDirectory(TestContext);
             Assembly testAssembly = CompileSimpleAssembly("Space in Name ByFullName.dll", testFolder, new TestLogger());
 
             // Act
@@ -165,7 +164,7 @@ namespace SonarQube.Plugins.CommonTests
         public void AssemblyResolver_ResolutionByFileNameWithSpace_Succeeds()
         {
             // Arrante
-            string testFolder = TestUtils.CreateTestDirectory(this.TestContext);
+            string testFolder = TestUtils.CreateTestDirectory(TestContext);
             Assembly testAssembly = CompileSimpleAssembly("Space in Name ByFileName.dll", testFolder, new TestLogger());
 
             // Act
@@ -182,7 +181,7 @@ namespace SonarQube.Plugins.CommonTests
         public void AssemblyResolver_VersionAssemblyRequested()
         {
             // Setup
-            string testFolder = TestUtils.CreateTestDirectory(this.TestContext);
+            string testFolder = TestUtils.CreateTestDirectory(TestContext);
             Assembly testAssembly = CompileSimpleAssembly("VersionAsm1.dll", testFolder, new TestLogger(), "2.1.0.4");
 
             // 1. Search for a version that can be found -> succeeds
@@ -197,7 +196,7 @@ namespace SonarQube.Plugins.CommonTests
             }
         }
 
-        #endregion
+        #endregion Tests
 
         #region Private methods
 
@@ -225,10 +224,12 @@ namespace SonarQube.Plugins.CommonTests
             CompilerResults result = null;
             using (CSharpCodeProvider provider = new CSharpCodeProvider())
             {
-                CompilerParameters options = new CompilerParameters();
-                options.OutputAssembly = outputFilePath;
-                options.GenerateExecutable = true;
-                options.GenerateInMemory = false;
+                CompilerParameters options = new CompilerParameters
+                {
+                    OutputAssembly = outputFilePath,
+                    GenerateExecutable = true,
+                    GenerateInMemory = false
+                };
 
                 result = provider.CompileAssemblyFromSource(options, versionedCode);
 
@@ -245,7 +246,7 @@ namespace SonarQube.Plugins.CommonTests
             return result.CompiledAssembly;
         }
 
-        #endregion
+        #endregion Private methods
 
         #region Checks
 
@@ -289,6 +290,6 @@ namespace SonarQube.Plugins.CommonTests
             Assert.AreEqual(expected.Location, resolved.Location, "Failed to load the expected assembly");
         }
 
-        #endregion
+        #endregion Checks
     }
 }

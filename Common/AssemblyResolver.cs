@@ -25,7 +25,6 @@ using System.Reflection;
 
 namespace SonarQube.Plugins.Common
 {
-
     /// <summary>
     /// Adds additional search directories for assembly resolution
     /// </summary>
@@ -44,18 +43,14 @@ namespace SonarQube.Plugins.Common
         /// <param name="rootSearchPaths">Additional search paths, assumed to be valid system directories</param>
         public AssemblyResolver(ILogger logger, params string[] rootSearchPaths)
         {
-            if (logger == null)
-            {
-                throw new ArgumentNullException("logger");
-            }
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             if (rootSearchPaths == null || rootSearchPaths.Length < 1)
             {
                 throw new ArgumentException(Resources.Resolver_ConstructorNoPaths, "rootSearchPaths");
             }
-            this.ResolverCalled = true;
+            ResolverCalled = true;
 
             this.rootSearchPaths = rootSearchPaths;
-            this.logger = logger;
 
             // This line required to resolve the Resources object before additional assembly resolution is added
             // Do not remove this line, otherwise CurrentDomain_AssemblyResolve will throw a StackOverflowException
@@ -67,7 +62,7 @@ namespace SonarQube.Plugins.Common
         private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             // This line causes a StackOverflowException unless Resources has already been called upon previously
-            this.logger.LogDebug(Resources.Resolver_ResolvingAssembly, args.Name, args?.RequestingAssembly?.FullName ?? Resources.Resolver_UnspecifiedRequestingAssembly);
+            logger.LogDebug(Resources.Resolver_ResolvingAssembly, args.Name, args?.RequestingAssembly?.FullName ?? Resources.Resolver_UnspecifiedRequestingAssembly);
             Assembly asm;
 
             // The supplied assembly name could be a file name or an assembly full name. Work out which it is
@@ -75,7 +70,6 @@ namespace SonarQube.Plugins.Common
 
             // Now work out the file name we are looking for
             string fileName = GetAssemblyFileName(args.Name);
-
 
             foreach (string rootSearchPath in rootSearchPaths)
             {
@@ -91,16 +85,16 @@ namespace SonarQube.Plugins.Common
                         (!isFileName && string.Equals(args.Name, asm.FullName, StringComparison.OrdinalIgnoreCase))
                         )
                     {
-                        this.logger.LogDebug(Resources.Resolver_AssemblyLocated, file);
+                        logger.LogDebug(Resources.Resolver_AssemblyLocated, file);
                         return asm;
                     }
                     else
                     {
-                        this.logger.LogDebug(Resources.Resolver_RejectedAssembly, asm.FullName);
+                        logger.LogDebug(Resources.Resolver_RejectedAssembly, asm.FullName);
                     }
                 }
             }
-            this.logger.LogDebug(Resources.Resolver_FailedToResolveAssembly);
+            logger.LogDebug(Resources.Resolver_FailedToResolveAssembly);
             return null;
         }
 
@@ -124,6 +118,7 @@ namespace SonarQube.Plugins.Common
         }
 
         #region IDisposable Support
+
         private bool disposedValue = false; // To detect redundant calls
 
         private void Dispose(bool disposing)
@@ -132,7 +127,7 @@ namespace SonarQube.Plugins.Common
             {
                 if (disposing)
                 {
-                    this.logger.LogDebug(Resources.Resolver_Dispose);
+                    logger.LogDebug(Resources.Resolver_Dispose);
                     AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomain_AssemblyResolve;
                 }
 
@@ -146,6 +141,7 @@ namespace SonarQube.Plugins.Common
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
         }
-        #endregion
+
+        #endregion IDisposable Support
     }
 }

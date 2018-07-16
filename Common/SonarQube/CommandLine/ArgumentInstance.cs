@@ -31,27 +31,19 @@ namespace SonarQube.Common
     [DebuggerDisplay("{descriptor.Id}={value}")]
     public class ArgumentInstance
     {
-        private readonly ArgumentDescriptor descriptor;
-        private readonly string value;
-
         public ArgumentInstance(ArgumentDescriptor descriptor, string value)
         {
-            if (descriptor == null)
-            {
-                throw new ArgumentNullException("descriptor");
-            }
-            this.descriptor = descriptor;
-            this.value = value;
+            Descriptor = descriptor ?? throw new ArgumentNullException(nameof(descriptor));
+            Value = value;
         }
 
         #region Data
 
-        public ArgumentDescriptor Descriptor { get { return this.descriptor; } }
+        public ArgumentDescriptor Descriptor { get; }
 
-        public string Value { get { return this.value; } }
+        public string Value { get; }
 
-
-        #endregion
+        #endregion Data
 
         #region Static methods
 
@@ -59,11 +51,11 @@ namespace SonarQube.Common
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
             }
             if (arguments == null)
             {
-                throw new ArgumentNullException("arguments");
+                throw new ArgumentNullException(nameof(arguments));
             }
 
             instance = arguments.FirstOrDefault(a => ArgumentDescriptor.IdComparer.Equals(a.Descriptor.Id, id));
@@ -72,10 +64,9 @@ namespace SonarQube.Common
 
         public static bool TryGetArgumentValue(string id, IEnumerable<ArgumentInstance> arguments, out string value)
         {
-            ArgumentInstance instance;
-            if (TryGetArgument(id, arguments, out instance))
+            if (TryGetArgument(id, arguments, out ArgumentInstance instance))
             {
-                value = instance.value;
+                value = instance.Value;
             }
             else
             {
@@ -85,6 +76,6 @@ namespace SonarQube.Common
             return instance != null;
         }
 
-        #endregion
+        #endregion Static methods
     }
 }

@@ -18,13 +18,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using SonarQube.Plugins.Common;
-using SonarQube.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using SonarQube.Common;
+using SonarQube.Plugins.Common;
 
 namespace SonarQube.Plugins.Roslyn.CommandLine
 {
@@ -49,16 +49,17 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
         {
             // Initialize the set of valid descriptors.
             // To add a new argument, just add it to the list.
-            Descriptors = new List<ArgumentDescriptor>();
-
-            Descriptors.Add(new ArgumentDescriptor(
-                id: KeywordIds.AnalyzerRef, prefixes: new string[] { "/analyzer:", "/a:" }, required: true, allowMultiple: false, description: CmdLineResources.ArgDescription_AnalzyerRef));
-            Descriptors.Add(new ArgumentDescriptor(
-                id: KeywordIds.SqaleXmlFile, prefixes: new string[] { "/sqale:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_SqaleXmlFile));
-            Descriptors.Add(new ArgumentDescriptor(
-                id: KeywordIds.AcceptLicenses, prefixes: new string[] { "/acceptLicenses" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_AcceptLicenses, isVerb: true));
-            Descriptors.Add(new ArgumentDescriptor(
-                id: KeywordIds.RecurseDependencies, prefixes: new string[] { "/recurse" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_RecurseDependencies, isVerb: true));
+            Descriptors = new List<ArgumentDescriptor>
+            {
+                new ArgumentDescriptor(
+                id: KeywordIds.AnalyzerRef, prefixes: new string[] { "/analyzer:", "/a:" }, required: true, allowMultiple: false, description: CmdLineResources.ArgDescription_AnalzyerRef),
+                new ArgumentDescriptor(
+                id: KeywordIds.SqaleXmlFile, prefixes: new string[] { "/sqale:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_SqaleXmlFile),
+                new ArgumentDescriptor(
+                id: KeywordIds.AcceptLicenses, prefixes: new string[] { "/acceptLicenses" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_AcceptLicenses, isVerb: true),
+                new ArgumentDescriptor(
+                id: KeywordIds.RecurseDependencies, prefixes: new string[] { "/recurse" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_RecurseDependencies, isVerb: true)
+            };
 
             Debug.Assert(Descriptors.All(d => d.Prefixes != null && d.Prefixes.Any()), "All descriptors must provide at least one prefix");
             Debug.Assert(Descriptors.Select(d => d.Id).Distinct().Count() == Descriptors.Count, "All descriptors must have a unique id");
@@ -68,29 +69,25 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
 
         private class NuGetReference
         {
-            private readonly string packageId;
-            private readonly NuGet.SemanticVersion version;
-
             public NuGetReference(string packageId, NuGet.SemanticVersion version)
             {
                 if (string.IsNullOrWhiteSpace(packageId))
                 {
-                    throw new ArgumentNullException("packageId");
+                    throw new ArgumentNullException(nameof(packageId));
                 }
-                this.packageId = packageId;
-                this.version = version;
+                PackageId = packageId;
+                Version = version;
             }
 
-            public string PackageId { get { return this.packageId; } }
-            public NuGet.SemanticVersion Version { get { return this.version; } }
+            public string PackageId { get; }
+            public NuGet.SemanticVersion Version { get; }
         }
-
 
         public static ProcessedArgs TryProcessArguments(string[] commandLineArgs, ILogger logger)
         {
             if (logger == null)
             {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(logger));
             }
 
             ArgumentProcessor processor = new ArgumentProcessor(logger);
@@ -107,17 +104,14 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
         public ProcessedArgs Process(string[] commandLineArgs)
         {
             ProcessedArgs processed = null;
-            IEnumerable<ArgumentInstance> arguments;
 
             // This call will fail if there are duplicate, missing, or unrecognized arguments
             CommandLineParser parser = new CommandLineParser(Descriptors, false /* don't allow unrecognized */);
-            bool parsedOk = parser.ParseArguments(commandLineArgs, this.logger, out arguments);
+            bool parsedOk = parser.ParseArguments(commandLineArgs, logger, out IEnumerable<ArgumentInstance> arguments);
 
-            NuGetReference analyzerRef;
-            parsedOk &= TryParseAnalyzerRef(arguments, out analyzerRef);
+            parsedOk &= TryParseAnalyzerRef(arguments, out NuGetReference analyzerRef);
 
-            string sqaleFilePath;
-            parsedOk &= TryParseSqaleFile(arguments, out sqaleFilePath);
+            parsedOk &= TryParseSqaleFile(arguments, out string sqaleFilePath);
 
             bool acceptLicense = GetLicenseAcceptance(arguments);
             bool recurseDependencies = GetRecursion(arguments);
@@ -167,13 +161,13 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
 
                 if (string.IsNullOrWhiteSpace(packageId))
                 {
-                    this.logger.LogError(CmdLineResources.ERROR_MissingPackageId, rawVersion);
+                    logger.LogError(CmdLineResources.ERROR_MissingPackageId, rawVersion);
                     return null;
                 }
 
                 if (!NuGet.SemanticVersion.TryParse(rawVersion, out packageVersion))
                 {
-                    this.logger.LogError(CmdLineResources.ERROR_InvalidVersion, rawVersion);
+                    logger.LogError(CmdLineResources.ERROR_InvalidVersion, rawVersion);
                     return null;
                 }
             }
@@ -181,7 +175,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             {
                 packageId = argumentValue;
             }
-            this.logger.LogDebug(CmdLineResources.DEBUG_ParsedReference, packageId, packageVersion);
+            logger.LogDebug(CmdLineResources.DEBUG_ParsedReference, packageId, packageVersion);
 
             return new NuGetReference(packageId, packageVersion);
         }
@@ -197,12 +191,12 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                 if (File.Exists(arg.Value))
                 {
                     sqaleFilePath = arg.Value;
-                    this.logger.LogDebug(CmdLineResources.DEBUG_UsingSqaleFile, sqaleFilePath);
+                    logger.LogDebug(CmdLineResources.DEBUG_UsingSqaleFile, sqaleFilePath);
                 }
                 else
                 {
                     sucess = false;
-                    this.logger.LogError(CmdLineResources.ERROR_SqaleFileNotFound, arg.Value);
+                    logger.LogError(CmdLineResources.ERROR_SqaleFileNotFound, arg.Value);
                 }
             }
             return sucess;
@@ -219,6 +213,5 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             ArgumentInstance arg = arguments.SingleOrDefault(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.RecurseDependencies, a.Descriptor.Id));
             return arg != null;
         }
-
     }
 }

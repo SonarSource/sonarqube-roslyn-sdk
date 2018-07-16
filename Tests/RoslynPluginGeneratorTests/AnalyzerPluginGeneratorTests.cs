@@ -18,14 +18,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using System;
+using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NuGet;
 using SonarLint.XmlDescriptor;
 using SonarQube.Plugins.Roslyn.CommandLine;
 using SonarQube.Plugins.Test.Common;
-using System;
-using System.Linq;
-using System.IO;
 using static SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests.RemoteRepoBuilder;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
@@ -44,12 +43,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_NoAnalyzersFoundInPackage_GenerateFails()
         {
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
 
             TestLogger logger = new TestLogger();
 
             // Create a fake remote repo containing a package that does not contain analyzers
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
             remoteRepoBuilder.CreatePackage("no.analyzers.id", "0.9", TestUtils.CreateTextFile("dummy.txt", outputDir), License.NotRequired /* no dependencies */ );
 
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
@@ -71,8 +70,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_LicenseAcceptanceNotRequired_Succeeds()
         {
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
 
             // Multi-level dependencies: no package requires license acceptence
             IPackage grandchild = CreatePackageWithAnalyzer(remoteRepoBuilder, "grandchild.id", "1.2", License.NotRequired /* no dependencies */);
@@ -109,13 +108,13 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_Recursive_Succeeds()
         {
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
 
             // Multi-level dependencies: no package requires license acceptence
             IPackage grandchild = CreatePackageWithAnalyzer(remoteRepoBuilder, "grandchild.id", "1.2", License.NotRequired /* no dependencies */);
             IPackage child = CreatePackageWithAnalyzer(remoteRepoBuilder, "child.id", "1.1", License.NotRequired, grandchild);
-            IPackage parent = CreatePackageWithAnalyzer(remoteRepoBuilder, "parent.id", "1.0", License.NotRequired, child);
+            CreatePackageWithAnalyzer(remoteRepoBuilder, "parent.id", "1.0", License.NotRequired, child);
 
             TestLogger logger = new TestLogger();
             AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, logger);
@@ -137,8 +136,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_LicenseAcceptanceRequiredByMainPackage()
         {
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
 
             // Parent and child: only parent requires license
             IPackage child = CreatePackageWithAnalyzer(remoteRepoBuilder, "child.id", "1.1", License.NotRequired);
@@ -174,8 +173,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_LicenseAcceptanceRequiredByDependency()
         {
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
 
             // Parent and child: only child requires license
             IPackage child = CreatePackageWithAnalyzer(remoteRepoBuilder, "child.requiredAccept.id", "2.0", License.Required);
@@ -211,8 +210,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_LicenseAcceptanceRequired_ByParentAndDependencies()
         {
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
 
             // Multi-level: parent and some but not all dependencies require license acceptance
             IPackage grandchild1 = CreatePackageWithAnalyzer(remoteRepoBuilder, "grandchild1.requiredAccept.id", "3.0", License.Required);
@@ -255,10 +254,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // No point in asking the user to accept licenses for packages that don't contain analyzers
 
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
             string dummyContentFile = TestUtils.CreateTextFile("dummy.txt", outputDir, "non-analyzer content file");
 
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
 
             // Parent only: requires license
             remoteRepoBuilder.CreatePackage("non-analyzer.requireAccept.id", "1.0", dummyContentFile, License.Required);
@@ -288,9 +287,9 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // We should succeed if we are generating plugins for the targeted package and its dependencies
 
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
             string dummyContentFile = TestUtils.CreateTextFile("dummy.txt", outputDir, "non-analyzer content file");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
 
             // Multi-level dependencies: no package requires license acceptence
             // Parent has no analyzers, but dependencies do
@@ -336,10 +335,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // We should fail with an error due to licenses if we are generating plugins for the targeted package and dependencies
 
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
             string dummyContentFile = TestUtils.CreateTextFile("dummy.txt", outputDir, "non-analyzer content file");
 
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
 
             // Multi-level: parent and some but not all dependencies require license acceptance
             // Parent has no analyzers, but dependencies do
@@ -396,16 +395,16 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_SqaleFileNotSpecified_TemplateFileCreated()
         {
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
 
             TestLogger logger = new TestLogger();
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
             IPackage child1 = CreatePackageWithAnalyzer(remoteRepoBuilder, "child1.requiredAccept.id", "2.1", License.NotRequired);
             IPackage child2 = CreatePackageWithAnalyzer(remoteRepoBuilder, "child2.id", "2.2", License.NotRequired);
             IPackage parent = CreatePackageWithAnalyzer(remoteRepoBuilder, "parent.id", "1.0", License.NotRequired, child1, child2);
 
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
-            
+
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
 
             // 1. Generate a plugin for the target package only. Expecting a plugin and a template SQALE file.
@@ -425,16 +424,15 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             AssertSqaleFileExistsForPackage(logger, outputDir, parent);
             AssertSqaleFileExistsForPackage(logger, outputDir, child1);
             AssertSqaleFileExistsForPackage(logger, outputDir, child2);
-
         }
 
         [TestMethod]
         public void Generate_ValidSqaleFileSpecified_TemplateFileNotCreated()
         {
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
 
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
             AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder);
 
             CreatePackageInFakeRemoteRepo(remoteRepoBuilder, "dummy.id", "1.1");
@@ -458,11 +456,11 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_InvalidSqaleFileSpecified_GeneratorError()
         {
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
 
             TestLogger logger = new TestLogger();
 
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
             CreatePackageInFakeRemoteRepo(remoteRepoBuilder, "dummy.id", "1.1");
 
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
@@ -584,9 +582,9 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // We should also be able to create a plugin manifest from an IPackage that is not a DataServicePackage
 
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
 
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
             IPackage testPackage = remoteRepoBuilder.CreatePackage("Foo.Bar", "1.0.0", TestUtils.CreateTextFile("dummy.txt", outputDir), License.NotRequired);
 
             // Act
@@ -629,7 +627,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                 outputDirectory);
             return args;
         }
-        
+
         private AnalyzerPluginGenerator CreateTestSubjectWithFakeRemoteRepo(RemoteRepoBuilder remoteRepoBuilder)
         {
             return CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, new TestLogger());
@@ -665,7 +663,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
         private string GetLocalNuGetDownloadDir()
         {
-            return TestUtils.EnsureTestDirectoryExists(this.TestContext, ".localNuGetDownload");
+            return TestUtils.EnsureTestDirectoryExists(TestContext, ".localNuGetDownload");
         }
 
         private static string GetExpectedTemplateSqaleFilePath(string outputDir, IPackage package)
@@ -678,7 +676,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             string expectedTemplateSqaleFilePath = GetExpectedTemplateSqaleFilePath(outputDir, package);
 
             Assert.IsTrue(File.Exists(expectedTemplateSqaleFilePath), "Expecting a template sqale file to have been created");
-            this.TestContext.AddResultFile(expectedTemplateSqaleFilePath);
+            TestContext.AddResultFile(expectedTemplateSqaleFilePath);
             logger.AssertSingleInfoMessageExists(expectedTemplateSqaleFilePath); // should be a message about the generated file
         }
 
@@ -694,7 +692,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             Assert.AreEqual(expectedCount, files.Length, "Unexpected number of JAR files generated");
         }
 
-        #endregion
-
+        #endregion Private methods
     }
 }

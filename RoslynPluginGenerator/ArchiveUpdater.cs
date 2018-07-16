@@ -18,11 +18,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using SonarQube.Plugins.Common;
 
 namespace SonarQube.Plugins.Roslyn
 {
@@ -44,25 +44,22 @@ namespace SonarQube.Plugins.Roslyn
         {
             if (string.IsNullOrWhiteSpace(workingDirectory))
             {
-                throw new ArgumentNullException("workingDirectory");
+                throw new ArgumentNullException(nameof(workingDirectory));
             }
-            if (logger == null)
-            {
-                throw new ArgumentNullException("logger");
-            }
-            this.logger = logger;
+
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.workingDirectory = workingDirectory;
 
-            this.fileMap = new Dictionary<string, string>();
+            fileMap = new Dictionary<string, string>();
         }
 
         public ArchiveUpdater SetInputArchive(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                throw new ArgumentNullException("filePath");
+                throw new ArgumentNullException(nameof(filePath));
             }
-            this.inputArchiveFilePath = filePath;
+            inputArchiveFilePath = filePath;
             return this;
         }
 
@@ -70,31 +67,31 @@ namespace SonarQube.Plugins.Roslyn
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                throw new ArgumentNullException("filePath");
+                throw new ArgumentNullException(nameof(filePath));
             }
-            this.outputArchiveFilePath = filePath;
+            outputArchiveFilePath = filePath;
             return this;
         }
 
         public ArchiveUpdater AddFile(string sourceFilePath, string relativeTargetFilePath)
         {
-            this.fileMap[relativeTargetFilePath] = sourceFilePath;
+            fileMap[relativeTargetFilePath] = sourceFilePath;
             return this;
         }
 
         public void UpdateArchive()
         {
-            this.logger.LogDebug(UIResources.ZIP_UpdatingArchive, this.inputArchiveFilePath);
+            logger.LogDebug(UIResources.ZIP_UpdatingArchive, inputArchiveFilePath);
 
-            string unpackedDir = Utilities.CreateSubDirectory(this.workingDirectory, "unpacked");
-            this.logger.LogDebug(UIResources.ZIP_WorkingDirectory, workingDirectory);
+            string unpackedDir = Utilities.CreateSubDirectory(workingDirectory, "unpacked");
+            logger.LogDebug(UIResources.ZIP_WorkingDirectory, workingDirectory);
 
-            ZipFile.ExtractToDirectory(this.inputArchiveFilePath, unpackedDir);
+            ZipFile.ExtractToDirectory(inputArchiveFilePath, unpackedDir);
 
             // Add in the new files
-            foreach (KeyValuePair<string, string> kvp in this.fileMap)
+            foreach (KeyValuePair<string, string> kvp in fileMap)
             {
-                this.logger.LogDebug(UIResources.ZIP_InsertingFile, kvp.Key, kvp.Value);
+                logger.LogDebug(UIResources.ZIP_InsertingFile, kvp.Key, kvp.Value);
 
                 string targetFilePath = Path.Combine(unpackedDir, kvp.Key);
                 Directory.CreateDirectory(Path.GetDirectoryName(targetFilePath));
@@ -102,15 +99,15 @@ namespace SonarQube.Plugins.Roslyn
             }
 
             // Re-zip
-            if (File.Exists(this.outputArchiveFilePath))
+            if (File.Exists(outputArchiveFilePath))
             {
-                this.logger.LogDebug(UIResources.ZIP_DeletingExistingArchive);
-                File.Delete(this.outputArchiveFilePath);
+                logger.LogDebug(UIResources.ZIP_DeletingExistingArchive);
+                File.Delete(outputArchiveFilePath);
             }
 
-            ZipUsingShell(unpackedDir, this.outputArchiveFilePath);
+            ZipUsingShell(unpackedDir, outputArchiveFilePath);
 
-            this.logger.LogDebug(UIResources.ZIP_NewArchiveCreated, this.outputArchiveFilePath);
+            logger.LogDebug(UIResources.ZIP_NewArchiveCreated, outputArchiveFilePath);
         }
 
         /// <summary>
@@ -118,7 +115,7 @@ namespace SonarQube.Plugins.Roslyn
         /// </summary>
         /// <remarks>Re-zipping a jar file using the .Net ZipFile class creates an invalid jar
         /// so we zip using the shell instead.
-        /// The code is doing effectively the same as the PowerShell script used by the 
+        /// The code is doing effectively the same as the PowerShell script used by the
         /// packaging project in the SonarQube Scanner for MSBuild:
         /// See https://github.com/SonarSource-VisualStudio/sonar-msbuild-runner/blob/master/PackagingProjects/CSharpPluginPayload/RepackageCSharpPlugin.ps1
         /// </remarks>
@@ -149,7 +146,7 @@ namespace SonarQube.Plugins.Roslyn
                 folder.CopyHere(dir, copyFlags);
                 System.Threading.Thread.Sleep(copyPauseInMilliseconds);
             }
-            
+
             foreach (string file in Directory.GetFiles(sourceDir, "*.*", SearchOption.TopDirectoryOnly))
             {
                 folder.CopyHere(file, copyFlags);
@@ -171,6 +168,6 @@ namespace SonarQube.Plugins.Roslyn
             }
         }
 
-        #endregion
+        #endregion Public methods
     }
 }

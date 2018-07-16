@@ -18,10 +18,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using NuGet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NuGet;
 
 namespace SonarQube.Plugins.Roslyn
 {
@@ -53,11 +53,11 @@ namespace SonarQube.Plugins.Roslyn
         {
             if (settings == null)
             {
-                throw new ArgumentNullException("settings");
+                throw new ArgumentNullException(nameof(settings));
             }
             if (logger == null)
             {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(logger));
             }
 
             // Load the user and machine-wide settings

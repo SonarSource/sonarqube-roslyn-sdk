@@ -18,55 +18,47 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using NuGet;
 using System;
+using NuGet;
 
 namespace SonarQube.Plugins.Roslyn.CommandLine
 {
     public class ProcessedArgs
     {
-        private readonly string packageId;
-        private readonly SemanticVersion packageVersion;
-        private readonly string sqaleFilePath;
-        private readonly string language;
-        private readonly bool acceptLicenses;
-        private readonly bool recurseDependencies;
-        private readonly string outputDirectory;
-
         public ProcessedArgs(string packageId, SemanticVersion packageVersion, string language, string sqaleFilePath, bool acceptLicenses, bool recurseDependencies, string outputDirectory)
         {
             if (string.IsNullOrWhiteSpace(packageId))
             {
-                throw new ArgumentNullException("packageId");
+                throw new ArgumentNullException(nameof(packageId));
             }
             // Version can be null
             SupportedLanguages.ThrowIfNotSupported(language);
             if (string.IsNullOrWhiteSpace(outputDirectory))
             {
-                throw new ArgumentNullException("outputDirectory");
+                throw new ArgumentNullException(nameof(outputDirectory));
             }
 
-            this.packageId = packageId;
-            this.packageVersion = packageVersion;
-            this.sqaleFilePath = sqaleFilePath; // can be null
-            this.language = language;
-            this.acceptLicenses = acceptLicenses;
-            this.recurseDependencies = recurseDependencies;
-            this.outputDirectory = outputDirectory;
+            PackageId = packageId;
+            PackageVersion = packageVersion;
+            SqaleFilePath = sqaleFilePath; // can be null
+            Language = language;
+            AcceptLicenses = acceptLicenses;
+            RecurseDependencies = recurseDependencies;
+            OutputDirectory = outputDirectory;
         }
 
-        public string PackageId { get { return this.packageId; } }
+        public string PackageId { get; }
 
-        public SemanticVersion PackageVersion { get { return this.packageVersion; } }
+        public SemanticVersion PackageVersion { get; }
 
-        public string SqaleFilePath {  get { return this.sqaleFilePath; } }
+        public string SqaleFilePath { get; }
 
-        public string Language { get { return this.language; } }
+        public string Language { get; }
 
-        public bool AcceptLicenses { get { return this.acceptLicenses; } }
+        public bool AcceptLicenses { get; }
 
-        public bool RecurseDependencies { get { return this.recurseDependencies; } }
+        public bool RecurseDependencies { get; }
 
-        public string OutputDirectory { get { return this.outputDirectory; } }
+        public string OutputDirectory { get; }
     }
 }

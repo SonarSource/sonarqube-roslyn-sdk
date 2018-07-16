@@ -18,8 +18,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using SonarQube.Common;
 using System;
+using SonarQube.Common;
 
 namespace SonarQube.Plugins.Common
 {
@@ -28,8 +28,8 @@ namespace SonarQube.Plugins.Common
         public const string DEBUG_PREFIX = "[DEBUG] ";
         public const string WARNING_PREFIX = "[WARNING] ";
 
-        public const ConsoleColor DebugColor = ConsoleColor.DarkCyan;  
-        public const ConsoleColor WarningColor = ConsoleColor.Yellow;  
+        public const ConsoleColor DebugColor = ConsoleColor.DarkCyan;
+        public const ConsoleColor WarningColor = ConsoleColor.Yellow;
         public const ConsoleColor ErrorColor = ConsoleColor.Red;
 
         #region ILogger interface
@@ -63,7 +63,7 @@ namespace SonarQube.Plugins.Common
             }
         }
 
-        #endregion
+        #endregion ILogger interface
 
         private static string GetFormattedMessage(string prefix, string message, params object[] args)
         {

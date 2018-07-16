@@ -18,8 +18,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using NuGet;
 using System;
+using NuGet;
 
 namespace SonarQube.Plugins.Roslyn
 {
@@ -34,11 +34,7 @@ namespace SonarQube.Plugins.Roslyn
 
         public NuGetLoggerAdapter(Common.ILogger logger)
         {
-            if (logger == null)
-            {
-                throw new ArgumentNullException("logger");
-            }
-            this.logger = logger;
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public void Log(MessageLevel level, string message, params object[] args)
@@ -48,23 +44,26 @@ namespace SonarQube.Plugins.Roslyn
             switch (level)
             {
                 case MessageLevel.Debug:
-                    this.logger.LogDebug(prefixedMessage, args);
+                    logger.LogDebug(prefixedMessage, args);
                     break;
+
                 case MessageLevel.Error:
-                    this.logger.LogError(prefixedMessage, args);
+                    logger.LogError(prefixedMessage, args);
                     break;
+
                 case MessageLevel.Warning:
-                    this.logger.LogWarning(prefixedMessage, args);
+                    logger.LogWarning(prefixedMessage, args);
                     break;
+
                 default:
-                    this.logger.LogInfo(prefixedMessage, args);
+                    logger.LogInfo(prefixedMessage, args);
                     break;
             }
         }
 
         public FileConflictResolution ResolveFileConflict(string message)
         {
-            this.logger.LogDebug(UIResources.NG_FileConflictOccurred, message);
+            logger.LogDebug(UIResources.NG_FileConflictOccurred, message);
             return FileConflictResolution.Ignore;
         }
     }
