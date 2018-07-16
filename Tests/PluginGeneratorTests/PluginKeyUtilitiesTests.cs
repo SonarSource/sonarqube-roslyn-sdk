@@ -18,9 +18,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Test.Common;
-using System;
 
 namespace SonarQube.Plugins.PluginGeneratorTests
 {
@@ -68,7 +68,7 @@ namespace SonarQube.Plugins.PluginGeneratorTests
             CheckThrowIfInvalidThrows("x!\"£$%^&*()_+");
         }
 
-        #endregion
+        #endregion Tests
 
         #region Private methods
 
@@ -91,7 +91,6 @@ namespace SonarQube.Plugins.PluginGeneratorTests
             AssertException.Expect<ArgumentException>(() => PluginKeyUtilities.ThrowIfInvalid(input));
         }
 
-        #endregion
-
+        #endregion Private methods
     }
 }

@@ -18,11 +18,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using System.IO;
+using System.Reflection;
 using NuGet;
 using SonarQube.Plugins.Common;
 using SonarQube.Plugins.Roslyn.CommandLine;
-using System.IO;
-using System.Reflection;
 
 namespace SonarQube.Plugins.Roslyn
 {
@@ -34,11 +34,11 @@ namespace SonarQube.Plugins.Roslyn
         private const int ERROR_CODE = 1;
         private const int SUCCESS_CODE = 0;
 
-        static int Main(string[] args)
+        private static int Main(string[] args)
         {
             ConsoleLogger logger = new ConsoleLogger();
             Utilities.LogAssemblyVersion(typeof(Program).Assembly, UIResources.AssemblyDescription, logger);
-            
+
             ProcessedArgs processedArgs = ArgumentProcessor.TryProcessArguments(args, logger);
 
             bool success = false;

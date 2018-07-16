@@ -18,12 +18,12 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
-using SonarLint.XmlDescriptor;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
+using SonarLint.XmlDescriptor;
 
 namespace SonarQube.Plugins.Roslyn
 {
@@ -38,11 +38,11 @@ namespace SonarQube.Plugins.Roslyn
         {
             if (analyzers == null)
             {
-                throw new ArgumentNullException("analyzers");
+                throw new ArgumentNullException(nameof(analyzers));
             }
 
             Debug.Assert(remediationValue.EndsWith("min"), "Expecting a remediation value in the form '15min'");
-            this.remediationConstantValue = remediationValue;
+            remediationConstantValue = remediationValue;
 
             SqaleModel root = new SqaleModel();
 
@@ -79,7 +79,7 @@ namespace SonarQube.Plugins.Roslyn
                     new SqaleRemediationProperty
                     {
                         Key = "offset",
-                        Value = this.remediationConstantValue,
+                        Value = remediationConstantValue,
                         Text = string.Empty
                     }
                 });
@@ -88,6 +88,6 @@ namespace SonarQube.Plugins.Roslyn
             }
         }
 
-        #endregion
+        #endregion Private methods
     }
 }

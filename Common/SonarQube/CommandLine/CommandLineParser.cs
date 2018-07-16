@@ -18,11 +18,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using SonarQube.Plugins.Common;
 
 namespace SonarQube.Common
 {
@@ -57,12 +57,12 @@ namespace SonarQube.Common
         {
             if (descriptors == null)
             {
-                throw new ArgumentNullException("descriptors");
+                throw new ArgumentNullException(nameof(descriptors));
             }
 
             if (descriptors.Select(d => d.Id).Distinct(ArgumentDescriptor.IdComparer).Count() != descriptors.Count())
             {
-                throw new ArgumentException(Resources.ERROR_Parser_UniqueDescriptorIds, "descriptors");
+                throw new ArgumentException(Resources.ERROR_Parser_UniqueDescriptorIds, nameof(descriptors));
             }
 
             this.descriptors = descriptors;
@@ -77,13 +77,12 @@ namespace SonarQube.Common
         {
             if (commandLineArgs == null)
             {
-                throw new ArgumentNullException("commandLineArgs");
+                throw new ArgumentNullException(nameof(commandLineArgs));
             }
             if (logger == null)
             {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(logger));
             }
-
 
             bool parsedOk = true;
 
@@ -92,17 +91,13 @@ namespace SonarQube.Common
 
             foreach (string arg in commandLineArgs)
             {
-                string prefix;
-                ArgumentDescriptor descriptor;
-
-                if (TryGetMatchingDescriptor(arg, out descriptor, out prefix))
+                if (TryGetMatchingDescriptor(arg, out ArgumentDescriptor descriptor, out string prefix))
                 {
                     string newId = descriptor.Id;
 
                     if (!descriptor.AllowMultiple && IdExists(newId, recognized))
                     {
-                        string existingValue;
-                        ArgumentInstance.TryGetArgumentValue(newId, recognized, out existingValue);
+                        ArgumentInstance.TryGetArgumentValue(newId, recognized, out string existingValue);
                         logger.LogError(Resources.ERROR_CmdLine_DuplicateArg, arg, existingValue);
                         parsedOk = false;
                     }
@@ -115,13 +110,13 @@ namespace SonarQube.Common
                 }
                 else
                 {
-                    if (!this.allowUnrecognized)
+                    if (!allowUnrecognized)
                     {
                         logger.LogError(Resources.ERROR_CmdLine_UnrecognizedArg, arg);
                         parsedOk = false;
                     }
 
-                    Debug.WriteLineIf(this.allowUnrecognized, "Ignoring unrecognized argument: " + arg);
+                    Debug.WriteLineIf(allowUnrecognized, "Ignoring unrecognized argument: " + arg);
                 }
             }
 
@@ -145,20 +140,17 @@ namespace SonarQube.Common
             descriptor = null;
             prefix = null;
 
-            bool found = false;
-
-            foreach (ArgumentDescriptor item in this.descriptors)
+            foreach (ArgumentDescriptor item in descriptors)
             {
                 string match = TryGetMatchingPrefix(item, argument);
                 if (match != null)
                 {
                     descriptor = item;
                     prefix = match;
-                    found = true;
-                    break;
+                    return true;
                 }
             }
-            return found;
+            return false;
         }
 
         private static string TryGetMatchingPrefix(ArgumentDescriptor descriptor, string argument)
@@ -166,25 +158,16 @@ namespace SonarQube.Common
             Debug.Assert(descriptor.Prefixes.Count(p => argument.StartsWith(p, ArgumentDescriptor.IdComparison)) < 2,
                 "Not expecting the argument to match multiple prefixes");
 
-            string match;
-            if (descriptor.IsVerb)
-            {
+            return descriptor.IsVerb
                 // Verbs match the whole argument
-                match = descriptor.Prefixes.FirstOrDefault(p => ArgumentDescriptor.IdComparer.Equals(p, argument));
-            }
-            else
-            {
+                ? descriptor.Prefixes.FirstOrDefault(p => ArgumentDescriptor.IdComparer.Equals(p, argument))
                 // Prefixes only match the start
-                match = descriptor.Prefixes.FirstOrDefault(p => argument.StartsWith(p, ArgumentDescriptor.IdComparison));
-            }
-            return match;
+                : descriptor.Prefixes.FirstOrDefault(p => argument.StartsWith(p, ArgumentDescriptor.IdComparison));
         }
 
         private static bool IdExists(string id, IEnumerable<ArgumentInstance> arguments)
         {
-            ArgumentInstance existing;
-            bool exists = ArgumentInstance.TryGetArgument(id, arguments, out existing);
-            return exists;
+            return ArgumentInstance.TryGetArgument(id, arguments, out ArgumentInstance existing);
         }
 
         /// <summary>
@@ -192,21 +175,18 @@ namespace SonarQube.Common
         /// </summary>
         private bool CheckRequiredArgumentsSupplied(IEnumerable<ArgumentInstance> arguments, ILogger logger)
         {
-            bool allExist = true;
-            foreach (ArgumentDescriptor desc in this.descriptors.Where(d => d.Required))
+            foreach (ArgumentDescriptor desc in descriptors.Where(d => d.Required))
             {
-                ArgumentInstance argument;
-                ArgumentInstance.TryGetArgument(desc.Id, arguments, out argument);
+                ArgumentInstance.TryGetArgument(desc.Id, arguments, out ArgumentInstance argument);
 
                 bool exists = argument != null && !string.IsNullOrWhiteSpace(argument.Value);
                 if (!exists)
                 {
                     logger.LogError(Resources.ERROR_CmdLine_MissingRequiredArgument, desc.Description);
-                    allExist = false;
+                    return false;
                 }
             }
-            return allExist;
+            return true;
         }
-
     }
 }

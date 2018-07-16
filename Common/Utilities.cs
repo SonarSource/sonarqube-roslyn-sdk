@@ -32,11 +32,11 @@ namespace SonarQube.Plugins.Common
         {
             if (assembly == null)
             {
-                throw new ArgumentNullException("assembly");
+                throw new ArgumentNullException(nameof(assembly));
             }
             if (logger == null)
             {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(logger));
             }
 
             logger.LogInfo("{0} {1}", description, assembly.GetName().Version);
@@ -54,11 +54,11 @@ namespace SonarQube.Plugins.Common
         {
             if (string.IsNullOrWhiteSpace(parent))
             {
-                throw new ArgumentNullException("parent");
+                throw new ArgumentNullException(nameof(parent));
             }
             if (string.IsNullOrWhiteSpace(child))
             {
-                throw new ArgumentNullException("child");
+                throw new ArgumentNullException(nameof(child));
             }
 
             string newDir = Path.Combine(parent, child);

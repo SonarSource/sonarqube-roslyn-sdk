@@ -18,12 +18,12 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NuGet;
-using SonarQube.Plugins.Test.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NuGet;
+using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
@@ -37,37 +37,26 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
         private readonly TestContext testContext;
         private readonly PackageManager manager;
-        private readonly IPackageRepository fakeRemoteRepo;
 
         public RemoteRepoBuilder(TestContext testContext)
         {
-            if (testContext == null)
-            {
-                throw new ArgumentNullException("testContext");
-            }
-            this.testContext = testContext;
+            this.testContext = testContext ?? throw new ArgumentNullException(nameof(testContext));
 
             string packageSource = GetFakeRemoteNuGetSourceDir();
-            this.fakeRemoteRepo = PackageRepositoryFactory.Default.CreateRepository(packageSource);
-            this.manager = new PackageManager(this.fakeRemoteRepo, packageSource);
+            FakeRemoteRepo = PackageRepositoryFactory.Default.CreateRepository(packageSource);
+            manager = new PackageManager(FakeRemoteRepo, packageSource);
         }
 
-        public IPackageRepository FakeRemoteRepo
-        {
-            get
-            {
-                return this.fakeRemoteRepo;
-            }
-        }
+        public IPackageRepository FakeRemoteRepo { get; }
 
         public void AddPackage(IPackage package)
         {
             if (package == null)
             {
-                throw new ArgumentNullException("package");
+                throw new ArgumentNullException(nameof(package));
             }
 
-            this.manager.InstallPackage(package, true, true);
+            manager.InstallPackage(package, true, true);
         }
 
         public IPackage CreatePackage(
@@ -109,13 +98,15 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             builder.Populate(metadata);
 
-            PhysicalPackageFile file = new PhysicalPackageFile();
-            file.SourcePath = contentFilePath;
-            file.TargetPath = Path.GetFileName(contentFilePath);
+            PhysicalPackageFile file = new PhysicalPackageFile
+            {
+                SourcePath = contentFilePath,
+                TargetPath = Path.GetFileName(contentFilePath)
+            };
             builder.Files.Add(file);
 
             string fileName = packageId + "." + metadata.Version + ".nupkg";
-            string destinationName = Path.Combine(this.manager.LocalRepository.Source, fileName);
+            string destinationName = Path.Combine(manager.LocalRepository.Source, fileName);
 
             using (Stream fileStream = File.Open(destinationName, FileMode.OpenOrCreate))
             {
@@ -123,16 +114,15 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             }
 
             // Retrieve and return the newly-created package
-            IPackage package = this.fakeRemoteRepo.FindPackage(packageId, new SemanticVersion(packageVersion));
+            IPackage package = FakeRemoteRepo.FindPackage(packageId, new SemanticVersion(packageVersion));
             Assert.IsNotNull(package, "Test setup error: failed to create and retrieve a test package");
 
             return package;
         }
 
-
         private string GetFakeRemoteNuGetSourceDir()
         {
-            return TestUtils.EnsureTestDirectoryExists(this.testContext, ".fakeRemoteNuGet");
+            return TestUtils.EnsureTestDirectoryExists(testContext, ".fakeRemoteNuGet");
         }
     }
 }

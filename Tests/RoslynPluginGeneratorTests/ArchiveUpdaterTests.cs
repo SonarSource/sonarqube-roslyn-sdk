@@ -18,10 +18,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SonarQube.Plugins.Test.Common;
 using System.IO;
 using System.IO.Compression;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
@@ -36,29 +36,28 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void ArchiveUpdater_SimpleUpdateJar_Succeeds()
         {
             // Arrange - create an input archive file
-            string rootTestDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string rootTestDir = TestUtils.CreateTestDirectory(TestContext);
             string originalZipFile = Path.Combine(rootTestDir, "original.zip");
             string updatedZipFile = Path.Combine(rootTestDir, "updated.zip");
 
-            string setupDir = TestUtils.CreateTestDirectory(this.TestContext, ".zip.setup");
+            string setupDir = TestUtils.CreateTestDirectory(TestContext, ".zip.setup");
             TestUtils.CreateTextFile("file1.txt", setupDir, "file 1 content");
             TestUtils.CreateTextFile("sub1\\sub2\\file2.txt", setupDir, "file 2 content");
 
             ZipFile.CreateFromDirectory(setupDir, originalZipFile);
 
             // Sanity check that the test archive was built correctly
-            ZipFileChecker checker = new ZipFileChecker(this.TestContext, originalZipFile);
+            ZipFileChecker checker = new ZipFileChecker(TestContext, originalZipFile);
             checker.AssertZipContainsOnlyExpectedFiles(
                 // Original files
                 "file1.txt",
                 "sub1\\sub2\\file2.txt");
 
-
             // Create some new dummy files to add
             string addFile1 = TestUtils.CreateTextFile("additional1.txt", rootTestDir, "a1");
             string addFile2 = TestUtils.CreateTextFile("additional2.txt", rootTestDir, "a2");
 
-            ArchiveUpdater updater = new ArchiveUpdater(new TestLogger());
+            string updaterRootDir = TestUtils.CreateTestDirectory(TestContext, "updater");
 
             // Act
             updater.SetInputArchive(originalZipFile)
@@ -69,7 +68,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             updater.UpdateArchive();
 
             // Assert
-            checker = new ZipFileChecker(this.TestContext, updatedZipFile);
+            checker = new ZipFileChecker(TestContext, updatedZipFile);
 
             checker.AssertZipContainsOnlyExpectedFiles(
                 // Original files

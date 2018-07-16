@@ -18,11 +18,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SonarQube.Plugins.Test.Common
 {
@@ -84,7 +84,7 @@ namespace SonarQube.Plugins.Test.Common
             {
                 fullPath = Path.Combine(parentDirectory, fileName);
             }
-            
+
             Assert.IsFalse(File.Exists(fullPath), "Not expecting file to exist: {0}", fullPath);
         }
 
@@ -127,9 +127,11 @@ namespace SonarQube.Plugins.Test.Common
 
         private static string GetTestDirectoryName(TestContext testContext, params string[] subDirs)
         {
-            List<string> parts = new List<string>();
-            parts.Add(testContext.TestDeploymentDir);
-            parts.Add(testContext.TestName);
+            List<string> parts = new List<string>
+            {
+                testContext.TestDeploymentDir,
+                testContext.TestName
+            };
 
             if (subDirs.Any())
             {
@@ -140,6 +142,6 @@ namespace SonarQube.Plugins.Test.Common
             return fullPath;
         }
 
-        #endregion
+        #endregion Private methods
     }
 }

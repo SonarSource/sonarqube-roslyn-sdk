@@ -27,7 +27,7 @@ namespace SonarQube.Plugins.Roslyn
     {
         public RoslynSdkConfiguration()
         {
-            this.Properties = new PluginProperties();
+            Properties = new PluginProperties();
         }
 
         public string PluginKeyDifferentiator { get; set; }
@@ -57,10 +57,10 @@ namespace SonarQube.Plugins.Roslyn
         {
             if (string.IsNullOrWhiteSpace(fileName))
             {
-                throw new ArgumentNullException("fileName");
+                throw new ArgumentNullException(nameof(fileName));
             }
 
-            this.FileName = fileName;
+            FileName = fileName;
 
             Serializer.SaveModel(this, fileName);
         }
@@ -72,7 +72,7 @@ namespace SonarQube.Plugins.Roslyn
         {
             if (string.IsNullOrWhiteSpace(fileName))
             {
-                throw new ArgumentNullException("fileName");
+                throw new ArgumentNullException(nameof(fileName));
             }
 
             RoslynSdkConfiguration model = Serializer.LoadModel<RoslynSdkConfiguration>(fileName);

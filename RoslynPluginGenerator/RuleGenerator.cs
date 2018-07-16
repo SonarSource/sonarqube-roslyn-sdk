@@ -18,14 +18,14 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using SonarQube.Plugins.Common;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
 
 namespace SonarQube.Plugins.Roslyn
 {
@@ -48,16 +48,16 @@ namespace SonarQube.Plugins.Roslyn
         /// <summary>
         /// Generate SonarQube specific rules based on Roslyn based diagnostics
         /// </summary>
-        public Rules GenerateRules(IEnumerable<DiagnosticAnalyzer> analyzers)
+        public Rules GenerateRules(IEnumerable<DiagnosticAnalyzer> diagnostics)
         {
-            if (analyzers == null)
+            if (diagnostics == null)
             {
-                throw new ArgumentNullException("analyzers");
+                throw new ArgumentNullException(nameof(diagnostics));
             }
 
             Rules rules = new Rules();
 
-            foreach (DiagnosticAnalyzer analyzer in analyzers)
+            foreach (DiagnosticAnalyzer analyzer in diagnostics)
             {
                 Rules analyzerRules = GetAnalyzerRules(analyzer);
 
@@ -94,19 +94,20 @@ namespace SonarQube.Plugins.Roslyn
                     continue;
                 }
 
-                Rule newRule = new Rule();
+                Rule newRule = new Rule
+                {
+                    Key = diagnostic.Id,
+                    InternalKey = diagnostic.Id,
 
-                newRule.Key = diagnostic.Id;
-                newRule.InternalKey = diagnostic.Id;
+                    Description = GetDescriptionAsRawHtml(diagnostic),
 
-                newRule.Description = GetDescriptionAsRawHtml(diagnostic);
+                    Name = diagnostic.Title.ToString(CultureInfo.InvariantCulture),
+                    Severity = GetSonarQubeSeverity(diagnostic.DefaultSeverity),
 
-                newRule.Name = diagnostic.Title.ToString(CultureInfo.InvariantCulture);
-                newRule.Severity = GetSonarQubeSeverity(diagnostic.DefaultSeverity);
-
-                // Rule XML properties that don't have an obvious Diagnostic equivalent:
-                newRule.Cardinality = Cardinality;
-                newRule.Status = Status;
+                    // Rule XML properties that don't have an obvious Diagnostic equivalent:
+                    Cardinality = Cardinality,
+                    Status = Status
+                };
 
                 // Diagnostic properties that don't have an obvious Rule xml equivalent:
                 //  diagnostic.Category
@@ -159,7 +160,6 @@ namespace SonarQube.Plugins.Roslyn
             }
 
             return sb.ToString();
-
         }
 
         private static string GetSonarQubeSeverity(DiagnosticSeverity diagnosticSeverity)
@@ -180,8 +180,6 @@ namespace SonarQube.Plugins.Roslyn
                     sqSeverity = "MINOR";
                     break;
 
-                case DiagnosticSeverity.Hidden:
-                case DiagnosticSeverity.Info:
                 default:
                     sqSeverity = "INFO";
                     break;

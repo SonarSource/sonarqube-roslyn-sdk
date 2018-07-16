@@ -18,8 +18,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using NuGet;
 using System.Collections.Generic;
+using NuGet;
 
 namespace SonarQube.Plugins.Roslyn
 {

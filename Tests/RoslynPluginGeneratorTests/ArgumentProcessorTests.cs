@@ -18,9 +18,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Roslyn.CommandLine;
-using System.IO;
 using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
@@ -43,7 +43,7 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             ProcessedArgs actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             // Assert
-            AssertArgumentsNotProcessed(actualArgs, logger);            
+            AssertArgumentsNotProcessed(actualArgs, logger);
         }
 
         [TestMethod]
@@ -137,9 +137,9 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             logger.AssertSingleErrorExists("missingFile.txt"); // should be an error containing the missing file name
 
             // 3. Existing sqale file
-            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string testDir = TestUtils.CreateTestDirectory(TestContext);
             string filePath = TestUtils.CreateTextFile("valid.sqale.txt", testDir, "sqale file contents");
-            
+
             logger = new TestLogger();
             rawArgs = new string[] { "/sqale:" + filePath,  "/a:valid:1.0" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
@@ -193,7 +193,7 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             AssertArgumentsNotProcessed(actualArgs, logger);
         }
 
-        #endregion
+        #endregion Tests
 
         #region Checks
 
@@ -230,6 +230,6 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             logger.AssertErrorsLogged(0);
         }
 
-        #endregion
+        #endregion Checks
     }
 }

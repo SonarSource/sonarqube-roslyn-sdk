@@ -18,9 +18,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SonarQube.Plugins;
 using System.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.PluginGeneratorTests
@@ -33,7 +32,7 @@ namespace SonarQube.Plugins.PluginGeneratorTests
         [TestMethod]
         public void Defn_Serialization()
         {
-            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string testDir = TestUtils.CreateTestDirectory(TestContext);
             string filePath = Path.Combine(testDir, "defn1.txt");
 
             PluginManifest originalDefn = new PluginManifest()
@@ -50,7 +49,7 @@ namespace SonarQube.Plugins.PluginGeneratorTests
                 OrganizationUrl = "organizationurl",
                 SourcesUrl ="sources",
                 TermsConditionsUrl = "terms",
-                Version = "version"      
+                Version = "version"
             };
 
             originalDefn.Save(filePath);
@@ -74,7 +73,7 @@ namespace SonarQube.Plugins.PluginGeneratorTests
             Assert.AreEqual("terms", reloadedDefn.TermsConditionsUrl, "Unexpected terms");
             Assert.AreEqual("version", reloadedDefn.Version, "Unexpected version");
 
-            this.TestContext.AddResultFile(filePath);
+            TestContext.AddResultFile(filePath);
         }
     }
 }

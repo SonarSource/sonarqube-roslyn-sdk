@@ -35,15 +35,15 @@ namespace SonarQube.Plugins.Roslyn
         {
             if (string.IsNullOrWhiteSpace(sourceDirectoryName))
             {
-                throw new ArgumentNullException("sourceDirectoryName");
+                throw new ArgumentNullException(nameof(sourceDirectoryName));
             }
             if (string.IsNullOrWhiteSpace(destinationArchiveFileName))
             {
-                throw new ArgumentNullException("destinationArchiveFileName");
+                throw new ArgumentNullException(nameof(destinationArchiveFileName));
             }
             if (fileInclusionPredicate == null)
             {
-                throw new ArgumentNullException("fileInclusionPredicate");
+                throw new ArgumentNullException(nameof(fileInclusionPredicate));
             }
 
             string[] files = Directory.GetFiles(sourceDirectoryName, "*.*", SearchOption.AllDirectories);

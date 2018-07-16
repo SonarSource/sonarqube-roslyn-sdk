@@ -18,56 +18,43 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using NuGet;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using NuGet;
 
 namespace SonarQube.Plugins.Roslyn
 {
     public class NuGetPackageHandler : INuGetPackageHandler
     {
         private readonly IPackageRepository remoteRepository;
-        private readonly string localCacheRoot;
         private readonly Common.ILogger logger;
         private readonly IPackageManager packageManager;
 
         public NuGetPackageHandler(IPackageRepository remoteRepository, string localCacheRoot, Common.ILogger logger)
         {
-            if (remoteRepository == null)
-            {
-                throw new ArgumentNullException("remoteRepository");
-            }
             if (string.IsNullOrWhiteSpace(localCacheRoot))
             {
-                throw new ArgumentNullException("localPackageDestination");
-            }
-            if (logger == null)
-            {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(localCacheRoot));
             }
 
-            this.logger = logger;
-            this.remoteRepository = remoteRepository;
-            this.localCacheRoot = localCacheRoot;
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.remoteRepository = remoteRepository ?? throw new ArgumentNullException(nameof(remoteRepository));
+            LocalCacheRoot = localCacheRoot;
 
             Directory.CreateDirectory(localCacheRoot);
-            this.packageManager = new PackageManager(remoteRepository, localCacheRoot);
-            this.packageManager.Logger = new NuGetLoggerAdapter(logger);
+            packageManager = new PackageManager(remoteRepository, localCacheRoot)
+            {
+                Logger = new NuGetLoggerAdapter(logger)
+            };
         }
 
         #region INuGetPackageHandler
 
-        public string LocalCacheRoot
-        {
-            get
-            {
-                return localCacheRoot;
-            }
-        }
+        public string LocalCacheRoot { get; }
 
         /// <summary>
         /// Attempts to download a NuGet package with the specified id and optional version
@@ -77,21 +64,17 @@ namespace SonarQube.Plugins.Roslyn
         {
             if (string.IsNullOrWhiteSpace(packageId))
             {
-                throw new ArgumentNullException("packageId");
-            }
-            if (logger == null)
-            {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(packageId));
             }
 
-            IPackage package = TryGetPackage(this.remoteRepository, packageId, version);
+            IPackage package = TryGetPackage(remoteRepository, packageId, version);
 
             if (package != null)
             {
                 try
                 {
                     // Prerelease packages enabled by default
-                    this.packageManager.InstallPackage(package, false, true, false);
+                    packageManager.InstallPackage(package, false, true, false);
                 }
                 catch (InvalidOperationException e)
                 {
@@ -107,7 +90,7 @@ namespace SonarQube.Plugins.Roslyn
         {
             if (package == null)
             {
-                throw new ArgumentNullException("package");
+                throw new ArgumentNullException(nameof(package));
             }
 
             List<IPackage> dependencies = new List<IPackage>();
@@ -120,18 +103,18 @@ namespace SonarQube.Plugins.Roslyn
         {
             if (package == null)
             {
-                throw new ArgumentNullException("package");
+                throw new ArgumentNullException(nameof(package));
             }
 
-            Debug.Assert(this.packageManager.FileSystem != null);
-            Debug.Assert(this.packageManager.PathResolver != null);
-            string packageDirectory = this.packageManager.FileSystem.GetFullPath(this.packageManager.PathResolver.GetPackageDirectory(package));
+            Debug.Assert(packageManager.FileSystem != null);
+            Debug.Assert(packageManager.PathResolver != null);
+            string packageDirectory = packageManager.FileSystem.GetFullPath(packageManager.PathResolver.GetPackageDirectory(package));
 
             Debug.Assert(Directory.Exists(packageDirectory), "Expecting the package directory to exist: {0}", packageDirectory);
             return packageDirectory;
         }
 
-        #endregion
+        #endregion INuGetPackageHandler
 
         private IPackage TryGetPackage(IPackageRepository repository, string packageId, SemanticVersion packageVersion)
         {
@@ -139,7 +122,7 @@ namespace SonarQube.Plugins.Roslyn
 
             logger.LogInfo(UIResources.NG_LocatingPackages, packageId);
             IList<IPackage> packages = PackageRepositoryExtensions.FindPackagesById(repository, packageId).ToList();
-            this.ListPackages(packages);
+            ListPackages(packages);
 
             if (packages.Count == 0)
             {
@@ -182,7 +165,7 @@ namespace SonarQube.Plugins.Roslyn
 
                     sb.AppendLine();
                 }
-                this.logger.LogDebug(sb.ToString());
+                logger.LogDebug(sb.ToString());
             }
         }
 
@@ -198,7 +181,7 @@ namespace SonarQube.Plugins.Roslyn
             }
             else
             {
-                this.logger.LogDebug(UIResources.NG_UsingLatestPackageVersion);
+                logger.LogDebug(UIResources.NG_UsingLatestPackageVersion);
             }
             Debug.Assert(package != null, "Failed to select a package");
             logger.LogInfo(UIResources.NG_SelectedPackageVersion, package.Version);
@@ -209,25 +192,25 @@ namespace SonarQube.Plugins.Roslyn
         private void GetAllDependencies(IPackage current, List<IPackage> collectedDependencies)
         {
             Debug.Assert(current != null);
-            this.logger.LogDebug(UIResources.NG_ResolvingPackageDependencies, current.Id, current.Version);
+            logger.LogDebug(UIResources.NG_ResolvingPackageDependencies, current.Id, current.Version);
 
             foreach (PackageDependency dependency in current.GetCompatiblePackageDependencies(null))
             {
-                IPackage dependencyPackage = this.packageManager.LocalRepository.ResolveDependency(dependency, true, true);
+                IPackage dependencyPackage = packageManager.LocalRepository.ResolveDependency(dependency, true, true);
 
                 if (dependencyPackage == null)
                 {
-                    this.logger.LogWarning(UIResources.NG_FailedToResolveDependency, dependency.Id, dependency.VersionSpec.ToString());
+                    logger.LogWarning(UIResources.NG_FailedToResolveDependency, dependency.Id, dependency.VersionSpec.ToString());
                 }
                 else
                 {
                     if (collectedDependencies.Contains(dependencyPackage))
                     {
-                        this.logger.LogDebug(UIResources.NG_DuplicateDependency, dependencyPackage.Id, dependencyPackage.Version);
+                        logger.LogDebug(UIResources.NG_DuplicateDependency, dependencyPackage.Id, dependencyPackage.Version);
                     }
                     else
                     {
-                        this.logger.LogDebug(UIResources.NG_AddingNewDependency, dependencyPackage.Id, dependencyPackage.Version);
+                        logger.LogDebug(UIResources.NG_AddingNewDependency, dependencyPackage.Id, dependencyPackage.Version);
                         collectedDependencies.Add(dependencyPackage);
 
                         GetAllDependencies(dependencyPackage, collectedDependencies);
@@ -235,6 +218,5 @@ namespace SonarQube.Plugins.Roslyn
                 }
             }
         }
-
     }
 }

@@ -18,10 +18,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SonarQube.Plugins.Test.Common
 {
@@ -39,58 +39,59 @@ namespace SonarQube.Plugins.Test.Common
 
         public TestLogger()
         {
-            this.DoReset("------------------------------------------------------------- (new TestLogger created)");
+            DoReset("------------------------------------------------------------- (new TestLogger created)");
         }
 
         #region Public methods
 
         public void Reset()
         {
-            this.DoReset("------------------------------------------------------------- (TestLogger reset)");
+            DoReset("------------------------------------------------------------- (TestLogger reset)");
         }
 
         public void AssertErrorsLogged()
         {
-            Assert.IsTrue(this.Errors.Count > 0, "Expecting at least one error to be logged");
+            Assert.IsTrue(Errors.Count > 0, "Expecting at least one error to be logged");
         }
 
         public void AssertMessagesLogged()
         {
-            Assert.IsTrue(this.InfoMessages.Count > 0, "Expecting at least one message to be logged");
+            Assert.IsTrue(InfoMessages.Count > 0, "Expecting at least one message to be logged");
         }
 
         public void AssertErrorsLogged(int expectedCount)
         {
-            Assert.AreEqual(expectedCount, this.Errors.Count, "Unexpected number of errors logged");
+            Assert.AreEqual(expectedCount, Errors.Count, "Unexpected number of errors logged");
         }
 
         public void AssertWarningsLogged(int expectedCount)
         {
-            Assert.AreEqual(expectedCount, this.Warnings.Count, "Unexpected number of warnings logged");
+            Assert.AreEqual(expectedCount, Warnings.Count, "Unexpected number of warnings logged");
         }
+
         public void AssertMessagesLogged(int expectedCount)
         {
-            Assert.AreEqual(expectedCount, this.InfoMessages.Count, "Unexpected number of messages logged");
+            Assert.AreEqual(expectedCount, InfoMessages.Count, "Unexpected number of messages logged");
         }
 
         public void AssertMessageLogged(string expected)
         {
-            bool found = this.InfoMessages.Any(s => expected.Equals(s, System.StringComparison.CurrentCulture));
+            bool found = InfoMessages.Any(s => expected.Equals(s, System.StringComparison.CurrentCulture));
             Assert.IsTrue(found, "Expected message was not found: '{0}'", expected);
         }
 
         public void AssertErrorLogged(string expected)
         {
-            bool found = this.Errors.Any(s => expected.Equals(s, System.StringComparison.CurrentCulture));
+            bool found = Errors.Any(s => expected.Equals(s, System.StringComparison.CurrentCulture));
             Assert.IsTrue(found, "Expected error was not found: '{0}'", expected);
         }
-        
+
         /// <summary>
         /// Checks that no message contain all of the specified strings
         /// </summary>
         public void AssertMessageNotLogged(params string[] text)
         {
-            IEnumerable<string> matches = this.InfoMessages.Where(w => text.All(t => w.Contains(t)));
+            IEnumerable<string> matches = InfoMessages.Where(w => text.All(t => w.Contains(t)));
             Assert.AreEqual(0, matches.Count(), "Not expecting messages to exist that contains the specified strings: {0}", string.Join(",", text));
         }
 
@@ -99,7 +100,7 @@ namespace SonarQube.Plugins.Test.Common
         /// </summary>
         public void AssertWarningNotLogged(params string[] text)
         {
-            IEnumerable<string> matches = this.Warnings.Where(w => text.All(t => w.Contains(t)));
+            IEnumerable<string> matches = Warnings.Where(w => text.All(t => w.Contains(t)));
             Assert.AreEqual(0, matches.Count(), "Not expecting warnings to exist that contains the specified strings: {0}", string.Join(",", text));
         }
 
@@ -108,7 +109,7 @@ namespace SonarQube.Plugins.Test.Common
         /// </summary>
         public void AssertSingleErrorExists(params string[] expected)
         {
-            IEnumerable<string> matches = this.Errors.Where(w => expected.All(e => w.Contains(e)));
+            IEnumerable<string> matches = Errors.Where(w => expected.All(e => w.Contains(e)));
             Assert.AreNotEqual(0, matches.Count(), "No error contains the expected strings: {0}", string.Join(",", expected));
             Assert.AreEqual(1, matches.Count(), "More than one error contains the expected strings: {0}", string.Join(",", expected));
         }
@@ -118,7 +119,7 @@ namespace SonarQube.Plugins.Test.Common
         /// </summary>
         public void AssertSingleWarningExists(params string[] expected)
         {
-            IEnumerable<string> matches = this.Warnings.Where(w => expected.All(e => w.Contains(e)));
+            IEnumerable<string> matches = Warnings.Where(w => expected.All(e => w.Contains(e)));
             Assert.AreNotEqual(0, matches.Count(), "No warning contains the expected strings: {0}", string.Join(",", expected));
             Assert.AreEqual(1, matches.Count(), "More than one warning contains the expected strings: {0}", string.Join(",", expected));
         }
@@ -128,7 +129,7 @@ namespace SonarQube.Plugins.Test.Common
         /// </summary>
         public string AssertSingleInfoMessageExists(params string[] expected)
         {
-            IEnumerable<string> matches = this.InfoMessages.Where(m => expected.All(e => m.Contains(e)));
+            IEnumerable<string> matches = InfoMessages.Where(m => expected.All(e => m.Contains(e)));
             Assert.AreNotEqual(0, matches.Count(), "No INFO message contains the expected strings: {0}", string.Join(",", expected));
             Assert.AreEqual(1, matches.Count(), "More than one INFO message contains the expected strings: {0}", string.Join(",", expected));
             return matches.First();
@@ -139,7 +140,7 @@ namespace SonarQube.Plugins.Test.Common
         /// </summary>
         public string AssertSingleDebugMessageExists(params string[] expected)
         {
-            IEnumerable<string> matches = this.DebugMessages.Where(m => expected.All(e => m.Contains(e)));
+            IEnumerable<string> matches = DebugMessages.Where(m => expected.All(e => m.Contains(e)));
             Assert.AreNotEqual(0, matches.Count(), "No debug message contains the expected strings: {0}", string.Join(",", expected));
             Assert.AreEqual(1, matches.Count(), "More than one DEBUG message contains the expected strings: {0}", string.Join(",", expected));
             return matches.First();
@@ -150,7 +151,7 @@ namespace SonarQube.Plugins.Test.Common
         /// </summary>
         public void AssertInfoMessageExists(params string[] expected)
         {
-            IEnumerable<string> matches = this.InfoMessages.Where(m => expected.All(e => m.Contains(e)));
+            IEnumerable<string> matches = InfoMessages.Where(m => expected.All(e => m.Contains(e)));
             Assert.AreNotEqual(0, matches.Count(), "No INFO message contains the expected strings: {0}", string.Join(",", expected));
         }
 
@@ -159,7 +160,7 @@ namespace SonarQube.Plugins.Test.Common
         /// </summary>
         public void AssertDebugMessageExists(params string[] expected)
         {
-            IEnumerable<string> matches = this.DebugMessages.Where(m => expected.All(e => m.Contains(e)));
+            IEnumerable<string> matches = DebugMessages.Where(m => expected.All(e => m.Contains(e)));
             Assert.AreNotEqual(0, matches.Count(), "No DEBUG message contains the expected strings: {0}", string.Join(",", expected));
         }
 
@@ -168,11 +169,11 @@ namespace SonarQube.Plugins.Test.Common
         /// </summary>
         public void AssertErrorDoesNotExist(params string[] expected)
         {
-            IEnumerable<string> matches = this.Errors.Where(w => expected.All(e => w.Contains(e)));
+            IEnumerable<string> matches = Errors.Where(w => expected.All(e => w.Contains(e)));
             Assert.AreEqual(0, matches.Count(), "Not expecting any errors to contain the specified strings: {0}", string.Join(",", expected));
         }
 
-        #endregion
+        #endregion Public methods
 
         #region ILogger interface
 
@@ -200,8 +201,7 @@ namespace SonarQube.Plugins.Test.Common
             WriteLine("DEBUG: " + message, args);
         }
 
-
-        #endregion
+        #endregion ILogger interface
 
         #region Private methods
 
@@ -235,6 +235,6 @@ namespace SonarQube.Plugins.Test.Common
             return formatted;
         }
 
-        #endregion
+        #endregion Private methods
     }
 }

@@ -18,9 +18,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using System.Collections.Immutable;
 
 namespace RoslynAnalyzer11
 {
@@ -28,14 +28,12 @@ namespace RoslynAnalyzer11
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class InternalAnalyzer : DiagnosticAnalyzer
     {
-
-        private static DiagnosticDescriptor Rule = new DiagnosticDescriptor("internal", "Title", "MessageFormat", "Testing", DiagnosticSeverity.Warning, isEnabledByDefault: true, description: "Description");
+        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor("internal", "Title", "MessageFormat", "Testing", DiagnosticSeverity.Warning, isEnabledByDefault: true, description: "Description");
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
 
         public override void Initialize(AnalysisContext context)
         {
         }
-
     }
 }
