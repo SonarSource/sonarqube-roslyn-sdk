@@ -20,6 +20,7 @@
 
 using System.IO;
 using System.IO.Compression;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SonarQube.Plugins.Test.Common
@@ -50,7 +51,7 @@ namespace SonarQube.Plugins.Test.Common
         public string AssertFileExists(string relativeFilePath)
         {
             string absolutePath = Path.Combine(UnzippedDirectoryPath, relativeFilePath);
-            Assert.IsTrue(File.Exists(absolutePath), "File does not exist in the zip: {0}", relativeFilePath);
+            File.Exists(absolutePath).Should().BeTrue("File does not exist in the zip: {0}", relativeFilePath);
             return absolutePath;
         }
 
@@ -62,8 +63,7 @@ namespace SonarQube.Plugins.Test.Common
 
                 string[] matchingFiles = Directory.GetFiles(UnzippedDirectoryPath, relativePath, SearchOption.TopDirectoryOnly);
 
-                Assert.IsTrue(matchingFiles.Length < 2, "Test error: supplied relative path should not match multiple files");
-                Assert.AreEqual(1, matchingFiles.Length, "Zip file does not contain expected file: {0}", relativePath);
+                matchingFiles.Length.Should().Be(1, "Zip file does not contain expected file: {0}", relativePath);
 
                 testContext.WriteLine("ZipFileChecker: found at '{0}'", matchingFiles[0]);
             }
@@ -74,7 +74,7 @@ namespace SonarQube.Plugins.Test.Common
             AssertZipContainsFiles(expectedRelativePaths);
 
             string[] allFilesInZip = Directory.GetFiles(UnzippedDirectoryPath, "*.*", SearchOption.AllDirectories);
-            Assert.AreEqual(expectedRelativePaths.Length, allFilesInZip.Length, "Zip contains more files than expected");
+            allFilesInZip.Length.Should().Be(expectedRelativePaths.Length, "Zip contains more files than expected");
         }
 
         private void DumpZipFile(string zipFilePath)

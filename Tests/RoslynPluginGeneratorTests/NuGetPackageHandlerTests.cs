@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NuGet;
 using SonarQube.Plugins.Test.Common;
@@ -201,11 +202,11 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // 1. Package id not found
             IPackage actual = handler.FetchPackage("unknown.package.id", new SemanticVersion("0.8.0"));
-            Assert.IsNull(actual, "Not expecting a package to be found");
+            actual.Should().BeNull("Not expecting a package to be found");
 
             // 2. Package id not found
             actual = handler.FetchPackage("package.id.1", new SemanticVersion("0.7.0"));
-            Assert.IsNull(actual, "Not expecting a package to be found");
+            actual.Should().BeNull("Not expecting a package to be found");
         }
 
         [TestMethod]
@@ -322,29 +323,28 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
         private static void AssertExpectedPackage(IPackage actual, string expectedId, string expectedVersion)
         {
-            Assert.IsNotNull(actual, "The package should not be null");
+            actual.Should().NotBeNull("The package should not be null");
 
             SemanticVersion sVersion = new SemanticVersion(expectedVersion);
 
-            Assert.AreEqual(expectedId, actual.Id, "Unexpected package id");
-            Assert.AreEqual(sVersion, actual.Version, "Unexpected package version");
+            expectedId.Should().Be(actual.Id, "Unexpected package id");
+            sVersion.Should().Be(actual.Version, "Unexpected package version");
         }
 
         private void AssertPackageDownloaded(string downloadDir, string expectedName, string expectedVersion)
         {
             string packageDir = Directory.GetDirectories(downloadDir)
                 .SingleOrDefault(d => d.Contains(expectedName) && d.Contains(expectedVersion));
-            Assert.IsNotNull(packageDir,
-                "Expected a package to have been downloaded: " + expectedName);
+            packageDir.Should().NotBeNull("Expected a package to have been downloaded: " + expectedName);
         }
 
         private static void AssertExpectedPackageIds(IEnumerable<IPackage> actual, params string[] expectedIds)
         {
             foreach(string expectedId in expectedIds)
             {
-                Assert.IsTrue(actual.Any(p => string.Equals(p.Id, expectedId, StringComparison.Ordinal)), "Dependency with the expected package id was not found. Id: {0}", expectedId);
+                actual.Any(p => string.Equals(p.Id, expectedId, StringComparison.Ordinal)).Should().BeTrue("Dependency with the expected package id was not found. Id: {0}", expectedId);
             }
-            Assert.AreEqual(expectedIds.Length, actual.Count(), "Too many dependencies returned");
+            expectedIds.Length.Should().Be(actual.Count(), "Too many dependencies returned");
         }
 
         #endregion Checks

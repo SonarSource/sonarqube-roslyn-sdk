@@ -19,6 +19,7 @@
  */
 
 using System.IO;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Roslyn.CommandLine;
 using SonarQube.Plugins.Test.Common;
@@ -199,33 +200,33 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
 
         private static void AssertArgumentsNotProcessed(ProcessedArgs actualArgs, TestLogger logger)
         {
-            Assert.IsNull(actualArgs, "Not expecting the arguments to have been processed successfully");
+            actualArgs.Should().BeNull("Not expecting the arguments to have been processed successfully");
             logger.AssertErrorsLogged();
         }
 
         private static void AssertArgumentsProcessed(ProcessedArgs actualArgs, TestLogger logger, string expectedId, string expectedVersion, string expectedSqale, bool expectedAcceptLicenses)
         {
-            Assert.IsNotNull(actualArgs, "Expecting the arguments to have been processed successfully");
+            actualArgs.Should().NotBeNull("Expecting the arguments to have been processed successfully");
 
-            Assert.AreEqual(actualArgs.PackageId, expectedId, "Unexpected package id returned");
+            expectedId.Should().Be(actualArgs.PackageId, "Unexpected package id returned");
 
             if (expectedVersion == null)
             {
-                Assert.IsNull(actualArgs.PackageVersion, "Expecting the version to be null");
+                actualArgs.PackageVersion.Should().BeNull("Expecting the version to be null");
             }
             else
             {
-                Assert.IsNotNull(actualArgs.PackageVersion, "Not expecting the version to be null");
-                Assert.AreEqual(expectedVersion, actualArgs.PackageVersion.ToString());
+                actualArgs.PackageVersion.Should().NotBeNull("Not expecting the version to be null");
+                actualArgs.PackageVersion.ToString().Should().Be(expectedVersion);
             }
 
-            Assert.AreEqual(expectedSqale, actualArgs.SqaleFilePath, "Unexpected sqale file path");
+            actualArgs.SqaleFilePath.Should().Be(expectedSqale, "Unexpected sqale file path");
             if (expectedSqale != null)
             {
-                Assert.IsTrue(File.Exists(expectedSqale), "Specified sqale file should exist: {0}", expectedSqale);
+                File.Exists(expectedSqale).Should().BeTrue("Specified sqale file should exist: {0}", expectedSqale);
             }
 
-            Assert.AreEqual(expectedAcceptLicenses, actualArgs.AcceptLicenses, "Unexpected value for AcceptLicenses");
+            actualArgs.AcceptLicenses.Should().Be(expectedAcceptLicenses, "Unexpected value for AcceptLicenses");
 
             logger.AssertErrorsLogged(0);
         }

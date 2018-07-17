@@ -19,6 +19,7 @@
  */
 
 using System.IO;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Test.Common;
 
@@ -53,25 +54,25 @@ namespace SonarQube.Plugins.PluginGeneratorTests
             };
 
             originalDefn.Save(filePath);
-            Assert.IsTrue(File.Exists(filePath), "File was not created: {0}", filePath);
+            File.Exists(filePath).Should().BeTrue("File was not created: {0}", filePath);
 
             PluginManifest reloadedDefn = PluginManifest.Load(filePath);
 
-            Assert.IsNotNull(reloadedDefn, "Reloaded object should not be null");
-            Assert.AreEqual("name", reloadedDefn.Name, "Unexpected name");
-            Assert.AreEqual("class", reloadedDefn.Class, "Unexpected class");
-            Assert.AreEqual("description", reloadedDefn.Description, "Unexpected description");
-            Assert.AreEqual("key", reloadedDefn.Key, "Unexpected key");
+            reloadedDefn.Should().NotBeNull("Reloaded object should not be null");
+            reloadedDefn.Name.Should().Be("name", "Unexpected name");
+            reloadedDefn.Class.Should().Be("class", "Unexpected class");
+            reloadedDefn.Description.Should().Be("description", "Unexpected description");
+            reloadedDefn.Key.Should().Be("key", "Unexpected key");
 
-            Assert.AreEqual("issuetracker", reloadedDefn.IssueTrackerUrl, "Unexpected issue tracker url");
-            Assert.AreEqual("license", reloadedDefn.License, "Unexpected license");
-            Assert.AreEqual("developers", reloadedDefn.Developers, "Unexpected developers");
-            Assert.AreEqual("homepage", reloadedDefn.Homepage, "Unexpected homepage");
-            Assert.AreEqual("organization", reloadedDefn.Organization, "Unexpected organization");
-            Assert.AreEqual("organizationurl", reloadedDefn.OrganizationUrl, "Unexpected organization url");
-            Assert.AreEqual("sources", reloadedDefn.SourcesUrl, "Unexpected sources");
-            Assert.AreEqual("terms", reloadedDefn.TermsConditionsUrl, "Unexpected terms");
-            Assert.AreEqual("version", reloadedDefn.Version, "Unexpected version");
+            reloadedDefn.IssueTrackerUrl.Should().Be("issuetracker", "Unexpected issue tracker url");
+            reloadedDefn.License.Should().Be("license", "Unexpected license");
+            reloadedDefn.Developers.Should().Be("developers", "Unexpected developers");
+            reloadedDefn.Homepage.Should().Be("homepage", "Unexpected homepage");
+            reloadedDefn.Organization.Should().Be("organization", "Unexpected organization");
+            reloadedDefn.OrganizationUrl.Should().Be("organizationurl", "Unexpected organization url");
+            reloadedDefn.SourcesUrl.Should().Be("sources", "Unexpected sources");
+            reloadedDefn.TermsConditionsUrl.Should().Be("terms", "Unexpected terms");
+            reloadedDefn.Version.Should().Be("version", "Unexpected version");
 
             TestContext.AddResultFile(filePath);
         }

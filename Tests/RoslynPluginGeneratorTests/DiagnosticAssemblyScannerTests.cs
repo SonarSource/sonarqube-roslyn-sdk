@@ -21,6 +21,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -44,8 +45,8 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             IEnumerable<DiagnosticAnalyzer> result = scanner.InstantiateDiagnostics(LanguageNames.CSharp /* no files */);
 
             // Assert
-            Assert.IsNotNull(result, "Not expecting InstantiateDiagnostics to return null");
-            Assert.IsFalse(result.Any(), "Not expecting any diagnostics to have been found");
+            result.Should().NotBeNull("Not expecting InstantiateDiagnostics to return null");
+            result.Any().Should().BeFalse("Not expecting any diagnostics to have been found");
         }
 
         [TestMethod]
@@ -64,8 +65,8 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
                 thisDllPath);
 
             // Assert
-            Assert.IsNotNull(result, "Not expecting InstantiateDiagnostics to return null");
-            Assert.IsFalse(result.Any(), "Not expecting any diagnostics to have been found");
+            result.Should().NotBeNull("Not expecting InstantiateDiagnostics to return null");
+            result.Any().Should().BeFalse("Not expecting any diagnostics to have been found");
         }
 
         [TestMethod]
@@ -88,7 +89,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             Assert_AnalyzerNotPresent(result, typeof(RoslynAnalyzer11.AbstractAnalyzer)); // not expecting abstract analyzers
             Assert_AnalyzerNotPresent(result, typeof(RoslynAnalyzer11.UnattributedAnalyzer)); // not expecting analyzers without attributes
 
-            Assert.AreEqual(3, result.Count(), "Expecting 3 C# analyzers");
+            result.Count().Should().Be(3, "Expecting 3 C# analyzers");
         }
 
         [TestMethod]
@@ -108,7 +109,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             Assert_AnalyzerIsPresent(result, typeof(RoslynAnalyzer11.ConfigurableAnalyzer));
             Assert_AnalyzerNotPresent(result, typeof(RoslynAnalyzer11.AbstractAnalyzer)); // not expecting abstract analyzers
 
-            Assert.AreEqual(2, result.Count(), "Expecting 2 VB analyzers");
+            result.Count().Should().Be(2, "Expecting 2 VB analyzers");
         }
 
         [TestMethod]
@@ -141,16 +142,15 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
 
             Assert_AnalyzerIsPresent(result, typeof(RoslynAnalyzer10.ExampleAnalyzer2));
 
-            Assert.AreEqual(4, result.Count(), "Unexpected number of C# analyzers returned");
+            result.Should().HaveCount(4, "Unexpected number of C# analyzers returned");
         }
 
         #region Private Methods
 
         private void Assert_AnalyzerIsPresent(IEnumerable<DiagnosticAnalyzer> analyzers, string fullExpectedTypeName)
         {
-            Assert.IsNotNull(
-                analyzers.SingleOrDefault(d => d.GetType().FullName == fullExpectedTypeName),
-                "Expected an analyzer with name: " + fullExpectedTypeName);
+            analyzers.SingleOrDefault(d => d.GetType().FullName == fullExpectedTypeName).Should()
+                .NotBeNull("Expected an analyzer with name: " + fullExpectedTypeName);
         }
 
         private void Assert_AnalyzerIsPresent(IEnumerable<DiagnosticAnalyzer> analyzers, Type expected)
@@ -161,9 +161,8 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
         private void Assert_AnalyzerNotPresent(IEnumerable<DiagnosticAnalyzer> analyzers, Type expected)
         {
             string analyzerName = expected.FullName;
-            Assert.IsNull(
-                analyzers.SingleOrDefault(d => d.GetType().FullName == analyzerName),
-                "Expected no analyzers with name: " + analyzerName);
+            analyzers.SingleOrDefault(d => d.GetType().FullName == analyzerName).Should()
+                .BeNull("Expected no analyzers with name: " + analyzerName);
         }
 
         #endregion Private Methods

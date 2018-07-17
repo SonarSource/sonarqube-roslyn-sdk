@@ -20,6 +20,7 @@
 
 using System.IO;
 using System.Linq;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Test.Common;
 
@@ -54,22 +55,22 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // Save and check
             config.Save(filePath);
-            Assert.AreEqual(filePath, config.FileName);
+            filePath.Should().Be(config.FileName);
             TestContext.AddResultFile(filePath);
 
             // Reload and check
             RoslynSdkConfiguration reloaded = RoslynSdkConfiguration.Load(filePath);
 
-            Assert.IsNotNull(reloaded);
+            reloaded.Should().NotBeNull();
 
-            Assert.AreEqual("diff", reloaded.PluginKeyDifferentiator);
-            Assert.AreEqual("key", reloaded.RepositoryKey);
-            Assert.AreEqual("repo.name", reloaded.RepositoryName);
-            Assert.AreEqual("language", reloaded.RepositoryLanguage);
-            Assert.AreEqual("rulesPath", reloaded.RulesXmlResourcePath);
-            Assert.AreEqual("sqalePath", reloaded.SqaleXmlResourcePath);
+            reloaded.PluginKeyDifferentiator.Should().Be("diff");
+            reloaded.RepositoryKey.Should().Be("key");
+            reloaded.RepositoryName.Should().Be("repo.name");
+            reloaded.RepositoryLanguage.Should().Be("language");
+            reloaded.RulesXmlResourcePath.Should().Be("rulesPath");
+            reloaded.SqaleXmlResourcePath.Should().Be("sqalePath");
 
-            Assert.AreEqual(2, reloaded.Properties.Count);
+            reloaded.Properties.Count.Should().Be(2);
             AssertPropertyExists("prop1.Key", "value1", reloaded.Properties);
             AssertPropertyExists("prop2.Key", "value2", reloaded.Properties);
         }
@@ -113,12 +114,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             TestContext.AddResultFile(resavedFilePath);
 
             // Assert
-            Assert.AreEqual("example", loaded.PluginKeyDifferentiator);
-            Assert.AreEqual("roslyn.example", loaded.RepositoryKey);
-            Assert.AreEqual("example", loaded.RepositoryLanguage);
-            Assert.AreEqual("example", loaded.RepositoryName);
-            Assert.AreEqual("/org/sonar/plugins/roslynsdk/rules.xml", loaded.RulesXmlResourcePath);
-            Assert.AreEqual("/org/sonar/plugins/roslynsdk/sqale.xml", loaded.SqaleXmlResourcePath);
+            loaded.PluginKeyDifferentiator.Should().Be("example");
+            loaded.RepositoryKey.Should().Be("roslyn.example");
+            loaded.RepositoryLanguage.Should().Be("example");
+            loaded.RepositoryName.Should().Be("example");
+            loaded.RulesXmlResourcePath.Should().Be("/org/sonar/plugins/roslynsdk/rules.xml");
+            loaded.SqaleXmlResourcePath.Should().Be("/org/sonar/plugins/roslynsdk/sqale.xml");
 
             AssertPropertyExists("example.pluginKey", "example.pluginKey.Value", loaded.Properties);
             AssertPropertyExists("example.pluginVersion", "example.pluginVersion.Value", loaded.Properties);
@@ -137,9 +138,9 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         {
             // Note: we're explicitly searching for the key using Linq so we can be sure a case-sensitive match is being used
             string match = actualProperties.Keys.OfType<string>().FirstOrDefault(k => string.Equals(expectedKey, k, System.StringComparison.Ordinal));
-            Assert.IsNotNull(match, "Expected key not found: {0}", expectedKey);
+            match.Should().NotBeNull("Expected key not found: {0}", expectedKey);
 
-            Assert.AreEqual(expectedValue, actualProperties[expectedKey], "Unexpected value for key '{0}'", expectedKey);
+            expectedValue.Should().Be(actualProperties[expectedKey], "Unexpected value for key '{0}'", expectedKey);
         }
 
         #endregion Private methods

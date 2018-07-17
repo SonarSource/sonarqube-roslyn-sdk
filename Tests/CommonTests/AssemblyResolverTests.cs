@@ -22,6 +22,8 @@ using System;
 using System.CodeDom.Compiler;
 using System.IO;
 using System.Reflection;
+using FluentAssertions;
+using FluentAssertions.Execution;
 using Microsoft.CSharp;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Common;
@@ -40,13 +42,16 @@ namespace SonarQube.Plugins.CommonTests
         public void AssemblyResolver_Creation()
         {
             // 1. Null logger
-            AssertException.Expect<ArgumentNullException>(() => new AssemblyResolver(null, new string[] { TestContext.TestDeploymentDir }));
+            Action action = () => new AssemblyResolver(null, new string[] { TestContext.TestDeploymentDir });
+            action.Should().ThrowExactly<ArgumentNullException>();
 
             // 2. Null paths
-            AssertException.Expect<ArgumentException>(() => new AssemblyResolver(new TestLogger(), null));
+            action = () => new AssemblyResolver(new TestLogger(), null);
+            action.Should().ThrowExactly<ArgumentException>();
 
             // 3. Empty paths
-            AssertException.Expect<ArgumentException>(() => new AssemblyResolver(new TestLogger(), new string[] { }));
+            action = () => new AssemblyResolver(new TestLogger(), new string[] { });
+            action.Should().ThrowExactly<ArgumentException>();
         }
 
         /// <summary>
@@ -80,8 +85,8 @@ namespace SonarQube.Plugins.CommonTests
                 }
 
                 // Assert
-                Assert.IsNotNull(simpleObject);
-                Assert.AreEqual<string>("SimpleProgram", simpleObject.GetType().ToString());
+                simpleObject.Should().NotBeNull();
+                simpleObject.GetType().ToString().Should().Be("SimpleProgram");
                 AssertResolverCaller(resolver);
             }
         }
@@ -239,7 +244,8 @@ namespace SonarQube.Plugins.CommonTests
                     {
                         logger.LogInfo(item);
                     }
-                    Assert.Fail("Test setup error: failed to create dynamic assembly. See the test output for compiler output");
+                    AssertionScope.Current.FailWith("Test setup error: failed to create dynamic assembly. " +
+                        "See the test output for compiler output");
                 }
             }
 
@@ -252,7 +258,8 @@ namespace SonarQube.Plugins.CommonTests
 
         private static void AssertAssemblyLoadFails(string asmRef)
         {
-            AssertException.Expect<FileNotFoundException>(() => Assembly.Load(asmRef));
+            Action action = () => Assembly.Load(asmRef);
+            action.Should().ThrowExactly<FileNotFoundException>();
         }
 
         private Assembly AssertAssemblyLoadSucceedsOnlyWithResolver(string asmRef, string searchPath)
@@ -274,20 +281,20 @@ namespace SonarQube.Plugins.CommonTests
             }
 
             // Assert
-            Assert.IsNotNull(resolveResult, "Failed to the load the assembly");
+            resolveResult.Should().NotBeNull("Failed to the load the assembly");
 
             return resolveResult;
         }
 
         private static void AssertResolverCaller(AssemblyResolver resolver)
         {
-            Assert.IsTrue(resolver.ResolverCalled, "Expected the assembly resolver to have been called");
+            resolver.ResolverCalled.Should().BeTrue("Expected the assembly resolver to have been called");
         }
 
         private static void AssertExpectedAssemblyLoaded(Assembly expected, Assembly resolved)
         {
-            Assert.IsNotNull(resolved, "Resolved assembly should not be null");
-            Assert.AreEqual(expected.Location, resolved.Location, "Failed to load the expected assembly");
+            resolved.Should().NotBeNull("Resolved assembly should not be null");
+            resolved.Location.Should().Be(expected.Location, "Failed to load the expected assembly");
         }
 
         #endregion Checks

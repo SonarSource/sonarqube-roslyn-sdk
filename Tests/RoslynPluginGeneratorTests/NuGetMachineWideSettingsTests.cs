@@ -21,6 +21,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NuGet;
 using SonarQube.Plugins.Test.Common;
@@ -43,7 +44,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // Act
             IMachineWideSettings testSubject = new NuGetMachineWideSettings(rootDir);
 
-            Assert.AreEqual(0, testSubject.Settings.Count(), "Unexpected number of settings files");
+            testSubject.Settings.Count().Should().Be(0, "Unexpected number of settings files");
         }
 
         [TestMethod]
@@ -92,14 +93,14 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
         private static void AssertExpectedConfigFilesLoaded(IMachineWideSettings actual, string baseDir, params string[] relativeConfigFilePaths)
         {
-            Assert.IsNotNull(actual, "MachineWideSettings should not be null");
+            actual.Should().NotBeNull("MachineWideSettings should not be null");
             foreach (string relativePath in relativeConfigFilePaths)
             {
                 string fullPath = Path.Combine(baseDir, relativePath);
-                Assert.IsTrue(actual.Settings.Any(s => string.Equals(s.ConfigFilePath, fullPath, StringComparison.OrdinalIgnoreCase)),
-                    "Expected config file was not loaded: {0}", relativePath);
+                actual.Settings.Any(s => string.Equals(s.ConfigFilePath, fullPath, StringComparison.OrdinalIgnoreCase)).Should()
+                    .BeTrue("Expected config file was not loaded: {0}", relativePath);
             }
-            Assert.AreEqual(relativeConfigFilePaths.Length, actual.Settings.Count(), "Too many config files loaded");
+            actual.Settings.Count().Should().Be(relativeConfigFilePaths.Length, "Too many config files loaded");
         }
 
         #endregion Private methods

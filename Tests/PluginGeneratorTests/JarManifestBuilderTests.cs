@@ -21,6 +21,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Test.Common;
 
@@ -157,7 +158,8 @@ name2: 11111111112222222222333333333344444444445555555555666666666677777
             // Act and assert
             foreach (string name in invalidNames)
             {
-                AssertException.Expect<ArgumentException>(() => builder.SetProperty(name, "valid.property"));
+                Action action = () => builder.SetProperty(name, "valid.property");
+                action.Should().Throw<ArgumentException>();
             }
         }
 
@@ -175,7 +177,8 @@ name2: 11111111112222222222333333333344444444445555555555666666666677777
             builder.SetProperty(validName1, "69 chars");
             builder.SetProperty(validName2, "70 chars");
 
-            AssertException.Expect<ArgumentException>(() => builder.SetProperty(invalidName, "valid.property"));
+            Action action = () => builder.SetProperty(invalidName, "valid.property");
+            action.Should().ThrowExactly<ArgumentException>();
         }
 
         [TestMethod]
@@ -217,8 +220,8 @@ name2: 11111111112222222222333333333344444444445555555555666666666677777
             File.WriteAllText(expectedFilePath, expectedContent);
             TestContext.AddResultFile(expectedFilePath);
 
-            Assert.IsNotNull(filePath, "Returned file path should not be null");
-            Assert.IsTrue(File.Exists(filePath), "Expected file does not exist: {0}", filePath);
+            filePath.Should().NotBeNull("Returned file path should not be null");
+            File.Exists(filePath).Should().BeTrue("Expected file does not exist: {0}", filePath);
 
             string actualContent = File.ReadAllText(filePath);
 
@@ -227,18 +230,18 @@ name2: 11111111112222222222333333333344444444445555555555666666666677777
 
             CheckManifestInvariants(filePath);
 
-            Assert.AreEqual(expectedContent, actualContent, false, System.Globalization.CultureInfo.InvariantCulture, "Unexpected manifest content");
+            actualContent.Should().Be(expectedContent, "Unexpected manifest content");
         }
 
         private static void CheckManifestInvariants(string filePath)
         {
             string[] content = File.ReadAllLines(filePath);
-            Assert.AreNotEqual(0, content.Length, "Expecting content in the manifest");
+            content.Length.Should().NotBe(0, "Expecting content in the manifest");
 
-            Assert.AreEqual("Manifest-Version: 1.0", content[0], "Expecting the first line to be the manifest version");
-            Assert.AreEqual(string.Empty, content[content.Length - 1], "Expecting the last line to be blank");
+            content[0].Should().Be("Manifest-Version: 1.0", "Expecting the first line to be the manifest version");
+            content[content.Length - 1].Should().Be(string.Empty, "Expecting the last line to be blank");
 
-            Assert.IsTrue(content.All(l => l.Length <= MaxLineLength), "Lines exceed the maximum permitted length");
+            content.All(l => l.Length <= MaxLineLength).Should().BeTrue("Lines exceed the maximum permitted length");
         }
 
         #endregion Private methods
