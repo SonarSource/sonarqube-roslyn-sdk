@@ -20,6 +20,7 @@
 
 using System.IO;
 using System.Linq;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NuGet;
 using SonarQube.Plugins.Test.Common;
@@ -58,7 +59,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             IPackageRepository actualRepo = NuGetRepositoryFactory.CreateRepository(settings, logger);
 
             // Assert
-            Assert.IsInstanceOfType(actualRepo, typeof(AggregateRepository));
+            actualRepo.Should().BeOfType<AggregateRepository>();
             AggregateRepository actualAggregateRepo = (AggregateRepository)actualRepo;
 
             AssertExpectedPackageSources(actualAggregateRepo,
@@ -88,7 +89,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             IPackageRepository actualRepo = NuGetRepositoryFactory.CreateRepository(settings, logger);
 
             // Assert
-            Assert.IsInstanceOfType(actualRepo, typeof(AggregateRepository));
+            actualRepo.Should().BeOfType<AggregateRepository>();
             AggregateRepository actualAggregateRepo = (AggregateRepository)actualRepo;
 
             AssertExpectedPackageSources(actualAggregateRepo,
@@ -121,7 +122,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             IPackageRepository actualRepo = NuGetRepositoryFactory.CreateRepository(settings, logger);
 
             // Assert
-            Assert.IsInstanceOfType(actualRepo, typeof(AggregateRepository));
+            actualRepo.Should().BeOfType<AggregateRepository>();
             AggregateRepository actualAggregateRepo = (AggregateRepository)actualRepo;
 
             AssertExpectedPackageSources(actualAggregateRepo
@@ -148,7 +149,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             IPackage locatedPackage = actualRepo.FindPackage("dummy.package.id"); // trying to use the bad repo should fail
 
             // Assert
-            Assert.IsNull(locatedPackage, "Should have failed to locate a package");
+            locatedPackage.Should().BeNull("Should have failed to locate a package");
             logger.AssertSingleWarningExists(NuGetLoggerAdapter.LogMessagePrefix, "http://bad.remote.unreachable.repo");
             logger.AssertWarningsLogged(1);
             logger.AssertErrorsLogged(0);
@@ -182,13 +183,13 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
         private static void AssertExpectedPackageSources(AggregateRepository actualRepo, params string[] expectedSources)
         {
-            foreach(string expectedSource in expectedSources)
+            foreach (string expectedSource in expectedSources)
             {
-                Assert.IsTrue(actualRepo.Repositories.Any(r => string.Equals(r.Source, expectedSource)),
-                    "Expected package source does not exist: {0}", expectedSource);
+                actualRepo.Repositories.Any(r => string.Equals(r.Source, expectedSource)).Should()
+                    .BeTrue("Expected package source does not exist: {0}", expectedSource);
             }
 
-            Assert.AreEqual(expectedSources.Length, actualRepo.Repositories.Count(), "Too many repositories returned");
+            actualRepo.Repositories.Count().Should().Be(expectedSources.Length, "Too many repositories returned");
         }
 
         #endregion Private methods

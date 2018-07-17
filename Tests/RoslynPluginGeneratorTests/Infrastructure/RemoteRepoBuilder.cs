@@ -21,6 +21,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NuGet;
 using SonarQube.Plugins.Test.Common;
@@ -115,7 +116,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // Retrieve and return the newly-created package
             IPackage package = FakeRemoteRepo.FindPackage(packageId, new SemanticVersion(packageVersion));
-            Assert.IsNotNull(package, "Test setup error: failed to create and retrieve a test package");
+            package.Should().NotBeNull("Test setup error: failed to create and retrieve a test package");
 
             return package;
         }

@@ -20,6 +20,7 @@
 
 using System;
 using System.Linq;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RoslynAnalyzer11;
 using SonarQube.Plugins.Test.Common;
@@ -53,14 +54,14 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             Rule rule1 = rules.Single(r => r.Key == diagnostic1.Id);
             VerifyRule(diagnostic1, rule1);
 
-            Assert.IsTrue(rule1.Description.Contains(diagnostic1.Description.ToString()), "Invalid rule description");
-            Assert.IsTrue(rule1.Description.Contains(diagnostic1.HelpLinkUri), "Invalid rule description");
-            Assert.IsFalse(rule1.Description.Trim().StartsWith("<![CDATA"), "Description should not be formatted as a CData section");
+            rule1.Description.Contains(diagnostic1.Description.ToString()).Should().BeTrue("Invalid rule description");
+            rule1.Description.Contains(diagnostic1.HelpLinkUri).Should().BeTrue("Invalid rule description");
+            rule1.Description.Trim().StartsWith("<![CDATA").Should().BeFalse("Description should not be formatted as a CData section");
 
             Rule rule2 = rules.Single(r => r.Key == diagnostic2.Id);
             VerifyRule(diagnostic2, rule2);
 
-            Assert.IsTrue(rule2.Description.Contains(UIResources.RuleGen_NoDescription), "Invalid rule description");
+            rule2.Description.Contains(UIResources.RuleGen_NoDescription).Should().BeTrue("Invalid rule description");
         }
 
         [TestMethod]
@@ -82,7 +83,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             {
                 VerifyRuleValid(rule);
 
-                Assert.IsNull(rule.Tags);
+                rule.Tags.Should().BeNull();
             }
         }
 
@@ -106,7 +107,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             {
                 VerifyRuleValid(rule);
 
-                Assert.AreEqual(rule.Description, UIResources.RuleGen_NoDescription);
+                rule.Description.Should().Be(UIResources.RuleGen_NoDescription);
             }
         }
 
@@ -116,19 +117,19 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
 
         private static void AssertExpectedRuleCount(int expected, Rules rules)
         {
-            Assert.IsNotNull(rules, "Generated rules list should not be null");
-            Assert.AreEqual(expected, rules.Count, "Unexpected number of rules");
+            rules.Should().NotBeNull("Generated rules list should not be null");
+            expected.Should().Be(rules.Count, "Unexpected number of rules");
         }
 
         private static void VerifyRule(Microsoft.CodeAnalysis.DiagnosticDescriptor diagnostic, Rule rule)
         {
-            Assert.AreEqual(diagnostic.Id, rule.Key, "Invalid rule key");
-            Assert.AreEqual(diagnostic.Id, rule.InternalKey, "Invalid rule internal key");
-            Assert.AreEqual(RuleGenerator.Cardinality, rule.Cardinality, "Invalid rule cardinality");
-            Assert.AreEqual(RuleGenerator.Status, rule.Status, "Invalid rule status");
+            diagnostic.Id.Should().Be(rule.Key, "Invalid rule key");
+            diagnostic.Id.Should().Be(rule.InternalKey, "Invalid rule internal key");
+            RuleGenerator.Cardinality.Should().Be(rule.Cardinality, "Invalid rule cardinality");
+            RuleGenerator.Status.Should().Be(rule.Status, "Invalid rule status");
 
-            Assert.AreEqual(diagnostic.Title.ToString(), rule.Name, "Invalid rule name");
-            Assert.IsNull(rule.Tags, "No tags information should be derived from the diagnostics");
+            rule.Name.Should().Be(diagnostic.Title.ToString(), "Invalid rule name");
+            rule.Tags.Should().BeNull("No tags information should be derived from the diagnostics");
 
             VerifyRuleValid(rule);
         }
@@ -138,13 +139,13 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
         /// </summary>
         private static void VerifyRuleValid(Rule rule)
         {
-            Assert.IsNotNull(rule.Key);
-            Assert.IsFalse(String.IsNullOrWhiteSpace(rule.Description));
+            rule.Key.Should().NotBeNull();
+            string.IsNullOrWhiteSpace(rule.Description).Should().BeFalse();
             if (rule.Tags != null)
             {
                 foreach (String tag in rule.Tags)
                 {
-                    Assert.IsTrue(String.Equals(tag, tag.ToLowerInvariant(), StringComparison.InvariantCulture));
+                    string.Equals(tag, tag.ToLowerInvariant(), StringComparison.InvariantCulture).Should().BeTrue();
                 }
             }
         }

@@ -19,6 +19,7 @@
  */
 
 using System.IO;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Test.Common;
 
@@ -64,7 +65,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             rules.Save(rulesFile, new TestLogger());
             TestContext.AddResultFile(rulesFile);
 
-            Assert.IsTrue(File.Exists(rulesFile), "Expected rules file does not exist: {0}", rulesFile);
+            File.Exists(rulesFile).Should().BeTrue("Expected rules file does not exist: {0}", rulesFile);
             Rules reloaded = Rules.Load(rulesFile);
 
             string expectedXmlContent = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -97,11 +98,11 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
 
             // Compare the serialized output
             string actualXmlContent = File.ReadAllText(rulesFile);
-            Assert.AreEqual(expectedXmlContent, actualXmlContent, "Unexpected XML content");
+            actualXmlContent.Should().Be(expectedXmlContent, "Unexpected XML content");
 
             // Check the rule descriptions were decoded correctly
-            Assert.AreEqual("description 1", reloaded[0].Description, "Description was not deserialized correctly");
-            Assert.AreEqual(@"<p>An Html <a href=""www.bing.com""> Description", reloaded[1].Description, "Description was not deserialized correctly");
+            reloaded[0].Description.Should().Be("description 1", "Description was not deserialized correctly");
+            reloaded[1].Description.Should().Be(@"<p>An Html <a href=""www.bing.com""> Description", "Description was not deserialized correctly");
         }
     }
 }
