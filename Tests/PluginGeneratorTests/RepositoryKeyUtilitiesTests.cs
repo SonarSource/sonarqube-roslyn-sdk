@@ -19,6 +19,7 @@
  */
 
 using System;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Test.Common;
 
@@ -88,7 +89,7 @@ namespace SonarQube.Plugins.PluginGeneratorTests
         private static void TestGetValidKey(string input, string expected)
         {
             string actual = RepositoryKeyUtilities.GetValidKey(input);
-            Assert.AreEqual(expected, actual, "Unexpected key returned");
+            actual.Should().Be(expected, "Unexpected key returned");
 
             RepositoryKeyUtilities.ThrowIfInvalid(expected); // should not throw on values returned by GetValidKey
         }
@@ -96,12 +97,14 @@ namespace SonarQube.Plugins.PluginGeneratorTests
         private static void CheckGetValidKeyThrows(string input)
         {
             // Should throw on input that cannot be corrected
-            AssertException.Expect<ArgumentException>(() => RepositoryKeyUtilities.GetValidKey(input));
+            Action action = () => RepositoryKeyUtilities.GetValidKey(input);
+            action.Should().Throw<ArgumentException>();
         }
 
         private static void CheckThrowIfInvalidThrows(string input)
         {
-            AssertException.Expect<ArgumentException>(() => RepositoryKeyUtilities.ThrowIfInvalid(input));
+            Action action = () => RepositoryKeyUtilities.ThrowIfInvalid(input);
+            action.Should().ThrowExactly<ArgumentException>();
         }
 
         #endregion Private methods

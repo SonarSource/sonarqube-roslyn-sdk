@@ -21,11 +21,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FluentAssertions;
 
 namespace SonarQube.Plugins.Test.Common
 {
-    public class TestLogger : SonarQube.Plugins.Common.ILogger
+    public class TestLogger : Plugins.Common.ILogger
     {
         public List<string> DebugMessages { get; private set; }
         public List<string> InfoMessages { get; private set; }
@@ -51,39 +51,39 @@ namespace SonarQube.Plugins.Test.Common
 
         public void AssertErrorsLogged()
         {
-            Assert.IsTrue(Errors.Count > 0, "Expecting at least one error to be logged");
+            Errors.Count.Should().BeGreaterThan(0, "Expecting at least one error to be logged");
         }
 
         public void AssertMessagesLogged()
         {
-            Assert.IsTrue(InfoMessages.Count > 0, "Expecting at least one message to be logged");
+            InfoMessages.Count.Should().BeGreaterThan(0, "Expecting at least one message to be logged");
         }
 
         public void AssertErrorsLogged(int expectedCount)
         {
-            Assert.AreEqual(expectedCount, Errors.Count, "Unexpected number of errors logged");
+            Errors.Count.Should().Be(expectedCount, "Unexpected number of errors logged");
         }
 
         public void AssertWarningsLogged(int expectedCount)
         {
-            Assert.AreEqual(expectedCount, Warnings.Count, "Unexpected number of warnings logged");
+            expectedCount.Should().Be(expectedCount, "Unexpected number of warnings logged");
         }
 
         public void AssertMessagesLogged(int expectedCount)
         {
-            Assert.AreEqual(expectedCount, InfoMessages.Count, "Unexpected number of messages logged");
+            InfoMessages.Count.Should().Be(expectedCount, "Unexpected number of messages logged");
         }
 
         public void AssertMessageLogged(string expected)
         {
             bool found = InfoMessages.Any(s => expected.Equals(s, System.StringComparison.CurrentCulture));
-            Assert.IsTrue(found, "Expected message was not found: '{0}'", expected);
+            found.Should().BeTrue("Expected message was not found: '{0}'", expected);
         }
 
         public void AssertErrorLogged(string expected)
         {
             bool found = Errors.Any(s => expected.Equals(s, System.StringComparison.CurrentCulture));
-            Assert.IsTrue(found, "Expected error was not found: '{0}'", expected);
+            found.Should().BeTrue("Expected error was not found: '{0}'", expected);
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace SonarQube.Plugins.Test.Common
         public void AssertMessageNotLogged(params string[] text)
         {
             IEnumerable<string> matches = InfoMessages.Where(w => text.All(t => w.Contains(t)));
-            Assert.AreEqual(0, matches.Count(), "Not expecting messages to exist that contains the specified strings: {0}", string.Join(",", text));
+            matches.Count().Should().Be(0, "Not expecting messages to exist that contains the specified strings: {0}", string.Join(",", text));
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace SonarQube.Plugins.Test.Common
         public void AssertWarningNotLogged(params string[] text)
         {
             IEnumerable<string> matches = Warnings.Where(w => text.All(t => w.Contains(t)));
-            Assert.AreEqual(0, matches.Count(), "Not expecting warnings to exist that contains the specified strings: {0}", string.Join(",", text));
+            matches.Count().Should().Be(0, "Not expecting warnings to exist that contains the specified strings: {0}", string.Join(",", text));
         }
 
         /// <summary>
@@ -110,8 +110,7 @@ namespace SonarQube.Plugins.Test.Common
         public void AssertSingleErrorExists(params string[] expected)
         {
             IEnumerable<string> matches = Errors.Where(w => expected.All(e => w.Contains(e)));
-            Assert.AreNotEqual(0, matches.Count(), "No error contains the expected strings: {0}", string.Join(",", expected));
-            Assert.AreEqual(1, matches.Count(), "More than one error contains the expected strings: {0}", string.Join(",", expected));
+            matches.Count().Should().Be(1, "More than one error contains the expected strings: {0}", string.Join(",", expected));
         }
 
         /// <summary>
@@ -120,8 +119,7 @@ namespace SonarQube.Plugins.Test.Common
         public void AssertSingleWarningExists(params string[] expected)
         {
             IEnumerable<string> matches = Warnings.Where(w => expected.All(e => w.Contains(e)));
-            Assert.AreNotEqual(0, matches.Count(), "No warning contains the expected strings: {0}", string.Join(",", expected));
-            Assert.AreEqual(1, matches.Count(), "More than one warning contains the expected strings: {0}", string.Join(",", expected));
+            matches.Count().Should().Be(1, "More than one warning contains the expected strings: {0}", string.Join(",", expected));
         }
 
         /// <summary>
@@ -130,8 +128,7 @@ namespace SonarQube.Plugins.Test.Common
         public string AssertSingleInfoMessageExists(params string[] expected)
         {
             IEnumerable<string> matches = InfoMessages.Where(m => expected.All(e => m.Contains(e)));
-            Assert.AreNotEqual(0, matches.Count(), "No INFO message contains the expected strings: {0}", string.Join(",", expected));
-            Assert.AreEqual(1, matches.Count(), "More than one INFO message contains the expected strings: {0}", string.Join(",", expected));
+            matches.Count().Should().Be(1, "More than one INFO message contains the expected strings: {0}", string.Join(",", expected));
             return matches.First();
         }
 
@@ -141,8 +138,7 @@ namespace SonarQube.Plugins.Test.Common
         public string AssertSingleDebugMessageExists(params string[] expected)
         {
             IEnumerable<string> matches = DebugMessages.Where(m => expected.All(e => m.Contains(e)));
-            Assert.AreNotEqual(0, matches.Count(), "No debug message contains the expected strings: {0}", string.Join(",", expected));
-            Assert.AreEqual(1, matches.Count(), "More than one DEBUG message contains the expected strings: {0}", string.Join(",", expected));
+            matches.Count().Should().Be(1, "More than one DEBUG message contains the expected strings: {0}", string.Join(",", expected));
             return matches.First();
         }
 
@@ -152,7 +148,7 @@ namespace SonarQube.Plugins.Test.Common
         public void AssertInfoMessageExists(params string[] expected)
         {
             IEnumerable<string> matches = InfoMessages.Where(m => expected.All(e => m.Contains(e)));
-            Assert.AreNotEqual(0, matches.Count(), "No INFO message contains the expected strings: {0}", string.Join(",", expected));
+            matches.Count().Should().NotBe(0, "No INFO message contains the expected strings: {0}", string.Join(",", expected));
         }
 
         /// <summary>
@@ -161,7 +157,7 @@ namespace SonarQube.Plugins.Test.Common
         public void AssertDebugMessageExists(params string[] expected)
         {
             IEnumerable<string> matches = DebugMessages.Where(m => expected.All(e => m.Contains(e)));
-            Assert.AreNotEqual(0, matches.Count(), "No DEBUG message contains the expected strings: {0}", string.Join(",", expected));
+            matches.Count().Should().NotBe(0, "No DEBUG message contains the expected strings: {0}", string.Join(",", expected));
         }
 
         /// <summary>
@@ -170,7 +166,7 @@ namespace SonarQube.Plugins.Test.Common
         public void AssertErrorDoesNotExist(params string[] expected)
         {
             IEnumerable<string> matches = Errors.Where(w => expected.All(e => w.Contains(e)));
-            Assert.AreEqual(0, matches.Count(), "Not expecting any errors to contain the specified strings: {0}", string.Join(",", expected));
+            matches.Count().Should().Be(0, "Not expecting any errors to contain the specified strings: {0}", string.Join(",", expected));
         }
 
         #endregion Public methods
