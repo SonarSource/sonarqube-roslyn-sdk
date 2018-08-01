@@ -58,9 +58,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             string addFile1 = TestUtils.CreateTextFile("additional1.txt", rootTestDir, "a1");
             string addFile2 = TestUtils.CreateTextFile("additional2.txt", rootTestDir, "a2");
 
-            string updaterRootDir = TestUtils.CreateTestDirectory(this.TestContext, "updater");
-
-            ArchiveUpdater updater = new ArchiveUpdater(updaterRootDir, new TestLogger());
+            ArchiveUpdater updater = new ArchiveUpdater(new TestLogger());
 
             // Act
             updater.SetInputArchive(originalZipFile)
@@ -83,6 +81,73 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                 "sub1\\sub2\\addFile2.txt",
                 "newSubDir\\addFile3.txt"
                 );
+        }
+
+        [TestMethod]
+        public void ExistingEntryUpdated_And_NewEntryAdded()
+        {
+            // Arrange - create an input archive file
+            string rootTestDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string originalZipFile = Path.Combine(rootTestDir, "original.zip");
+            string updatedZipFile = Path.Combine(rootTestDir, "updated.zip");
+
+            using (var archive = new ZipArchive(File.Create(originalZipFile), ZipArchiveMode.Create))
+            {
+                AddEntry(archive, "sub/unchanged", "unchanged value");
+                AddEntry(archive, "sub/changed", "original data in file that is going to be changed to something shorted");
+            }
+
+            Assert.IsTrue(File.Exists(originalZipFile), "Test setup error: original zip file not created");
+
+            string changedFile = TestUtils.CreateTextFile("changed.txt", rootTestDir, "new data in changed file");
+            string newFile = TestUtils.CreateTextFile("newfile.txt", rootTestDir, "new file");
+
+
+            // Act
+            ArchiveUpdater updater = new ArchiveUpdater(new TestLogger());
+
+            updater.SetInputArchive(originalZipFile)
+                .SetOutputArchive(updatedZipFile)
+                .AddFile(changedFile, "sub/changed")
+                .AddFile(newFile, "newfile");
+            updater.UpdateArchive();
+
+
+            // Assert
+            using (var updatedArchive = new ZipArchive(File.OpenRead(updatedZipFile), ZipArchiveMode.Read))
+            {
+                AssertEntryExists(updatedArchive, "sub/unchanged", "unchanged value");
+                AssertEntryExists(updatedArchive, "sub/changed", "new data in changed file");
+                AssertEntryExists(updatedArchive, "newfile", "new file");
+            }
+        }
+
+        private static void AddEntry(ZipArchive archive, string entryFullName, string text)
+        {
+            var entry = archive.CreateEntry(entryFullName);
+            using (var stream = entry.Open())
+            {   
+                var data = System.Text.Encoding.UTF8.GetBytes(text);
+                stream.Write(data, 0, data.Length);
+            }
+        }
+
+        private static void AssertEntryExists(ZipArchive archive, string entryFullName, string expectedText)
+        {
+            var entry = archive.GetEntry(entryFullName);
+            Assert.IsNotNull(entry, $"Expected entry not found: {entryFullName}");
+
+            const int MAX_DATA_LENGTH = 100;
+
+            using (var stream = entry.Open())
+            {
+                var actualData = new byte[MAX_DATA_LENGTH];
+                var actualLength = stream.Read(actualData, 0, MAX_DATA_LENGTH);
+                Assert.IsTrue(actualLength < MAX_DATA_LENGTH, $"Test setup error: sample test string should be less than {MAX_DATA_LENGTH}");
+
+                var actualText = System.Text.Encoding.UTF8.GetString(actualData, 0, actualLength);
+                Assert.AreEqual(expectedText, actualText, $"Entry does not contain the expected data. Entry: {entryFullName}");
+            }
         }
 
         #endregion

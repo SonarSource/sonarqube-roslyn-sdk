@@ -19,7 +19,7 @@ namespace SonarQube.Plugins.Roslyn {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class UIResources {
@@ -538,16 +538,34 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Deleting existing archive....
+        ///   Looks up a localized string similar to Creating new entry: &apos;{0}&apos;.
         /// </summary>
-        public static string ZIP_DeletingExistingArchive {
+        public static string ZIP_CreatingNewEntry {
             get {
-                return ResourceManager.GetString("ZIP_DeletingExistingArchive", resourceCulture);
+                return ResourceManager.GetString("ZIP_CreatingNewEntry", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Inserting file {0}. Source: {1}.
+        ///   Looks up a localized string similar to Deleting existing entry: &apos;{0}&apos;.
+        /// </summary>
+        public static string ZIP_DeleteExistingEntry {
+            get {
+                return ResourceManager.GetString("ZIP_DeleteExistingEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deleting existing jar....
+        /// </summary>
+        public static string ZIP_DeletingExistingJar {
+            get {
+                return ResourceManager.GetString("ZIP_DeletingExistingJar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Inserting file &apos;{0}&apos;. Source: &apos;{1}&apos;.
         /// </summary>
         public static string ZIP_InsertingFile {
             get {
@@ -556,29 +574,20 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to New archive created: {0}.
+        ///   Looks up a localized string similar to Jar updated.
         /// </summary>
-        public static string ZIP_NewArchiveCreated {
+        public static string ZIP_JarUpdated {
             get {
-                return ResourceManager.GetString("ZIP_NewArchiveCreated", resourceCulture);
+                return ResourceManager.GetString("ZIP_JarUpdated", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Updating archive {0}.
+        ///   Looks up a localized string similar to Updating jar &apos;{0}&apos;.
         /// </summary>
-        public static string ZIP_UpdatingArchive {
+        public static string ZIP_UpdatingJar {
             get {
-                return ResourceManager.GetString("ZIP_UpdatingArchive", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Working directory: {0}.
-        /// </summary>
-        public static string ZIP_WorkingDirectory {
-            get {
-                return ResourceManager.GetString("ZIP_WorkingDirectory", resourceCulture);
+                return ResourceManager.GetString("ZIP_UpdatingJar", resourceCulture);
             }
         }
     }

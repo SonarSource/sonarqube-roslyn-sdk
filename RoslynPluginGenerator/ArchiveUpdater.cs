@@ -31,7 +31,6 @@ namespace SonarQube.Plugins.Roslyn
     /// </summary>
     public class ArchiveUpdater
     {
-        private readonly string workingDirectory;
         private readonly IDictionary<string, string> fileMap;
         private readonly ILogger logger;
 
@@ -40,29 +39,20 @@ namespace SonarQube.Plugins.Roslyn
 
         #region Public methods
 
-        public ArchiveUpdater(string workingDirectory, ILogger logger)
+        public ArchiveUpdater(ILogger logger)
         {
-            if (string.IsNullOrWhiteSpace(workingDirectory))
-            {
-                throw new ArgumentNullException("workingDirectory");
-            }
-            if (logger == null)
-            {
-                throw new ArgumentNullException("logger");
-            }
-            this.logger = logger;
-            this.workingDirectory = workingDirectory;
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            this.fileMap = new Dictionary<string, string>();
+            fileMap = new Dictionary<string, string>();
         }
 
         public ArchiveUpdater SetInputArchive(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                throw new ArgumentNullException("filePath");
+                throw new ArgumentNullException(nameof(filePath));
             }
-            this.inputArchiveFilePath = filePath;
+            inputArchiveFilePath = filePath;
             return this;
         }
 
@@ -70,107 +60,68 @@ namespace SonarQube.Plugins.Roslyn
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                throw new ArgumentNullException("filePath");
+                throw new ArgumentNullException(nameof(filePath));
             }
-            this.outputArchiveFilePath = filePath;
+            outputArchiveFilePath = filePath;
             return this;
         }
 
         public ArchiveUpdater AddFile(string sourceFilePath, string relativeTargetFilePath)
         {
-            this.fileMap[relativeTargetFilePath] = sourceFilePath;
+            fileMap[relativeTargetFilePath] = sourceFilePath;
             return this;
         }
 
         public void UpdateArchive()
         {
-            this.logger.LogDebug(UIResources.ZIP_UpdatingArchive, this.inputArchiveFilePath);
-
-            string unpackedDir = Utilities.CreateSubDirectory(this.workingDirectory, "unpacked");
-            this.logger.LogDebug(UIResources.ZIP_WorkingDirectory, workingDirectory);
-
-            ZipFile.ExtractToDirectory(this.inputArchiveFilePath, unpackedDir);
-
-            // Add in the new files
-            foreach (KeyValuePair<string, string> kvp in this.fileMap)
+            if (File.Exists(outputArchiveFilePath))
             {
-                this.logger.LogDebug(UIResources.ZIP_InsertingFile, kvp.Key, kvp.Value);
-
-                string targetFilePath = Path.Combine(unpackedDir, kvp.Key);
-                Directory.CreateDirectory(Path.GetDirectoryName(targetFilePath));
-                File.Copy(kvp.Value, targetFilePath);
+                logger.LogDebug(UIResources.ZIP_DeletingExistingJar);
+                File.Delete(outputArchiveFilePath);
             }
+            File.Copy(inputArchiveFilePath, outputArchiveFilePath);
 
-            // Re-zip
-            if (File.Exists(this.outputArchiveFilePath))
-            {
-                this.logger.LogDebug(UIResources.ZIP_DeletingExistingArchive);
-                File.Delete(this.outputArchiveFilePath);
-            }
-
-            ZipUsingShell(unpackedDir, this.outputArchiveFilePath);
-
-            this.logger.LogDebug(UIResources.ZIP_NewArchiveCreated, this.outputArchiveFilePath);
+            logger.LogDebug(UIResources.ZIP_UpdatingJar, inputArchiveFilePath);
+            DoUpdate();
+            logger.LogDebug(UIResources.ZIP_JarUpdated, outputArchiveFilePath);
         }
 
-        /// <summary>
-        /// Zips the folder using the shell
-        /// </summary>
-        /// <remarks>Re-zipping a jar file using the .Net ZipFile class creates an invalid jar
-        /// so we zip using the shell instead.
-        /// The code is doing effectively the same as the PowerShell script used by the 
-        /// packaging project in the SonarQube Scanner for MSBuild:
-        /// See https://github.com/SonarSource-VisualStudio/sonar-msbuild-runner/blob/master/PackagingProjects/CSharpPluginPayload/RepackageCSharpPlugin.ps1
-        /// </remarks>
-        private static void ZipUsingShell(string sourceDir, string targetZipFilePath)
+        private void DoUpdate()
         {
-            // The Folder.CopyHere method for Shell Objects allows configuration based on a combination of flags.
-            // Docs here: https://msdn.microsoft.com/en-us/library/windows/desktop/bb787866(v=vs.85).aspx
-            // The value below (1556) consists of
-            //    (4)    - no progress dialog
-            //    (16)   - respond with "yes to all" to any dialog box
-            //    (512)  - Do not confirm the creation of a new directory
-            //    (1024) - Do not display an UI in case of error
-            const int copyFlags = 1556;
-
-            const int copyPauseInMilliseconds = 500;
-
-            // The file must have a ".zip" extension for the shell code below to work
-            string zipFilePath = targetZipFilePath + ".zip";
-            CreateEmptyZipFile(zipFilePath);
-
-            Type shellAppType = Type.GetTypeFromProgID("Shell.Application");
-            Object app = Activator.CreateInstance(shellAppType);
-
-            Shell32.Folder folder = shellAppType.InvokeMember("NameSpace", System.Reflection.BindingFlags.InvokeMethod, null, app, new object[] { zipFilePath }) as Shell32.Folder;
-
-            foreach(string dir in Directory.GetDirectories(sourceDir))
+            using (ZipArchive newArchive = new ZipArchive(new FileStream(outputArchiveFilePath, FileMode.Open), ZipArchiveMode.Update))
             {
-                folder.CopyHere(dir, copyFlags);
-                System.Threading.Thread.Sleep(copyPauseInMilliseconds);
-            }
-            
-            foreach (string file in Directory.GetFiles(sourceDir, "*.*", SearchOption.TopDirectoryOnly))
-            {
-                folder.CopyHere(file, copyFlags);
-                System.Threading.Thread.Sleep(copyPauseInMilliseconds);
-            }
+                // Add/update the new files
+                foreach (KeyValuePair<string, string> kvp in fileMap)
+                {
+                    var data = File.ReadAllBytes(kvp.Value);
 
-            // Rename the file to the expected name
-            File.Move(zipFilePath, targetZipFilePath);
+                    string canonicalKey = kvp.Key.Replace("\\", "/");
+                    var entry = GetOrCreateEntry(newArchive, canonicalKey);
+
+                    logger.LogDebug(UIResources.ZIP_InsertingFile, kvp.Key, kvp.Value);
+                    using (var entryStream = entry.Open())
+                    {
+                        entryStream.Write(data, 0, data.Length);
+                        entryStream.Flush();
+                    }
+                }
+            }
         }
 
-        private static void CreateEmptyZipFile(string filePath)
+        private ZipArchiveEntry GetOrCreateEntry(ZipArchive archive, string fullEntryName)
         {
-            byte[] emptyZipHeader = new byte[] { 80, 75, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
-            using (FileStream fs = File.Create(filePath))
+            var existingEntry = archive.GetEntry(fullEntryName);
+            if (existingEntry != null)
             {
-                fs.Write(emptyZipHeader, 0, emptyZipHeader.Length);
-                fs.Flush();
+                logger.LogDebug(UIResources.ZIP_DeleteExistingEntry, fullEntryName);
+                existingEntry.Delete();
             }
-        }
 
-        #endregion
+            logger.LogDebug(UIResources.ZIP_CreatingNewEntry, fullEntryName);
+            return archive.CreateEntry(fullEntryName);
+
+        }
+        
+        #endregion Public methods
     }
 }
