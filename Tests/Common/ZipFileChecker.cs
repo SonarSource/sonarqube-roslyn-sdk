@@ -37,7 +37,6 @@ namespace SonarQube.Plugins.Test.Common
             this.testContext = testContext;
             TestUtils.AssertFileExists(zipFilePath);
             testContext.AddResultFile(zipFilePath);
-            testContext.AddResultFile(Path.ChangeExtension(zipFilePath, "shell"));
 
             UnzippedDirectoryPath = TestUtils.CreateTestDirectory(testContext, "unzipped." + Path.GetFileNameWithoutExtension(zipFilePath));
             ZipFile.ExtractToDirectory(zipFilePath, UnzippedDirectoryPath);
