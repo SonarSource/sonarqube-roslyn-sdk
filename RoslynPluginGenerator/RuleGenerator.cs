@@ -25,7 +25,10 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Reflection;
 using System.Text;
+using SonarQube.Plugins.Roslyn.CommandLine;
 
 namespace SonarQube.Plugins.Roslyn
 {
@@ -37,10 +40,17 @@ namespace SonarQube.Plugins.Roslyn
         public const string Cardinality = "SINGLE";
         public const string Status = "READY";
         private readonly ILogger logger;
+        private readonly string htmlDescriptionResourceNamespace;
 
         public RuleGenerator(ILogger logger)
+            : this(logger, null)
+        {
+        }
+
+        public RuleGenerator(ILogger logger, string htmlDescriptionResourceNamespace)
         {
             this.logger = logger;
+            this.htmlDescriptionResourceNamespace = htmlDescriptionResourceNamespace;
         }
 
         #region IRuleGenerator
@@ -99,7 +109,7 @@ namespace SonarQube.Plugins.Roslyn
                 newRule.Key = diagnostic.Id;
                 newRule.InternalKey = diagnostic.Id;
 
-                newRule.Description = GetDescriptionAsRawHtml(diagnostic);
+                newRule.Description = GetDescription(analyzer, diagnostic);
 
                 newRule.Name = diagnostic.Title.ToString(CultureInfo.InvariantCulture);
                 newRule.Severity = GetSonarQubeSeverity(diagnostic.DefaultSeverity);
@@ -131,10 +141,65 @@ namespace SonarQube.Plugins.Roslyn
         }
 
         /// <summary>
+        /// Returns the description as HTML.
+        /// </summary>
+        private string GetDescription(DiagnosticAnalyzer analyzer, DiagnosticDescriptor diagnostic)
+        {
+            Assembly analyzerAssembly = analyzer.GetType().Assembly;
+            string ruleDescriptionNamespace;
+
+            if (!TryGetResourceName(analyzerAssembly, diagnostic.Id, out ruleDescriptionNamespace))
+                return GetDiagnosticDescriptionAsRawHtml(diagnostic);
+
+            string htmlDescription;
+            if (TryGetResourceContentFromAssembly(analyzerAssembly, ruleDescriptionNamespace, out htmlDescription))
+                return htmlDescription;
+
+            return GetDiagnosticDescriptionAsRawHtml(diagnostic);
+        }
+
+        private bool TryGetResourceName(Assembly assembly, string diagnosticId, out string resourceName)
+        {
+            var manifestResourceNames = assembly.GetManifestResourceNames().AsQueryable();
+            if (string.IsNullOrWhiteSpace(htmlDescriptionResourceNamespace))
+            {
+                manifestResourceNames =
+                    manifestResourceNames.Where(
+                        name =>
+                            name.EndsWith($"Rules.Descriptions.{diagnosticId}.html",
+                                StringComparison.OrdinalIgnoreCase));
+            }
+            else
+            {
+                manifestResourceNames =
+                    manifestResourceNames.Where(name => name.Equals($"{htmlDescriptionResourceNamespace}.{diagnosticId}.html"));
+            }
+
+            resourceName = manifestResourceNames.SingleOrDefault();
+            return !string.IsNullOrWhiteSpace(resourceName);
+        }
+
+        private bool TryGetResourceContentFromAssembly(Assembly assembly, string resourceName, out string resourceContent)
+        {
+            resourceContent = null;
+            using (Stream resourceStream = assembly.GetManifestResourceStream(resourceName))
+            {
+                if (resourceStream == null)
+                    return false;
+
+                using (var streamReader = new StreamReader(resourceStream))
+                {
+                    resourceContent = streamReader.ReadToEnd();
+                    return !string.IsNullOrWhiteSpace(resourceContent);
+                }
+            }
+        }
+
+        /// <summary>
         /// Returns the description as HTML
         /// </summary>
         /// <returns>Note: the description should be returned as the HTML that should be rendered i.e. there is no need enclose it in a CDATA section</returns>
-        private static string GetDescriptionAsRawHtml(DiagnosticDescriptor diagnostic)
+        private static string GetDiagnosticDescriptionAsRawHtml(DiagnosticDescriptor diagnostic)
         {
             StringBuilder sb = new StringBuilder();
             bool hasDescription = false;

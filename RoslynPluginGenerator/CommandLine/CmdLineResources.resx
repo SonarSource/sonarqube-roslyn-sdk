@@ -123,6 +123,9 @@
   <data name="ArgDescription_AnalzyerRef" xml:space="preserve">
     <value>/a:[NuGet package id]  or  /a:[NuGet package id]:[version]</value>
   </data>
+  <data name="ArgDescription_DescriptionResourceNamespace" xml:space="preserve">
+    <value>/d:[Namespace] or /descriptionNamespace:[Namespace] - Specifies the resource namespace where the html description are embedded.</value>
+  </data>
   <data name="ArgDescription_RecurseDependencies" xml:space="preserve">
     <value>/recurse - search for analyzers in target package and any dependencies</value>
   </data>
