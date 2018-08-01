@@ -31,7 +31,6 @@ namespace SonarQube.Plugins.Roslyn
     /// </summary>
     public class ArchiveUpdater
     {
-        private readonly string workingDirectory;
         private readonly IDictionary<string, string> fileMap;
         private readonly ILogger logger;
 
@@ -40,15 +39,9 @@ namespace SonarQube.Plugins.Roslyn
 
         #region Public methods
 
-        public ArchiveUpdater(string workingDirectory, ILogger logger)
+        public ArchiveUpdater(ILogger logger)
         {
-            if (string.IsNullOrWhiteSpace(workingDirectory))
-            {
-                throw new ArgumentNullException(nameof(workingDirectory));
-            }
-
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            this.workingDirectory = workingDirectory;
 
             fileMap = new Dictionary<string, string>();
         }

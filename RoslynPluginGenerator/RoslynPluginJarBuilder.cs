@@ -22,7 +22,6 @@ using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace SonarQube.Plugins.Roslyn
 {
@@ -256,7 +255,7 @@ namespace SonarQube.Plugins.Roslyn
 
             // Update the jar
             string templateJarFilePath = ExtractTemplateJarFile(workingDirectory);
-            ArchiveUpdater updater = new ArchiveUpdater(workingDirectory, this.logger);
+            ArchiveUpdater updater = new ArchiveUpdater(this.logger);
 
             updater.SetInputArchive(templateJarFilePath)
                 .SetOutputArchive(this.outputJarFilePath)

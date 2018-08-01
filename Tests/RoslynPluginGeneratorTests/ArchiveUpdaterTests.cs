@@ -58,9 +58,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             string addFile1 = TestUtils.CreateTextFile("additional1.txt", rootTestDir, "a1");
             string addFile2 = TestUtils.CreateTextFile("additional2.txt", rootTestDir, "a2");
 
-            string updaterRootDir = TestUtils.CreateTestDirectory(this.TestContext, "updater");
-
-            ArchiveUpdater updater = new ArchiveUpdater(updaterRootDir, new TestLogger());
+            ArchiveUpdater updater = new ArchiveUpdater(new TestLogger());
 
             // Act
             updater.SetInputArchive(originalZipFile)
@@ -106,7 +104,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
 
             // Act
-            ArchiveUpdater updater = new ArchiveUpdater(rootTestDir, new TestLogger());
+            ArchiveUpdater updater = new ArchiveUpdater(new TestLogger());
 
             updater.SetInputArchive(originalZipFile)
                 .SetOutputArchive(updatedZipFile)
