@@ -50,11 +50,10 @@ namespace SonarQube.Plugins.Roslyn
 
         public static void ThrowIfNotSupported(string language)
         {
-            if (!SupportedLanguages.IsSupported(language))
+            if (!IsSupported(language))
             {
-                throw new System.ArgumentOutOfRangeException(
-                    string.Format(System.Globalization.CultureInfo.CurrentCulture,
-                    UIResources.APG_UnsupportedLanguage, language), "language");
+                throw new System.ArgumentOutOfRangeException(nameof(language),
+                    string.Format(System.Globalization.CultureInfo.CurrentCulture, UIResources.APG_UnsupportedLanguage, language));
             }
         }
     }

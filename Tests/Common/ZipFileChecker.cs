@@ -18,9 +18,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.IO.Compression;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SonarQube.Plugins.Test.Common
 {
@@ -36,12 +37,18 @@ namespace SonarQube.Plugins.Test.Common
             this.testContext = testContext;
             TestUtils.AssertFileExists(zipFilePath);
             testContext.AddResultFile(zipFilePath);
-            testContext.AddResultFile(Path.ChangeExtension(zipFilePath, "shell"));
 
             UnzippedDirectoryPath = TestUtils.CreateTestDirectory(testContext, "unzipped." + Path.GetFileNameWithoutExtension(zipFilePath));
             ZipFile.ExtractToDirectory(zipFilePath, UnzippedDirectoryPath);
 
-            DumpZipFile(zipFilePath);
+            // Dump the zip contents
+            var filesInZip = Directory.GetFiles(UnzippedDirectoryPath, "*.*", SearchOption.AllDirectories);
+            testContext.WriteLine($"Zip file contents: {zipFilePath}");
+            testContext.WriteLine($"File count: {filesInZip.Length}");
+            foreach (string file in filesInZip)
+            {
+                testContext.WriteLine($"  {file}");
+            }
         }
 
         /// <summary>
@@ -52,7 +59,7 @@ namespace SonarQube.Plugins.Test.Common
         public string AssertFileExists(string relativeFilePath)
         {
             string absolutePath = Path.Combine(UnzippedDirectoryPath, relativeFilePath);
-            Assert.IsTrue(File.Exists(absolutePath), "File does not exist in the zip: {0}", relativeFilePath);
+            File.Exists(absolutePath).Should().BeTrue($"File does not exist in the zip: Relative path: {relativeFilePath}, absolute path: {absolutePath}");
             return absolutePath;
         }
 
@@ -60,14 +67,14 @@ namespace SonarQube.Plugins.Test.Common
         {
             foreach (string relativePath in expectedRelativePaths)
             {
-                this.testContext.WriteLine("ZipFileChecker: checking for file '{0}'", relativePath);
+                testContext.WriteLine("ZipFileChecker: checking for file '{0}'", relativePath);
 
                 string[] matchingFiles = Directory.GetFiles(UnzippedDirectoryPath, relativePath, SearchOption.TopDirectoryOnly);
 
-                Assert.IsTrue(matchingFiles.Length < 2, "Test error: supplied relative path should not match multiple files");
-                Assert.AreEqual(1, matchingFiles.Length, "Zip file does not contain expected file: {0}", relativePath);
+                matchingFiles.Length.Should().BeLessThan(2, $"Test error: supplied relative path should not match multiple files: {relativePath}, count: {matchingFiles.Length}");
+                matchingFiles.Length.Should().Be(1, $"Zip file does not contain expected file: {relativePath}");
 
-                this.testContext.WriteLine("ZipFileChecker: found at '{0}'", matchingFiles[0]);
+                testContext.WriteLine("ZipFileChecker: found at '{0}'", matchingFiles[0]);
             }
         }
 
@@ -76,19 +83,7 @@ namespace SonarQube.Plugins.Test.Common
             AssertZipContainsFiles(expectedRelativePaths);
 
             string[] allFilesInZip = Directory.GetFiles(UnzippedDirectoryPath, "*.*", SearchOption.AllDirectories);
-            Assert.AreEqual(expectedRelativePaths.Length, allFilesInZip.Length, "Zip contains more files than expected");
-        }
-
-        private void DumpZipFile(string zipFilePath)
-        {
-            // Dump the zip contents
-            var filesInZip = Directory.GetFiles(UnzippedDirectoryPath, "*.*", SearchOption.AllDirectories);
-            testContext.WriteLine($"Zip file contents: {zipFilePath}");
-            testContext.WriteLine($"File count: {filesInZip.Length}");
-            foreach (string file in filesInZip)
-            {
-                testContext.WriteLine($"  {file}");
-            }
+            allFilesInZip.Length.Should().Be(expectedRelativePaths.Length, "Zip contains more files than expected");
         }
     }
 }

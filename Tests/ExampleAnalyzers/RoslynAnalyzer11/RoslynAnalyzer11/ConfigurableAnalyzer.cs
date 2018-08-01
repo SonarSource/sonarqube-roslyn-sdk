@@ -18,10 +18,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace RoslynAnalyzer11
 {
@@ -57,14 +57,14 @@ namespace RoslynAnalyzer11
             string[] tags = null)
         {
             var diagnostic = new DiagnosticDescriptor(key, title, messageFormat, category, severity, isEnabledByDefault, description, helpLinkUri, tags);
-            this.registeredDiagnostics.Add(diagnostic);
+            registeredDiagnostics.Add(diagnostic);
 
             return diagnostic;
         }
 
         public void ResetDiagnostics()
         {
-            this.registeredDiagnostics.Clear();
+            registeredDiagnostics.Clear();
         }
 
         #endregion Test interface

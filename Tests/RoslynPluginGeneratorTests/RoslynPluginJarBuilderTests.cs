@@ -18,9 +18,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Test.Common;
-using System.IO;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
@@ -35,8 +35,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void RoslynPlugin_Test()
         {
             // Arrange
-            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
-            string workingDir = TestUtils.CreateTestDirectory(this.TestContext, ".working");
+            string testDir = TestUtils.CreateTestDirectory(TestContext);
+            string workingDir = TestUtils.CreateTestDirectory(TestContext, ".working");
             string outputJarFilePath = Path.Combine(testDir, "created.jar");
 
             string dummyRulesFile = TestUtils.CreateTextFile("rules.txt", testDir, "<rules />");
@@ -61,11 +61,11 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                 .SetPluginManifestProperties(manifest)
                 .AddResourceFile(dummyZipFile, "static\\foo.zip")
                 .SetJarFilePath(outputJarFilePath);
-            
+
             builder.BuildJar(workingDir);
 
             // Assert
-            ZipFileChecker checker = new ZipFileChecker(this.TestContext, outputJarFilePath);
+            ZipFileChecker checker = new ZipFileChecker(TestContext, outputJarFilePath);
 
             checker.AssertZipContainsFiles(
                 "META-INF\\MANIFEST.MF",
@@ -76,7 +76,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                 );
         }
 
-        #endregion
-
+        #endregion Tests
     }
 }

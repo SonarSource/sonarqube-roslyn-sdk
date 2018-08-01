@@ -19,18 +19,19 @@
  */
 
 using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SonarQube.Plugins.Test.Common;
-using System.IO;
-using NuGet;
-using System.Linq;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NuGet;
+using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
     /// <summary>
     /// Tests for NuGetPackageHandler.cs
-    /// 
+    ///
     /// There is no test for the scenario released package A depending on prerelease package B as this is not allowed.
     /// </summary>
     [TestClass]
@@ -50,7 +51,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void NuGet_TestPackageDownload_Release_Release()
         {
             // Arrange
-            string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
+            string targetNuGetRoot = TestUtils.CreateTestDirectory(TestContext, ".nuget.target");
 
             // Create test NuGet payload and packages
             IPackageRepository fakeRemoteRepo = CreateTestPackageWithSingleDependency(ReleaseVersion, ReleaseVersion);
@@ -73,7 +74,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void NuGet_TestPackageDownload_PreRelease_Release()
         {
             // Arrange
-            string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
+            string targetNuGetRoot = TestUtils.CreateTestDirectory(TestContext, ".nuget.target");
 
             // Create test NuGet payload and packages
             IPackageRepository fakeRemoteRepo = CreateTestPackageWithSingleDependency(PreReleaseVersion, ReleaseVersion);
@@ -96,7 +97,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void NuGet_TestPackageDownload_PreRelease_PreRelease()
         {
             // Arrange
-            string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
+            string targetNuGetRoot = TestUtils.CreateTestDirectory(TestContext, ".nuget.target");
 
             // Create test NuGet payload and packages
             IPackageRepository fakeRemoteRepo = CreateTestPackageWithSingleDependency(PreReleaseVersion, PreReleaseVersion);
@@ -118,9 +119,9 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         [TestMethod]
         public void FetchPackage_VersionSpecified_CorrectVersionSelected()
         {
-            string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
+            string targetNuGetRoot = TestUtils.CreateTestDirectory(TestContext, ".nuget.target");
 
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
             BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "0.8.0");
             BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "1.0.0-rc1");
             BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "2.0.0");
@@ -147,8 +148,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void FetchPackage_VersionNotSpecified_ReleaseVersionExists_LastReleaseVersionSelected()
         {
             // Arrange
-            string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            string targetNuGetRoot = TestUtils.CreateTestDirectory(TestContext, ".nuget.target");
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
 
             BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "0.8.0");
             BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "0.9.0-rc1");
@@ -169,8 +170,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void FetchPackage_VersionNotSpecified_NoReleaseVersions_LastPreReleaseVersionSelected()
         {
             // Arrange
-            string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            string targetNuGetRoot = TestUtils.CreateTestDirectory(TestContext, ".nuget.target");
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
 
             BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "0.9.0-rc1");
             BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "1.0.0-rc1");
@@ -191,8 +192,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void FetchPackage_PackageNotFound_NullReturned()
         {
             // Arrange
-            string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            string targetNuGetRoot = TestUtils.CreateTestDirectory(TestContext, ".nuget.target");
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
 
             BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "0.8.0");
             BuildAndInstallPackage(remoteRepoBuilder, "package.id.1", "0.9.0");
@@ -201,28 +202,28 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             // 1. Package id not found
             IPackage actual = handler.FetchPackage("unknown.package.id", new SemanticVersion("0.8.0"));
-            Assert.IsNull(actual, "Not expecting a package to be found");
+            actual.Should().BeNull("Not expecting a package to be found");
 
             // 2. Package id not found
             actual = handler.FetchPackage("package.id.1", new SemanticVersion("0.7.0"));
-            Assert.IsNull(actual, "Not expecting a package to be found");
+            actual.Should().BeNull("Not expecting a package to be found");
         }
 
         [TestMethod]
         public void GetDependencies_DependenciesInstalledLocally_Succeeds()
         {
             // Arrange
-            string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            string targetNuGetRoot = TestUtils.CreateTestDirectory(TestContext, ".nuget.target");
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
             string dummyContentFile = CreateDummyContentFile();
 
-            // Build a dependency graph 
+            // Build a dependency graph
             // A depends on B
             // B depends on C, D, E
             // D also depends on E => duplicate dependency
             // E depends on F
             // -> expected [B, C, D, E, F]
-            
+
             // Leaf nodes
             IPackage f = remoteRepoBuilder.CreatePackage("f", "1.0", dummyContentFile, RemoteRepoBuilder.License.NotRequired /* no dependencies */);
             IPackage c = remoteRepoBuilder.CreatePackage("c", "1.0", dummyContentFile, RemoteRepoBuilder.License.NotRequired /* no dependencies */);
@@ -256,8 +257,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void GetDependencies_DependenciesNotInstalledLocally_Warning()
         {
             // Arrange
-            string targetNuGetRoot = TestUtils.CreateTestDirectory(this.TestContext, ".nuget.target");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            string targetNuGetRoot = TestUtils.CreateTestDirectory(TestContext, ".nuget.target");
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
             string dummyContentFile = CreateDummyContentFile();
 
             IEnumerable<IPackage> actualDependencies;
@@ -265,7 +266,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // Build a dependency graph: "main" depends on "dependency"
             IPackage dependencyPackage = remoteRepoBuilder.CreatePackage("dependency.package.id", "1.2", dummyContentFile, RemoteRepoBuilder.License.Required /* no dependencies */);
             IPackage mainPackage = remoteRepoBuilder.CreatePackage("a", "2.0", dummyContentFile, RemoteRepoBuilder.License.NotRequired, dependencyPackage);
-
 
             // 1. Dependencies have not been installed locally -> warning but no error
             TestLogger logger = new TestLogger();
@@ -276,7 +276,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             logger.AssertErrorsLogged(0);
             logger.AssertWarningsLogged(1);
             logger.AssertSingleWarningExists("dependency.package.id");
-
 
             // 2. Now install the package -> dependencies should resolve ok
             logger = new TestLogger();
@@ -290,20 +289,20 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             logger.AssertWarningsLogged(0);
         }
 
-        #endregion
+        #endregion Tests
 
         #region Private methods
 
-        private IPackage BuildAndInstallPackage(RemoteRepoBuilder remoteRepoBuilder, string id, string version)
+        private void BuildAndInstallPackage(RemoteRepoBuilder remoteRepoBuilder, string id, string version)
         {
             string dummyTextFile = CreateDummyContentFile();
-            return remoteRepoBuilder.CreatePackage(id, version, dummyTextFile, RemoteRepoBuilder.License.NotRequired);
+            remoteRepoBuilder.CreatePackage(id, version, dummyTextFile, RemoteRepoBuilder.License.NotRequired);
         }
-        
+
         private IPackageRepository CreateTestPackageWithSingleDependency(string dependentPackageVersion, string testPackageVersion)
         {
             string dummyTextFile = CreateDummyContentFile();
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
 
             IPackage testPackage = remoteRepoBuilder.CreatePackage(TestPackageId, testPackageVersion, dummyTextFile, RemoteRepoBuilder.License.NotRequired);
             remoteRepoBuilder.CreatePackage(DependentPackageId, dependentPackageVersion, dummyTextFile, RemoteRepoBuilder.License.NotRequired, testPackage);
@@ -313,42 +312,41 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
         private string CreateDummyContentFile()
         {
-            string testDir = TestUtils.EnsureTestDirectoryExists(this.TestContext, "source");
+            string testDir = TestUtils.EnsureTestDirectoryExists(TestContext, "source");
             string dummyTextFile = TestUtils.CreateTextFile(Guid.NewGuid().ToString(), testDir, "content");
             return dummyTextFile;
         }
 
-        #endregion
+        #endregion Private methods
 
         #region Checks
 
         private static void AssertExpectedPackage(IPackage actual, string expectedId, string expectedVersion)
         {
-            Assert.IsNotNull(actual, "The package should not be null");
+            actual.Should().NotBeNull("The package should not be null");
 
             SemanticVersion sVersion = new SemanticVersion(expectedVersion);
 
-            Assert.AreEqual(expectedId, actual.Id, "Unexpected package id");
-            Assert.AreEqual(sVersion, actual.Version, "Unexpected package version");
+            expectedId.Should().Be(actual.Id, "Unexpected package id");
+            sVersion.Should().Be(actual.Version, "Unexpected package version");
         }
 
         private void AssertPackageDownloaded(string downloadDir, string expectedName, string expectedVersion)
         {
             string packageDir = Directory.GetDirectories(downloadDir)
                 .SingleOrDefault(d => d.Contains(expectedName) && d.Contains(expectedVersion));
-            Assert.IsNotNull(packageDir,
-                "Expected a package to have been downloaded: " + expectedName);
+            packageDir.Should().NotBeNull("Expected a package to have been downloaded: " + expectedName);
         }
 
         private static void AssertExpectedPackageIds(IEnumerable<IPackage> actual, params string[] expectedIds)
         {
             foreach(string expectedId in expectedIds)
             {
-                Assert.IsTrue(actual.Any(p => string.Equals(p.Id, expectedId, StringComparison.Ordinal)), "Dependency with the expected package id was not found. Id: {0}", expectedId);
+                actual.Any(p => string.Equals(p.Id, expectedId, StringComparison.Ordinal)).Should().BeTrue("Dependency with the expected package id was not found. Id: {0}", expectedId);
             }
-            Assert.AreEqual(expectedIds.Length, actual.Count(), "Too many dependencies returned");
+            expectedIds.Length.Should().Be(actual.Count(), "Too many dependencies returned");
         }
 
-        #endregion
+        #endregion Checks
     }
 }

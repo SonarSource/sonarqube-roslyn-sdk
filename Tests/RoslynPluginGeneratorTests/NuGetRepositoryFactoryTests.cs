@@ -18,11 +18,12 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using System.IO;
+using System.Linq;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NuGet;
 using SonarQube.Plugins.Test.Common;
-using System.IO;
-using System.Linq;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
@@ -58,7 +59,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             IPackageRepository actualRepo = NuGetRepositoryFactory.CreateRepository(settings, logger);
 
             // Assert
-            Assert.IsInstanceOfType(actualRepo, typeof(AggregateRepository));
+            actualRepo.Should().BeOfType<AggregateRepository>();
             AggregateRepository actualAggregateRepo = (AggregateRepository)actualRepo;
 
             AssertExpectedPackageSources(actualAggregateRepo,
@@ -88,7 +89,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             IPackageRepository actualRepo = NuGetRepositoryFactory.CreateRepository(settings, logger);
 
             // Assert
-            Assert.IsInstanceOfType(actualRepo, typeof(AggregateRepository));
+            actualRepo.Should().BeOfType<AggregateRepository>();
             AggregateRepository actualAggregateRepo = (AggregateRepository)actualRepo;
 
             AssertExpectedPackageSources(actualAggregateRepo,
@@ -121,7 +122,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             IPackageRepository actualRepo = NuGetRepositoryFactory.CreateRepository(settings, logger);
 
             // Assert
-            Assert.IsInstanceOfType(actualRepo, typeof(AggregateRepository));
+            actualRepo.Should().BeOfType<AggregateRepository>();
             AggregateRepository actualAggregateRepo = (AggregateRepository)actualRepo;
 
             AssertExpectedPackageSources(actualAggregateRepo
@@ -148,13 +149,13 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             IPackage locatedPackage = actualRepo.FindPackage("dummy.package.id"); // trying to use the bad repo should fail
 
             // Assert
-            Assert.IsNull(locatedPackage, "Should have failed to locate a package");
+            locatedPackage.Should().BeNull("Should have failed to locate a package");
             logger.AssertSingleWarningExists(NuGetLoggerAdapter.LogMessagePrefix, "http://bad.remote.unreachable.repo");
             logger.AssertWarningsLogged(1);
             logger.AssertErrorsLogged(0);
         }
 
-        #endregion
+        #endregion Tests
 
         #region Private methods
 
@@ -167,12 +168,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // from an XML file on disk
 
             // Note: it's best to use local package sources for enabled packages
-            // i.e. references to local directories. The directories do not have 
+            // i.e. references to local directories. The directories do not have
             // to exist.
             // If you reference a remote package source such as https://www.nuget.org/api/v2/
             // then the repository factory will attempt to contact the remote repo
             // (which is slow) and will fail if it cannot be reached.
-            string testDir = TestUtils.CreateTestDirectory(this.TestContext);            
+            string testDir = TestUtils.CreateTestDirectory(TestContext);
             string fullConfigFilePath = Path.Combine(testDir, "validConfig.txt");
             File.WriteAllText(fullConfigFilePath, configXml);
 
@@ -182,17 +183,15 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
         private static void AssertExpectedPackageSources(AggregateRepository actualRepo, params string[] expectedSources)
         {
-            foreach(string expectedSource in expectedSources)
+            foreach (string expectedSource in expectedSources)
             {
-                Assert.IsTrue(actualRepo.Repositories.Any(r => string.Equals(r.Source, expectedSource)),
-                    "Expected package source does not exist: {0}", expectedSource);
+                actualRepo.Repositories.Any(r => string.Equals(r.Source, expectedSource)).Should()
+                    .BeTrue("Expected package source does not exist: {0}", expectedSource);
             }
 
-            Assert.AreEqual(expectedSources.Length, actualRepo.Repositories.Count(), "Too many repositories returned");
+            actualRepo.Repositories.Count().Should().Be(expectedSources.Length, "Too many repositories returned");
         }
 
-        #endregion
-
-
+        #endregion Private methods
     }
 }

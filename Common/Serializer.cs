@@ -39,22 +39,23 @@ namespace SonarQube.Plugins.Roslyn
         {
             if (model == null)
             {
-                throw new ArgumentNullException("model");
+                throw new ArgumentNullException(nameof(model));
             }
 
             if (string.IsNullOrWhiteSpace(fileName))
             {
-                throw new ArgumentNullException("fileName");
+                throw new ArgumentNullException(nameof(fileName));
             }
 
             XmlSerializer serializer = new XmlSerializer(typeof(T));
-            XmlWriterSettings settings = new XmlWriterSettings();
-
-            settings.CloseOutput = true;
-            settings.ConformanceLevel = ConformanceLevel.Document;
-            settings.Indent = true;
-            settings.NamespaceHandling = NamespaceHandling.OmitDuplicates;
-            settings.OmitXmlDeclaration = false;
+            XmlWriterSettings settings = new XmlWriterSettings
+            {
+                CloseOutput = true,
+                ConformanceLevel = ConformanceLevel.Document,
+                Indent = true,
+                NamespaceHandling = NamespaceHandling.OmitDuplicates,
+                OmitXmlDeclaration = false
+            };
 
             // Serialize to memory first to reduce the opportunity for intermittent
             // locking issues when writing the file
@@ -73,7 +74,7 @@ namespace SonarQube.Plugins.Roslyn
         {
             if (string.IsNullOrWhiteSpace(fileName))
             {
-                throw new ArgumentNullException("fileName");
+                throw new ArgumentNullException(nameof(fileName));
             }
             if (!File.Exists(fileName))
             {
@@ -92,6 +93,6 @@ namespace SonarQube.Plugins.Roslyn
             return model;
         }
 
-        #endregion Serialisation methods
+        #endregion Serialization methods
     }
 }

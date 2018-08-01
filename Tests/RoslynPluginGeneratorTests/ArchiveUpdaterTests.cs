@@ -18,10 +18,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SonarQube.Plugins.Test.Common;
 using System.IO;
 using System.IO.Compression;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
@@ -36,23 +37,22 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void ArchiveUpdater_SimpleUpdateJar_Succeeds()
         {
             // Arrange - create an input archive file
-            string rootTestDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string rootTestDir = TestUtils.CreateTestDirectory(TestContext);
             string originalZipFile = Path.Combine(rootTestDir, "original.zip");
             string updatedZipFile = Path.Combine(rootTestDir, "updated.zip");
 
-            string setupDir = TestUtils.CreateTestDirectory(this.TestContext, ".zip.setup");
+            string setupDir = TestUtils.CreateTestDirectory(TestContext, ".zip.setup");
             TestUtils.CreateTextFile("file1.txt", setupDir, "file 1 content");
             TestUtils.CreateTextFile("sub1\\sub2\\file2.txt", setupDir, "file 2 content");
 
             ZipFile.CreateFromDirectory(setupDir, originalZipFile);
 
             // Sanity check that the test archive was built correctly
-            ZipFileChecker checker = new ZipFileChecker(this.TestContext, originalZipFile);
+            ZipFileChecker checker = new ZipFileChecker(TestContext, originalZipFile);
             checker.AssertZipContainsOnlyExpectedFiles(
                 // Original files
                 "file1.txt",
                 "sub1\\sub2\\file2.txt");
-
 
             // Create some new dummy files to add
             string addFile1 = TestUtils.CreateTextFile("additional1.txt", rootTestDir, "a1");
@@ -69,7 +69,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             updater.UpdateArchive();
 
             // Assert
-            checker = new ZipFileChecker(this.TestContext, updatedZipFile);
+            checker = new ZipFileChecker(TestContext, updatedZipFile);
 
             checker.AssertZipContainsOnlyExpectedFiles(
                 // Original files
@@ -135,7 +135,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         private static void AssertEntryExists(ZipArchive archive, string entryFullName, string expectedText)
         {
             var entry = archive.GetEntry(entryFullName);
-            Assert.IsNotNull(entry, $"Expected entry not found: {entryFullName}");
+            entry.Should().NotBeNull($"Expected entry not found: {entryFullName}");
 
             const int MAX_DATA_LENGTH = 100;
 
@@ -143,10 +143,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             {
                 var actualData = new byte[MAX_DATA_LENGTH];
                 var actualLength = stream.Read(actualData, 0, MAX_DATA_LENGTH);
-                Assert.IsTrue(actualLength < MAX_DATA_LENGTH, $"Test setup error: sample test string should be less than {MAX_DATA_LENGTH}");
+                actualLength.Should().BeLessThan(MAX_DATA_LENGTH, $"Test setup error: sample test string should be less than {MAX_DATA_LENGTH}");
 
                 var actualText = System.Text.Encoding.UTF8.GetString(actualData, 0, actualLength);
-                Assert.AreEqual(expectedText, actualText, $"Entry does not contain the expected data. Entry: {entryFullName}");
+                actualText.Should().Be(expectedText, $"Entry does not contain the expected data. Entry: {entryFullName}");
             }
         }
 

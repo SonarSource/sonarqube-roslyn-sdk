@@ -18,9 +18,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using System;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Test.Common;
-using System;
 
 namespace SonarQube.Plugins.PluginGeneratorTests
 {
@@ -68,14 +69,14 @@ namespace SonarQube.Plugins.PluginGeneratorTests
             CheckThrowIfInvalidThrows("x!\"£$%^&*()_+");
         }
 
-        #endregion
+        #endregion Tests
 
         #region Private methods
 
         private static void TestGetValidKey(string input, string expected)
         {
             string actual = PluginKeyUtilities.GetValidKey(input);
-            Assert.AreEqual(expected, actual, "Unexpected plugin key returned");
+            actual.Should().Be(expected, "Unexpected plugin key returned");
 
             PluginKeyUtilities.ThrowIfInvalid(expected); // should not throw on values returned by GetValidKey
         }
@@ -83,15 +84,16 @@ namespace SonarQube.Plugins.PluginGeneratorTests
         private static void CheckGetValidKeyThrows(string input)
         {
             // Should throw on input that cannot be corrected
-            AssertException.Expect<ArgumentException>(() => PluginKeyUtilities.GetValidKey(input));
+            Action action = () => PluginKeyUtilities.GetValidKey(input);
+            action.Should().Throw<ArgumentException>();
         }
 
         private static void CheckThrowIfInvalidThrows(string input)
         {
-            AssertException.Expect<ArgumentException>(() => PluginKeyUtilities.ThrowIfInvalid(input));
+            Action action = () => PluginKeyUtilities.ThrowIfInvalid(input);
+            action.Should().ThrowExactly<ArgumentException>();
         }
 
-        #endregion
-
+        #endregion Private methods
     }
 }

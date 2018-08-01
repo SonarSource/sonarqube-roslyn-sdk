@@ -18,9 +18,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using System;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Test.Common;
-using System;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
@@ -30,15 +31,29 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         [TestMethod]
         public void ThrowIfNotSupported_Unrecognised_Throws()
         {
-            AssertException.Expect<ArgumentOutOfRangeException>(() => SupportedLanguages.ThrowIfNotSupported(""));
-            AssertException.Expect<ArgumentOutOfRangeException>(() => SupportedLanguages.ThrowIfNotSupported("123"));
-            AssertException.Expect<ArgumentOutOfRangeException>(() => SupportedLanguages.ThrowIfNotSupported("Visual Basic"));
-            AssertException.Expect<ArgumentOutOfRangeException>(() => SupportedLanguages.ThrowIfNotSupported("CSharp"));
+            Action action = () => SupportedLanguages.ThrowIfNotSupported("");
+            action.Should().ThrowExactly<ArgumentOutOfRangeException>();
 
-            AssertException.Expect<ArgumentOutOfRangeException>(() => SupportedLanguages.ThrowIfNotSupported("Cs"));
-            AssertException.Expect<ArgumentOutOfRangeException>(() => SupportedLanguages.ThrowIfNotSupported("CS"));
-            AssertException.Expect<ArgumentOutOfRangeException>(() => SupportedLanguages.ThrowIfNotSupported("vB"));
-            AssertException.Expect<ArgumentOutOfRangeException>(() => SupportedLanguages.ThrowIfNotSupported("VB"));
+            action = () => SupportedLanguages.ThrowIfNotSupported("123");
+            action.Should().ThrowExactly<ArgumentOutOfRangeException>();
+
+            action = () => SupportedLanguages.ThrowIfNotSupported("Visual Basic");
+            action.Should().ThrowExactly<ArgumentOutOfRangeException>();
+
+            action = () => SupportedLanguages.ThrowIfNotSupported("CSharp");
+            action.Should().ThrowExactly<ArgumentOutOfRangeException>();
+
+            action = () => SupportedLanguages.ThrowIfNotSupported("Cs");
+            action.Should().ThrowExactly<ArgumentOutOfRangeException>();
+
+            action = () => SupportedLanguages.ThrowIfNotSupported("CS");
+            action.Should().ThrowExactly<ArgumentOutOfRangeException>();
+
+            action = () => SupportedLanguages.ThrowIfNotSupported("vB");
+            action.Should().ThrowExactly<ArgumentOutOfRangeException>();
+
+            action = () => SupportedLanguages.ThrowIfNotSupported("VB");
+            action.Should().ThrowExactly<ArgumentOutOfRangeException>();
         }
 
         [TestMethod]
@@ -51,19 +66,24 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         [TestMethod]
         public void GetRoslynName_Unrecognised_Throws()
         {
-            AssertException.Expect<ArgumentOutOfRangeException>(() => SupportedLanguages.GetRoslynLanguageName("foo"));
-            AssertException.Expect<ArgumentOutOfRangeException>(() => SupportedLanguages.GetRoslynLanguageName("CS")); // case-sensitive
-            AssertException.Expect<ArgumentOutOfRangeException>(() => SupportedLanguages.GetRoslynLanguageName("VB")); // case-sensitive
+            Action action = () => SupportedLanguages.GetRoslynLanguageName("foo");
+            action.Should().ThrowExactly<ArgumentOutOfRangeException>();
+
+            action = () => SupportedLanguages.GetRoslynLanguageName("CS");
+            action.Should().ThrowExactly<ArgumentOutOfRangeException>(); // case-sensitive
+
+            action = () => SupportedLanguages.GetRoslynLanguageName("VB");
+            action.Should().ThrowExactly<ArgumentOutOfRangeException>(); // case-sensitive
         }
 
         [TestMethod]
         public void GetRoslynName_Recognised_ReturnsExpected()
         {
             string result = SupportedLanguages.GetRoslynLanguageName("cs");
-            Assert.AreEqual(result, "C#");
+            result.Should().Be("C#");
 
             result = SupportedLanguages.GetRoslynLanguageName("vb");
-            Assert.AreEqual(result, "Visual Basic");
+            result.Should().Be("Visual Basic");
         }
     }
 }

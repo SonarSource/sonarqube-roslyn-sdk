@@ -19,13 +19,15 @@
  */
 
 using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.IO;
-using SonarQube.Plugins.Test.Common;
-using System.Reflection;
-using SonarQube.Plugins.Common;
-using Microsoft.CSharp;
 using System.CodeDom.Compiler;
+using System.IO;
+using System.Reflection;
+using FluentAssertions;
+using FluentAssertions.Execution;
+using Microsoft.CSharp;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SonarQube.Plugins.Common;
+using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.CommonTests
 {
@@ -40,13 +42,16 @@ namespace SonarQube.Plugins.CommonTests
         public void AssemblyResolver_Creation()
         {
             // 1. Null logger
-            AssertException.Expect<ArgumentNullException>(() => new AssemblyResolver(null, new string[] { this.TestContext.TestDeploymentDir }));
+            Action action = () => new AssemblyResolver(null, new string[] { TestContext.TestDeploymentDir });
+            action.Should().ThrowExactly<ArgumentNullException>();
 
             // 2. Null paths
-            AssertException.Expect<ArgumentException>(() => new AssemblyResolver(new TestLogger(), null));
+            action = () => new AssemblyResolver(new TestLogger(), null);
+            action.Should().ThrowExactly<ArgumentException>();
 
             // 3. Empty paths
-            AssertException.Expect<ArgumentException>(() => new AssemblyResolver(new TestLogger(), new string[] { }));
+            action = () => new AssemblyResolver(new TestLogger(), new string[] { });
+            action.Should().ThrowExactly<ArgumentException>();
         }
 
         /// <summary>
@@ -57,7 +62,7 @@ namespace SonarQube.Plugins.CommonTests
         {
             // Arrange
             TestLogger logger = new TestLogger();
-            string testFolder = TestUtils.CreateTestDirectory(this.TestContext);
+            string testFolder = TestUtils.CreateTestDirectory(TestContext);
             CompileSimpleAssembly("SimpleAssembly.dll", testFolder, logger);
 
             object simpleObject = null;
@@ -69,7 +74,7 @@ namespace SonarQube.Plugins.CommonTests
                 foreach (string assemblyPath in Directory.GetFiles(testFolder, "*.dll", SearchOption.AllDirectories))
                 {
                     Assembly assembly = Assembly.LoadFile(assemblyPath);
-                    
+
                     foreach (Type type in assembly.GetExportedTypes())
                     {
                         if (!type.IsAbstract)
@@ -80,10 +85,9 @@ namespace SonarQube.Plugins.CommonTests
                 }
 
                 // Assert
-                Assert.IsNotNull(simpleObject);
-                Assert.AreEqual<string>("SimpleProgram", simpleObject.GetType().ToString());
+                simpleObject.Should().NotBeNull();
+                simpleObject.GetType().ToString().Should().Be("SimpleProgram");
                 AssertResolverCaller(resolver);
-
             }
         }
 
@@ -95,7 +99,7 @@ namespace SonarQube.Plugins.CommonTests
         {
             // Arrange
             TestLogger logger = new TestLogger();
-            string testFolder = TestUtils.CreateTestDirectory(this.TestContext);
+            string testFolder = TestUtils.CreateTestDirectory(TestContext);
 
             // Act
             using (AssemblyResolver resolver = new AssemblyResolver(logger, testFolder))
@@ -114,7 +118,7 @@ namespace SonarQube.Plugins.CommonTests
         public void AssemblyResolver_ResolutionByFullAssemblyName_Succeeds()
         {
             // Arrange
-            string testFolder = TestUtils.CreateTestDirectory(this.TestContext);
+            string testFolder = TestUtils.CreateTestDirectory(TestContext);
             Assembly testAssembly = CompileSimpleAssembly("SimpleAssemblyByFullName.dll", testFolder, new TestLogger());
 
             // Act
@@ -131,7 +135,7 @@ namespace SonarQube.Plugins.CommonTests
         public void AssemblyResolver_ResolutionByFileName_Succeeds()
         {
             // Arrante
-            string testFolder = TestUtils.CreateTestDirectory(this.TestContext);
+            string testFolder = TestUtils.CreateTestDirectory(TestContext);
             Assembly testAssembly = CompileSimpleAssembly("SimpleAssemblyByFileName.dll", testFolder, new TestLogger());
 
             // Act
@@ -148,7 +152,7 @@ namespace SonarQube.Plugins.CommonTests
         public void AssemblyResolver_ResolutionByFullAssemblyNameWithSpace_Succeeds()
         {
             // Arrange
-            string testFolder = TestUtils.CreateTestDirectory(this.TestContext);
+            string testFolder = TestUtils.CreateTestDirectory(TestContext);
             Assembly testAssembly = CompileSimpleAssembly("Space in Name ByFullName.dll", testFolder, new TestLogger());
 
             // Act
@@ -165,7 +169,7 @@ namespace SonarQube.Plugins.CommonTests
         public void AssemblyResolver_ResolutionByFileNameWithSpace_Succeeds()
         {
             // Arrante
-            string testFolder = TestUtils.CreateTestDirectory(this.TestContext);
+            string testFolder = TestUtils.CreateTestDirectory(TestContext);
             Assembly testAssembly = CompileSimpleAssembly("Space in Name ByFileName.dll", testFolder, new TestLogger());
 
             // Act
@@ -182,7 +186,7 @@ namespace SonarQube.Plugins.CommonTests
         public void AssemblyResolver_VersionAssemblyRequested()
         {
             // Setup
-            string testFolder = TestUtils.CreateTestDirectory(this.TestContext);
+            string testFolder = TestUtils.CreateTestDirectory(TestContext);
             Assembly testAssembly = CompileSimpleAssembly("VersionAsm1.dll", testFolder, new TestLogger(), "2.1.0.4");
 
             // 1. Search for a version that can be found -> succeeds
@@ -197,7 +201,7 @@ namespace SonarQube.Plugins.CommonTests
             }
         }
 
-        #endregion
+        #endregion Tests
 
         #region Private methods
 
@@ -225,10 +229,12 @@ namespace SonarQube.Plugins.CommonTests
             CompilerResults result = null;
             using (CSharpCodeProvider provider = new CSharpCodeProvider())
             {
-                CompilerParameters options = new CompilerParameters();
-                options.OutputAssembly = outputFilePath;
-                options.GenerateExecutable = true;
-                options.GenerateInMemory = false;
+                CompilerParameters options = new CompilerParameters
+                {
+                    OutputAssembly = outputFilePath,
+                    GenerateExecutable = true,
+                    GenerateInMemory = false
+                };
 
                 result = provider.CompileAssemblyFromSource(options, versionedCode);
 
@@ -238,20 +244,22 @@ namespace SonarQube.Plugins.CommonTests
                     {
                         logger.LogInfo(item);
                     }
-                    Assert.Fail("Test setup error: failed to create dynamic assembly. See the test output for compiler output");
+                    AssertionScope.Current.FailWith("Test setup error: failed to create dynamic assembly. " +
+                        "See the test output for compiler output");
                 }
             }
 
             return result.CompiledAssembly;
         }
 
-        #endregion
+        #endregion Private methods
 
         #region Checks
 
         private static void AssertAssemblyLoadFails(string asmRef)
         {
-            AssertException.Expect<FileNotFoundException>(() => Assembly.Load(asmRef));
+            Action action = () => Assembly.Load(asmRef);
+            action.Should().ThrowExactly<FileNotFoundException>();
         }
 
         private Assembly AssertAssemblyLoadSucceedsOnlyWithResolver(string asmRef, string searchPath)
@@ -273,22 +281,22 @@ namespace SonarQube.Plugins.CommonTests
             }
 
             // Assert
-            Assert.IsNotNull(resolveResult, "Failed to the load the assembly");
+            resolveResult.Should().NotBeNull("Failed to the load the assembly");
 
             return resolveResult;
         }
 
         private static void AssertResolverCaller(AssemblyResolver resolver)
         {
-            Assert.IsTrue(resolver.ResolverCalled, "Expected the assembly resolver to have been called");
+            resolver.ResolverCalled.Should().BeTrue("Expected the assembly resolver to have been called");
         }
 
         private static void AssertExpectedAssemblyLoaded(Assembly expected, Assembly resolved)
         {
-            Assert.IsNotNull(resolved, "Resolved assembly should not be null");
-            Assert.AreEqual(expected.Location, resolved.Location, "Failed to load the expected assembly");
+            resolved.Should().NotBeNull("Resolved assembly should not be null");
+            resolved.Location.Should().Be(expected.Location, "Failed to load the expected assembly");
         }
 
-        #endregion
+        #endregion Checks
     }
 }

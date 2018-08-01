@@ -40,7 +40,7 @@ namespace SonarQube.Plugins
         {
             if (key == null)
             {
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
             }
 
             StringBuilder sb = new StringBuilder();
@@ -65,7 +65,7 @@ namespace SonarQube.Plugins
 
         public static void ThrowIfInvalid(string key)
         {
-            if (string.IsNullOrWhiteSpace(key) || 
+            if (string.IsNullOrWhiteSpace(key) ||
                 key.Length > 255 ||
                 key.Any(c => !IsValidChar(c)))
             {
@@ -79,6 +79,5 @@ namespace SonarQube.Plugins
             bool isValid = char.IsLetterOrDigit(c) || allowedSymbols.Any(a => a == c);
             return isValid;
         }
-
     }
 }

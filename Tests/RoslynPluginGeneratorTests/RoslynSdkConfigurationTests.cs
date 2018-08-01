@@ -18,10 +18,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SonarQube.Plugins.Test.Common;
 using System.IO;
 using System.Linq;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
@@ -36,40 +37,40 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void SdkConfig_SaveAndReload_Succeeds()
         {
             // Arrange
-            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string testDir = TestUtils.CreateTestDirectory(TestContext);
             string filePath = Path.Combine(testDir, "original.txt");
 
-
-            RoslynSdkConfiguration config = new RoslynSdkConfiguration();
-
-            config.PluginKeyDifferentiator = "diff";
-            config.RepositoryKey = "key";
-            config.RepositoryName = "repo.name";
-            config.RepositoryLanguage = "language";
-            config.RulesXmlResourcePath = "rulesPath";
-            config.SqaleXmlResourcePath = "sqalePath";
+            RoslynSdkConfiguration config = new RoslynSdkConfiguration
+            {
+                PluginKeyDifferentiator = "diff",
+                RepositoryKey = "key",
+                RepositoryName = "repo.name",
+                RepositoryLanguage = "language",
+                RulesXmlResourcePath = "rulesPath",
+                SqaleXmlResourcePath = "sqalePath"
+            };
 
             config.Properties["prop1.Key"] = "value1";
             config.Properties["prop2.Key"] = "value2";
 
-            // Save and check 
+            // Save and check
             config.Save(filePath);
-            Assert.AreEqual(filePath, config.FileName);
-            this.TestContext.AddResultFile(filePath);
+            filePath.Should().Be(config.FileName);
+            TestContext.AddResultFile(filePath);
 
             // Reload and check
             RoslynSdkConfiguration reloaded = RoslynSdkConfiguration.Load(filePath);
 
-            Assert.IsNotNull(reloaded);
+            reloaded.Should().NotBeNull();
 
-            Assert.AreEqual("diff", reloaded.PluginKeyDifferentiator);
-            Assert.AreEqual("key", reloaded.RepositoryKey);
-            Assert.AreEqual("repo.name", reloaded.RepositoryName);
-            Assert.AreEqual("language", reloaded.RepositoryLanguage);
-            Assert.AreEqual("rulesPath", reloaded.RulesXmlResourcePath);
-            Assert.AreEqual("sqalePath", reloaded.SqaleXmlResourcePath);
+            reloaded.PluginKeyDifferentiator.Should().Be("diff");
+            reloaded.RepositoryKey.Should().Be("key");
+            reloaded.RepositoryName.Should().Be("repo.name");
+            reloaded.RepositoryLanguage.Should().Be("language");
+            reloaded.RulesXmlResourcePath.Should().Be("rulesPath");
+            reloaded.SqaleXmlResourcePath.Should().Be("sqalePath");
 
-            Assert.AreEqual(2, reloaded.Properties.Count);
+            reloaded.Properties.Count.Should().Be(2);
             AssertPropertyExists("prop1.Key", "value1", reloaded.Properties);
             AssertPropertyExists("prop2.Key", "value2", reloaded.Properties);
         }
@@ -78,6 +79,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void SdkConfig_LoadRealExample_Succeeds()
         {
             // Arrange
+
             #region File content
 
             string exampleConfig = @"<RoslynSdkConfiguration>
@@ -99,25 +101,25 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 </RoslynSdkConfiguration>
 ";
 
-            #endregion
+            #endregion File content
 
-            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string testDir = TestUtils.CreateTestDirectory(TestContext);
             string filePath = TestUtils.CreateTextFile("realPluginProperties.txt", testDir, exampleConfig);
-            this.TestContext.AddResultFile(filePath);
+            TestContext.AddResultFile(filePath);
 
             // Act
             RoslynSdkConfiguration loaded = RoslynSdkConfiguration.Load(filePath);
             string resavedFilePath = Path.Combine(testDir, "resaved.txt");
             loaded.Save(resavedFilePath);
-            this.TestContext.AddResultFile(resavedFilePath);
+            TestContext.AddResultFile(resavedFilePath);
 
             // Assert
-            Assert.AreEqual("example", loaded.PluginKeyDifferentiator);
-            Assert.AreEqual("roslyn.example", loaded.RepositoryKey);
-            Assert.AreEqual("example", loaded.RepositoryLanguage);
-            Assert.AreEqual("example", loaded.RepositoryName);
-            Assert.AreEqual("/org/sonar/plugins/roslynsdk/rules.xml", loaded.RulesXmlResourcePath);
-            Assert.AreEqual("/org/sonar/plugins/roslynsdk/sqale.xml", loaded.SqaleXmlResourcePath);
+            loaded.PluginKeyDifferentiator.Should().Be("example");
+            loaded.RepositoryKey.Should().Be("roslyn.example");
+            loaded.RepositoryLanguage.Should().Be("example");
+            loaded.RepositoryName.Should().Be("example");
+            loaded.RulesXmlResourcePath.Should().Be("/org/sonar/plugins/roslynsdk/rules.xml");
+            loaded.SqaleXmlResourcePath.Should().Be("/org/sonar/plugins/roslynsdk/sqale.xml");
 
             AssertPropertyExists("example.pluginKey", "example.pluginKey.Value", loaded.Properties);
             AssertPropertyExists("example.pluginVersion", "example.pluginVersion.Value", loaded.Properties);
@@ -128,7 +130,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             AssertPropertyExists("example.ruleNamespace", "example.ruleNamespace.Value", loaded.Properties);
         }
 
-        #endregion
+        #endregion Tests
 
         #region Private methods
 
@@ -136,12 +138,11 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         {
             // Note: we're explicitly searching for the key using Linq so we can be sure a case-sensitive match is being used
             string match = actualProperties.Keys.OfType<string>().FirstOrDefault(k => string.Equals(expectedKey, k, System.StringComparison.Ordinal));
-            Assert.IsNotNull(match, "Expected key not found: {0}", expectedKey);
+            match.Should().NotBeNull("Expected key not found: {0}", expectedKey);
 
-            Assert.AreEqual(expectedValue, actualProperties[expectedKey], "Unexpected value for key '{0}'", expectedKey);
+            expectedValue.Should().Be(actualProperties[expectedKey], "Unexpected value for key '{0}'", expectedKey);
         }
 
-        #endregion
-
+        #endregion Private methods
     }
 }

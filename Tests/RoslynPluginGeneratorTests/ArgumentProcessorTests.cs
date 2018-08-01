@@ -18,9 +18,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using System.IO;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Roslyn.CommandLine;
-using System.IO;
 using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
@@ -43,7 +44,7 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             ProcessedArgs actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             // Assert
-            AssertArgumentsNotProcessed(actualArgs, logger);            
+            AssertArgumentsNotProcessed(actualArgs, logger);
         }
 
         [TestMethod]
@@ -137,9 +138,9 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             logger.AssertSingleErrorExists("missingFile.txt"); // should be an error containing the missing file name
 
             // 3. Existing sqale file
-            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string testDir = TestUtils.CreateTestDirectory(TestContext);
             string filePath = TestUtils.CreateTextFile("valid.sqale.txt", testDir, "sqale file contents");
-            
+
             logger = new TestLogger();
             rawArgs = new string[] { "/sqale:" + filePath,  "/a:valid:1.0" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
@@ -193,43 +194,43 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             AssertArgumentsNotProcessed(actualArgs, logger);
         }
 
-        #endregion
+        #endregion Tests
 
         #region Checks
 
         private static void AssertArgumentsNotProcessed(ProcessedArgs actualArgs, TestLogger logger)
         {
-            Assert.IsNull(actualArgs, "Not expecting the arguments to have been processed successfully");
+            actualArgs.Should().BeNull("Not expecting the arguments to have been processed successfully");
             logger.AssertErrorsLogged();
         }
 
         private static void AssertArgumentsProcessed(ProcessedArgs actualArgs, TestLogger logger, string expectedId, string expectedVersion, string expectedSqale, bool expectedAcceptLicenses)
         {
-            Assert.IsNotNull(actualArgs, "Expecting the arguments to have been processed successfully");
+            actualArgs.Should().NotBeNull("Expecting the arguments to have been processed successfully");
 
-            Assert.AreEqual(actualArgs.PackageId, expectedId, "Unexpected package id returned");
+            expectedId.Should().Be(actualArgs.PackageId, "Unexpected package id returned");
 
             if (expectedVersion == null)
             {
-                Assert.IsNull(actualArgs.PackageVersion, "Expecting the version to be null");
+                actualArgs.PackageVersion.Should().BeNull("Expecting the version to be null");
             }
             else
             {
-                Assert.IsNotNull(actualArgs.PackageVersion, "Not expecting the version to be null");
-                Assert.AreEqual(expectedVersion, actualArgs.PackageVersion.ToString());
+                actualArgs.PackageVersion.Should().NotBeNull("Not expecting the version to be null");
+                actualArgs.PackageVersion.ToString().Should().Be(expectedVersion);
             }
 
-            Assert.AreEqual(expectedSqale, actualArgs.SqaleFilePath, "Unexpected sqale file path");
+            actualArgs.SqaleFilePath.Should().Be(expectedSqale, "Unexpected sqale file path");
             if (expectedSqale != null)
             {
-                Assert.IsTrue(File.Exists(expectedSqale), "Specified sqale file should exist: {0}", expectedSqale);
+                File.Exists(expectedSqale).Should().BeTrue("Specified sqale file should exist: {0}", expectedSqale);
             }
 
-            Assert.AreEqual(expectedAcceptLicenses, actualArgs.AcceptLicenses, "Unexpected value for AcceptLicenses");
+            actualArgs.AcceptLicenses.Should().Be(expectedAcceptLicenses, "Unexpected value for AcceptLicenses");
 
             logger.AssertErrorsLogged(0);
         }
 
-        #endregion
+        #endregion Checks
     }
 }

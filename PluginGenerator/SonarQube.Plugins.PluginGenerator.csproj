@@ -1,6 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+
+  <PropertyGroup>
+    <!-- This project uses C# syntax that isn't supported by the version of the compiler
+         that is installed with VS2015. If you remove the following line you will be able
+         to open the project in VS2015, but you will need a newer version of VS/MSBuild
+         to be able to compile it successfully. -->
+    <MinimumVisualStudioVersion>15.0.0.0</MinimumVisualStudioVersion>
+  </PropertyGroup>
+
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
