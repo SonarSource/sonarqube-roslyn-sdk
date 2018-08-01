@@ -141,7 +141,7 @@ namespace SonarQube.Plugins.Roslyn
             // Initial run with the user-targeted package and arguments
             if (analyzersByPackage.ContainsKey(targetPackage))
             {
-                string generatedJarPath = GeneratePluginForPackage(args.OutputDirectory, args.Language, args.SqaleFilePath, targetPackage, analyzersByPackage[targetPackage]);
+                string generatedJarPath = GeneratePluginForPackage(args.OutputDirectory, args.Language, args.SqaleFilePath, targetPackage, analyzersByPackage[targetPackage], args.TagsToAdd, args.RuleType);
                 if (generatedJarPath == null)
                 {
                     return false;
@@ -159,7 +159,7 @@ namespace SonarQube.Plugins.Roslyn
                 foreach (IPackage currentPackage in analyzersByPackage.Keys)
                 {
                     // No way to specify the SQALE file for any but the user-targeted package at this time
-                    string generatedJarPath = GeneratePluginForPackage(args.OutputDirectory, args.Language, null, currentPackage, analyzersByPackage[currentPackage]);
+                    string generatedJarPath = GeneratePluginForPackage(args.OutputDirectory, args.Language, null, currentPackage, analyzersByPackage[currentPackage], args.TagsToAdd, args.RuleType);
                     if (generatedJarPath == null)
                     {
                         return false;
@@ -179,7 +179,7 @@ namespace SonarQube.Plugins.Roslyn
             return true;
         }
 
-        private string GeneratePluginForPackage(string outputDir, string language, string sqaleFilePath, IPackage package, IEnumerable<DiagnosticAnalyzer> analyzers)
+        private string GeneratePluginForPackage(string outputDir, string language, string sqaleFilePath, IPackage package, IEnumerable<DiagnosticAnalyzer> analyzers, string[] tagsToAdd, string ruleType)
         {
             Debug.Assert(analyzers.Any(), "The method must be called with a populated list of DiagnosticAnalyzers.");
 
@@ -202,7 +202,7 @@ namespace SonarQube.Plugins.Roslyn
             definition.SourceZipFilePath = this.CreateAnalyzerStaticPayloadFile(packageDir, baseDirectory);
             definition.StaticResourceName = Path.GetFileName(definition.SourceZipFilePath);
 
-            definition.RulesFilePath = GenerateRulesFile(analyzers, baseDirectory);
+            definition.RulesFilePath = GenerateRulesFile(analyzers, baseDirectory, tagsToAdd, ruleType);
 
             string generatedSqaleFile = null;
             bool generate = true;
@@ -328,7 +328,7 @@ namespace SonarQube.Plugins.Roslyn
         /// Generate a rules file for the specified analyzers
         /// </summary>
         /// <returns>The full path to the generated file</returns>
-        private string GenerateRulesFile(IEnumerable<DiagnosticAnalyzer> analyzers, string baseDirectory)
+        private string GenerateRulesFile(IEnumerable<DiagnosticAnalyzer> analyzers, string baseDirectory, string[] tagsToAdd, string ruleType)
         {
             this.logger.LogInfo(UIResources.APG_GeneratingRules);
 
@@ -341,6 +341,20 @@ namespace SonarQube.Plugins.Roslyn
 
             if (rules != null)
             {
+                foreach (Rule rule in rules)
+                {
+                    rule.Type = ruleType;
+
+                    if (rule.Tags == null)
+                    {
+                        rule.Tags = tagsToAdd;
+                    }
+                    else
+                    {
+                        rule.Tags = rule.Tags.Concat(tagsToAdd).ToArray();
+                    }
+                }
+
                 rules.Save(rulesFilePath, logger);
                 this.logger.LogDebug(UIResources.APG_RulesGeneratedToFile, rules.Count, rulesFilePath);
             }

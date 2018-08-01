@@ -120,11 +120,17 @@
   <data name="ArgDescription_AcceptLicenses" xml:space="preserve">
     <value>/acceptLicenses - indicates that you accept the licenses for any packages that required license acceptance</value>
   </data>
+  <data name="ArgDescription_AddTag" xml:space="preserve">
+    <value>/addTag:[tag] - add this tag to all rules </value>
+  </data>
   <data name="ArgDescription_AnalzyerRef" xml:space="preserve">
     <value>/a:[NuGet package id]  or  /a:[NuGet package id]:[version]</value>
   </data>
   <data name="ArgDescription_RecurseDependencies" xml:space="preserve">
     <value>/recurse - search for analyzers in target package and any dependencies</value>
+  </data>
+  <data name="ArgDescription_RuleType" xml:space="preserve">
+    <value>/ruleType:["CODE_SMELL" (default) or "BUG" or "VULNERABILITY"] - set all rule's type to Code smell or Bug or Vulnerabilty</value>
   </data>
   <data name="ArgDescription_SqaleXmlFile" xml:space="preserve">
     <value>/s:[path to sqale xml file]</value>

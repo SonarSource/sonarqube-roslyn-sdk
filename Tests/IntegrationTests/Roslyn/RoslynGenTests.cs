@@ -57,7 +57,7 @@ namespace SonarQube.Plugins.IntegrationTests
             // Act
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
-            ProcessedArgs args = new ProcessedArgs(packageId, new SemanticVersion("1.0.2"), "cs", null, false, false, outputDir);
+            ProcessedArgs args = new ProcessedArgs(packageId, new SemanticVersion("1.0.2"), "cs", null, false, false, outputDir, new string[0], null);
             bool result = apg.Generate(args);
 
             // Assert
@@ -92,7 +92,7 @@ namespace SonarQube.Plugins.IntegrationTests
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
             ProcessedArgs args = new ProcessedArgs(targetPkg.Id, targetPkg.Version, "cs", null, false, 
-                true /* generate plugins for dependencies with analyzers*/, outputDir);
+                true /* generate plugins for dependencies with analyzers*/, outputDir, new string[0], null);
             bool result = apg.Generate(args);
 
             // Assert
@@ -127,7 +127,7 @@ namespace SonarQube.Plugins.IntegrationTests
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
             ProcessedArgs args = new ProcessedArgs(targetPkg.Id, targetPkg.Version, "cs", null, false,
-                true /* generate plugins for dependencies with analyzers*/, outputDir);
+                true /* generate plugins for dependencies with analyzers*/, outputDir, new string[0], null);
             bool result = apg.Generate(args);
 
             // Assert
