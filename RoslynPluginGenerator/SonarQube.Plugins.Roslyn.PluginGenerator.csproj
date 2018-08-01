@@ -178,7 +178,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\sonar-roslyn-sdk-template-plugin-1.0-empty.jar" />
+    <EmbeddedResource Include="Resources\sonar-roslyn-sdk-template-plugin-1.1.jar" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="Shell32">
