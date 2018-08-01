@@ -33,7 +33,7 @@ namespace SonarQube.Plugins.Roslyn
         /// <summary>
         /// Name of the embedded resource that contains the .jar file to update
         /// </summary>
-        private const string EmptyTemplateJarResourceName = "SonarQube.Plugins.Roslyn.Resources.sonar-roslyn-sdk-template-plugin-1.0-empty.jar";
+        private const string TemplateJarResourceName = "SonarQube.Plugins.Roslyn.Resources.sonar-roslyn-sdk-template-plugin-1.1.jar";
 
         /// <summary>
         /// The name of the plugin class in the embedded jar file
@@ -355,7 +355,7 @@ namespace SonarQube.Plugins.Roslyn
         {
             string templateJarFilePath = Path.Combine(workingDirectory, "template.jar");
 
-            using (Stream resourceStream = typeof(RoslynPluginJarBuilder).Assembly.GetManifestResourceStream(EmptyTemplateJarResourceName))
+            using (Stream resourceStream = typeof(RoslynPluginJarBuilder).Assembly.GetManifestResourceStream(TemplateJarResourceName))
             {
                 using (FileStream file = new FileStream(templateJarFilePath, FileMode.CreateNew, FileAccess.Write))
                 {
