@@ -18,14 +18,14 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using System;
+using System.IO;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NuGet;
 using SonarLint.XmlDescriptor;
 using SonarQube.Plugins.Roslyn.CommandLine;
 using SonarQube.Plugins.Test.Common;
-using System;
-using System.Linq;
-using System.IO;
 using static SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests.RemoteRepoBuilder;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
@@ -44,12 +44,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_NoAnalyzersFoundInPackage_GenerateFails()
         {
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
 
             TestLogger logger = new TestLogger();
 
             // Create a fake remote repo containing a package that does not contain analyzers
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
             remoteRepoBuilder.CreatePackage("no.analyzers.id", "0.9", TestUtils.CreateTextFile("dummy.txt", outputDir), License.NotRequired /* no dependencies */ );
 
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
@@ -60,7 +60,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             bool result = apg.Generate(args);
 
             // Assert
-            Assert.IsFalse(result, "Expecting generation to fail");
+            result.Should().BeFalse("Expecting generation to fail");
             logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, "no.analyzers.id"));
             logger.AssertSingleWarningExists(UIResources.APG_NoAnalyzersInTargetSuggestRecurse);
             logger.AssertWarningsLogged(2);
@@ -71,8 +71,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_LicenseAcceptanceNotRequired_Succeeds()
         {
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
 
             // Multi-level dependencies: no package requires license acceptence
             IPackage grandchild = CreatePackageWithAnalyzer(remoteRepoBuilder, "grandchild.id", "1.2", License.NotRequired /* no dependencies */);
@@ -86,7 +86,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ ,
                 false, outputDir);
             bool result = apg.Generate(args);
-            Assert.IsTrue(result, "Generator should succeed if there are no licenses to accept");
+            result.Should().BeTrue("Generator should succeed if there are no licenses to accept");
 
             logger.AssertErrorsLogged(0);
             logger.AssertWarningNotLogged("parent.id"); // not expecting warnings about packages that don't require acceptance
@@ -96,7 +96,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // 2. Acceptance not required -> succeeds if accept = true
             args = CreateArgs("parent.id", "1.0", "cs", null, true /* accept licenses */, false, outputDir);
             result = apg.Generate(args);
-            Assert.IsTrue(result, "Generator should succeed if there are no licenses to accept");
+            result.Should().BeTrue("Generator should succeed if there are no licenses to accept");
 
             logger.AssertErrorsLogged(0);
             logger.AssertWarningNotLogged("parent.id"); // not expecting warnings about packages that don't require acceptance
@@ -109,13 +109,13 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_Recursive_Succeeds()
         {
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
 
             // Multi-level dependencies: no package requires license acceptence
             IPackage grandchild = CreatePackageWithAnalyzer(remoteRepoBuilder, "grandchild.id", "1.2", License.NotRequired /* no dependencies */);
             IPackage child = CreatePackageWithAnalyzer(remoteRepoBuilder, "child.id", "1.1", License.NotRequired, grandchild);
-            IPackage parent = CreatePackageWithAnalyzer(remoteRepoBuilder, "parent.id", "1.0", License.NotRequired, child);
+            CreatePackageWithAnalyzer(remoteRepoBuilder, "parent.id", "1.0", License.NotRequired, child);
 
             TestLogger logger = new TestLogger();
             AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, logger);
@@ -125,7 +125,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             bool result = apg.Generate(args);
 
             // Assert
-            Assert.IsTrue(result, "Generator should succeed if there are no licenses to accept");
+            result.Should().BeTrue("Generator should succeed if there are no licenses to accept");
             logger.AssertWarningNotLogged("parent.id"); // not expecting warnings about packages that don't require acceptance
             logger.AssertWarningNotLogged("child.id");
             logger.AssertWarningNotLogged("grandchild.id");
@@ -137,8 +137,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_LicenseAcceptanceRequiredByMainPackage()
         {
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
 
             // Parent and child: only parent requires license
             IPackage child = CreatePackageWithAnalyzer(remoteRepoBuilder, "child.id", "1.1", License.NotRequired);
@@ -151,7 +151,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             ProcessedArgs args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, false /* accept licenses */ ,
                 false, outputDir);
             bool result = apg.Generate(args);
-            Assert.IsFalse(result, "Generator should fail because license has not been accepted");
+            result.Should().BeFalse("Generator should fail because license has not been accepted");
 
             logger.AssertSingleErrorExists("parent.requiredAccept.id", "1.0"); // error listing the main package
             logger.AssertSingleWarningExists("parent.requiredAccept.id", "1.0"); // warning for each licensed package
@@ -162,7 +162,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, true /* accept licenses */ ,
                 false /* generate plugins for dependencies */, outputDir);
             result = apg.Generate(args);
-            Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
+            result.Should().BeTrue("Generator should succeed if licenses are accepted");
 
             logger.AssertSingleWarningExists(UIResources.APG_NGAcceptedPackageLicenses); // warning that licenses accepted
             logger.AssertSingleWarningExists("parent.requiredAccept.id", "1.0"); // warning for each licensed package
@@ -174,8 +174,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_LicenseAcceptanceRequiredByDependency()
         {
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
 
             // Parent and child: only child requires license
             IPackage child = CreatePackageWithAnalyzer(remoteRepoBuilder, "child.requiredAccept.id", "2.0", License.Required);
@@ -188,7 +188,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ ,
                 false, outputDir);
             bool result = apg.Generate(args);
-            Assert.IsFalse(result, "Generator should fail because license has not been accepted");
+            result.Should().BeFalse("Generator should fail because license has not been accepted");
 
             logger.AssertSingleErrorExists("parent.id", "1.0"); // error listing the main package
             logger.AssertSingleWarningExists("child.requiredAccept.id", "2.0"); // warning for each licensed package
@@ -199,7 +199,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             args = CreateArgs("parent.id", "1.0", "cs", null, true /* accept licenses */ ,
                 false, outputDir);
             result = apg.Generate(args);
-            Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
+            result.Should().BeTrue("Generator should succeed if licenses are accepted");
 
             logger.AssertSingleWarningExists(UIResources.APG_NGAcceptedPackageLicenses); // warning that licenses have been accepted
             logger.AssertSingleWarningExists("child.requiredAccept.id", "2.0"); // warning for each licensed package
@@ -211,8 +211,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_LicenseAcceptanceRequired_ByParentAndDependencies()
         {
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
 
             // Multi-level: parent and some but not all dependencies require license acceptance
             IPackage grandchild1 = CreatePackageWithAnalyzer(remoteRepoBuilder, "grandchild1.requiredAccept.id", "3.0", License.Required);
@@ -227,7 +227,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             ProcessedArgs args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, false /* accept licenses */ ,
                 false, outputDir);
             bool result = apg.Generate(args);
-            Assert.IsFalse(result, "Generator should fail because license has not been accepted");
+            result.Should().BeFalse("Generator should fail because license has not been accepted");
 
             logger.AssertSingleErrorExists("parent.requiredAccept.id", "1.0"); // error referring to the main package
 
@@ -240,7 +240,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             args = CreateArgs("parent.requiredAccept.id", "1.0", "cs", null, true /* accept licenses */ ,
                 false, outputDir);
             result = apg.Generate(args);
-            Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
+            result.Should().BeTrue("Generator should succeed if licenses are accepted");
 
             logger.AssertSingleWarningExists(UIResources.APG_NGAcceptedPackageLicenses); // warning that licenses have been accepted
             logger.AssertSingleWarningExists("grandchild1.requiredAccept.id", "3.0"); // warning for each licensed package
@@ -255,10 +255,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // No point in asking the user to accept licenses for packages that don't contain analyzers
 
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
             string dummyContentFile = TestUtils.CreateTextFile("dummy.txt", outputDir, "non-analyzer content file");
 
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
 
             // Parent only: requires license
             remoteRepoBuilder.CreatePackage("non-analyzer.requireAccept.id", "1.0", dummyContentFile, License.Required);
@@ -270,7 +270,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             ProcessedArgs args = CreateArgs("non-analyzer.requireAccept.id", "1.0", "cs", null, false /* accept licenses */ ,
                 false, outputDir);
             bool result = apg.Generate(args);
-            Assert.IsFalse(result, "Expecting generator to fail");
+            result.Should().BeFalse("Expecting generator to fail");
 
             logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, "non-analyzer.requireAccept.id"));
             logger.AssertSingleWarningExists(UIResources.APG_NoAnalyzersInTargetSuggestRecurse);
@@ -288,9 +288,9 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // We should succeed if we are generating plugins for the targeted package and its dependencies
 
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
             string dummyContentFile = TestUtils.CreateTextFile("dummy.txt", outputDir, "non-analyzer content file");
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
 
             // Multi-level dependencies: no package requires license acceptence
             // Parent has no analyzers, but dependencies do
@@ -305,7 +305,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ ,
                 false, outputDir);
             bool result = apg.Generate(args);
-            Assert.IsFalse(result, "Expecting generator to fail");
+            result.Should().BeFalse("Expecting generator to fail");
 
             logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, "parent.id"));
             logger.AssertSingleWarningExists(UIResources.APG_NoAnalyzersInTargetSuggestRecurse);
@@ -317,7 +317,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             args = CreateArgs("parent.id", "1.0", "cs", null, false /* accept licenses */ ,
                 true /* generate plugins for dependencies */, outputDir);
             result = apg.Generate(args);
-            Assert.IsTrue(result, "Generator should succeed if there are no licenses to accept");
+            result.Should().BeTrue("Generator should succeed if there are no licenses to accept");
 
             logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, "parent.id"));
             logger.AssertWarningNotLogged("child.id");
@@ -336,10 +336,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // We should fail with an error due to licenses if we are generating plugins for the targeted package and dependencies
 
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
             string dummyContentFile = TestUtils.CreateTextFile("dummy.txt", outputDir, "non-analyzer content file");
 
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
 
             // Multi-level: parent and some but not all dependencies require license acceptance
             // Parent has no analyzers, but dependencies do
@@ -354,7 +354,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             ProcessedArgs args = CreateArgs("non-analyzer.parent.requireAccept.id", "1.0", "cs", null, false /* accept licenses */ ,
                 false, outputDir);
             bool result = apg.Generate(args);
-            Assert.IsFalse(result, "Expecting generator to fail");
+            result.Should().BeFalse("Expecting generator to fail");
 
             logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, "non-analyzer.parent.requireAccept.id"));
             logger.AssertSingleWarningExists(UIResources.APG_NoAnalyzersInTargetSuggestRecurse);
@@ -367,7 +367,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             args = CreateArgs("non-analyzer.parent.requireAccept.id", "1.0", "cs", null, false /* accept licenses */ ,
                 true /* generate plugins for dependencies */, outputDir);
             result = apg.Generate(args);
-            Assert.IsFalse(result, "Generator should fail because license has not been accepted");
+            result.Should().BeFalse("Generator should fail because license has not been accepted");
 
             logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, "non-analyzer.parent.requireAccept.id"));
             logger.AssertSingleWarningExists("non-analyzer.parent.requireAccept.id", "1.0"); // warning for each licensed package
@@ -382,7 +382,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             args = CreateArgs("non-analyzer.parent.requireAccept.id", "1.0", "cs", null, true /* accept licenses */ ,
                 true /* generate plugins for dependencies */, outputDir);
             result = apg.Generate(args);
-            Assert.IsTrue(result, "Generator should succeed if licenses are accepted");
+            result.Should().BeTrue("Generator should succeed if licenses are accepted");
 
             logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, "non-analyzer.parent.requireAccept.id"));
             logger.AssertSingleWarningExists(UIResources.APG_NGAcceptedPackageLicenses); // warning that licenses have been accepted
@@ -396,23 +396,23 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_SqaleFileNotSpecified_TemplateFileCreated()
         {
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
 
             TestLogger logger = new TestLogger();
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
             IPackage child1 = CreatePackageWithAnalyzer(remoteRepoBuilder, "child1.requiredAccept.id", "2.1", License.NotRequired);
             IPackage child2 = CreatePackageWithAnalyzer(remoteRepoBuilder, "child2.id", "2.2", License.NotRequired);
             IPackage parent = CreatePackageWithAnalyzer(remoteRepoBuilder, "parent.id", "1.0", License.NotRequired, child1, child2);
 
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
-            
+
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
 
             // 1. Generate a plugin for the target package only. Expecting a plugin and a template SQALE file.
             ProcessedArgs args = CreateArgs("parent.id", "1.0", "cs", null, false, false, outputDir);
             bool result = apg.Generate(args);
 
-            Assert.IsTrue(result, "Expecting generation to have succeeded");
+            result.Should().BeTrue("Expecting generation to have succeeded");
             AssertSqaleFileExistsForPackage(logger, outputDir, parent);
 
             // 2. Generate a plugin for target package and all dependencies. Expecting three plugins and associated SQALE files.
@@ -420,21 +420,20 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             args = CreateArgs("parent.id", "1.0", "cs", null, false, true /* /recurse = true */, outputDir);
             result = apg.Generate(args);
 
-            Assert.IsTrue(result, "Expecting generation to have succeeded");
+            result.Should().BeTrue("Expecting generation to have succeeded");
             logger.AssertSingleWarningExists(UIResources.APG_RecurseEnabled_SQALENotEnabled);
             AssertSqaleFileExistsForPackage(logger, outputDir, parent);
             AssertSqaleFileExistsForPackage(logger, outputDir, child1);
             AssertSqaleFileExistsForPackage(logger, outputDir, child2);
-
         }
 
         [TestMethod]
         public void Generate_ValidSqaleFileSpecified_TemplateFileNotCreated()
         {
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
 
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
             AnalyzerPluginGenerator apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder);
 
             CreatePackageInFakeRemoteRepo(remoteRepoBuilder, "dummy.id", "1.1");
@@ -450,7 +449,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             bool result = apg.Generate(args);
 
             // Assert
-            Assert.IsTrue(result, "Expecting generation to have succeeded");
+            result.Should().BeTrue("Expecting generation to have succeeded");
             AssertSqaleTemplateDoesNotExist(outputDir);
         }
 
@@ -458,11 +457,11 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_InvalidSqaleFileSpecified_GeneratorError()
         {
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
 
             TestLogger logger = new TestLogger();
 
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
             CreatePackageInFakeRemoteRepo(remoteRepoBuilder, "dummy.id", "1.1");
 
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
@@ -479,7 +478,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             bool result = apg.Generate(args);
 
             // Assert
-            Assert.IsFalse(result, "Expecting generation to have failed");
+            result.Should().BeFalse("Expecting generation to have failed");
             AssertSqaleTemplateDoesNotExist(outputDir);
             logger.AssertSingleErrorExists("invalidSqale.xml"); // expecting an error containing the invalid sqale file name
         }
@@ -508,19 +507,19 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             PluginManifest actualPluginManifest = AnalyzerPluginGenerator.CreatePluginManifest(testPackage);
 
             // Assert
-            Assert.IsNotNull(actualPluginManifest);
+            actualPluginManifest.Should().NotBeNull();
 
-            Assert.AreEqual(testPackage.Description, actualPluginManifest.Description);
-            Assert.AreEqual(testPackage.Authors, actualPluginManifest.Developers);
-            Assert.AreEqual(testPackage.ProjectUrl.ToString(), actualPluginManifest.Homepage, false);
-            Assert.AreEqual(PluginKeyUtilities.GetValidKey(testPackage.Id), actualPluginManifest.Key);
+            actualPluginManifest.Description.Should().Be(testPackage.Description);
+            actualPluginManifest.Developers.Should().Be(testPackage.Authors);
+            actualPluginManifest.Homepage.Should().Be(testPackage.ProjectUrl.ToString());
+            actualPluginManifest.Key.Should().Be(PluginKeyUtilities.GetValidKey(testPackage.Id));
 
-            Assert.AreEqual(testPackage.Title, actualPluginManifest.Name);
-            Assert.AreEqual(testPackage.Owners, actualPluginManifest.Organization);
-            Assert.AreEqual(testPackage.Version, actualPluginManifest.Version);
+            actualPluginManifest.Name.Should().Be(testPackage.Title);
+            actualPluginManifest.Organization.Should().Be(testPackage.Owners);
+            actualPluginManifest.Version.Should().Be(testPackage.Version);
 
-            Assert.AreEqual(testPackage.LicenseUrl.ToString(), actualPluginManifest.TermsConditionsUrl, false);
-            Assert.AreEqual(testPackage.LicenseNames, actualPluginManifest.License);
+            actualPluginManifest.TermsConditionsUrl.Should().Be(testPackage.LicenseUrl.ToString());
+            actualPluginManifest.License.Should().Be(testPackage.LicenseNames);
         }
 
         [TestMethod]
@@ -537,8 +536,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             PluginManifest actualPluginManifest = AnalyzerPluginGenerator.CreatePluginManifest(testPackage);
 
             // Assert
-            Assert.IsNotNull(actualPluginManifest);
-            Assert.IsTrue(string.Equals("Foo Bar Test", actualPluginManifest.Name));
+            actualPluginManifest.Should().NotBeNull();
+            actualPluginManifest.Name.Should().Be("Foo Bar Test");
         }
 
         [TestMethod]
@@ -550,14 +549,14 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // Arrange
             DataServicePackage testPackage = CreateTestDataServicePackage();
             testPackage.LicenseNames = "Foo Bar License";
-            testPackage.LicenseUrl = new System.Uri("http://foo.bar");
+            testPackage.LicenseUrl = new Uri("http://foo.bar");
 
             // Act
             PluginManifest actualPluginManifest = AnalyzerPluginGenerator.CreatePluginManifest(testPackage);
 
             // Assert
-            Assert.IsNotNull(actualPluginManifest);
-            Assert.AreEqual(testPackage.LicenseNames, actualPluginManifest.License);
+            actualPluginManifest.Should().NotBeNull();
+            actualPluginManifest.License.Should().Be(testPackage.LicenseNames);
         }
 
         [TestMethod]
@@ -568,14 +567,14 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // Arrange
             DataServicePackage testPackage = CreateTestDataServicePackage();
             testPackage.LicenseNames = null;
-            testPackage.LicenseUrl = new System.Uri("http://foo.bar");
+            testPackage.LicenseUrl = new Uri("http://foo.bar");
 
             // Act
             PluginManifest actualPluginManifest = AnalyzerPluginGenerator.CreatePluginManifest(testPackage);
 
             // Assert
-            Assert.IsNotNull(actualPluginManifest);
-            Assert.AreEqual(testPackage.LicenseUrl.ToString(), actualPluginManifest.License, false);
+            actualPluginManifest.Should().NotBeNull();
+            actualPluginManifest.License.Should().Be(testPackage.LicenseUrl.ToString());
         }
 
         [TestMethod]
@@ -584,17 +583,17 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // We should also be able to create a plugin manifest from an IPackage that is not a DataServicePackage
 
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
 
-            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            RemoteRepoBuilder remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
             IPackage testPackage = remoteRepoBuilder.CreatePackage("Foo.Bar", "1.0.0", TestUtils.CreateTextFile("dummy.txt", outputDir), License.NotRequired);
 
             // Act
             PluginManifest actualPluginManifest = AnalyzerPluginGenerator.CreatePluginManifest(testPackage);
 
             // Assert
-            Assert.IsNotNull(actualPluginManifest);
-            Assert.AreEqual(testPackage.LicenseUrl.ToString(), actualPluginManifest.License, false);
+            actualPluginManifest.Should().NotBeNull();
+            actualPluginManifest.License.Should().Be(testPackage.LicenseUrl.ToString());
         }
 
         [TestMethod]
@@ -611,8 +610,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             PluginManifest actualPluginManifest = AnalyzerPluginGenerator.CreatePluginManifest(testPackage);
 
             // Assert
-            Assert.IsNotNull(actualPluginManifest);
-            Assert.AreEqual(testPackage.Authors, actualPluginManifest.Organization);
+            actualPluginManifest.Should().NotBeNull();
+            actualPluginManifest.Organization.Should().Be(testPackage.Authors);
         }
 
         #region Private methods
@@ -629,7 +628,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                 outputDirectory);
             return args;
         }
-        
+
         private AnalyzerPluginGenerator CreateTestSubjectWithFakeRemoteRepo(RemoteRepoBuilder remoteRepoBuilder)
         {
             return CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder, new TestLogger());
@@ -665,7 +664,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
         private string GetLocalNuGetDownloadDir()
         {
-            return TestUtils.EnsureTestDirectoryExists(this.TestContext, ".localNuGetDownload");
+            return TestUtils.EnsureTestDirectoryExists(TestContext, ".localNuGetDownload");
         }
 
         private static string GetExpectedTemplateSqaleFilePath(string outputDir, IPackage package)
@@ -677,24 +676,23 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         {
             string expectedTemplateSqaleFilePath = GetExpectedTemplateSqaleFilePath(outputDir, package);
 
-            Assert.IsTrue(File.Exists(expectedTemplateSqaleFilePath), "Expecting a template sqale file to have been created");
-            this.TestContext.AddResultFile(expectedTemplateSqaleFilePath);
+            File.Exists(expectedTemplateSqaleFilePath).Should().BeTrue("Expecting a template sqale file to have been created");
+            TestContext.AddResultFile(expectedTemplateSqaleFilePath);
             logger.AssertSingleInfoMessageExists(expectedTemplateSqaleFilePath); // should be a message about the generated file
         }
 
         private static void AssertSqaleTemplateDoesNotExist(string outputDir)
         {
             string[] matches = Directory.GetFiles(outputDir, "*sqale*template*", SearchOption.AllDirectories);
-            Assert.AreEqual(0, matches.Length, "Not expecting any squale template files to exist");
+            matches.Length.Should().Be(0, "Not expecting any squale template files to exist");
         }
 
         private static void AssertJarsGenerated(string rootDir, int expectedCount)
         {
             string[] files = Directory.GetFiles(rootDir, "*.jar", SearchOption.TopDirectoryOnly);
-            Assert.AreEqual(expectedCount, files.Length, "Unexpected number of JAR files generated");
+            files.Length.Should().Be(expectedCount, "Unexpected number of JAR files generated");
         }
 
-        #endregion
-
+        #endregion Private methods
     }
 }

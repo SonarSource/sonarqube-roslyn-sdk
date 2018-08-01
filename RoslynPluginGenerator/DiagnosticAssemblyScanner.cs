@@ -18,14 +18,14 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
-using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
+using SonarQube.Plugins.Common;
 
 namespace SonarQube.Plugins.Roslyn
 {
@@ -54,7 +54,7 @@ namespace SonarQube.Plugins.Roslyn
             AssemblyResolver additionalAssemblyResolver = null;
             if (additionalSearchFolders.Any())
             {
-                additionalAssemblyResolver = new AssemblyResolver(this.logger, additionalSearchFolders.ToArray());
+                additionalAssemblyResolver = new AssemblyResolver(logger, additionalSearchFolders.ToArray());
             }
 
             List<DiagnosticAnalyzer> analyzers = new List<DiagnosticAnalyzer>();
@@ -65,7 +65,6 @@ namespace SonarQube.Plugins.Roslyn
                 {
                     analyzers.AddRange(InstantiateDiagnosticsFromAssembly(assemblyPath, language));
                 }
-
             }
             finally
             {
@@ -100,16 +99,16 @@ namespace SonarQube.Plugins.Roslyn
                     Debug.Assert(analyzers != null);
                     if (analyzers.Any())
                     {
-                        this.logger.LogInfo(UIResources.Scanner_AnalyzersLoadSuccess, analyzers.Count());
+                        logger.LogInfo(UIResources.Scanner_AnalyzersLoadSuccess, analyzers.Count());
                     }
                     else
                     {
-                        this.logger.LogInfo(UIResources.Scanner_NoAnalyzers, analyzerAssembly.ToString());
+                        logger.LogInfo(UIResources.Scanner_NoAnalyzers, analyzerAssembly.ToString());
                     }
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogError(UIResources.Scanner_AnalyzerInstantiationFail, analyzerAssembly.FullName, ex.Message);
+                    logger.LogError(UIResources.Scanner_AnalyzerInstantiationFail, analyzerAssembly.FullName, ex.Message);
                 }
             }
 
@@ -124,7 +123,7 @@ namespace SonarQube.Plugins.Roslyn
             Assembly analyzerAssembly;
             analyzerAssembly = Assembly.LoadFrom(assemblyPath);
 
-            this.logger.LogInfo(UIResources.Scanner_AssemblyLoadSuccess, analyzerAssembly.FullName);
+            logger.LogInfo(UIResources.Scanner_AssemblyLoadSuccess, analyzerAssembly.FullName);
             return analyzerAssembly;
         }
 
@@ -144,7 +143,7 @@ namespace SonarQube.Plugins.Roslyn
                     DiagnosticAnalyzer analyzer = (DiagnosticAnalyzer)Activator.CreateInstance(type);
                     analyzers.Add(analyzer);
 
-                    this.logger.LogDebug(UIResources.Scanner_AnalyzerLoaded, analyzer.ToString());
+                    logger.LogDebug(UIResources.Scanner_AnalyzerLoaded, analyzer.ToString());
                 }
             }
 

@@ -18,11 +18,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using SonarQube.Plugins.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using SonarQube.Plugins.Common;
 
 namespace SonarQube.Common
 {
@@ -49,17 +49,17 @@ namespace SonarQube.Common
         {
             if (runnerArgs == null)
             {
-                throw new ArgumentNullException("runnerArgs");
+                throw new ArgumentNullException(nameof(runnerArgs));
             }
             Debug.Assert(!string.IsNullOrWhiteSpace(runnerArgs.ExeName), "Process runner exe name should not be null/empty");
             Debug.Assert( runnerArgs.Logger!= null, "Process runner logger should not be null/empty");
 
-            this.outputLogger = runnerArgs.Logger;
+            outputLogger = runnerArgs.Logger;
 
             if (!File.Exists(runnerArgs.ExeName))
             {
-                this.outputLogger.LogError(Resources.ERROR_ProcessRunner_ExeNotFound, runnerArgs.ExeName);
-                this.ExitCode = ErrorCode;
+                outputLogger.LogError(Resources.ERROR_ProcessRunner_ExeNotFound, runnerArgs.ExeName);
+                ExitCode = ErrorCode;
                 return false;
             }
 
@@ -81,9 +81,10 @@ namespace SonarQube.Common
             Process process = null;
             try
             {
-                process = new Process();
-
-                process.StartInfo = psi;
+                process = new Process
+                {
+                    StartInfo = psi
+                };
                 process.ErrorDataReceived += OnErrorDataReceived;
                 process.OutputDataReceived += OnOutputDataReceived;
 
@@ -93,7 +94,7 @@ namespace SonarQube.Common
 
                 // Warning: do not log the raw command line args as they
                 // may contain sensitive data
-                this.outputLogger.LogDebug(Resources.MSG_ExecutingFile,
+                outputLogger.LogDebug(Resources.MSG_ExecutingFile,
                     runnerArgs.ExeName,
                     runnerArgs.GetCommandLineArgsLogText(),
                     runnerArgs.WorkingDirectory,
@@ -110,16 +111,16 @@ namespace SonarQube.Common
                 // true: we might still have timed out, but the process ended when we asked it to
                 if (succeeded)
                 {
-                    this.outputLogger.LogDebug(Resources.MSG_ExecutionExitCode, process.ExitCode);
-                    this.ExitCode = process.ExitCode;
+                    outputLogger.LogDebug(Resources.MSG_ExecutionExitCode, process.ExitCode);
+                    ExitCode = process.ExitCode;
                 }
                 else
                 {
-                    this.ExitCode = ErrorCode;
-                    this.outputLogger.LogWarning(Resources.WARN_ExecutionTimedOut, runnerArgs.TimeoutInMilliseconds, runnerArgs.ExeName);
+                    ExitCode = ErrorCode;
+                    outputLogger.LogWarning(Resources.WARN_ExecutionTimedOut, runnerArgs.TimeoutInMilliseconds, runnerArgs.ExeName);
                 }
 
-                succeeded = succeeded && (this.ExitCode == 0);
+                succeeded = succeeded && (ExitCode == 0);
             }
             finally
             {
@@ -131,7 +132,7 @@ namespace SonarQube.Common
             return succeeded;
         }
 
-        #endregion
+        #endregion Public methods
 
         #region Private methods
 
@@ -164,7 +165,7 @@ namespace SonarQube.Common
             {
                 // It's important to log this as an important message because
                 // this the log redirection pipeline of the child process
-                this.outputLogger.LogInfo(e.Data);
+                outputLogger.LogInfo(e.Data);
             }
         }
 
@@ -172,11 +173,11 @@ namespace SonarQube.Common
         {
             if (e.Data != null)
             {
-                this.ErrorsLogged = true;
-                this.outputLogger.LogError(e.Data);
+                ErrorsLogged = true;
+                outputLogger.LogError(e.Data);
             }
         }
 
-        #endregion
+        #endregion Private methods
     }
 }

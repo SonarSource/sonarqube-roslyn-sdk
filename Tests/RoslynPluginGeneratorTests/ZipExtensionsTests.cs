@@ -18,10 +18,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SonarQube.Plugins.Test.Common;
 using System;
 using System.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
@@ -36,7 +36,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void ZipDir_SimpleFilter_1()
         {
             // Arrange
-            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string testDir = TestUtils.CreateTestDirectory(TestContext);
 
             TestUtils.CreateTextFile("dummy.txt", testDir, "dummy content");
             TestUtils.CreateTextFile("sub1\\foo.txt", testDir, "dummy content");
@@ -50,7 +50,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             ZipExtensions.CreateFromDirectory(testDir, fullzipFileName, shouldInclude);
 
-            ZipFileChecker checker = new ZipFileChecker(this.TestContext, fullzipFileName);
+            ZipFileChecker checker = new ZipFileChecker(TestContext, fullzipFileName);
             checker.AssertZipContainsOnlyExpectedFiles(
                 "dummy.txt",
                 "sub1\\foo.txt",
@@ -61,7 +61,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void ZipDir_SimpleFilter_2()
         {
             // Arrange
-            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string testDir = TestUtils.CreateTestDirectory(TestContext);
 
             TestUtils.CreateTextFile("dummy.txt", testDir, "dummy content");
             TestUtils.CreateTextFile("sub1\\foo.txt", testDir, "dummy content");
@@ -74,14 +74,13 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             ZipExtensions.CreateFromDirectory(testDir, fullzipFileName, shouldInclude);
 
-            ZipFileChecker checker = new ZipFileChecker(this.TestContext, fullzipFileName);
+            ZipFileChecker checker = new ZipFileChecker(TestContext, fullzipFileName);
             checker.AssertZipContainsOnlyExpectedFiles(
                 "sub1\\foo.txt",
                 "sub2\\bar.123",
                 "sub2\\archive1.zip");
         }
 
-        #endregion
-
+        #endregion Tests
     }
 }

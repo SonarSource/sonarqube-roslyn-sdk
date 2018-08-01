@@ -19,7 +19,6 @@
  */
 
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -56,19 +55,19 @@ namespace SonarQube.Plugins.Roslyn
 
             while (reader.IsStartElement())
             {
-                this.Add(reader.Name, reader.ReadElementContentAsString());
+                Add(reader.Name, reader.ReadElementContentAsString());
             }
             reader.ReadEndElement();
         }
 
         void IXmlSerializable.WriteXml(XmlWriter writer)
         {
-            foreach (string key in this.Keys)
+            foreach (string key in Keys)
             {
                 writer.WriteElementString(key, this[key]);
             }
         }
 
-        #endregion
+        #endregion IXmlSerializable methods
     }
 }

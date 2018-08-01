@@ -18,18 +18,18 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SonarQube.Plugins.Test.Common;
 using System;
 using System.IO;
 using System.Linq;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.PluginGeneratorTests
 {
     [TestClass]
     public class JarManifestBuilderTests
     {
-
         /// <summary>
         /// Maximum allowed line length in a jar
         /// </summary>
@@ -43,7 +43,7 @@ namespace SonarQube.Plugins.PluginGeneratorTests
         public void Manifest_NoEntries_BuildsOk()
         {
             // Arrange
-            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string testDir = TestUtils.CreateTestDirectory(TestContext);
             JarManifestBuilder builder = new JarManifestBuilder();
 
             string expected = @"Manifest-Version: 1.0
@@ -53,14 +53,14 @@ namespace SonarQube.Plugins.PluginGeneratorTests
             string filePath = builder.WriteManifest(testDir);
 
             // Assert
-            CheckManifest(filePath, expected);            
+            CheckManifest(filePath, expected);
         }
 
         [TestMethod]
         public void Manifest_ValidEntries_BuildsOk()
         {
             // Arrange
-            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string testDir = TestUtils.CreateTestDirectory(TestContext);
             JarManifestBuilder builder = new JarManifestBuilder();
 
             string expected = @"Manifest-Version: 1.0
@@ -78,14 +78,14 @@ PROPERTY3: Value 333
             // Assert
             CheckManifest(filePath, expected);
         }
-        
+
         [TestMethod]
         public void Manifest_ValidLongName_BuildsOk()
         {
             // Tests writing name-value pairs that exceed the allowed line limit
 
             // Arrange
-            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string testDir = TestUtils.CreateTestDirectory(TestContext);
             JarManifestBuilder builder = new JarManifestBuilder();
 
             string expected = @"Manifest-Version: 1.0
@@ -96,7 +96,7 @@ PROPERTY3: Value 333
 
 ";
             // Act
-            // Max length name 
+            // Max length name
             builder.SetProperty("1111111111222222222233333333334444444444555555555566666666667777777777", "value1");
 
             // Long name
@@ -114,7 +114,7 @@ PROPERTY3: Value 333
             // Tests writing name-value pairs that exceed the allowed line limit
 
             // Arrange
-            string testDir = TestUtils.CreateTestDirectory(this.TestContext);
+            string testDir = TestUtils.CreateTestDirectory(TestContext);
             JarManifestBuilder builder = new JarManifestBuilder();
 
             string expected = @"Manifest-Version: 1.0
@@ -158,7 +158,8 @@ name2: 11111111112222222222333333333344444444445555555555666666666677777
             // Act and assert
             foreach (string name in invalidNames)
             {
-                AssertException.Expect<ArgumentException>(() => builder.SetProperty(name, "valid.property"));
+                Action action = () => builder.SetProperty(name, "valid.property");
+                action.Should().Throw<ArgumentException>();
             }
         }
 
@@ -176,7 +177,8 @@ name2: 11111111112222222222333333333344444444445555555555666666666677777
             builder.SetProperty(validName1, "69 chars");
             builder.SetProperty(validName2, "70 chars");
 
-            AssertException.Expect<ArgumentException>(() => builder.SetProperty(invalidName, "valid.property"));
+            Action action = () => builder.SetProperty(invalidName, "valid.property");
+            action.Should().ThrowExactly<ArgumentException>();
         }
 
         [TestMethod]
@@ -203,11 +205,10 @@ name2: 11111111112222222222333333333344444444445555555555666666666677777
                 builder.SetProperty(name, "valid.property");
             }
 
-            string manifest = builder.BuildManifest();
-
+            builder.BuildManifest();
         }
 
-        #endregion
+        #endregion Tests methods
 
         #region Private methods
 
@@ -217,32 +218,32 @@ name2: 11111111112222222222333333333344444444445555555555666666666677777
             // to make manual comparisons easier
             string expectedFilePath = Path.Combine(Path.GetDirectoryName(filePath), "expected.txt");
             File.WriteAllText(expectedFilePath, expectedContent);
-            this.TestContext.AddResultFile(expectedFilePath);
+            TestContext.AddResultFile(expectedFilePath);
 
-            Assert.IsNotNull(filePath, "Returned file path should not be null");
-            Assert.IsTrue(File.Exists(filePath), "Expected file does not exist: {0}", filePath);
+            filePath.Should().NotBeNull("Returned file path should not be null");
+            File.Exists(filePath).Should().BeTrue("Expected file does not exist: {0}", filePath);
 
             string actualContent = File.ReadAllText(filePath);
 
-            this.TestContext.AddResultFile(filePath);
-            this.TestContext.WriteLine(actualContent);
+            TestContext.AddResultFile(filePath);
+            TestContext.WriteLine(actualContent);
 
             CheckManifestInvariants(filePath);
 
-            Assert.AreEqual(expectedContent, actualContent, false, System.Globalization.CultureInfo.InvariantCulture, "Unexpected manifest content");
+            actualContent.Should().Be(expectedContent, "Unexpected manifest content");
         }
 
         private static void CheckManifestInvariants(string filePath)
         {
             string[] content = File.ReadAllLines(filePath);
-            Assert.AreNotEqual(0, content.Length, "Expecting content in the manifest");
+            content.Length.Should().NotBe(0, "Expecting content in the manifest");
 
-            Assert.AreEqual(content[0], "Manifest-Version: 1.0", "Expecting the first line to be the manifest version");
-            Assert.AreEqual(content[content.Length - 1], string.Empty, "Expecting the last line to be blank");
+            content[0].Should().Be("Manifest-Version: 1.0", "Expecting the first line to be the manifest version");
+            content[content.Length - 1].Should().Be(string.Empty, "Expecting the last line to be blank");
 
-            Assert.IsTrue(content.All(l => l.Length <= MaxLineLength), "Lines exceed the maximum permitted length");
+            content.All(l => l.Length <= MaxLineLength).Should().BeTrue("Lines exceed the maximum permitted length");
         }
 
-        #endregion
+        #endregion Private methods
     }
 }

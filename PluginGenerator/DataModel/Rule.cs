@@ -27,7 +27,6 @@ namespace SonarQube.Plugins.Roslyn
     [XmlType(TypeName = "rule")]
     public class Rule
     {
-       
         /// <summary>
         /// Use this property to set the rule description. HTML formatting is supported.
         /// </summary>
@@ -55,12 +54,9 @@ namespace SonarQube.Plugins.Roslyn
             get
             {
                 XmlDocument doc = new XmlDocument();
-                return doc.CreateCDataSection(this.Description);
+                return doc.CreateCDataSection(Description);
             }
-            set
-            {
-                this.Description = value.Value;
-            }
+            set => Description = value.Value;
         }
 
         [XmlElement(ElementName = "severity")]
@@ -71,7 +67,7 @@ namespace SonarQube.Plugins.Roslyn
 
         [XmlElement(ElementName = "status")]
         public string Status { get; set; }
-        
+
         [XmlElement(ElementName = "tag")]
         public string[] Tags { get; set; }
 

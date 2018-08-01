@@ -18,10 +18,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using NuGet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NuGet;
 
 namespace SonarQube.Plugins.Roslyn
 {
@@ -48,9 +48,9 @@ namespace SonarQube.Plugins.Roslyn
         {
             if (string.IsNullOrWhiteSpace(baseDir))
             {
-                throw new ArgumentNullException("baseDir");
+                throw new ArgumentNullException(nameof(baseDir));
             }
-            this.machineSettings = Settings.LoadMachineWideSettings(new PhysicalFileSystem(baseDir), SonarQubeConfigSubDirName).ToArray();
+            machineSettings = Settings.LoadMachineWideSettings(new PhysicalFileSystem(baseDir), SonarQubeConfigSubDirName).ToArray();
         }
 
         #region IMachineWideSettings methods
@@ -59,10 +59,10 @@ namespace SonarQube.Plugins.Roslyn
         {
             get
             {
-                return this.machineSettings;
+                return machineSettings;
             }
         }
 
-        #endregion
+        #endregion IMachineWideSettings methods
     }
 }

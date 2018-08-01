@@ -18,11 +18,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SonarQube.Plugins.Test.Common
 {
@@ -31,7 +31,7 @@ namespace SonarQube.Plugins.Test.Common
         public static string CreateTestDirectory(TestContext testContext, params string[] subDirs)
         {
             string fullPath = GetTestDirectoryName(testContext, subDirs);
-            Assert.IsFalse(Directory.Exists(fullPath), "Test directory should not already exist: {0}", fullPath);
+            Directory.Exists(fullPath).Should().BeFalse("Test directory should not already exist: {0}", fullPath);
             Directory.CreateDirectory(fullPath);
 
             testContext.WriteLine("Test setup: created directory: {0}", fullPath);
@@ -60,14 +60,14 @@ namespace SonarQube.Plugins.Test.Common
             string fullPath;
             if (parentDirectory == null)
             {
-                Assert.IsTrue(Path.IsPathRooted(fileName), "Test error: expecting the supplied file path to be absolute. File: {0}", fileName);
+                Path.IsPathRooted(fileName).Should().BeTrue("Test error: expecting the supplied file path to be absolute. File: {0}", fileName);
                 fullPath = fileName;
             }
             else
             {
                 fullPath = Path.Combine(parentDirectory, fileName);
             }
-            Assert.IsTrue(File.Exists(fullPath), "Expected file does not exist: {0}", fullPath);
+            File.Exists(fullPath).Should().BeTrue("Expected file does not exist: {0}", fullPath);
 
             return File.ReadAllText(fullPath);
         }
@@ -77,15 +77,15 @@ namespace SonarQube.Plugins.Test.Common
             string fullPath;
             if (parentDirectory == null)
             {
-                Assert.IsTrue(Path.IsPathRooted(fileName), "Test error: expecting the supplied file path to be absolute. File: {0}", fileName);
+                Path.IsPathRooted(fileName).Should().BeTrue("Test error: expecting the supplied file path to be absolute. File: {0}", fileName);
                 fullPath = fileName;
             }
             else
             {
                 fullPath = Path.Combine(parentDirectory, fileName);
             }
-            
-            Assert.IsFalse(File.Exists(fullPath), "Not expecting file to exist: {0}", fullPath);
+
+            File.Exists(fullPath).Should().BeFalse("Not expecting file to exist: {0}", fullPath);
         }
 
         public static string CreateTextFile(string relativeFileName, string directory, string content = null)
@@ -100,36 +100,15 @@ namespace SonarQube.Plugins.Test.Common
             return fullPath;
         }
 
-        /// <summary>
-        /// Executes the action and fails the test if the expected exception is not thrown.
-        /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
-        public static void AssertExceptionIsThrown<TException>(Action action)
-             where TException : Exception
-        {
-            try
-            {
-                action();
-            }
-            catch (Exception thrownException)
-            {
-                if (thrownException is TException)
-                {
-                    return;
-                }
-                Assert.Fail("Exception of type " + typeof(TException).FullName + " was expected, but got " + thrownException.GetType().FullName + " instead.");
-            }
-
-            Assert.Fail("Exception of type " + typeof(TException).FullName + " was expected, but was not thrown");
-        }
-
         #region Private methods
 
         private static string GetTestDirectoryName(TestContext testContext, params string[] subDirs)
         {
-            List<string> parts = new List<string>();
-            parts.Add(testContext.TestDeploymentDir);
-            parts.Add(testContext.TestName);
+            List<string> parts = new List<string>
+            {
+                testContext.TestDeploymentDir,
+                testContext.TestName
+            };
 
             if (subDirs.Any())
             {
@@ -140,6 +119,6 @@ namespace SonarQube.Plugins.Test.Common
             return fullPath;
         }
 
-        #endregion
+        #endregion Private methods
     }
 }

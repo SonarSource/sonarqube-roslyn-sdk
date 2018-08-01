@@ -76,7 +76,7 @@ namespace SonarQube.Plugins
 
             // Write the main attributes
             sb.AppendLine(ManifestVersionEntry);
-            
+
             // Write the remaining attributes
             foreach(KeyValuePair<string, string> kvp in this.properties)
             {
