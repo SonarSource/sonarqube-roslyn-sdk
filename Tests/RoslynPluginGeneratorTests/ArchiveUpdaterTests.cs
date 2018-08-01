@@ -20,6 +20,7 @@
 
 using System.IO;
 using System.IO.Compression;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Test.Common;
 
@@ -57,7 +58,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             string addFile1 = TestUtils.CreateTextFile("additional1.txt", rootTestDir, "a1");
             string addFile2 = TestUtils.CreateTextFile("additional2.txt", rootTestDir, "a2");
 
-            string updaterRootDir = TestUtils.CreateTestDirectory(TestContext, "updater");
+            ArchiveUpdater updater = new ArchiveUpdater(new TestLogger());
 
             // Act
             updater.SetInputArchive(originalZipFile)
@@ -134,7 +135,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         private static void AssertEntryExists(ZipArchive archive, string entryFullName, string expectedText)
         {
             var entry = archive.GetEntry(entryFullName);
-            Assert.IsNotNull(entry, $"Expected entry not found: {entryFullName}");
+            entry.Should().NotBeNull($"Expected entry not found: {entryFullName}");
 
             const int MAX_DATA_LENGTH = 100;
 
@@ -142,10 +143,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             {
                 var actualData = new byte[MAX_DATA_LENGTH];
                 var actualLength = stream.Read(actualData, 0, MAX_DATA_LENGTH);
-                Assert.IsTrue(actualLength < MAX_DATA_LENGTH, $"Test setup error: sample test string should be less than {MAX_DATA_LENGTH}");
+                actualLength.Should().BeLessThan(MAX_DATA_LENGTH, $"Test setup error: sample test string should be less than {MAX_DATA_LENGTH}");
 
                 var actualText = System.Text.Encoding.UTF8.GetString(actualData, 0, actualLength);
-                Assert.AreEqual(expectedText, actualText, $"Entry does not contain the expected data. Entry: {entryFullName}");
+                actualText.Should().Be(expectedText, $"Entry does not contain the expected data. Entry: {entryFullName}");
             }
         }
 
