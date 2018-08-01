@@ -33,19 +33,25 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         {
             Action action = () => SupportedLanguages.ThrowIfNotSupported("");
             action.Should().ThrowExactly<ArgumentOutOfRangeException>();
+
             action = () => SupportedLanguages.ThrowIfNotSupported("123");
             action.Should().ThrowExactly<ArgumentOutOfRangeException>();
+
             action = () => SupportedLanguages.ThrowIfNotSupported("Visual Basic");
             action.Should().ThrowExactly<ArgumentOutOfRangeException>();
+
             action = () => SupportedLanguages.ThrowIfNotSupported("CSharp");
             action.Should().ThrowExactly<ArgumentOutOfRangeException>();
 
             action = () => SupportedLanguages.ThrowIfNotSupported("Cs");
             action.Should().ThrowExactly<ArgumentOutOfRangeException>();
+
             action = () => SupportedLanguages.ThrowIfNotSupported("CS");
             action.Should().ThrowExactly<ArgumentOutOfRangeException>();
+
             action = () => SupportedLanguages.ThrowIfNotSupported("vB");
             action.Should().ThrowExactly<ArgumentOutOfRangeException>();
+
             action = () => SupportedLanguages.ThrowIfNotSupported("VB");
             action.Should().ThrowExactly<ArgumentOutOfRangeException>();
         }
@@ -62,8 +68,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         {
             Action action = () => SupportedLanguages.GetRoslynLanguageName("foo");
             action.Should().ThrowExactly<ArgumentOutOfRangeException>();
+
             action = () => SupportedLanguages.GetRoslynLanguageName("CS");
             action.Should().ThrowExactly<ArgumentOutOfRangeException>(); // case-sensitive
+
             action = () => SupportedLanguages.GetRoslynLanguageName("VB");
             action.Should().ThrowExactly<ArgumentOutOfRangeException>(); // case-sensitive
         }

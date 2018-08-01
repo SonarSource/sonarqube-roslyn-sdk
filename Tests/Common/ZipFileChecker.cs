@@ -36,6 +36,7 @@ namespace SonarQube.Plugins.Test.Common
         {
             this.testContext = testContext;
             TestUtils.AssertFileExists(zipFilePath);
+            testContext.AddResultFile(zipFilePath);
 
             UnzippedDirectoryPath = TestUtils.CreateTestDirectory(testContext, "unzipped." + Path.GetFileNameWithoutExtension(zipFilePath));
             ZipFile.ExtractToDirectory(zipFilePath, UnzippedDirectoryPath);
@@ -51,7 +52,7 @@ namespace SonarQube.Plugins.Test.Common
         public string AssertFileExists(string relativeFilePath)
         {
             string absolutePath = Path.Combine(UnzippedDirectoryPath, relativeFilePath);
-            File.Exists(absolutePath).Should().BeTrue("File does not exist in the zip: {0}", relativeFilePath);
+            File.Exists(absolutePath).Should().BeTrue($"File does not exist in the zip: Relative path: {relativeFilePath}, absolute path: {absolutePath}");
             return absolutePath;
         }
 
@@ -63,7 +64,8 @@ namespace SonarQube.Plugins.Test.Common
 
                 string[] matchingFiles = Directory.GetFiles(UnzippedDirectoryPath, relativePath, SearchOption.TopDirectoryOnly);
 
-                matchingFiles.Length.Should().Be(1, "Zip file does not contain expected file: {0}", relativePath);
+                matchingFiles.Length.Should().BeLessThan(2, $"Test error: supplied relative path should not match multiple files: {relativePath}, count: {matchingFiles.Length}");
+                matchingFiles.Length.Should().Be(1, $"Zip file does not contain expected file: {relativePath}");
 
                 testContext.WriteLine("ZipFileChecker: found at '{0}'", matchingFiles[0]);
             }
@@ -77,16 +79,16 @@ namespace SonarQube.Plugins.Test.Common
             allFilesInZip.Length.Should().Be(expectedRelativePaths.Length, "Zip contains more files than expected");
         }
 
-        private void DumpZipFile(string zipFilePath)
-        {
-            // Dump the zip contents
-            var filesInZip = Directory.GetFiles(UnzippedDirectoryPath, "*.*", SearchOption.AllDirectories);
-            testContext.WriteLine($"Zip file contents: {zipFilePath}");
-            testContext.WriteLine($"File count: {filesInZip.Length}");
-            foreach (string file in filesInZip)
-            {
-                testContext.WriteLine($"  {file}");
-            }
+        private void DumpZipFile(string zipFilePath)	
+        {	
+            // Dump the zip contents	
+            var filesInZip = Directory.GetFiles(UnzippedDirectoryPath, "*.*", SearchOption.AllDirectories);	
+            testContext.WriteLine($"Zip file contents: {zipFilePath}");	
+            testContext.WriteLine($"File count: {filesInZip.Length}");	
+            foreach (string file in filesInZip)	
+            {	
+                testContext.WriteLine($"  {file}");	
+            }	
         }
     }
 }
