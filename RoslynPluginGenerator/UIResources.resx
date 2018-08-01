@@ -282,19 +282,22 @@ Error: {1}</value>
   <data name="Scanner_NoAnalyzers" xml:space="preserve">
     <value>No analyzers found in assembly {0}</value>
   </data>
-  <data name="ZIP_DeletingExistingArchive" xml:space="preserve">
-    <value>Deleting existing archive...</value>
+  <data name="ZIP_CreatingNewEntry" xml:space="preserve">
+    <value>Creating new entry: '{0}'</value>
+  </data>
+  <data name="ZIP_DeleteExistingEntry" xml:space="preserve">
+    <value>Deleting existing entry: '{0}'</value>
+  </data>
+  <data name="ZIP_DeletingExistingJar" xml:space="preserve">
+    <value>Deleting existing jar...</value>
   </data>
   <data name="ZIP_InsertingFile" xml:space="preserve">
-    <value>Inserting file {0}. Source: {1}</value>
+    <value>Inserting file '{0}'. Source: '{1}'</value>
   </data>
-  <data name="ZIP_NewArchiveCreated" xml:space="preserve">
-    <value>New archive created: {0}</value>
+  <data name="ZIP_JarUpdated" xml:space="preserve">
+    <value>Jar updated</value>
   </data>
-  <data name="ZIP_UpdatingArchive" xml:space="preserve">
-    <value>Updating archive {0}</value>
-  </data>
-  <data name="ZIP_WorkingDirectory" xml:space="preserve">
-    <value>Working directory: {0}</value>
+  <data name="ZIP_UpdatingJar" xml:space="preserve">
+    <value>Updating jar '{0}'</value>
   </data>
 </root>
