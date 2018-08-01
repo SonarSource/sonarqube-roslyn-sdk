@@ -141,6 +141,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>UIResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="UserOptions.cs" />
     <Compile Include="ZipExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

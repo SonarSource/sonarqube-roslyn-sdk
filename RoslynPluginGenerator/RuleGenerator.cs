@@ -48,7 +48,7 @@ namespace SonarQube.Plugins.Roslyn
         /// <summary>
         /// Generate SonarQube specific rules based on Roslyn based diagnostics
         /// </summary>
-        public Rules GenerateRules(IEnumerable<DiagnosticAnalyzer> analyzers)
+        public Rules GenerateRules(IEnumerable<DiagnosticAnalyzer> analyzers, UserOptions userOptions)
         {
             if (analyzers == null)
             {
@@ -59,7 +59,7 @@ namespace SonarQube.Plugins.Roslyn
 
             foreach (DiagnosticAnalyzer analyzer in analyzers)
             {
-                Rules analyzerRules = GetAnalyzerRules(analyzer);
+                Rules analyzerRules = GetAnalyzerRules(analyzer, userOptions);
 
                 foreach (Rule analyzerRule in analyzerRules)
                 {
@@ -80,7 +80,7 @@ namespace SonarQube.Plugins.Roslyn
 
         #region Private methods
 
-        private Rules GetAnalyzerRules(DiagnosticAnalyzer analyzer)
+        private Rules GetAnalyzerRules(DiagnosticAnalyzer analyzer, UserOptions userOptions)
         {
             // For info on SonarQube rules see http://docs.sonarqube.org/display/SONAR/Rules
 
@@ -101,7 +101,15 @@ namespace SonarQube.Plugins.Roslyn
 
                 newRule.Description = GetDescriptionAsRawHtml(diagnostic);
 
-                newRule.Name = diagnostic.Title.ToString(CultureInfo.InvariantCulture);
+                if (userOptions.CombineIdAndName)
+                {
+                    newRule.Name = String.Format("{0}: {1}", diagnostic.Id.ToString(CultureInfo.InvariantCulture), diagnostic.Title.ToString(CultureInfo.InvariantCulture));
+                }
+                else
+                {
+                    newRule.Name = diagnostic.Title.ToString(CultureInfo.InvariantCulture);
+                }
+                
                 newRule.Severity = GetSonarQubeSeverity(diagnostic.DefaultSeverity);
 
                 // Rule XML properties that don't have an obvious Diagnostic equivalent:
