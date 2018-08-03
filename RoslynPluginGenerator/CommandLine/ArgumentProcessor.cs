@@ -116,8 +116,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
 
             parsedOk &= TryParseSqaleFile(arguments, out string sqaleFilePath);
 
-            string ruleFilePath;
-            parsedOk &= TryParseRuleFile(arguments, out ruleFilePath);
+            parsedOk &= TryParseRuleFile(arguments, out string ruleFilePath);
 
             bool acceptLicense = GetLicenseAcceptance(arguments);
             bool recurseDependencies = GetRecursion(arguments);

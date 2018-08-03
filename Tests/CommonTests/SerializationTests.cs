@@ -44,8 +44,10 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
                     Severity = "CRITICAL",
                     Cardinality = "SINGLE",
                     Status = "READY",
-                   Type = IssueType.CODE_SMELL,
-                    Tags = new[] { "t1", "t2" }
+                    Type = IssueType.CODE_SMELL,
+                    Tags = new[] { "t1", "t2" },
+                    DebtRemediationFunction = DebtRemediationFunctionType.CONSTANT_ISSUE,
+                    DebtRemediationFunctionOffset = "15min"
                 },
 
                 new Rule()
@@ -83,6 +85,8 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
     <type>CODE_SMELL</type>
     <tag>t1</tag>
     <tag>t2</tag>
+    <debtRemediationFunction>CONSTANT_ISSUE</debtRemediationFunction>
+    <debtRemediationFunctionOffset>15min</debtRemediationFunctionOffset>
   </rule>
   <rule>
     <key>key2</key>
