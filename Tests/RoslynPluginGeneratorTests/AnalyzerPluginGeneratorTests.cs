@@ -580,7 +580,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             bool result = apg.Generate(args);
 
             // Assert
-            Assert.IsFalse(result, "Expecting generation to have failed");
+            result.Should().BeFalse();
             AssertRuleTemplateDoesNotExist(outputDir);
             logger.AssertSingleErrorExists("invalidRule.xml"); // expecting an error containing the invalid rule file name
         }
@@ -807,7 +807,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         private static void AssertRuleTemplateDoesNotExist(string outputDir)
         {
             string[] matches = Directory.GetFiles(outputDir, "*rules*template*", SearchOption.AllDirectories);
-            Assert.AreEqual(0, matches.Length, "Not expecting any rules template files to exist");
+            matches.Length.Should().Be(0, "Not expecting any rules template files to exist");
         }
 
         private static void AssertJarsGenerated(string rootDir, int expectedCount)
