@@ -18,11 +18,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using System.IO;
-using System.IO.Compression;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Test.Common;
+using System.IO;
+using System.IO.Compression;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
@@ -97,7 +97,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                 AddEntry(archive, "sub/changed", "original data in file that is going to be changed to something shorted");
             }
 
-            Assert.IsTrue(File.Exists(originalZipFile), "Test setup error: original zip file not created");
+            File.Exists(originalZipFile).Should().BeTrue("Test setup error: original zip file not created");
 
             string changedFile = TestUtils.CreateTextFile("changed.txt", rootTestDir, "new data in changed file");
             string newFile = TestUtils.CreateTextFile("newfile.txt", rootTestDir, "new file");

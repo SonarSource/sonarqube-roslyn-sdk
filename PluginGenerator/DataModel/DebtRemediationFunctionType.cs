@@ -23,8 +23,8 @@ namespace SonarQube.Plugins.Roslyn
     public enum DebtRemediationFunctionType
     {
         Unspecified,
-        LINEAR,
-        LINEAR_OFFSET,
+        LINEAR,             // Currently not supported by the C# plugin (v7.3)
+        LINEAR_OFFSET,      // Currently not supported by the C# plugin (v7.3)
         CONSTANT_ISSUE
     }
 }

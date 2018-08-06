@@ -188,46 +188,50 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
 
         private bool TryParseSqaleFile(IEnumerable<ArgumentInstance> arguments, out string sqaleFilePath)
         {
-            bool sucess = true;
             sqaleFilePath = null;
             ArgumentInstance arg = arguments.SingleOrDefault(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.SqaleXmlFile, a.Descriptor.Id));
 
-            if (arg != null)
+            if (arg == null)
             {
-                if (File.Exists(arg.Value))
-                {
-                    sqaleFilePath = arg.Value;
-                    logger.LogDebug(CmdLineResources.DEBUG_UsingSqaleFile, sqaleFilePath);
-                }
-                else
-                {
-                    sucess = false;
-                    logger.LogError(CmdLineResources.ERROR_SqaleFileNotFound, arg.Value);
-                }
+                return true;
             }
-            return sucess;
+
+            bool success = true;
+            if (File.Exists(arg.Value))
+            {
+                sqaleFilePath = arg.Value;
+                logger.LogDebug(CmdLineResources.DEBUG_UsingSqaleFile, sqaleFilePath);
+            }
+            else
+            {
+                success = false;
+                logger.LogError(CmdLineResources.ERROR_SqaleFileNotFound, arg.Value);
+            }
+            return success;
         }
 
         private bool TryParseRuleFile(IEnumerable<ArgumentInstance> arguments, out string ruleFilePath)
         {
-            bool sucess = true;
             ruleFilePath = null;
             ArgumentInstance arg = arguments.SingleOrDefault(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.RuleXmlFile, a.Descriptor.Id));
 
-            if (arg != null)
+            if (arg == null)
             {
-                if (File.Exists(arg.Value))
-                {
-                    ruleFilePath = arg.Value;
-                    this.logger.LogDebug(CmdLineResources.DEBUG_UsingRuleFile, ruleFilePath);
-                }
-                else
-                {
-                    sucess = false;
-                    this.logger.LogError(CmdLineResources.ERROR_RuleFileNotFound, arg.Value);
-                }
+                return true;
             }
-            return sucess;
+
+            bool success = true;
+            if (File.Exists(arg.Value))
+            {
+                ruleFilePath = arg.Value;
+                this.logger.LogDebug(CmdLineResources.DEBUG_UsingRuleFile, ruleFilePath);
+            }
+            else
+            {
+                success = false;
+                this.logger.LogError(CmdLineResources.ERROR_RuleFileNotFound, arg.Value);
+            }
+            return success;
         }
 
         private static bool GetLicenseAcceptance(IEnumerable<ArgumentInstance> arguments)

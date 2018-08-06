@@ -18,14 +18,14 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using System;
-using System.IO;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NuGet;
 using SonarLint.XmlDescriptor;
 using SonarQube.Plugins.Roslyn.CommandLine;
 using SonarQube.Plugins.Test.Common;
+using System;
+using System.IO;
 using static SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests.RemoteRepoBuilder;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
@@ -506,16 +506,16 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                 .SetRecurseDependencies(true)
                 .Build();
             bool result = testSubject.Generate(args);
+            result.Should().BeTrue();
 
-            Assert.IsTrue(result, "Expecting generation to have succeeded");
             AssertRuleTemplateFileExistsForPackage(logger, outputDir, parent);
 
             // 2. Generate a plugin for target package and all dependencies. Expecting three plugins and associated rule files.
             logger.Reset();
             args = CreateArgs("parent.id", "1.0", "cs", null, false, true /* /recurse = true */, outputDir);
             result = testSubject.Generate(args);
+            result.Should().BeTrue();
 
-            Assert.IsTrue(result, "Expecting generation to have succeeded");
             logger.AssertSingleWarningExists(UIResources.APG_RecurseEnabled_SQALEandRuleCustomisationNotEnabled);
             AssertRuleTemplateFileExistsForPackage(logger, outputDir, parent);
             AssertRuleTemplateFileExistsForPackage(logger, outputDir, child1);
@@ -547,7 +547,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             bool result = apg.Generate(args);
 
             // Assert
-            Assert.IsTrue(result, "Expecting generation to have succeeded");
+            result.Should().BeTrue();
             AssertRuleTemplateDoesNotExist(outputDir);
         }
 
@@ -799,7 +799,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         {
             string expectedFilePath = GetExpectedRuleTemplateFilePath(outputDir, package);
 
-            Assert.IsTrue(File.Exists(expectedFilePath), "Expecting a template rule file to have been created");
+            File.Exists(expectedFilePath).Should().BeTrue();
             this.TestContext.AddResultFile(expectedFilePath);
             logger.AssertSingleInfoMessageExists(expectedFilePath); // should be a message about the generated file
         }

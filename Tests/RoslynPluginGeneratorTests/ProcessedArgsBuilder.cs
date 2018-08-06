@@ -25,20 +25,21 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 {
     public class ProcessedArgsBuilder
     {
-        private string packageId;
+        private readonly string packageId;
         private string packageVersion;
         private string language;
         private string sqaleFilePath;
         private string ruleFilePath;
         private bool acceptLicenses;
         private bool recurseDependencies;
-        private string outputDirectory;
+        private readonly string outputDirectory;
 
         public ProcessedArgsBuilder(string packageId, string outputDir)
         {
             this.packageId = packageId;
             this.outputDirectory = outputDir;
         }
+
         public ProcessedArgsBuilder SetPackageVersion(string packageVersion)
         {
             this.packageVersion = packageVersion;
