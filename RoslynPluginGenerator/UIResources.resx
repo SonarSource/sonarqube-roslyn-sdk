@@ -165,8 +165,8 @@
   <data name="APG_PluginGenerated" xml:space="preserve">
     <value>Plugin generated: {0}</value>
   </data>
-  <data name="APG_RecurseEnabled_SQALEandRuleCustomisationNotEnabled" xml:space="preserve">
-    <value>SQALE and customised rule xml information cannot currently be embedded into plugins generated from package dependencies.</value>
+  <data name="APG_RecurseEnabled_RuleCustomizationNotEnabled" xml:space="preserve">
+    <value>Customized rule xml information cannot currently be embedded into plugins generated from package dependencies.</value>
   </data>
   <data name="APG_RulesGeneratedToFile" xml:space="preserve">
     <value>{0} rules generated to {1}</value>

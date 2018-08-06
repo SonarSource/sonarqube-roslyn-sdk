@@ -82,7 +82,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                 packageId,
                 new SemanticVersion(packageVersion),
                 language,
-                sqaleFilePath,
                 ruleFilePath,
                 acceptLicenses,
                 recurseDependencies,

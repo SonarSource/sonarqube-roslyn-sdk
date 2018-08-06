@@ -97,55 +97,35 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             rawArgs = new string[] { "/a:testing.id.no.version" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
-            AssertArgumentsProcessed(actualArgs, logger, "testing.id.no.version", null, null, false);
+            AssertArgumentsProcessed(actualArgs, logger, "testing.id.no.version", null, false);
 
             // 2. Id and version
             logger = new TestLogger();
             rawArgs = new string[] { "/analyzer:testing.id.with.version:1.0.0-rc1" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
-            AssertArgumentsProcessed(actualArgs, logger, "testing.id.with.version", "1.0.0-rc1", null, false);
+            AssertArgumentsProcessed(actualArgs, logger, "testing.id.with.version", "1.0.0-rc1", false);
 
             // 3. Id containing a colon, with version
             logger = new TestLogger();
             rawArgs = new string[] { "/analyzer:id.with:colon:2.1.0" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
-            AssertArgumentsProcessed(actualArgs, logger, "id.with:colon", "2.1.0", null, false);
+            AssertArgumentsProcessed(actualArgs, logger, "id.with:colon", "2.1.0", false);
         }
 
         [TestMethod]
-        public void ArgProc_SqaleFile()
+        public void ArgProc_SqaleParameterIsDeprecated()
         {
-            // 0. Setup
-            TestLogger logger;
-            string[] rawArgs;
+            // Arrange
+            TestLogger logger = new TestLogger();
+            string[] rawArgs = new string[] { "/sqale:mySqaleFile.txt", "/a:validId" };
+
             ProcessedArgs actualArgs;
-
-            // 1. No sqale file value -> valid
-            logger = new TestLogger();
-            rawArgs = new string[] { "/a:validId" };
-            actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
-
-            AssertArgumentsProcessed(actualArgs, logger, "validId", null, null, false);
-
-            // 2. Missing sqale file
-            logger = new TestLogger();
-            rawArgs = new string[] { "/sqale:missingFile.txt", "/a:validId" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             AssertArgumentsNotProcessed(actualArgs, logger);
-            logger.AssertSingleErrorExists("missingFile.txt"); // should be an error containing the missing file name
-
-            // 3. Existing sqale file
-            string testDir = TestUtils.CreateTestDirectory(TestContext);
-            string filePath = TestUtils.CreateTextFile("valid.sqale.txt", testDir, "sqale file contents");
-
-            logger = new TestLogger();
-            rawArgs = new string[] { "/sqale:" + filePath,  "/a:valid:1.0" };
-            actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
-
-            AssertArgumentsProcessed(actualArgs, logger, "valid", "1.0", filePath, false);
+            logger.AssertSingleErrorExists("The /sqale parameter is no longer supported");
         }
 
         [TestMethod]
@@ -196,7 +176,7 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             rawArgs = new string[] { "/a:validId", "/acceptLicenses" };
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
-            AssertArgumentsProcessed(actualArgs, logger, "validId", null, null, true);
+            AssertArgumentsProcessed(actualArgs, logger, "validId", null, true);
         }
 
         [TestMethod]
@@ -239,7 +219,7 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             logger.AssertErrorsLogged();
         }
 
-        private static void AssertArgumentsProcessed(ProcessedArgs actualArgs, TestLogger logger, string expectedId, string expectedVersion, string expectedSqale, bool expectedAcceptLicenses)
+        private static void AssertArgumentsProcessed(ProcessedArgs actualArgs, TestLogger logger, string expectedId, string expectedVersion, bool expectedAcceptLicenses)
         {
             actualArgs.Should().NotBeNull("Expecting the arguments to have been processed successfully");
 
@@ -253,12 +233,6 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             {
                 actualArgs.PackageVersion.Should().NotBeNull("Not expecting the version to be null");
                 actualArgs.PackageVersion.ToString().Should().Be(expectedVersion);
-            }
-
-            actualArgs.SqaleFilePath.Should().Be(expectedSqale, "Unexpected sqale file path");
-            if (expectedSqale != null)
-            {
-                File.Exists(expectedSqale).Should().BeTrue("Specified sqale file should exist: {0}", expectedSqale);
             }
 
             actualArgs.AcceptLicenses.Should().Be(expectedAcceptLicenses, "Unexpected value for AcceptLicenses");

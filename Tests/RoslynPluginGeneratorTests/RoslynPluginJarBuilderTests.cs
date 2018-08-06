@@ -57,7 +57,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                 .SetRepositoryKey("repo.key")
                 .SetRepositoryName("repo.name")
                 .SetRulesFilePath(dummyRulesFile)
-                .SetSqaleFilePath(dummySqaleFile)
                 .SetPluginManifestProperties(manifest)
                 .AddResourceFile(dummyZipFile, "static\\foo.zip")
                 .SetJarFilePath(outputJarFilePath);

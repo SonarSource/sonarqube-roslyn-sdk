@@ -97,7 +97,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sqale:[path to sqale xml file].
+        ///   Looks up a localized string similar to /sqale:[path to sqale xml file] - DEPRECATED. Use the /rules parameter instead..
         /// </summary>
         internal static string ArgDescription_SqaleXmlFile {
             get {
@@ -120,15 +120,6 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
         internal static string DEBUG_UsingRuleFile {
             get {
                 return ResourceManager.GetString("DEBUG_UsingRuleFile", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Using SQALE file &apos;{0}&apos;.
-        /// </summary>
-        internal static string DEBUG_UsingSqaleFile {
-            get {
-                return ResourceManager.GetString("DEBUG_UsingSqaleFile", resourceCulture);
             }
         }
         
@@ -160,11 +151,13 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The specified SQALE file could not found: {0}.
+        ///   Looks up a localized string similar to The /sqale parameter is no longer supported. 
+        ///If you are targetting SonarQube v6.7 or higher, use the /rules parameter and add the debt remediation information to the rules.xml file instead. If you are targetting an older version of SonarQube, use v1.0 of this SDK.
+        ///.
         /// </summary>
-        internal static string ERROR_SqaleFileNotFound {
+        internal static string ERROR_SqaleParameterIsNotSupported {
             get {
-                return ResourceManager.GetString("ERROR_SqaleFileNotFound", resourceCulture);
+                return ResourceManager.GetString("ERROR_SqaleParameterIsNotSupported", resourceCulture);
             }
         }
     }

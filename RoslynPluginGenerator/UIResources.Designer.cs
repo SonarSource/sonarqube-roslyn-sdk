@@ -205,11 +205,11 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SQALE and customised rule xml information cannot currently be embedded into plugins generated from package dependencies..
+        ///   Looks up a localized string similar to Customized rule xml information cannot currently be embedded into plugins generated from package dependencies..
         /// </summary>
-        public static string APG_RecurseEnabled_SQALEandRuleCustomisationNotEnabled {
+        public static string APG_RecurseEnabled_RuleCustomizationNotEnabled {
             get {
-                return ResourceManager.GetString("APG_RecurseEnabled_SQALEandRuleCustomisationNotEnabled", resourceCulture);
+                return ResourceManager.GetString("APG_RecurseEnabled_RuleCustomizationNotEnabled", resourceCulture);
             }
         }
         

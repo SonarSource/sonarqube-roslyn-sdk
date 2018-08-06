@@ -45,8 +45,7 @@ namespace SonarQube.Plugins.Roslyn
 
         private const string RelativeConfigurationResourcePath = "org\\sonar\\plugins\\roslynsdk\\configuration.xml";
         private const string RelativeRulesXmlResourcePath = "org\\sonar\\plugins\\roslynsdk\\rules.xml";
-        private const string RelativeSqaleXmlResourcePath = "org\\sonar\\plugins\\roslynsdk\\sqale.xml";
-
+        
         private readonly ILogger logger;
 
         private readonly IDictionary<string, string> pluginProperties;
@@ -54,7 +53,6 @@ namespace SonarQube.Plugins.Roslyn
         private readonly IDictionary<string, string> fileToRelativePathMap;
         private string language;
         private string rulesFilePath;
-        private string sqaleFilePath;
         private string repositoryKey;
         private string repositoryName;
 
@@ -180,16 +178,6 @@ namespace SonarQube.Plugins.Roslyn
             return this;
         }
 
-        public RoslynPluginJarBuilder SetSqaleFilePath(string filePath)
-        {
-            // The existence of the file will be checked before building
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new ArgumentNullException(nameof(filePath));
-            }
-            sqaleFilePath = filePath;
-            return this;
-        }
 
         public RoslynPluginJarBuilder SetRepositoryKey(string key)
         {
@@ -261,11 +249,6 @@ namespace SonarQube.Plugins.Roslyn
                 updater.AddFile(kvp.Key, kvp.Value);
             }
 
-            if (!string.IsNullOrWhiteSpace(sqaleFilePath))
-            {
-                updater.AddFile(sqaleFilePath, RelativeSqaleXmlResourcePath);
-            }
-
             updater.UpdateArchive();
         }
 
@@ -307,11 +290,6 @@ namespace SonarQube.Plugins.Roslyn
                 RepositoryLanguage = language,
                 RulesXmlResourcePath = GetAbsoluteResourcePath(RelativeRulesXmlResourcePath)
             };
-
-            if (!string.IsNullOrWhiteSpace(sqaleFilePath))
-            {
-                config.SqaleXmlResourcePath = GetAbsoluteResourcePath(RelativeSqaleXmlResourcePath);
-            }
 
             foreach(KeyValuePair<string,string> kvp in pluginProperties)
             {
