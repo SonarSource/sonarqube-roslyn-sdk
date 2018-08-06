@@ -68,8 +68,41 @@ namespace SonarQube.Plugins.Roslyn
         [XmlElement(ElementName = "status")]
         public string Status { get; set; }
 
+        [XmlElement(ElementName = "type")]
+        public IssueType Type { get; set; }
+
         [XmlElement(ElementName = "tag")]
         public string[] Tags { get; set; }
+
+        [XmlIgnore]
+        public DebtRemediationFunctionType DebtRemediationFunction { get; set; }
+
+        /// <summary>
+        /// Do not read/write this property directly - use <see cref="DebtRemediationFunction"/> instead.
+        /// </summary>
+        /// <remarks>This property is a hack that allows us to use an enum to specify
+        /// debt remediation function, but to have nothing written to the XML if the
+        /// the value is not specified. There are other ways to do this, but they required
+        /// much more code.</remarks>
+        [XmlElement(ElementName = "debtRemediationFunction")]
+        public string DebtRemediationFunction_DoNotUse_ForSerializationOnly
+        {
+            get
+            {
+                if (DebtRemediationFunction == DebtRemediationFunctionType.Unspecified)
+                {
+                    return null;
+                }
+                return DebtRemediationFunction.ToString();
+            }
+            set
+            {
+                this.DebtRemediationFunction = (DebtRemediationFunctionType)Enum.Parse(typeof(DebtRemediationFunctionType), value);
+            }
+        }
+
+        [XmlElement(ElementName = "debtRemediationFunctionOffset")]
+        public string DebtRemediationFunctionOffset { get; set; }
 
         /// <summary>
         /// Specified the culture and case when comparing rule keys

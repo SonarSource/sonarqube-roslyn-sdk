@@ -19,7 +19,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class CmdLineResources {
@@ -88,7 +88,16 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /s:[path to sqale xml file].
+        ///   Looks up a localized string similar to /rules:[path to rules xml file].
+        /// </summary>
+        internal static string ArgDescription_RuleXmlFile {
+            get {
+                return ResourceManager.GetString("ArgDescription_RuleXmlFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sqale:[path to sqale xml file].
         /// </summary>
         internal static string ArgDescription_SqaleXmlFile {
             get {
@@ -102,6 +111,15 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
         internal static string DEBUG_ParsedReference {
             get {
                 return ResourceManager.GetString("DEBUG_ParsedReference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Using rules xml file &apos;{0}&apos;.
+        /// </summary>
+        internal static string DEBUG_UsingRuleFile {
+            get {
+                return ResourceManager.GetString("DEBUG_UsingRuleFile", resourceCulture);
             }
         }
         
@@ -129,6 +147,15 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
         internal static string ERROR_MissingPackageId {
             get {
                 return ResourceManager.GetString("ERROR_MissingPackageId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The specified rules xml file could not found: {0}.
+        /// </summary>
+        internal static string ERROR_RuleFileNotFound {
+            get {
+                return ResourceManager.GetString("ERROR_RuleFileNotFound", resourceCulture);
             }
         }
         

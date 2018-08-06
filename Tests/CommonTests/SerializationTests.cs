@@ -44,7 +44,10 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
                     Severity = "CRITICAL",
                     Cardinality = "SINGLE",
                     Status = "READY",
-                    Tags = new[] { "t1", "t2" }
+                    Type = IssueType.CODE_SMELL,
+                    Tags = new[] { "t1", "t2" },
+                    DebtRemediationFunction = DebtRemediationFunctionType.CONSTANT_ISSUE,
+                    DebtRemediationFunctionOffset = "15min"
                 },
 
                 new Rule()
@@ -55,6 +58,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
                     Description = @"<p>An Html <a href=""www.bing.com""> Description",
                     Severity = "MAJOR",
                     Cardinality = "SINGLE",
+                    Type = IssueType.BUG,
                     Status = "READY",
                 }
             };
@@ -78,8 +82,11 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
     <severity>CRITICAL</severity>
     <cardinality>SINGLE</cardinality>
     <status>READY</status>
+    <type>CODE_SMELL</type>
     <tag>t1</tag>
     <tag>t2</tag>
+    <debtRemediationFunction>CONSTANT_ISSUE</debtRemediationFunction>
+    <debtRemediationFunctionOffset>15min</debtRemediationFunctionOffset>
   </rule>
   <rule>
     <key>key2</key>
@@ -89,6 +96,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
     <severity>MAJOR</severity>
     <cardinality>SINGLE</cardinality>
     <status>READY</status>
+    <type>BUG</type>
   </rule>
 </rules>";
 

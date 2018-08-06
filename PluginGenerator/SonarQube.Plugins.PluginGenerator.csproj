@@ -52,6 +52,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataModel\DebtRemediationFunctionType.cs" />
+    <Compile Include="DataModel\IssueType.cs" />
     <Compile Include="DataModel\Rule.cs" />
     <Compile Include="DataModel\Rules.cs" />
     <Compile Include="JarManifestBuilder.cs" />
