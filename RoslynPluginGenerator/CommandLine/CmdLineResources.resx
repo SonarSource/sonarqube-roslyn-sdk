@@ -130,16 +130,13 @@
     <value>/rules:[path to rules xml file]</value>
   </data>
   <data name="ArgDescription_SqaleXmlFile" xml:space="preserve">
-    <value>/sqale:[path to sqale xml file]</value>
+    <value>/sqale:[path to sqale xml file] - DEPRECATED. Use the /rules parameter instead.</value>
   </data>
   <data name="DEBUG_ParsedReference" xml:space="preserve">
     <value>Parsed NuGet reference. Id: {0}, version: {1}</value>
   </data>
   <data name="DEBUG_UsingRuleFile" xml:space="preserve">
     <value>Using rules xml file '{0}'</value>
-  </data>
-  <data name="DEBUG_UsingSqaleFile" xml:space="preserve">
-    <value>Using SQALE file '{0}'</value>
   </data>
   <data name="ERROR_InvalidVersion" xml:space="preserve">
     <value>Invalid NuGet package version: {0}</value>
@@ -150,7 +147,9 @@
   <data name="ERROR_RuleFileNotFound" xml:space="preserve">
     <value>The specified rules xml file could not found: {0}</value>
   </data>
-  <data name="ERROR_SqaleFileNotFound" xml:space="preserve">
-    <value>The specified SQALE file could not found: {0}</value>
+  <data name="ERROR_SqaleParameterIsNotSupported" xml:space="preserve">
+    <value>The /sqale parameter is no longer supported. 
+If you are targetting SonarQube v6.7 or higher, use the /rules parameter and add the debt remediation information to the rules.xml file instead. If you are targetting an older version of SonarQube, use v1.0 of this SDK.
+</value>
   </data>
 </root>

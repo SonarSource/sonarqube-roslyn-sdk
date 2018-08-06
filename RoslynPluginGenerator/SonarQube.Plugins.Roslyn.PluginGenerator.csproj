@@ -133,8 +133,6 @@
     <Compile Include="RoslynPluginDefinition.cs" />
     <Compile Include="RoslynPluginJarBuilder.cs" />
     <Compile Include="RuleGenerator.cs" />
-    <Compile Include="HardcodedConstantSqaleGenerator.cs" />
-    <Compile Include="SqaleModel.cs" />
     <Compile Include="SupportedLanguages.cs" />
     <Compile Include="UIResources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -172,6 +170,7 @@
     <EmbeddedResource Include="CommandLine\CmdLineResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>CmdLineResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="UIResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

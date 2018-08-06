@@ -40,8 +40,6 @@ namespace SonarQube.Plugins.Roslyn
 
         public string RulesXmlResourcePath { get; set; }
 
-        public string SqaleXmlResourcePath { get; set; }
-
         [XmlElement("PluginProperties")]
         public PluginProperties Properties { get; set; }
 

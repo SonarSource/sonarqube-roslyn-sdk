@@ -114,7 +114,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
 
             parsedOk &= TryParseAnalyzerRef(arguments, out NuGetReference analyzerRef);
 
-            parsedOk &= TryParseSqaleFile(arguments, out string sqaleFilePath);
+            parsedOk &= TryParseSqaleArgument(arguments);
 
             parsedOk &= TryParseRuleFile(arguments, out string ruleFilePath);
 
@@ -128,7 +128,6 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                     analyzerRef.PackageId,
                     analyzerRef.Version,
                     SupportedLanguages.CSharp, /* TODO: support multiple languages */
-                    sqaleFilePath,
                     ruleFilePath,
                     acceptLicense,
                     recurseDependencies,
@@ -186,9 +185,8 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             return new NuGetReference(packageId, packageVersion);
         }
 
-        private bool TryParseSqaleFile(IEnumerable<ArgumentInstance> arguments, out string sqaleFilePath)
+        private bool TryParseSqaleArgument(IEnumerable<ArgumentInstance> arguments)
         {
-            sqaleFilePath = null;
             ArgumentInstance arg = arguments.SingleOrDefault(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.SqaleXmlFile, a.Descriptor.Id));
 
             if (arg == null)
@@ -196,18 +194,8 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                 return true;
             }
 
-            bool success = true;
-            if (File.Exists(arg.Value))
-            {
-                sqaleFilePath = arg.Value;
-                logger.LogDebug(CmdLineResources.DEBUG_UsingSqaleFile, sqaleFilePath);
-            }
-            else
-            {
-                success = false;
-                logger.LogError(CmdLineResources.ERROR_SqaleFileNotFound, arg.Value);
-            }
-            return success;
+            logger.LogError(CmdLineResources.ERROR_SqaleParameterIsNotSupported);
+            return false;
         }
 
         private bool TryParseRuleFile(IEnumerable<ArgumentInstance> arguments, out string ruleFilePath)

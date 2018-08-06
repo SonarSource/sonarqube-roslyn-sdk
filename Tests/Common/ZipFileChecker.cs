@@ -71,6 +71,18 @@ namespace SonarQube.Plugins.Test.Common
             }
         }
 
+        public void AssertZipDoesNotContainFiles(params string[] unexpectedRelativePaths)
+        {
+            foreach (string relativePath in unexpectedRelativePaths)
+            {
+                testContext.WriteLine("ZipFileChecker: checking for file '{0}'", relativePath);
+
+                string[] matchingFiles = Directory.GetFiles(UnzippedDirectoryPath, relativePath, SearchOption.TopDirectoryOnly);
+
+                matchingFiles.Length.Should().Be(0, $"Zip file contains unexpected file: {relativePath}");
+            }
+        }
+
         public void AssertZipContainsOnlyExpectedFiles(params string[] expectedRelativePaths)
         {
             AssertZipContainsFiles(expectedRelativePaths);

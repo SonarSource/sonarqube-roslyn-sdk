@@ -123,9 +123,6 @@
   <data name="APG_CreatedTempWorkingDir" xml:space="preserve">
     <value>Temporary working folder for this run: {0}</value>
   </data>
-  <data name="APG_GeneratingConstantSqaleFile" xml:space="preserve">
-    <value>Generating fixed remediation cost SQALE file...</value>
-  </data>
   <data name="APG_GeneratingPlugin" xml:space="preserve">
     <value>Generating plugin...</value>
   </data>
@@ -134,9 +131,6 @@
   </data>
   <data name="APG_InvalidRulesFile" xml:space="preserve">
     <value>The specified rules xml file is invalid: {0}</value>
-  </data>
-  <data name="APG_InvalidSqaleFile" xml:space="preserve">
-    <value>The specified SQALE file is invalid: {0}</value>
   </data>
   <data name="APG_LocatingAnalyzers" xml:space="preserve">
     <value>Looking for analyzers in the package...</value>
@@ -165,14 +159,11 @@
   <data name="APG_PluginGenerated" xml:space="preserve">
     <value>Plugin generated: {0}</value>
   </data>
-  <data name="APG_RecurseEnabled_SQALEandRuleCustomisationNotEnabled" xml:space="preserve">
-    <value>SQALE and customised rule xml information cannot currently be embedded into plugins generated from package dependencies.</value>
+  <data name="APG_RecurseEnabled_RuleCustomizationNotEnabled" xml:space="preserve">
+    <value>Customized rule xml information cannot currently be embedded into plugins generated from package dependencies.</value>
   </data>
   <data name="APG_RulesGeneratedToFile" xml:space="preserve">
     <value>{0} rules generated to {1}</value>
-  </data>
-  <data name="APG_SqaleGeneratedToFile" xml:space="preserve">
-    <value>SQALE generated to file {0}</value>
   </data>
   <data name="APG_TemplateRuleFileGenerated" xml:space="preserve">
     <value>
@@ -182,22 +173,11 @@ Rules definitions: a template rules xml file for the analyzer was saved to {0}. 
  * re-run this generator specifying the rules xml file to use with the /rules:[filename] argument.
 </value>
   </data>
-  <data name="APG_TemplateSqaleFileGenerated" xml:space="preserve">
-    <value>
-SQALE: an empty SQALE file for the analyzer was saved to {0}. To provide SQALE remediation information for the analyzer:
- * rename the file
- * fill in the appropriate remediation information for each diagnostic
- * re-run this generator specifying the sqale file to use with the /sqale:[filename] argument.
-</value>
-  </data>
   <data name="APG_UnsupportedLanguage" xml:space="preserve">
     <value>The language '{0}' is not supported. Valid options are 'cs' or 'vb'.</value>
   </data>
   <data name="APG_UsingSuppliedRulesFile" xml:space="preserve">
     <value>Using the supplied rules xml file: {0}</value>
-  </data>
-  <data name="APG_UsingSuppliedSqaleFile" xml:space="preserve">
-    <value>Using the SQALE file: {0}</value>
   </data>
   <data name="AssemblyDescription" xml:space="preserve">
     <value>Roslyn Analyzer Plugin Generator for SonarQube</value>

@@ -29,7 +29,6 @@ namespace SonarQube.Plugins.Roslyn
         public string PackageId { get; set; }
         public string PackageVersion { get; set; }
         public PluginManifest Manifest { get; set; }
-        public string SqaleFilePath { get; set; }
         public string RulesFilePath { get; set; }
 
         /// <summary>

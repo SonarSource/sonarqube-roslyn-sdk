@@ -26,7 +26,6 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using NuGet;
-using SonarLint.XmlDescriptor;
 using SonarQube.Plugins.Common;
 using SonarQube.Plugins.Roslyn.CommandLine;
 
@@ -49,13 +48,6 @@ namespace SonarQube.Plugins.Roslyn
         /// Specifies the format for the name of the template rules xml file
         /// </summary>
         public const string RulesTemplateFileNameFormat = "{0}.{1}.rules.template.xml";
-
-        /// <summary>
-        /// Specifies the format for the name of the placeholder SQALE file
-        /// </summary>
-        public const string SqaleTemplateFileNameFormat = "{0}.{1}.sqale.template.xml";
-
-        private const string DefaultRemediationCost = "5min";
 
         private readonly INuGetPackageHandler packageHandler;
         private readonly SonarQube.Plugins.Common.ILogger logger;
@@ -139,7 +131,7 @@ namespace SonarQube.Plugins.Roslyn
             // Initial run with the user-targeted package and arguments
             if (analyzersByPackage.ContainsKey(targetPackage))
             {
-                string generatedJarPath = GeneratePluginForPackage(args.OutputDirectory, args.Language, args.SqaleFilePath, args.RuleFilePath, targetPackage, analyzersByPackage[targetPackage]);
+                string generatedJarPath = GeneratePluginForPackage(args.OutputDirectory, args.Language, args.RuleFilePath, targetPackage, analyzersByPackage[targetPackage]);
                 if (generatedJarPath == null)
                 {
                     return false;
@@ -152,12 +144,12 @@ namespace SonarQube.Plugins.Roslyn
             // Dependent package generation changes the arguments
             if (args.RecurseDependencies)
             {
-                logger.LogWarning(UIResources.APG_RecurseEnabled_SQALEandRuleCustomisationNotEnabled);
+                logger.LogWarning(UIResources.APG_RecurseEnabled_RuleCustomizationNotEnabled);
 
                 foreach (IPackage currentPackage in analyzersByPackage.Keys)
                 {
-                    // No way to specify the SQALE or rules xml files for any but the user-targeted package at this time
-                    string generatedJarPath = GeneratePluginForPackage(args.OutputDirectory, args.Language, null, null, currentPackage, analyzersByPackage[currentPackage]);
+                    // No way to specify the rules xml files for any but the user-targeted package at this time
+                    string generatedJarPath = GeneratePluginForPackage(args.OutputDirectory, args.Language, null, currentPackage, analyzersByPackage[currentPackage]);
                     if (generatedJarPath == null)
                     {
                         return false;
@@ -177,7 +169,7 @@ namespace SonarQube.Plugins.Roslyn
             return true;
         }
 
-        private string GeneratePluginForPackage(string outputDir, string language, string sqaleFilePath, string rulesFilePath, IPackage package, IEnumerable<DiagnosticAnalyzer> analyzers)
+        private string GeneratePluginForPackage(string outputDir, string language, string rulesFilePath, IPackage package, IEnumerable<DiagnosticAnalyzer> analyzers)
         {
             Debug.Assert(analyzers.Any(), "The method must be called with a populated list of DiagnosticAnalyzers.");
 
@@ -191,7 +183,6 @@ namespace SonarQube.Plugins.Roslyn
             RoslynPluginDefinition definition = new RoslynPluginDefinition
             {
                 Language = language,
-                SqaleFilePath = sqaleFilePath,
                 RulesFilePath = rulesFilePath,
                 PackageId = package.Id,
                 PackageVersion = package.Version.ToString(),
@@ -218,27 +209,12 @@ namespace SonarQube.Plugins.Roslyn
                 generate = IsValidRulesFile(definition.RulesFilePath);
             }
 
-            string generatedSqaleFile = null;
-            
-            if (definition.SqaleFilePath == null)
-            {
-                generatedSqaleFile = CalculateSqaleFileName(package, outputDir);
-                GenerateFixedSqaleFile(analyzers, generatedSqaleFile);
-                Debug.Assert(File.Exists(generatedSqaleFile));
-            }
-            else
-            {
-                this.logger.LogInfo(UIResources.APG_UsingSuppliedSqaleFile, definition.SqaleFilePath);
-                generate = IsValidSqaleFile(definition.SqaleFilePath);
-            }
-
             if (generate)
             {
                 createdJarFilePath = BuildPlugin(definition, outputDir);
             }
 
             LogMessageForGeneratedRules(generatedRulesTemplateFile);
-            LogMessageForGeneratedSqale(generatedSqaleFile);
 
             return createdJarFilePath;
         }
@@ -249,15 +225,6 @@ namespace SonarQube.Plugins.Roslyn
             {
                 // Log a message about the generated rules xml file for every plugin generated
                 this.logger.LogInfo(UIResources.APG_TemplateRuleFileGenerated, generatedFile);
-            }
-        }
-
-        private void LogMessageForGeneratedSqale(string generatedSqaleFile)
-        {
-            if (generatedSqaleFile != null)
-            {
-                // Log a message about the generated SQALE file for every plugin generated
-                logger.LogInfo(UIResources.APG_TemplateSqaleFileGenerated, generatedSqaleFile);
             }
         }
 
@@ -386,30 +353,6 @@ namespace SonarQube.Plugins.Roslyn
             return filePath;
         }
 
-        private static string CalculateSqaleFileName(IPackage package, string directory)
-        {
-            string filePath = string.Format(System.Globalization.CultureInfo.CurrentCulture,
-                SqaleTemplateFileNameFormat, package.Id, package.Version);
-
-            filePath = Path.Combine(directory, filePath);
-            return filePath;
-        }
-
-        /// <summary>
-        /// Generates a SQALE file with fixed remediation costs for the specified analyzers
-        /// </summary>
-        private void GenerateFixedSqaleFile(IEnumerable<DiagnosticAnalyzer> analyzers, string outputFilePath)
-        {
-            logger.LogInfo(UIResources.APG_GeneratingConstantSqaleFile);
-
-            HardcodedConstantSqaleGenerator generator = new HardcodedConstantSqaleGenerator();
-
-            SqaleModel sqale = generator.GenerateSqaleData(analyzers, DefaultRemediationCost);
-
-            Serializer.SaveModel(sqale, outputFilePath);
-            logger.LogDebug(UIResources.APG_SqaleGeneratedToFile, outputFilePath);
-        }
-
         /// <summary>
         /// Checks that the supplied rule file has valid content
         /// </summary>
@@ -432,29 +375,7 @@ namespace SonarQube.Plugins.Roslyn
             }
             return true;
         }
-
-        /// <summary>
-        /// Checks that the supplied sqale file has valid content
-        /// </summary>
-        private bool IsValidSqaleFile(string sqaleFilePath)
-        {
-            Debug.Assert(!string.IsNullOrWhiteSpace(sqaleFilePath));
-            // Existence is checked when parsing the arguments
-            Debug.Assert(File.Exists(sqaleFilePath), "Expecting the sqale file to exist: " + sqaleFilePath);
-
-            try
-            {
-                // TODO: consider adding further checks
-                Serializer.LoadModel<SqaleModel>(sqaleFilePath);
-            }
-            catch(InvalidOperationException) // will be thrown for invalid xml
-            {
-                logger.LogError(UIResources.APG_InvalidSqaleFile, sqaleFilePath);
-                return false;
-            }
-            return true;
-        }
-
+        
         public /* for test */ static PluginManifest CreatePluginManifest(IPackage package)
         {
             // The manifest properties supported by SonarQube are documented at
@@ -561,11 +482,6 @@ namespace SonarQube.Plugins.Roslyn
                         .SetRulesFilePath(definition.RulesFilePath)
                         .SetPluginManifestProperties(definition.Manifest)
                         .SetJarFilePath(fullJarPath);
-
-            if (!string.IsNullOrWhiteSpace(definition.SqaleFilePath))
-            {
-                builder.SetSqaleFilePath(definition.SqaleFilePath);
-            }
 
             AddRoslynMetadata(builder, definition, repositoryId);
 
