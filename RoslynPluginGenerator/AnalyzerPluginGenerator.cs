@@ -49,13 +49,6 @@ namespace SonarQube.Plugins.Roslyn
         /// </summary>
         public const string RulesTemplateFileNameFormat = "{0}.{1}.rules.template.xml";
 
-        /// <summary>
-        /// Specifies the format for the name of the placeholder SQALE file
-        /// </summary>
-        public const string SqaleTemplateFileNameFormat = "{0}.{1}.sqale.template.xml";
-
-        private const string DefaultRemediationCost = "5min";
-
         private readonly INuGetPackageHandler packageHandler;
         private readonly SonarQube.Plugins.Common.ILogger logger;
 

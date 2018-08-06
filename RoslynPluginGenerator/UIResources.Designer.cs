@@ -79,15 +79,6 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Generating fixed remediation cost SQALE file....
-        /// </summary>
-        public static string APG_GeneratingConstantSqaleFile {
-            get {
-                return ResourceManager.GetString("APG_GeneratingConstantSqaleFile", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Generating plugin....
         /// </summary>
         public static string APG_GeneratingPlugin {
@@ -111,15 +102,6 @@ namespace SonarQube.Plugins.Roslyn {
         public static string APG_InvalidRulesFile {
             get {
                 return ResourceManager.GetString("APG_InvalidRulesFile", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The specified SQALE file is invalid: {0}.
-        /// </summary>
-        public static string APG_InvalidSqaleFile {
-            get {
-                return ResourceManager.GetString("APG_InvalidSqaleFile", resourceCulture);
             }
         }
         
@@ -223,15 +205,6 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SQALE generated to file {0}.
-        /// </summary>
-        public static string APG_SqaleGeneratedToFile {
-            get {
-                return ResourceManager.GetString("APG_SqaleGeneratedToFile", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to 
         ///Rules definitions: a template rules xml file for the analyzer was saved to {0}. To customise the rules definitions for the analyzer:
         /// * rename the file
@@ -242,20 +215,6 @@ namespace SonarQube.Plugins.Roslyn {
         public static string APG_TemplateRuleFileGenerated {
             get {
                 return ResourceManager.GetString("APG_TemplateRuleFileGenerated", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 
-        ///SQALE: an empty SQALE file for the analyzer was saved to {0}. To provide SQALE remediation information for the analyzer:
-        /// * rename the file
-        /// * fill in the appropriate remediation information for each diagnostic
-        /// * re-run this generator specifying the sqale file to use with the /sqale:[filename] argument.
-        ///.
-        /// </summary>
-        public static string APG_TemplateSqaleFileGenerated {
-            get {
-                return ResourceManager.GetString("APG_TemplateSqaleFileGenerated", resourceCulture);
             }
         }
         
@@ -274,15 +233,6 @@ namespace SonarQube.Plugins.Roslyn {
         public static string APG_UsingSuppliedRulesFile {
             get {
                 return ResourceManager.GetString("APG_UsingSuppliedRulesFile", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Using the SQALE file: {0}.
-        /// </summary>
-        public static string APG_UsingSuppliedSqaleFile {
-            get {
-                return ResourceManager.GetString("APG_UsingSuppliedSqaleFile", resourceCulture);
             }
         }
         

@@ -28,7 +28,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         private readonly string packageId;
         private string packageVersion;
         private string language;
-        private string sqaleFilePath;
         private string ruleFilePath;
         private bool acceptLicenses;
         private bool recurseDependencies;
@@ -49,12 +48,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public ProcessedArgsBuilder SetLanguage(string language)
         {
             this.language = language;
-            return this;
-        }
-
-        public ProcessedArgsBuilder SetSqaleFilePath(string filePath)
-        {
-            this.sqaleFilePath = filePath;
             return this;
         }
 

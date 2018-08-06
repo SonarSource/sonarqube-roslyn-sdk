@@ -47,7 +47,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                 RepositoryName = "repo.name",
                 RepositoryLanguage = "language",
                 RulesXmlResourcePath = "rulesPath",
-                SqaleXmlResourcePath = "sqalePath"
             };
 
             config.Properties["prop1.Key"] = "value1";
@@ -68,7 +67,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             reloaded.RepositoryName.Should().Be("repo.name");
             reloaded.RepositoryLanguage.Should().Be("language");
             reloaded.RulesXmlResourcePath.Should().Be("rulesPath");
-            reloaded.SqaleXmlResourcePath.Should().Be("sqalePath");
 
             reloaded.Properties.Count.Should().Be(2);
             AssertPropertyExists("prop1.Key", "value1", reloaded.Properties);
@@ -88,7 +86,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
   <RepositoryLanguage>example</RepositoryLanguage>
   <RepositoryName>example</RepositoryName>
   <RulesXmlResourcePath>/org/sonar/plugins/roslynsdk/rules.xml</RulesXmlResourcePath>
-  <SqaleXmlResourcePath>/org/sonar/plugins/roslynsdk/sqale.xml</SqaleXmlResourcePath>
   <PluginProperties>
     <example.pluginKey>example.pluginKey.Value</example.pluginKey>
     <example.pluginVersion>example.pluginVersion.Value</example.pluginVersion>
@@ -119,7 +116,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             loaded.RepositoryLanguage.Should().Be("example");
             loaded.RepositoryName.Should().Be("example");
             loaded.RulesXmlResourcePath.Should().Be("/org/sonar/plugins/roslynsdk/rules.xml");
-            loaded.SqaleXmlResourcePath.Should().Be("/org/sonar/plugins/roslynsdk/sqale.xml");
 
             AssertPropertyExists("example.pluginKey", "example.pluginKey.Value", loaded.Properties);
             AssertPropertyExists("example.pluginVersion", "example.pluginVersion.Value", loaded.Properties);

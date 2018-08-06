@@ -40,7 +40,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             string outputJarFilePath = Path.Combine(testDir, "created.jar");
 
             string dummyRulesFile = TestUtils.CreateTextFile("rules.txt", testDir, "<rules />");
-            string dummySqaleFile = TestUtils.CreateTextFile("sqale.txt", testDir, "<sqale />");
             string dummyZipFile = TestUtils.CreateTextFile("payload.txt", testDir, "zip");
 
             PluginManifest manifest= new PluginManifest()
@@ -70,9 +69,11 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                 "META-INF\\MANIFEST.MF",
                 "static\\foo.zip",
                 "org\\sonar\\plugins\\roslynsdk\\configuration.xml",
-                "org\\sonar\\plugins\\roslynsdk\\sqale.xml",
                 "org\\sonar\\plugins\\roslynsdk\\rules.xml"
                 );
+
+            checker.AssertZipDoesNotContainFiles(
+                "org\\sonar\\plugins\\roslynsdk\\sqale.xml");
         }
 
         #endregion Tests
