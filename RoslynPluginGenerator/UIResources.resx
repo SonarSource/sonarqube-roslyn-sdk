@@ -179,9 +179,6 @@ Rules definitions: a template rules xml file for the analyzer was saved to {0}. 
   <data name="APG_UsingSuppliedRulesFile" xml:space="preserve">
     <value>Using the supplied rules xml file: {0}</value>
   </data>
-  <data name="AssemblyDescription" xml:space="preserve">
-    <value>Roslyn Analyzer Plugin Generator for SonarQube</value>
-  </data>
   <data name="Builder_Error_OutputJarPathMustBeSpecified" xml:space="preserve">
     <value>The file path for the jar file to be created must be specified</value>
   </data>
@@ -246,6 +243,15 @@ The conflict will be ignored.</value>
   </data>
   <data name="NG_UsingLatestPackageVersion" xml:space="preserve">
     <value>Using version marked as latest.</value>
+  </data>
+  <data name="Program_AssemblyDescription" xml:space="preserve">
+    <value>Roslyn Analyzer Plugin Generator for SonarQube</value>
+  </data>
+  <data name="Program_SupportedRoslynVersion" xml:space="preserve">
+    <value>Maximum supported Roslyn version:</value>
+  </data>
+  <data name="Program_SupportedSonarQubeVersions" xml:space="preserve">
+    <value>Minimum supported SonarQube version: 6.7 (highest version tested against: 7.3-alpha1)</value>
   </data>
   <data name="RuleGen_DuplicateKey" xml:space="preserve">
     <value>Skipping rule in analyzer {0}: Duplicate key.</value>

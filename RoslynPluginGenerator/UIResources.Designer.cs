@@ -237,15 +237,6 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Roslyn Analyzer Plugin Generator for SonarQube.
-        /// </summary>
-        public static string AssemblyDescription {
-            get {
-                return ResourceManager.GetString("AssemblyDescription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The file path for the jar file to be created must be specified.
         /// </summary>
         public static string Builder_Error_OutputJarPathMustBeSpecified {
@@ -433,6 +424,33 @@ namespace SonarQube.Plugins.Roslyn {
         public static string NG_UsingLatestPackageVersion {
             get {
                 return ResourceManager.GetString("NG_UsingLatestPackageVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Roslyn Analyzer Plugin Generator for SonarQube.
+        /// </summary>
+        public static string Program_AssemblyDescription {
+            get {
+                return ResourceManager.GetString("Program_AssemblyDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Maximum supported Roslyn version:.
+        /// </summary>
+        public static string Program_SupportedRoslynVersion {
+            get {
+                return ResourceManager.GetString("Program_SupportedRoslynVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Minimum supported SonarQube version: 6.7 (highest version tested against: 7.3-alpha1).
+        /// </summary>
+        public static string Program_SupportedSonarQubeVersions {
+            get {
+                return ResourceManager.GetString("Program_SupportedSonarQubeVersions", resourceCulture);
             }
         }
         

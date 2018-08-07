@@ -20,6 +20,7 @@
 
 using System.IO;
 using System.Reflection;
+using Microsoft.CodeAnalysis.Diagnostics;
 using NuGet;
 using SonarQube.Plugins.Common;
 using SonarQube.Plugins.Roslyn.CommandLine;
@@ -37,7 +38,9 @@ namespace SonarQube.Plugins.Roslyn
         private static int Main(string[] args)
         {
             ConsoleLogger logger = new ConsoleLogger();
-            Utilities.LogAssemblyVersion(typeof(Program).Assembly, UIResources.AssemblyDescription, logger);
+            Utilities.LogAssemblyVersion(typeof(Program).Assembly, UIResources.Program_AssemblyDescription, logger);
+            Utilities.LogAssemblyVersion(typeof(DiagnosticAnalyzer).Assembly, UIResources.Program_SupportedRoslynVersion, logger);
+            logger.LogInfo(UIResources.Program_SupportedSonarQubeVersions);
 
             ProcessedArgs processedArgs = ArgumentProcessor.TryProcessArguments(args, logger);
 
