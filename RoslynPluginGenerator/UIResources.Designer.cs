@@ -237,6 +237,24 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Entry not found in template plugin: {0}.
+        /// </summary>
+        public static string Builder_Error_EntryNotFoundInTemplatePlugin {
+            get {
+                return ResourceManager.GetString("Builder_Error_EntryNotFoundInTemplatePlugin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manifest property should be copied from the template jar, not set directly: {0}.
+        /// </summary>
+        public static string Builder_Error_ManifestPropertyShouldBeCopiedFromTemplate {
+            get {
+                return ResourceManager.GetString("Builder_Error_ManifestPropertyShouldBeCopiedFromTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The file path for the jar file to be created must be specified.
         /// </summary>
         public static string Builder_Error_OutputJarPathMustBeSpecified {

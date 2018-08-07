@@ -86,6 +86,8 @@ namespace SonarQube.Plugins.Roslyn
             logger.LogDebug(UIResources.ZIP_JarUpdated, outputArchiveFilePath);
         }
 
+        #endregion Public methods
+
         private void DoUpdate()
         {
             using (ZipArchive newArchive = new ZipArchive(new FileStream(outputArchiveFilePath, FileMode.Open), ZipArchiveMode.Update))
@@ -121,7 +123,5 @@ namespace SonarQube.Plugins.Roslyn
             return archive.CreateEntry(fullEntryName);
 
         }
-        
-        #endregion Public methods
     }
 }

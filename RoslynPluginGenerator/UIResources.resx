@@ -179,6 +179,12 @@ Rules definitions: a template rules xml file for the analyzer was saved to {0}. 
   <data name="APG_UsingSuppliedRulesFile" xml:space="preserve">
     <value>Using the supplied rules xml file: {0}</value>
   </data>
+  <data name="Builder_Error_EntryNotFoundInTemplatePlugin" xml:space="preserve">
+    <value>Entry not found in template plugin: {0}</value>
+  </data>
+  <data name="Builder_Error_ManifestPropertyShouldBeCopiedFromTemplate" xml:space="preserve">
+    <value>Manifest property should be copied from the template jar, not set directly: {0}</value>
+  </data>
   <data name="Builder_Error_OutputJarPathMustBeSpecified" xml:space="preserve">
     <value>The file path for the jar file to be created must be specified</value>
   </data>

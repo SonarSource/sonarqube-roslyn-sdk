@@ -21,6 +21,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using SonarQube.Plugins.Common;
 
 namespace SonarQube.Plugins.Roslyn
@@ -41,10 +42,10 @@ namespace SonarQube.Plugins.Roslyn
         private const string PluginClassName = "org.sonar.plugins.roslynsdk.RoslynSdkGeneratedPlugin";
 
         // Locations in the jar where various file should be embedded
-        private const string RelativeManifestResourcePath = "META-INF\\MANIFEST.MF";
+        private const string RelativeManifestResourcePath = "META-INF/MANIFEST.MF";
 
-        private const string RelativeConfigurationResourcePath = "org\\sonar\\plugins\\roslynsdk\\configuration.xml";
-        private const string RelativeRulesXmlResourcePath = "org\\sonar\\plugins\\roslynsdk\\rules.xml";
+        private const string RelativeConfigurationResourcePath = "org/sonar/plugins/roslynsdk/configuration.xml";
+        private const string RelativeRulesXmlResourcePath = "org/sonar/plugins/roslynsdk/rules.xml";
         
         private readonly ILogger logger;
 
@@ -65,8 +66,6 @@ namespace SonarQube.Plugins.Roslyn
             pluginProperties = new Dictionary<string, string>();
             jarManifestBuilder = new JarManifestBuilder();
             fileToRelativePathMap = new Dictionary<string, string>();
-
-            SetFixedManifestProperties();
         }
 
         public RoslynPluginJarBuilder SetJarFilePath(string filePath)
@@ -178,7 +177,6 @@ namespace SonarQube.Plugins.Roslyn
             return this;
         }
 
-
         public RoslynPluginJarBuilder SetRepositoryKey(string key)
         {
             RepositoryKeyUtilities.ThrowIfInvalid(key);
@@ -230,12 +228,13 @@ namespace SonarQube.Plugins.Roslyn
 
             ValidateConfiguration();
 
+            string templateJarFilePath = ExtractTemplateJarFile(workingDirectory);
+
             // Create the config and manifest files
             string configFilePath = BuildConfigFile(workingDirectory);
-            string manifestFilePath = jarManifestBuilder.WriteManifest(workingDirectory);
+            string manifestFilePath = BuildManifest(templateJarFilePath, workingDirectory);
 
             // Update the jar
-            string templateJarFilePath = ExtractTemplateJarFile(workingDirectory);
             ArchiveUpdater updater = new ArchiveUpdater(this.logger);
 
             updater.SetInputArchive(templateJarFilePath)
@@ -315,20 +314,6 @@ namespace SonarQube.Plugins.Roslyn
             return pluginKey;
         }
 
-        /// <summary>
-        /// Sets the invariant, required manifest properties
-        /// </summary>
-        private void SetFixedManifestProperties()
-        {
-            // This property must appear first in the manifest.
-            // See http://docs.oracle.com/javase/6/docs/technotes/guides/jar/jar.html#JAR%20Manifest
-            jarManifestBuilder.SetProperty("Sonar-Version", "4.5.2");
-            jarManifestBuilder.SetProperty("Plugin-Dependencies", "META-INF/lib/sslr-squid-bridge-2.6.jar");
-            jarManifestBuilder.SetProperty("Plugin-SourcesUrl", "https://github.com/SonarSource-VisualStudio/sonarqube-roslyn-sdk-template-plugin");
-
-            jarManifestBuilder.SetProperty("Plugin-Class", PluginClassName);
-        }
-
         private static string ExtractTemplateJarFile(string workingDirectory)
         {
             string templateJarFilePath = Path.Combine(workingDirectory, "template.jar");
@@ -343,6 +328,64 @@ namespace SonarQube.Plugins.Roslyn
             }
 
             return templateJarFilePath;
+        }
+
+        private string BuildManifest(string templateJarFilePath, string workingDirectory)
+        {
+            var templateManifest = GetContentsOfFileFromArchive(templateJarFilePath, RelativeManifestResourcePath);
+
+            CopyReservedPropertiesFromExistingManifest(templateManifest);
+
+            var manifestFilePath = jarManifestBuilder.WriteManifest(workingDirectory);
+            return manifestFilePath;
+        }
+
+        private string GetContentsOfFileFromArchive(string pathToArchive, string fullEntryName)
+        {
+            string text = null;
+            using (var archive = new ZipArchive(new FileStream(pathToArchive, FileMode.Open)))
+            {
+                var entry = archive.GetEntry(fullEntryName);
+                if (entry == null)
+                {
+                    throw new InvalidOperationException(
+                        string.Format(System.Globalization.CultureInfo.CurrentCulture,
+                            UIResources.Builder_Error_EntryNotFoundInTemplatePlugin, fullEntryName));
+                }
+
+                var buffer = new byte[entry.Length];
+                using (var entryStream = entry.Open())
+                {
+                    entryStream.Read(buffer, 0, buffer.Length);
+                    text = System.Text.Encoding.UTF8.GetString(buffer);
+                }
+            }
+
+            return text;
+        }
+
+        /// <summary>
+        /// Some of the properties in the template manifest should
+        /// be preserved e.g. the supported SonarQube version
+        /// </summary>
+        private void CopyReservedPropertiesFromExistingManifest(string templateManifest)
+        {
+            var reader = new JarManifestReader(templateManifest);
+            CopyValueFromExistingManifest(reader, "Sonar-Version");
+            CopyValueFromExistingManifest(reader, "Plugin-Dependencies");
+            CopyValueFromExistingManifest(reader, "Plugin-Class");
+            CopyValueFromExistingManifest(reader, "SonarLint-Supported"); // applies to other IDEs i.e. not VS
+        }
+
+        private void CopyValueFromExistingManifest(JarManifestReader reader, string property)
+        {
+            if (jarManifestBuilder.TryGetValue(property, out string value))
+            {
+                throw new InvalidOperationException(
+                    string.Format(System.Globalization.CultureInfo.CurrentCulture,
+                        UIResources.Builder_Error_ManifestPropertyShouldBeCopiedFromTemplate, property));
+            }
+            jarManifestBuilder.SetProperty(property, reader.GetValue(property));
         }
 
         #endregion Private methods configuration
