@@ -57,6 +57,7 @@
     <Compile Include="DataModel\Rule.cs" />
     <Compile Include="DataModel\Rules.cs" />
     <Compile Include="JarManifestBuilder.cs" />
+    <Compile Include="JarManifestReader.cs" />
     <Compile Include="PluginKeyUtilities.cs" />
     <Compile Include="RepositoryKeyUtilities.cs" />
     <Compile Include="PluginDefinition.cs" />

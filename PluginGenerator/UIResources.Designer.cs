@@ -19,7 +19,7 @@ namespace SonarQube.Plugins {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class UIResources {
@@ -93,6 +93,24 @@ namespace SonarQube.Plugins {
         internal static string Misc_Error_InvalidRepositoryKey {
             get {
                 return ResourceManager.GetString("Misc_Error_InvalidRepositoryKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manifest file is not valid - line does not contain a key-value separator: &apos;{0}&apos;.
+        /// </summary>
+        internal static string Reader_Error_InvalidManifest {
+            get {
+                return ResourceManager.GetString("Reader_Error_InvalidManifest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The expected setting was not found in the manifest file: {0}.
+        /// </summary>
+        internal static string Reader_Error_MissingManifestSetting {
+            get {
+                return ResourceManager.GetString("Reader_Error_MissingManifestSetting", resourceCulture);
             }
         }
     }
