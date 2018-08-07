@@ -1,22 +1,31 @@
-Creating a plug-in jar file:
-----------------------------
+Supported Roslyn version
+------------------------
+Currently the SDK is built against Microsoft.CodeAnalysis v2.8.2. It ships with a binding redirect file that forwards all of
+the earlier versions to v2.8.2, so it should work against analyzers written with any earlier Roslyn version.
 
-* generate the MD file containing the plugin info
-  - License, OrganizationUrl, BuildDate, Version, Class, Sonar-Version, Organization, Name, Description, Key
+The SDK only needs the packages "Microsoft.CodeAnalysis.Analyzers" and "Microsoft.CodeAnalysis.Common". However, we reference
+the full "Microsoft.CodeAnalysis" package as it will pull in other packages that might be needed by the third-party analyzers
+e.g. the workspaces packages.
 
-Plugin-BuildDate: 2015-09-27T13:50:19+0100
-Sonar-Version: 4.5.2
+If the SDK fails to generate a plugin for a Roslyn analyzer:
+1) check that the analyzer is built against v2.8.2 or earlier (e.g. by using ildasm to see which version is referenced), and
+2) check that any other dependencies required by the analyzer are available.
 
-* create folder structure: folder per namespace
-  - RulesDefinition.java, Plugin.java, rules.xml
+The SDK will fetch any NuGet dependencies that are declared in the NuGet analyzer package. However, analyzer packages do
+not normally reference the Roslyn packages they required, so they will not be fetched.
 
-* Compile the classes
- javac myorg\*.* -classpath sonar-plugin-api-4.5.2.jar
 
- Note: the code references the sonar-plugin-api jar, which must be locatable
+Updating the version of Roslyn used by the SDK
+----------------------------------------------
+1) Use the VS Package Manager to update the version of Microsoft.CodeAnalysis referenced by the following projects:
+  * RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj
+  * Tests\IntegrationTests\IntegrationTests.csproj
+  * Tests\RoslynPluginGeneratorTests\SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests.csproj
 
-* Create the jar file
- jar cvfm test.jar MANIFEST.MF myorg\*.class* resources\*.*
+2) update the app.config file to forward all calls to the new version
+   File: RoslynPluginGenerator\app.config.
+   Note: this is the app.config that is shipped with the SDK, and it is shared (linked) to the test
+   projects so it is the only app.config that needs to be updated.
 
 
 
@@ -25,14 +34,13 @@ Sonar-Version: 4.5.2
 
  [root folder]
 
-	MANIFEST.MF			: manifest file containing plugin property values used by SonarQube
+    META-INF/MANIFEST.MF                            : manifest file containing general plugin property values used by SonarQube
+                                                    : e.g. plugin name, version, unique key etc
 
-	[myorg]
-		[plugin] etc	i.e. folder structure corresponding to the namespaces of the class components
-			Plugin.class
-			RuleDefinitions.class
+    org/sonar/plugins/roslynsdk/configuration.xml   : metadata about the analyzer used by the Scanner for MSBuild
+                                                    : e.g repository key and language
 
-	[resources]
-		rules.xml		: XML file containing the new rules (loaded by RulesDefinition.class)
+    org/sonar/plugins/roslynsdk/rules.xml           : XML file containing the new rules (loaded by RulesDefinition.class)
 
 
+    static/[analyzer id].[analyzer version].zip     : the zip containing the third party analyzer will be added here
