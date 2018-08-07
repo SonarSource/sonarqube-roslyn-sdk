@@ -27,6 +27,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NuGet;
+using SonarQube.Plugins.Common;
 using SonarQube.Plugins.Roslyn;
 using SonarQube.Plugins.Roslyn.CommandLine;
 using SonarQube.Plugins.Test.Common;
@@ -141,6 +142,25 @@ namespace SonarQube.Plugins.IntegrationTests
             AssertJarsGenerated(outputDir, 3);
         }
 
+        [TestMethod]
+        public void RoslynPlugin_ThirdPartyAnalyzer_1_Succeeds()
+        {
+            // Note: this test will access the public nuget site if the package
+            // can't be found locally so:
+            // 1) it can be slow and
+            // 2) it it more likely to fail due to environmental issues
+            CheckCanGenerateForThirdPartyAssembly("wintellect.analyzers", new SemanticVersion("1.0.6"));
+        }
+
+        [TestMethod]
+        public void RoslynPlugin_ThirdPartyAnalyzer_2_Succeeds()
+        {
+            // Build against the latest public version (currently v5.6)
+            // Note: this test could fail if the third-party analyzer is updated
+            // to use a newer version of Roslyn than the one supported by the SDK
+            CheckCanGenerateForThirdPartyAssembly("RefactoringEssentials", null /* latest */);
+        }
+
         #region Private methods
 
         private IPackageManager CreatePackageManager(string rootDir)
@@ -205,6 +225,58 @@ namespace SonarQube.Plugins.IntegrationTests
 
                 return pkg;
             }
+        }
+
+        private void CheckCanGenerateForThirdPartyAssembly(string packageId, SemanticVersion version)
+        {
+            // Arrange
+            var logger = new TestLogger();
+            var outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
+            var localPackageDestination = TestUtils.CreateTestDirectory(TestContext, ".localpackages");
+            var localRepoWithRemotePackage = InstallRemotePackageLocally(packageId, version);
+
+            // Act
+            var nuGetHandler = new NuGetPackageHandler(localRepoWithRemotePackage, localPackageDestination, logger);
+
+            var apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
+            var args = new ProcessedArgs(packageId, version, "cs", null, false, false, outputDir);
+            var result = apg.Generate(args);
+
+            // Assert
+            result.Should().BeTrue();
+
+            // Expecting one plugin per dependency with analyzers
+            AssertJarsGenerated(outputDir, 1);
+        }
+
+        /// <summary>
+        /// Installs the specified package from the public NuGet feed to the
+        /// local machine, and returns the local package repo that provides
+        /// access to the package.
+        /// </summary>
+        private IPackageRepository InstallRemotePackageLocally(string packageId, SemanticVersion version)
+        {
+            TestContext.WriteLine($"Test setup: installing package locally - {packageId}, {version?.ToString() ?? "{{version not specified}}"}");
+
+            // Note: using the same shared cache location as for the SDK itself to reduce
+            // the number of times the package needs to be pulled from the public feed.
+            // The remote feed will only be used if the package cannot be found locally.
+            var sdkPackageDestination = Utilities.CreateTempDirectory(".nuget");
+            TestContext.WriteLine($"Test setup: local shared repo directory: {sdkPackageDestination}");
+
+            var repo = PackageRepositoryFactory.Default.CreateRepository("https://www.nuget.org/api/v2/");
+            var packageManager = new PackageManager(repo, sdkPackageDestination);
+            try
+            {
+                packageManager.InstallPackage(packageId, version);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Test setup error: failed to install NuGet package locally. Error: {ex.ToString()}");
+            }
+
+            TestContext.WriteLine($"Test setup: package installed.");
+            return packageManager.LocalRepository;
         }
 
         #endregion Private methods
