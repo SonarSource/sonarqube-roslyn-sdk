@@ -73,6 +73,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="JarManifestBuilderTests.cs" />
+    <Compile Include="JarManifestReaderTests.cs" />
     <Compile Include="PluginDefinitionTests.cs" />
     <Compile Include="RepositoryKeyUtilitiesTests.cs" />
     <Compile Include="PluginKeyUtilitiesTests.cs" />

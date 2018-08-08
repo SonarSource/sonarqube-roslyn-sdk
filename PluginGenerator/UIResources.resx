@@ -129,4 +129,10 @@
   <data name="JMan_Error_NameTooLong" xml:space="preserve">
     <value>The attribute name is too long. Maximum 70 chars. Name: {0}</value>
   </data>
+  <data name="Reader_Error_InvalidManifest" xml:space="preserve">
+    <value>Manifest file is not valid - line does not contain a key-value separator: '{0}'</value>
+  </data>
+  <data name="Reader_Error_MissingManifestSetting" xml:space="preserve">
+    <value>The expected setting was not found in the manifest file: {0}</value>
+  </data>
 </root>

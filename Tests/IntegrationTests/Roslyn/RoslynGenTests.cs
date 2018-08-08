@@ -247,6 +247,13 @@ namespace SonarQube.Plugins.IntegrationTests
 
             // Expecting one plugin per dependency with analyzers
             AssertJarsGenerated(outputDir, 1);
+
+            var jarFilePath = Directory.GetFiles(outputDir, "*.jar", SearchOption.TopDirectoryOnly).Single();
+            var jarChecker = new ZipFileChecker(TestContext, jarFilePath);
+            var actualManifestFilePath = jarChecker.AssertFileExists("META-INF\\MANIFEST.MF");
+
+            JarManifestReader reader = new JarManifestReader(File.ReadAllText(actualManifestFilePath));
+            AssertFixedValuesInManifest(reader);
         }
 
         /// <summary>
@@ -320,10 +327,12 @@ namespace SonarQube.Plugins.IntegrationTests
 
             // Check the contents of the manifest
             string actualManifestFilePath = jarChecker.AssertFileExists("META-INF\\MANIFEST.MF");
-            string[] actualManifest = File.ReadAllLines(actualManifestFilePath);
-            AssertExpectedManifestValue(WellKnownPluginProperties.Key, pluginId.Replace(".", ""), actualManifest);
-            AssertExpectedManifestValue("Plugin-Key", pluginId.Replace(".", ""), actualManifest); // plugin-key should be lowercase and alphanumeric
-            AssertPackagePropertiesInManifest(package, actualManifest);
+
+            var manifestReader = new JarManifestReader(File.ReadAllText(actualManifestFilePath));
+            manifestReader.FindValue(WellKnownPluginProperties.Key).Should().Be(pluginId.Replace(".", ""));
+
+            AssertPackagePropertiesInManifest(package, manifestReader);
+            AssertFixedValuesInManifest(manifestReader);
 
             // Check the rules
             string actualRuleFilePath = jarChecker.AssertFileExists("." + config.RulesXmlResourcePath);
@@ -373,27 +382,23 @@ namespace SonarQube.Plugins.IntegrationTests
             actual.Severity.Should().NotBeNull("Severity should be specified");
         }
 
-        private static void AssertPackagePropertiesInManifest(IPackage package, string[] actualManifest)
+        private static void AssertPackagePropertiesInManifest(IPackage package, JarManifestReader manifestReader)
         {
-            AssertExpectedManifestValue("Plugin-Name", package.Title, actualManifest);
-            AssertExpectedManifestValue("Plugin-Version", package.Version.ToString(), actualManifest);
-            AssertExpectedManifestValue("Plugin-Description", package.Description, actualManifest);
-            AssertExpectedManifestValue("Plugin-Organization", String.Join(",", package.Owners), actualManifest);
-            AssertExpectedManifestValue("Plugin-Homepage", package.ProjectUrl.ToString(), actualManifest);
-            AssertExpectedManifestValue("Plugin-Developers", String.Join(",", package.Authors), actualManifest);
-            AssertExpectedManifestValue("Plugin-TermsConditionsUrl", package.LicenseUrl.ToString(), actualManifest);
+            manifestReader.FindValue("Plugin-Name").Should().Be(package.Title);
+            manifestReader.FindValue("Plugin-Version").Should().Be(package.Version.ToString());
+            manifestReader.FindValue("Plugin-Description").Should().Be(package.Description);
+            manifestReader.FindValue("Plugin-Organization").Should().Be(String.Join(",", package.Owners));
+            manifestReader.FindValue("Plugin-Homepage").Should().Be(package.ProjectUrl.ToString());
+            manifestReader.FindValue("Plugin-Developers").Should().Be(String.Join(",", package.Authors));
+            manifestReader.FindValue("Plugin-TermsConditionsUrl").Should().Be(package.LicenseUrl.ToString());
         }
-
-        private static void AssertExpectedManifestValue(string propertyName, string expectedValue, string[] actualManifest)
+        
+        private static void AssertFixedValuesInManifest(JarManifestReader reader)
         {
-            string expectedPrefix = propertyName + ": ";
-
-            string match = actualManifest.SingleOrDefault(a => a.StartsWith(expectedPrefix, StringComparison.Ordinal));
-            match.Should().NotBeNull("Failed to find expected manifest property: {0}", propertyName);
-
-            // TODO: handle multi-line values
-            string actualValue = match.Substring(expectedPrefix.Length);
-            actualValue.Should().Be(expectedValue, "Unexpected manifest property value. Property: {0}", propertyName);
+            reader.FindValue("Sonar-Version").Should().Be("6.7");
+            reader.FindValue("Plugin-Class").Should().Be("org.sonar.plugins.roslynsdk.RoslynSdkGeneratedPlugin");
+            reader.FindValue("SonarLint-Supported").Should().Be("false");
+            reader.FindValue("Plugin-Dependencies").Should().Be("META-INF/lib/jsr305-1.3.9.jar META-INF/lib/commons-io-2.6.jar META-INF/lib/stax2-api-3.1.4.jar META-INF/lib/staxmate-2.0.1.jar META-INF/lib/stax-api-1.0.1.jar");
         }
 
         private void CheckEmbeddedAnalyzerPayload(ZipFileChecker jarChecker, string staticResourceName,
