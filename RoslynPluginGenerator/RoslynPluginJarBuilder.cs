@@ -36,9 +36,9 @@ namespace SonarQube.Plugins.Roslyn
         /// </summary>
         private const string TemplateJarResourceName = "SonarQube.Plugins.Roslyn.Resources.sonar-roslyn-sdk-template-plugin-1.1.jar";
 
-        // Locations in the jar where various file should be embedded
+        // Locations in the jar archive where various file should be embedded.
+        // Using forward-slash since that is the separator used by Java for archive entry names.
         private const string RelativeManifestResourcePath = "META-INF/MANIFEST.MF";
-
         private const string RelativeConfigurationResourcePath = "org/sonar/plugins/roslynsdk/configuration.xml";
         private const string RelativeRulesXmlResourcePath = "org/sonar/plugins/roslynsdk/rules.xml";
         
