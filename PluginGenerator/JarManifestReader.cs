@@ -18,7 +18,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-
 using System;
 using System.Collections.Generic;
 
@@ -30,8 +29,7 @@ namespace SonarQube.Plugins
     /// </summary>
     public class JarManifestReader
     {
-        private Dictionary<string, string> kvps;
-        private const char CONTINUATION_CHAR = ' ';
+        private readonly Dictionary<string, string> kvps;
         private const string SEPARATOR = ": ";
 
         public JarManifestReader(string manifestText)
@@ -46,12 +44,11 @@ namespace SonarQube.Plugins
             // A manifest file line can have at most 72 characters. Long values are split across
             // multiple lines, with the continuation line starting with a single space.
             // The simplest way to rejoin the lines is just to replace all (EOL + space) with EOL
-
             var joinedText = manifestText.Replace("\r\n ", string.Empty);
             var lines = joinedText.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
 
             // Every line should now be a key-value pair
-            foreach(var line in lines)
+            foreach (var line in lines)
             {
                 var index = line.IndexOf(SEPARATOR);
 

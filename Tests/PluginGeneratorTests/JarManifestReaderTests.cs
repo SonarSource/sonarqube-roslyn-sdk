@@ -44,7 +44,6 @@ Plugin-SourcesUrl: https://github.com/SonarSource-VisualStudio/sonarqu
             // Act
             var jarReader = new JarManifestReader(text);
 
-
             // Assert
             jarReader.FindValue("Manifest-Version").Should().Be("1.0");
 

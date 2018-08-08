@@ -36,11 +36,6 @@ namespace SonarQube.Plugins.Roslyn
         /// </summary>
         private const string TemplateJarResourceName = "SonarQube.Plugins.Roslyn.Resources.sonar-roslyn-sdk-template-plugin-1.1.jar";
 
-        /// <summary>
-        /// The name of the plugin class in the embedded jar file
-        /// </summary>
-        private const string PluginClassName = "org.sonar.plugins.roslynsdk.RoslynSdkGeneratedPlugin";
-
         // Locations in the jar where various file should be embedded
         private const string RelativeManifestResourcePath = "META-INF/MANIFEST.MF";
 
