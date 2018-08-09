@@ -2,7 +2,7 @@
 
 ### License
 
-Copyright 2015-2017 SonarSource.
+Copyright 2015-2018 SonarSource.
 
 Licensed under the [GNU Lesser General Public License, Version 3.0](http://www.gnu.org/licenses/lgpl.txt)
 
@@ -17,16 +17,30 @@ This repo contains tools to help integrate Roslyn analyzers with SonarQube so th
 Specifically, the tools will generate a Java SonarQube plugin that registers the rules with SonarQube. The generated plugin works with the [C# plugin](http://docs.sonarqube.org/x/bAAW) (v4.5 or higher) and the [SonarQube Scanner for MSBuild](http://docs.sonarqube.org/x/Lx9q) (v2.0 or higher) to handle executing the analyzer and uploading any issues.
 See this [blog post](https://blogs.msdn.microsoft.com/visualstudioalm/2016/02/18/sonarqube-scanner-for-msbuild-v2-0-released-support-for-third-party-roslyn-analyzers/) for more information.
 
+### Deprecation of the Roslyn SDK by [MMF-1332](https://jira.sonarsource.com/browse/MMF-1332)
+Once MMF-1332 is implemented,  issues for all Roslyn analyzers will be automatically imported to SonarQube without the need for the custom plugin produced by this SDK.
+
 ### Download latest release
-The latest release version (v1.0) is available [here](https://github.com/SonarSource-VisualStudio/sonarqube-roslyn-sdk/releases/download/1.0/SonarQube.Roslyn.SDK-1.0.zip).
+The latest release version (v2.0) is available [here](https://github.com/SonarSource-VisualStudio/sonarqube-roslyn-sdk/releases/download/2.0/SonarQube.Roslyn.SDK-2.0.zip).
+
+### Compatibility
+v1.0 of the SDK generates plugins that are compatible with SonarQube v4.5.2 -> v6.7.
+
+v2.0 generates plugins that are compatible versions of SonarQube from v6.7 (tested with the current latest available version, v7.3alpha1).
+
+If you have an existing plugin that was generated with v1.0 of the SDK and want to use the plugin with SonarQube 7.0 or later, you will need to create a new plugin using v2.0 of the SDK. If you customized the _SQALE.xml_ file for your v1.0 plugin, you will need to move the remediation information to the _rules.xml_ file for the v2.0 plugin.
 
 #### Current limitations:
    - the analyzer must be available as a NuGet package
-   - the analyzer must use __Roslyn v1.0 or v1.1__ (newer versions of Roslyn are not yet supported - see issue [SFSRAP-45](https://jira.sonarsource.com/browse/SFSRAP-45) for a workaround)
+   - the analyzer must use __Roslyn 2.8.2 or lower__ ~~(newer versions of Roslyn are not yet supported - see issue [SFSRAP-45](https://jira.sonarsource.com/browse/SFSRAP-45) for a workaround)~~
    - only C# rules are supported
 
-These limitations will be addressed at some point in the future.
+#### Changes between v1.0 and v2.0
+The full list of changes is contained is available on the [release page](https://github.com/SonarSource/sonarqube-roslyn-sdk/releases/tag/2.0). The main changes are described in more detail below.
 
+* in v1.0, it was not possible to customize the _rules.xml_ file, although debt remediation information could be supplied in a separate _sqale.xml_ file. SQALE has been deprecated in SonarQube, and the format of the _rules.xml_ file has been extended to support debt remediation information. As a result, v2.0 of the SDK no longer supports providing a _sqale.xml_ file. Instead, it is now possible to manually edit the _rules.xml_ that describes the rule. This means debt remediation data can be added, and it also means that the rest of the metadata describing the rules can be edited to (e.g. to change the severity or classification or the rules, or to add tags).
+* v2.0 is built against Roslyn 2.8.2, so will work against analyzers that use that version of Roslyn or earlier.
+* v2.0 uses NuGet v4.7, which supports the TLS1.3 security protocol.
 
 ### Target users
 There are two groups of target users:
@@ -58,6 +72,29 @@ e.g. *wintellectanalyzers-plugin-1.0.5.jar*
 
 The generated jar can be installed to SonarQube as normal (e.g. by dropping it in the SonarQube server *extensions\plugins* folder and restarting the SonarQube server).
 You will see a new repository containing all of the rules defined by the analyzer. The rules can be added to Quality Profiles just like any other SonarQube rule.
+
+#### Customizing the rules.xml file
+To customize the _rules.xml_ file, run the generator once against the NuGet package. The generator will produce a template _rules.xml_ for the analyzers found in the package as well as producing the .jar file. Edit the _rules.xml_ file then run the generator tool again, this time providing the _/rules_ parameter to point to the edited _rules.xml_ file.
+
+The XML snippet below shows the expected format for tags and debt remediation information.
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<rules>
+  <rule>
+    <key>S1000</key>
+    <name>My title</name>
+    <severity>BLOCKER|CRITICAL|MAJOR|MINOR|INFO</severity>
+    <cardinality>SINGLE</cardinality>
+    <description><![CDATA[My description]]></description>
+    <tag>my-first-tag</tag>
+    <tag>my-second-tag</tag>
+    <type>BUG</type>
+    <debtRemediationFunction>CONSTANT_ISSUE</debtRemediationFunction>
+    <debtRemediationFunctionOffset>15min</debtRemediationFunctionOffset>
+  </rule>
+</rules>
+```
 
 
 #### Configuring NuGet feeds
