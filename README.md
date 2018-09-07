@@ -67,7 +67,7 @@ There are two groups of target users:
 It is possible to specify an optional package version
 e.g. */a:Wintellect.Analyzers:1.0.5.0*
 
-The tool will create a .jar file called based on the package name and version in the current directory
+The tool will create a .jar file named after the package name and version in the current directory
 e.g. *wintellectanalyzers-plugin-1.0.5.jar*
 
 The generated jar can be installed to SonarQube as normal (e.g. by dropping it in the SonarQube server *extensions\plugins* folder and restarting the SonarQube server).
