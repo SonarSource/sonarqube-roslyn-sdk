@@ -54,7 +54,7 @@ There are two groups of target users:
 ### Getting started
 
 #### To generate a SonarQube plugin for an analyzer:
-1. Download and install the latest [released version](https://github.com/SonarSource-VisualStudio/sonarqube-roslyn-sdk/releases/download/1.0/SonarQube.Roslyn.SDK-1.0.zip)
+1. Download and install the latest [released version](https://github.com/SonarSource-VisualStudio/sonarqube-roslyn-sdk/releases/download/2.0/SonarQube.Roslyn.SDK-2.0.zip)
   
   Alternatively, if you want to build the SDK locally:
   * Clone the repository
