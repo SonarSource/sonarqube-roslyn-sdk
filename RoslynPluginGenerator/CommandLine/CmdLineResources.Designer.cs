@@ -79,6 +79,15 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to /o:[PathToOutputDirectory] Specifies where the jar file should be put.
+        /// </summary>
+        internal static string ArgDescription_OutputDirectory {
+            get {
+                return ResourceManager.GetString("ArgDescription_OutputDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to /recurse - search for analyzers in target package and any dependencies.
         /// </summary>
         internal static string ArgDescription_RecurseDependencies {
