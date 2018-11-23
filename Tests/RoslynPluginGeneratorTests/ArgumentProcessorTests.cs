@@ -209,6 +209,28 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             AssertArgumentsNotProcessed(actualArgs, logger);
         }
 
+        [TestMethod]
+        public void ArgProc_OutputDirectory_Parameter()
+        {
+            var logger = new TestLogger();
+            var rawArgs = new string[] { "/a:validId", "/o:My/Output/Directory" };
+
+            var actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
+
+            actualArgs.OutputDirectory.Should().Be("My/Output/Directory");
+        }
+
+        [TestMethod]
+        public void ArgProc_OutputDirectory_Default()
+        {
+            var logger = new TestLogger();
+            var rawArgs = new string[] { "/a:validId" };
+
+            var actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
+
+            actualArgs.OutputDirectory.Should().Be(Directory.GetCurrentDirectory());
+        }
+
         #endregion Tests
 
         #region Checks

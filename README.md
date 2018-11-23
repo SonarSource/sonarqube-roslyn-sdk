@@ -69,6 +69,7 @@ e.g. */a:Wintellect.Analyzers:1.0.5.0*
 
 The tool will create a .jar file named after the package name and version in the current directory
 e.g. *wintellectanalyzers-plugin-1.0.5.jar*
+You can specify the output directory with the `/o:PathToOutputDir` command line parameter.
 
 The generated jar can be installed to SonarQube as normal (e.g. by dropping it in the SonarQube server *extensions\plugins* folder and restarting the SonarQube server).
 You will see a new repository containing all of the rules defined by the analyzer. The rules can be added to Quality Profiles just like any other SonarQube rule.

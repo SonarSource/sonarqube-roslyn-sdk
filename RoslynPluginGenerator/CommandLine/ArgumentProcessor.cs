@@ -42,6 +42,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             public const string RuleXmlFile = "rules.xml";
             public const string AcceptLicenses = "accept.licenses";
             public const string RecurseDependencies = "recurse.dependencies";
+            public const string OutputDirectory = "output.dir";
         }
 
         private static IList<ArgumentDescriptor> Descriptors;
@@ -61,7 +62,9 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                 new ArgumentDescriptor(
                     id: KeywordIds.AcceptLicenses, prefixes: new string[] { "/acceptLicenses" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_AcceptLicenses, isVerb: true),
                 new ArgumentDescriptor(
-                    id: KeywordIds.RecurseDependencies, prefixes: new string[] { "/recurse" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_RecurseDependencies, isVerb: true)
+                    id: KeywordIds.RecurseDependencies, prefixes: new string[] { "/recurse" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_RecurseDependencies, isVerb: true),
+                new ArgumentDescriptor(
+                    id: KeywordIds.OutputDirectory, prefixes: new string[] { "/ouputdir:", "/o:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_OutputDirectory)
             };
 
             Debug.Assert(Descriptors.All(d => d.Prefixes != null && d.Prefixes.Any()), "All descriptors must provide at least one prefix");
@@ -120,6 +123,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
 
             bool acceptLicense = GetLicenseAcceptance(arguments);
             bool recurseDependencies = GetRecursion(arguments);
+            string outputDirectory = GetOutputDirectory(arguments);
 
             if (parsedOk)
             {
@@ -131,7 +135,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                     ruleFilePath,
                     acceptLicense,
                     recurseDependencies,
-                    System.IO.Directory.GetCurrentDirectory());
+                    outputDirectory);
             }
 
             return processed;
@@ -220,6 +224,18 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                 this.logger.LogError(CmdLineResources.ERROR_RuleFileNotFound, arg.Value);
             }
             return success;
+        }
+
+        private string GetOutputDirectory(IEnumerable<ArgumentInstance> arguments)
+        {
+            ArgumentInstance arg = arguments.SingleOrDefault(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.OutputDirectory, a.Descriptor.Id));
+
+            if (arg != null)
+            {
+                return arg.Value;
+            }
+
+            return Directory.GetCurrentDirectory();
         }
 
         private static bool GetLicenseAcceptance(IEnumerable<ArgumentInstance> arguments)
