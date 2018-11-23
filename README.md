@@ -105,7 +105,8 @@ The SDK will look for NuGet.config files in the following locations:
 - %ProgramData%\NuGet\Config\SonarQube (a custom machine-wide location
 - %ProgramData%\NuGet\Config (i.e. the standard machine-wide location)
 
-If the analyzer you want to package is available in a private NuGet feed then you will need to create an appropriate NuGet.config file to point to the private feed.
+If the analyzer you want to package is available in a private NuGet feed then you will need to create an appropriate NuGet.config file to point to the private feed. Alternatively you can use the `/customnugetrepo:file:///PathToRepo` 
+parameter. This will overwrite the above mentioned NuGet behaviour.
 
 #### Generating a jar for an analyzer that is not available from a NuGet feed
 If you want to create a jar for Roslyn analyzer that is not available from a NuGet feed (e.g. an analyzer you have created on your local machine) you can specify a package source that points at a local directory containing the *.nupkg* file created by the standard Roslyn templates. See the [NuGet docs](https://docs.nuget.org/create/hosting-your-own-nuget-feeds) for more information.

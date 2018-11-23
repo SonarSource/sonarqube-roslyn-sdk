@@ -59,7 +59,7 @@ namespace SonarQube.Plugins.IntegrationTests
             // Act
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
-            ProcessedArgs args = new ProcessedArgs(packageId, new SemanticVersion("1.0.2"), "cs", null, false, false, outputDir);
+            ProcessedArgs args = new ProcessedArgs(packageId, new SemanticVersion("1.0.2"), "cs", null, false, false, outputDir, null);
             bool result = apg.Generate(args);
 
             // Assert
@@ -94,7 +94,7 @@ namespace SonarQube.Plugins.IntegrationTests
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
             ProcessedArgs args = new ProcessedArgs(targetPkg.Id, targetPkg.Version, "cs", null, false, 
-                true /* generate plugins for dependencies with analyzers*/, outputDir);
+                true /* generate plugins for dependencies with analyzers*/, outputDir, null);
             bool result = apg.Generate(args);
 
             // Assert
@@ -129,7 +129,7 @@ namespace SonarQube.Plugins.IntegrationTests
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
             ProcessedArgs args = new ProcessedArgs(targetPkg.Id, targetPkg.Version, "cs", null, false,
-                true /* generate plugins for dependencies with analyzers*/, outputDir);
+                true /* generate plugins for dependencies with analyzers*/, outputDir, null);
             bool result = apg.Generate(args);
 
             // Assert
@@ -239,7 +239,7 @@ namespace SonarQube.Plugins.IntegrationTests
             var nuGetHandler = new NuGetPackageHandler(localRepoWithRemotePackage, localPackageDestination, logger);
 
             var apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
-            var args = new ProcessedArgs(packageId, version, "cs", null, false, false, outputDir);
+            var args = new ProcessedArgs(packageId, version, "cs", null, false, false, outputDir, null);
             var result = apg.Generate(args);
 
             // Assert

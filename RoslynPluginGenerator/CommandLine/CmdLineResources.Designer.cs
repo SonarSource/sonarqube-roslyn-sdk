@@ -61,6 +61,15 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to /customnugetrepo:[Path/Url to Repo] - overwrites default nuget behaviour and only uses this repository..
+        /// </summary>
+        internal static string ArgDesciption_CustomNuGetRepo {
+            get {
+                return ResourceManager.GetString("ArgDesciption_CustomNuGetRepo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to /acceptLicenses - indicates that you accept the licenses for any packages that required license acceptance.
         /// </summary>
         internal static string ArgDescription_AcceptLicenses {

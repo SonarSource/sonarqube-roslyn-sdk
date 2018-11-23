@@ -20,8 +20,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using NuGet;
+using SonarQube.Plugins.Common;
+using SonarQube.Plugins.Roslyn.CommandLine;
 
 namespace SonarQube.Plugins.Roslyn
 {
@@ -86,6 +90,27 @@ namespace SonarQube.Plugins.Roslyn
             aggRepo.Logger = new NuGetLoggerAdapter(logger);
 
             return aggRepo;
+        }
+
+        /// <summary>
+        /// Creates a NuGet repo depending on the given command line arguments for the customnugetrepo path.
+        /// </summary>
+        public static IPackageRepository CreateRepositoryForArguments(ConsoleLogger logger, ProcessedArgs processedArgs)
+        {
+            IPackageRepository repo;
+
+            if (string.IsNullOrWhiteSpace(processedArgs.CustomNuGetRepository))
+            {
+                string exeDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                ISettings nuGetSettings = GetSettingsFromConfigFiles(exeDir);
+                repo = CreateRepository(nuGetSettings, logger);
+            }
+            else
+            {
+                repo = PackageRepositoryFactory.Default.CreateRepository(processedArgs.CustomNuGetRepository);
+            }
+
+            return repo;
         }
     }
 }

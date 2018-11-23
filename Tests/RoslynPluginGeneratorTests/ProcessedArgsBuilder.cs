@@ -32,6 +32,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         private bool acceptLicenses;
         private bool recurseDependencies;
         private readonly string outputDirectory;
+        private string customNuGetRepo;
+
 
         public ProcessedArgsBuilder(string packageId, string outputDir)
         {
@@ -69,6 +71,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             return this;
         }
 
+        public ProcessedArgsBuilder SetCustomNuGetRepository(string repoUri)
+        {
+            this.customNuGetRepo = repoUri;
+            return this;
+        }
+
         public ProcessedArgs Build()
         {
             ProcessedArgs args = new ProcessedArgs(
@@ -78,7 +86,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                 ruleFilePath,
                 acceptLicenses,
                 recurseDependencies,
-                outputDirectory);
+                outputDirectory,
+                customNuGetRepo);
             return args;
         }
     }

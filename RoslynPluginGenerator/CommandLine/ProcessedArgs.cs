@@ -26,7 +26,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
     public class ProcessedArgs
     {
         public ProcessedArgs(string packageId, SemanticVersion packageVersion, string language, string ruleFilePath,
-            bool acceptLicenses, bool recurseDependencies, string outputDirectory)
+            bool acceptLicenses, bool recurseDependencies, string outputDirectory, string customNuGetRepository)
         {
             if (string.IsNullOrWhiteSpace(packageId))
             {
@@ -46,6 +46,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             AcceptLicenses = acceptLicenses;
             RecurseDependencies = recurseDependencies;
             OutputDirectory = outputDirectory;
+            CustomNuGetRepository = customNuGetRepository;
         }
 
         public string PackageId { get; }
@@ -61,5 +62,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
         public bool RecurseDependencies { get; }
 
         public string OutputDirectory { get; }
+
+		public string CustomNuGetRepository { get; }
     }
 }
