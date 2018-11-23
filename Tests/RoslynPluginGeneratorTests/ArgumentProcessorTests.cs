@@ -231,6 +231,28 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             actualArgs.OutputDirectory.Should().Be(Directory.GetCurrentDirectory());
         }
 
+        [TestMethod]
+        public void ArgProc_CustomNuGetRepository_Default()
+        {
+            var logger = new TestLogger();
+            var rawArgs = new string[] { "/a:validId" };
+
+            var actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
+
+            actualArgs.CustomNuGetRepository.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void ArgProc_CustomNuGetRepository_Path()
+        {
+            var logger = new TestLogger();
+            var rawArgs = new string[] { "/a:validId", "/customnugetrepo:file:///somelocalrepo/path" };
+
+            var actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
+
+            actualArgs.CustomNuGetRepository.Should().Be("file:///somelocalrepo/path");
+        }
+
         #endregion Tests
 
         #region Checks

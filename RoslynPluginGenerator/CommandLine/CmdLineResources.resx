@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ArgDesciption_CustomNuGetRepo" xml:space="preserve">
+    <value>/customnugetrepo:[Path/Url to Repo] - overwrites default nuget behaviour and only uses this repository.</value>
+  </data>
   <data name="ArgDescription_AcceptLicenses" xml:space="preserve">
     <value>/acceptLicenses - indicates that you accept the licenses for any packages that required license acceptance</value>
   </data>

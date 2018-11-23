@@ -23,6 +23,7 @@ using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NuGet;
+using SonarQube.Plugins.Common;
 using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
@@ -153,6 +154,22 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             logger.AssertSingleWarningExists(NuGetLoggerAdapter.LogMessagePrefix, "http://bad.remote.unreachable.repo");
             logger.AssertWarningsLogged(1);
             logger.AssertErrorsLogged(0);
+        }
+
+        [TestMethod]
+        public void RepoFactory_GetRepositoryForArguments_CustomNuGetRepo_Overwrites_Default()
+        {
+            var settings = new ProcessedArgsBuilder("SomePackage", "SomeoutDir")
+                .SetCustomNuGetRepository("file:///customrepo/path")
+                .SetPackageVersion("0.0.1")
+                .SetLanguage("cs")
+                .Build();
+            var logger = new ConsoleLogger();
+
+            var repo = NuGetRepositoryFactory.CreateRepositoryForArguments(logger, settings);
+
+            repo.Should().BeOfType<LazyLocalPackageRepository>();
+            repo.Source.Should().Be("/customrepo/path");
         }
 
         #endregion Tests
