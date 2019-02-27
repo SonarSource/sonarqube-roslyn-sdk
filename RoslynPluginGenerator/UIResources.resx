@@ -247,6 +247,9 @@ The conflict will be ignored.</value>
   <data name="NG_SelectedPackageVersion" xml:space="preserve">
     <value>Version was not specified. Using version {0}.</value>
   </data>
+  <data name="NG_UsingCustomNuGetFolder" xml:space="preserve">
+    <value>Using custom folder as package source: {0}</value>
+  </data>
   <data name="NG_UsingLatestPackageVersion" xml:space="preserve">
     <value>Using version marked as latest.</value>
   </data>

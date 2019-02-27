@@ -48,7 +48,8 @@ namespace SonarQube.Plugins.Roslyn
             if (processedArgs != null)
             {
                 string localNuGetCache = Utilities.CreateTempDirectory(".nuget");
-                var repo = NuGetRepositoryFactory.CreateRepositoryForArguments(logger, processedArgs);
+                var defaultNuGetDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                var repo = NuGetRepositoryFactory.CreateRepositoryForArguments(logger, processedArgs, defaultNuGetDir);
                 var packageHandler = new NuGetPackageHandler(repo, localNuGetCache, logger);
 
                 AnalyzerPluginGenerator generator = new AnalyzerPluginGenerator(packageHandler, logger);

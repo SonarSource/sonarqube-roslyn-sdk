@@ -63,7 +63,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             actualRepo.Should().BeOfType<AggregateRepository>();
             AggregateRepository actualAggregateRepo = (AggregateRepository)actualRepo;
 
-            AssertExpectedPackageSources(actualAggregateRepo,
+            AssertOnlyExpectedPackageSources(actualAggregateRepo,
                 "d:\\active_cache",
                 "c:\\another\\active\\cache");
 
@@ -93,7 +93,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             actualRepo.Should().BeOfType<AggregateRepository>();
             AggregateRepository actualAggregateRepo = (AggregateRepository)actualRepo;
 
-            AssertExpectedPackageSources(actualAggregateRepo,
+            AssertOnlyExpectedPackageSources(actualAggregateRepo,
                 "c:\\active");
         }
 
@@ -126,7 +126,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             actualRepo.Should().BeOfType<AggregateRepository>();
             AggregateRepository actualAggregateRepo = (AggregateRepository)actualRepo;
 
-            AssertExpectedPackageSources(actualAggregateRepo
+            AssertOnlyExpectedPackageSources(actualAggregateRepo
                 /* no packages sources so no repositories */ );
         }
 
@@ -157,19 +157,60 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         }
 
         [TestMethod]
-        public void RepoFactory_GetRepositoryForArguments_CustomNuGetRepo_Overwrites_Default()
+        public void RepoFactory_CreateRepositoryForArguments_NoCustomNuGetRepo_DefaultUsed()
+        {
+            // Create a valid config settings file that specifies the package sources to use
+            var configXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<configuration>
+  <packageSources>
+    <add key=""local1"" value=""d:\cache1"" />
+    <add key=""local2"" value=""c:\cache2"" />
+  </packageSources>
+  <disabledPackageSources>
+    <add key=""local1_inactive"" value=""true"" />
+  </disabledPackageSources>
+</configuration>";
+            var fullConfigFilePath = WriteConfigFile(configXml);
+
+            var settings = new ProcessedArgsBuilder("SomePackage", "SomeoutDir")
+                .SetPackageVersion("0.0.1")
+                .SetLanguage("cs")
+                .Build();
+
+            var logger = new TestLogger();
+
+            var actualRepo = NuGetRepositoryFactory.CreateRepositoryForArguments(logger, settings, 
+                Path.GetDirectoryName(fullConfigFilePath));
+
+            actualRepo.Should().BeOfType<AggregateRepository>();
+            AggregateRepository actualAggregateRepo = (AggregateRepository)actualRepo;
+
+            // There might be other machine-level nuget.config settings that have been picked,
+            // so we'll only check that the known package sources above were found
+            AssertExpectedPackageSourcesExist(actualAggregateRepo,
+                "d:\\cache1",
+                "c:\\cache2");
+
+            logger.AssertErrorsLogged(0);
+            logger.AssertWarningsLogged(0);
+        }
+
+        [TestMethod]
+        public void RepoFactory_CreateRepositoryForArguments_CustomNuGetRepo_Overwrites_Default()
         {
             var settings = new ProcessedArgsBuilder("SomePackage", "SomeoutDir")
                 .SetCustomNuGetRepository("file:///customrepo/path")
                 .SetPackageVersion("0.0.1")
                 .SetLanguage("cs")
                 .Build();
-            var logger = new ConsoleLogger();
+            var logger = new TestLogger();
 
-            var repo = NuGetRepositoryFactory.CreateRepositoryForArguments(logger, settings);
+            var repo = NuGetRepositoryFactory.CreateRepositoryForArguments(logger, settings, "c:\\dummy\\config\\");
 
             repo.Should().BeOfType<LazyLocalPackageRepository>();
             repo.Source.Should().Be("/customrepo/path");
+            logger.AssertErrorsLogged(0);
+            logger.AssertWarningsLogged(0);
         }
 
         #endregion Tests
@@ -190,23 +231,36 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             // If you reference a remote package source such as https://www.nuget.org/api/v2/
             // then the repository factory will attempt to contact the remote repo
             // (which is slow) and will fail if it cannot be reached.
-            string testDir = TestUtils.CreateTestDirectory(TestContext);
-            string fullConfigFilePath = Path.Combine(testDir, "validConfig.txt");
-            File.WriteAllText(fullConfigFilePath, configXml);
+            var fullConfigPath = WriteConfigFile(configXml);
+            var configDir = Path.GetDirectoryName(fullConfigPath);
+            var configFileName = Path.GetFileName(fullConfigPath);
 
-            Settings settings = new NuGet.Settings(new NuGet.PhysicalFileSystem(testDir), "validConfig.txt");
+            Settings settings = new NuGet.Settings(new NuGet.PhysicalFileSystem(configDir), configFileName);
             return settings;
         }
 
-        private static void AssertExpectedPackageSources(AggregateRepository actualRepo, params string[] expectedSources)
+        private string WriteConfigFile(string configXml)
+        {
+            string testDir = TestUtils.CreateTestDirectory(TestContext);
+            string fullConfigFilePath = Path.Combine(testDir, "nuget.config");
+            File.WriteAllText(fullConfigFilePath, configXml);
+
+            return fullConfigFilePath;
+        }
+
+        private static void AssertOnlyExpectedPackageSources(AggregateRepository actualRepo, params string[] expectedSources)
+        {
+            AssertExpectedPackageSourcesExist(actualRepo, expectedSources);
+            actualRepo.Repositories.Count().Should().Be(expectedSources.Length, "Too many repositories returned");
+        }
+
+        private static void AssertExpectedPackageSourcesExist(AggregateRepository actualRepo, params string[] expectedSources)
         {
             foreach (string expectedSource in expectedSources)
             {
                 actualRepo.Repositories.Any(r => string.Equals(r.Source, expectedSource)).Should()
                     .BeTrue("Expected package source does not exist: {0}", expectedSource);
             }
-
-            actualRepo.Repositories.Count().Should().Be(expectedSources.Length, "Too many repositories returned");
         }
 
         #endregion Private methods

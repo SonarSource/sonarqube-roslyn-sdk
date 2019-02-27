@@ -437,6 +437,15 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Using custom folder as package source: {0}.
+        /// </summary>
+        public static string NG_UsingCustomNuGetFolder {
+            get {
+                return ResourceManager.GetString("NG_UsingCustomNuGetFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Using version marked as latest..
         /// </summary>
         public static string NG_UsingLatestPackageVersion {
