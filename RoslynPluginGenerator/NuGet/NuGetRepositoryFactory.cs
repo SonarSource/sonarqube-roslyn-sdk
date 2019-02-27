@@ -18,14 +18,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using NuGet;
+using SonarQube.Plugins.Roslyn.CommandLine;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using NuGet;
-using SonarQube.Plugins.Common;
-using SonarQube.Plugins.Roslyn.CommandLine;
 
 namespace SonarQube.Plugins.Roslyn
 {
@@ -95,18 +92,18 @@ namespace SonarQube.Plugins.Roslyn
         /// <summary>
         /// Creates a NuGet repo depending on the given command line arguments for the customnugetrepo path.
         /// </summary>
-        public static IPackageRepository CreateRepositoryForArguments(ConsoleLogger logger, ProcessedArgs processedArgs)
+        public static IPackageRepository CreateRepositoryForArguments(Common.ILogger logger, ProcessedArgs processedArgs, string defaultNuGetPath)
         {
             IPackageRepository repo;
 
             if (string.IsNullOrWhiteSpace(processedArgs.CustomNuGetRepository))
             {
-                string exeDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                ISettings nuGetSettings = GetSettingsFromConfigFiles(exeDir);
+                ISettings nuGetSettings = GetSettingsFromConfigFiles(defaultNuGetPath);
                 repo = CreateRepository(nuGetSettings, logger);
             }
             else
             {
+                logger.LogDebug(UIResources.NG_UsingCustomNuGetFolder, processedArgs.CustomNuGetRepository);
                 repo = PackageRepositoryFactory.Default.CreateRepository(processedArgs.CustomNuGetRepository);
             }
 
