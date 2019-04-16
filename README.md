@@ -13,12 +13,11 @@ Licensed under the [GNU Lesser General Public License, Version 3.0](http://www.g
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=sonarqube-roslyn-sdk&metric=coverage)](https://sonarcloud.io/component_measures?id=sonarqube-roslyn-sdk&metric=coverage)
 
 ### Overview
-This repo contains tools to help integrate Roslyn analyzers with SonarQube so that issues detected by the Roslyn analyzers are reported in SonarQube.
+This repo contains tools to help integrate Roslyn analyzers with SonarQube so that issues detected by the Roslyn analyzers are reported and managed in SonarQube.
 Specifically, the tools will generate a Java SonarQube plugin that registers the rules with SonarQube. The generated plugin works with the [C# plugin](http://docs.sonarqube.org/x/bAAW) (v4.5 or higher) and the [SonarQube Scanner for MSBuild](http://docs.sonarqube.org/x/Lx9q) (v2.0 or higher) to handle executing the analyzer and uploading any issues.
 See this [blog post](https://blogs.msdn.microsoft.com/visualstudioalm/2016/02/18/sonarqube-scanner-for-msbuild-v2-0-released-support-for-third-party-roslyn-analyzers/) for more information.
 
-### Deprecation of the Roslyn SDK by [MMF-1332](https://jira.sonarsource.com/browse/MMF-1332)
-Once MMF-1332 is implemented,  issues for all Roslyn analyzers will be automatically imported to SonarQube without the need for the custom plugin produced by this SDK.
+> Note: The [SonarQube Scanner for MSBuild](http://docs.sonarqube.org/x/Lx9q) automatically imports issues from third-party Roslyn analyzers as generic issues. However, if you want to manage issues inside SonarQube, you need to use this SDK. For details, please read [Importing Issues from Third-Party Roslyn Analyzers (C#, VB.NET)](https://docs.sonarqube.org/pages/viewpage.action?pageId=11640944)
 
 ### Download latest release
 The latest release version (v2.0) is available [here](https://github.com/SonarSource-VisualStudio/sonarqube-roslyn-sdk/releases/download/2.0/SonarQube.Roslyn.SDK-2.0.zip).
