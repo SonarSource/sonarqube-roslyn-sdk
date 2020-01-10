@@ -11,6 +11,8 @@ assignees: ''
 
 Please provide a succinct description of your issue.
 
+Note: please ask support questions in the [community forum](https://community.sonarsource.com/c/help/8)
+
 ### Repro steps
 
 Please provide the steps required to reproduce the problem
