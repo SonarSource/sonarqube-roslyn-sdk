@@ -35,7 +35,6 @@ Please provide a description of any known workarounds.
 
 ### Related information
 
-* SonarLint for VS Version
+* Roslyn version
 * Visual Studio Version (e.g. Professional v15.4.1)
-* SonarQube server version
-* Languages in your solution (C#, VB.Net, Javascript, C, C++)
+* Languages targeted by the analyzer (C#, VB.Net)

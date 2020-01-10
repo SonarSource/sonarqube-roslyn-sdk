@@ -32,4 +32,4 @@ Please provide a description of any known workarounds.
 
 * Roslyn version
 * Visual Studio Version (e.g. Professional v15.4.1)
-* Languages in your solution (C#, VB.Net)
+* Languages targeted by the analyzer (C#, VB.Net)
