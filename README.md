@@ -20,10 +20,10 @@ See this [blog post](https://blogs.msdn.microsoft.com/visualstudioalm/2016/02/18
 #### Integration with the SonarQube Scanner for MSBuild
 The [SonarQube Scanner for MSBuild](http://docs.sonarqube.org/x/Lx9q) will automatically execute your custom rules as part of an analysis build using the configuration you have defined in the Quality Profile. There is no need to manually reference your analyzer NuGet package in the MSBuild projects you want to analyse.
 
-The SonarQube Scanner for MSBuild can also import isues from Roslyn analyzers that do not have plugins created using this SDK. However, they will be imported as "external issues" and are handled differently in SonarQube. For details, please read [Importing Issues from Third-Party Roslyn Analyzers (C#, VB.NET)](https://docs.sonarqube.org/pages/viewpage.action?pageId=11640944).
+The SonarQube Scanner for MSBuild can also import issues from Roslyn analyzers that do not have plugins created using this SDK. However, they will be imported as "external issues" and are handled differently in SonarQube. See [Importing Issues from Third-Party Roslyn Analyzers (C#, VB.NET)](https://docs.sonarqube.org/pages/viewpage.action?pageId=11640944) for more information.
 
 #### Integration with SonarLint for Visual Studio
-If you define a Quality Profile that references your custom rules then [SonarLint for Visual Studio ](https://github.com/sonarsource/sonarlint-visualstudio) in Connected Mode will include those rules in the ruleset it generates.
+If you define a Quality Profile that references your custom rules then [SonarLint for Visual Studio ](https://github.com/sonarsource/sonarlint-visualstudio) in *Connected Mode* will include those rules in the ruleset it generates.
 However, it will **not** automatically configure Visual Studio to execute your custom rules.
 If you want your customer rules to be executed inside Visual Studio then you will need reference your analyzer NuGet package from your MSBuild projects, or install your analyzer VSIX on each developer machine.
 
