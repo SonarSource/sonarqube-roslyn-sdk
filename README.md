@@ -17,7 +17,17 @@ This repo contains tools to help integrate Roslyn analyzers with SonarQube so th
 Specifically, the tools will generate a Java SonarQube plugin that registers the rules with SonarQube. The generated plugin works with the [C# plugin](http://docs.sonarqube.org/x/bAAW) (v4.5 or higher) and the [SonarQube Scanner for MSBuild](http://docs.sonarqube.org/x/Lx9q) (v2.0 or higher) to handle executing the analyzer and uploading any issues.
 See this [blog post](https://blogs.msdn.microsoft.com/visualstudioalm/2016/02/18/sonarqube-scanner-for-msbuild-v2-0-released-support-for-third-party-roslyn-analyzers/) for more information.
 
-> Note: The [SonarQube Scanner for MSBuild](http://docs.sonarqube.org/x/Lx9q) automatically imports issues from third-party Roslyn analyzers as generic issues. However, if you want to manage issues inside SonarQube, you need to use this SDK. For details, please read [Importing Issues from Third-Party Roslyn Analyzers (C#, VB.NET)](https://docs.sonarqube.org/pages/viewpage.action?pageId=11640944)
+#### Integration with the SonarQube Scanner for MSBuild
+The [SonarQube Scanner for MSBuild](http://docs.sonarqube.org/x/Lx9q) will automatically execute your custom rules as part of an analysis build using the configuration you have defined in the Quality Profile. There is no need to manually reference your analyzer NuGet package in the MSBuild projects you want to analyse.
+
+The SonarQube Scanner for MSBuild can also import isues from Roslyn analyzers that do not have plugins created using this SDK. However, they will be imported as "external issues" and are handled differently in SonarQube. For details, please read [Importing Issues from Third-Party Roslyn Analyzers (C#, VB.NET)](https://docs.sonarqube.org/pages/viewpage.action?pageId=11640944).
+
+#### Integration with SonarLint for Visual Studio
+If you define a Quality Profile that references your custom rules then [SonarLint for Visual Studio ](https://github.com/sonarsource/sonarlint-visualstudio) in Connected Mode will include those rules in the ruleset it generates.
+However, it will **not** automatically configure Visual Studio to execute your custom rules.
+If you want your customer rules to be executed inside Visual Studio then you will need reference your analyzer NuGet package from your MSBuild projects, or install your analyzer VSIX on each developer machine.
+
+See the [SonarLint for Visual Studio wiki](https://github.com/SonarSource/sonarlint-visualstudio/wiki/Connected-Mode) for more information on Connected Mode.
 
 ### Download latest release
 The latest release version (v2.0) is available [here](https://github.com/SonarSource-VisualStudio/sonarqube-roslyn-sdk/releases/download/2.0/SonarQube.Roslyn.SDK-2.0.zip).
