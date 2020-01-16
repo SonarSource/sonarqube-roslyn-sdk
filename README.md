@@ -55,7 +55,7 @@ The full list of changes is contained is available on the [release page](https:/
 There are two groups of target users:
 
 1. Roslyn analyzer authors
-   - Analyzer authors will be able to use the tools during development to provide additional metadata about their rules (e.g. SonarQube severity, tags, a richer description, ...) and generate the SonarQube plugin.
+   - Analyzer authors will be able to use the tools during development to provide additional metadata about their rules (e.g. SonarQube severity, tags, a richer description, ...) and generate the SonarQube plugin. See below for additional notes if you are developing your analyzer and running the SDK against the generated NuGet repeatedly on the same development machine.
 
 2. Roslyn analyzer users
    - If the analyzer author has not provided a SonarQube plugin for their analyzer then users will be able to generate a plugin from an analyzer NuGet package, although they won't be able to provide such rich metadata.
@@ -143,3 +143,16 @@ The NuGet package properties are mapped to plugin properties as follows:
 \* This property is not visible to users, but must be unique. It is calculated from the package id.
 
 \*\* This property is assigned heuristically by the NuGet.org website based on the licenseUrl.
+
+
+### Additional notes for Roslyn analyzer authors
+The SDK caches the NuGet packages it downloads locally under `%temp%\.sonarqube.sdk\.nuget`.
+
+This matters if you are developing your analyzer iteratively on a development machine i.e. with the following workflow:
+> change analyzer code -> build package -> deploy package to local NuGet feed -> run SDK against the new package -> repeat
+
+In that case, you have to do one of the following before running the SDK:
+* change the package version number, or
+* delete your package from the local cache (`%temp%\.sonarqube.sdk\.nuget`).
+
+If you don't, the SDK exe will use the cached version, rather than the version you have just built.
