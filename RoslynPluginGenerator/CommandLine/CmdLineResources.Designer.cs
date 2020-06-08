@@ -19,7 +19,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class CmdLineResources {
@@ -57,6 +57,15 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clears the Nuget package from Nuget cache.
+        /// </summary>
+        internal static string ArgDesciption_cleartempnugetcache {
+            get {
+                return ResourceManager.GetString("ArgDesciption_cleartempnugetcache", resourceCulture);
             }
         }
         

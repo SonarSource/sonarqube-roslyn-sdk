@@ -75,5 +75,14 @@ namespace SonarQube.Plugins.Common
             // so we'll ignore them
             return filePath.EndsWith(DllExtension, StringComparison.OrdinalIgnoreCase);
         }
+
+        public static void CleanCacheForPackage(string localCacheRoot, string assemblyName, string version)
+        {
+            string assemblyDir = Path.Combine(localCacheRoot, string.Format("{0}.{1}", assemblyName, version));
+            if (Directory.Exists(assemblyDir))
+            {
+                Directory.Delete(assemblyDir, true);
+            }
+        }
     }
 }
