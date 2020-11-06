@@ -25,37 +25,37 @@ using System.Linq;
 
 namespace SonarQube.Plugins.Roslyn
 {
-    public static class ZipExtensions
-    {
-        /// <summary>
-        /// Creates a zip file from the specified directory, filtering out files that don't
-        /// match the supplied check
-        /// </summary>
-        public static void CreateFromDirectory(string sourceDirectoryName, string destinationArchiveFileName, Func<string, bool> fileInclusionPredicate)
-        {
-            if (string.IsNullOrWhiteSpace(sourceDirectoryName))
-            {
-                throw new ArgumentNullException(nameof(sourceDirectoryName));
-            }
-            if (string.IsNullOrWhiteSpace(destinationArchiveFileName))
-            {
-                throw new ArgumentNullException(nameof(destinationArchiveFileName));
-            }
-            if (fileInclusionPredicate == null)
-            {
-                throw new ArgumentNullException(nameof(fileInclusionPredicate));
-            }
+	public static class ZipExtensions
+	{
+		/// <summary>
+		/// Creates a zip file from the specified directory, filtering out files that don't
+		/// match the supplied check
+		/// </summary>
+		public static void CreateFromDirectory(string sourceDirectoryName, string destinationArchiveFileName, Func<string, bool> fileInclusionPredicate)
+		{
+			if (string.IsNullOrWhiteSpace(sourceDirectoryName))
+			{
+				throw new ArgumentNullException(nameof(sourceDirectoryName));
+			}
+			if (string.IsNullOrWhiteSpace(destinationArchiveFileName))
+			{
+				throw new ArgumentNullException(nameof(destinationArchiveFileName));
+			}
+			if (fileInclusionPredicate == null)
+			{
+				throw new ArgumentNullException(nameof(fileInclusionPredicate));
+			}
 
-            string[] files = Directory.GetFiles(sourceDirectoryName, "*.*", SearchOption.AllDirectories);
+			string[] files = Directory.GetFiles(sourceDirectoryName, "*.*", SearchOption.AllDirectories);
 
-            int pathPrefixLength = sourceDirectoryName.Length + 1;
-            using (ZipArchive archive = ZipFile.Open(destinationArchiveFileName, ZipArchiveMode.Create))
-            {
-                foreach (string file in files.Where(f => fileInclusionPredicate(f)))
-                {
-                    archive.CreateEntryFromFile(file, file.Substring(pathPrefixLength), CompressionLevel.Optimal);
-                }
-            }
-        }
-    }
+			int pathPrefixLength = sourceDirectoryName.Length + 1;
+			using (ZipArchive archive = ZipFile.Open(destinationArchiveFileName, ZipArchiveMode.Create))
+			{
+				foreach (string file in files.Where(f => fileInclusionPredicate(f)))
+				{
+					archive.CreateEntryFromFile(file, file.Substring(pathPrefixLength), CompressionLevel.Optimal);
+				}
+			}
+		}
+	}
 }
