@@ -42,17 +42,16 @@ namespace SonarQube.Plugins.IntegrationTests
 		[TestMethod]
 		public void RoslynPlugin_GenerateForValidAnalyzer_Succeeds()
 		{
-			RoslynPlugin_GenerateForValidAnalyzer_Succeeds(new RoslynAnalyzer11.CSharpAnalyzer());
+			RoslynPlugin_GenerateForValidAnalyzer_Succeeds(new RoslynAnalyzer11.CSharpAnalyzer(), "RoslynAnalyzer11.dll");
 		}
-
 
 		[TestMethod]
 		public void RoslynPlugin_GenerateForValidAnalyzer_Succeeds_For_Modern_Analyzer()
 		{
-			RoslynPlugin_GenerateForValidAnalyzer_Succeeds(new RoslynAnalyzer3.CSharpAnalyzer());
+			RoslynPlugin_GenerateForValidAnalyzer_Succeeds(new RoslynAnalyzer3.CSharpAnalyzer(), "RoslynAnalyzer3.dll");
 		}
 
-		public void RoslynPlugin_GenerateForValidAnalyzer_Succeeds(DiagnosticAnalyzer analyzer)
+		public void RoslynPlugin_GenerateForValidAnalyzer_Succeeds(DiagnosticAnalyzer analyzer, string analyzerAssemblyName)
 		{
 			// Arrange
 			TestLogger logger = new TestLogger();
@@ -76,7 +75,7 @@ namespace SonarQube.Plugins.IntegrationTests
 			result.Should().BeTrue();
 
 			// Expecting one plugin per dependency with analyzers
-			CheckJarGeneratedForPackage(outputDir, analyzer, analyzerPkg);
+			CheckJarGeneratedForPackage(outputDir, analyzer, analyzerPkg, analyzerAssemblyName);
 			AssertJarsGenerated(outputDir, 1);
 		}
 
@@ -84,17 +83,17 @@ namespace SonarQube.Plugins.IntegrationTests
 		[TestMethod]
 		public void RoslynPlugin_GenerateForDependencyAnalyzers_Succeeds()
 		{
-			RoslynPlugin_GenerateForDependencyAnalyzers_Succeeds(new RoslynAnalyzer11.CSharpAnalyzer());
+			RoslynPlugin_GenerateForDependencyAnalyzers_Succeeds(new RoslynAnalyzer11.CSharpAnalyzer(), "RoslynAnalyzer11.dll");
 		}
 
 
 		[TestMethod]
 		public void RoslynPlugin_GenerateForDependencyAnalyzers_Succeeds_For_Modern_Analyzer()
 		{
-			RoslynPlugin_GenerateForDependencyAnalyzers_Succeeds(new RoslynAnalyzer3.CSharpAnalyzer());
+			RoslynPlugin_GenerateForDependencyAnalyzers_Succeeds(new RoslynAnalyzer3.CSharpAnalyzer(), "RoslynAnalyzer3.dll");
 		}
 
-		public void RoslynPlugin_GenerateForDependencyAnalyzers_Succeeds(DiagnosticAnalyzer analyzer)
+		public void RoslynPlugin_GenerateForDependencyAnalyzers_Succeeds(DiagnosticAnalyzer analyzer, string analyzerAssemblyName)
 		{
 			// Arrange
 			TestLogger logger = new TestLogger();
@@ -120,24 +119,24 @@ namespace SonarQube.Plugins.IntegrationTests
 			result.Should().BeTrue();
 
 			// Expecting one plugin per dependency with analyzers
-			CheckJarGeneratedForPackage(outputDir, analyzer, child1);
-			CheckJarGeneratedForPackage(outputDir, analyzer, child2);
+			CheckJarGeneratedForPackage(outputDir, analyzer, child1, analyzerAssemblyName);
+			CheckJarGeneratedForPackage(outputDir, analyzer, child2, analyzerAssemblyName);
 			AssertJarsGenerated(outputDir, 2);
 		}
 
 		[TestMethod]
 		public void RoslynPlugin_GenerateForMultiLevelAnalyzers_Succeeds()
 		{
-			RoslynPlugin_GenerateForMultiLevelAnalyzers_Succeeds(new RoslynAnalyzer11.CSharpAnalyzer());
+			RoslynPlugin_GenerateForMultiLevelAnalyzers_Succeeds(new RoslynAnalyzer11.CSharpAnalyzer(), "RoslynAnalyzer11.dll");
 		}
 
 		[TestMethod]
 		public void RoslynPlugin_GenerateForMultiLevelAnalyzers_Succeeds_For_Modern_Analyzer()
 		{
-			RoslynPlugin_GenerateForMultiLevelAnalyzers_Succeeds(new RoslynAnalyzer3.CSharpAnalyzer());
+			RoslynPlugin_GenerateForMultiLevelAnalyzers_Succeeds(new RoslynAnalyzer3.CSharpAnalyzer(), "RoslynAnalyzer3.dll");
 		}
 
-		public void RoslynPlugin_GenerateForMultiLevelAnalyzers_Succeeds(DiagnosticAnalyzer analyzer)
+		public void RoslynPlugin_GenerateForMultiLevelAnalyzers_Succeeds(DiagnosticAnalyzer analyzer, string analyzerAssemblyName)
 		{
 			// Arrange
 			TestLogger logger = new TestLogger();
@@ -164,9 +163,9 @@ namespace SonarQube.Plugins.IntegrationTests
 			result.Should().BeTrue();
 
 			// Expecting one plugin per dependency with analyzers
-			CheckJarGeneratedForPackage(outputDir, analyzer, targetPkg);
-			CheckJarGeneratedForPackage(outputDir, analyzer, child1);
-			CheckJarGeneratedForPackage(outputDir, analyzer, child2);
+			CheckJarGeneratedForPackage(outputDir, analyzer, targetPkg, analyzerAssemblyName);
+			CheckJarGeneratedForPackage(outputDir, analyzer, child1, analyzerAssemblyName);
+			CheckJarGeneratedForPackage(outputDir, analyzer, child2, analyzerAssemblyName);
 			AssertJarsGenerated(outputDir, 3);
 		}
 
@@ -332,7 +331,7 @@ namespace SonarQube.Plugins.IntegrationTests
 			return Directory.GetFiles(rootDir, "*.jar", SearchOption.TopDirectoryOnly);
 		}
 
-		private void CheckJarGeneratedForPackage(string rootDir, DiagnosticAnalyzer analyzer, IPackage package)
+		private void CheckJarGeneratedForPackage(string rootDir, DiagnosticAnalyzer analyzer, IPackage package, string analyzerAssemblyName)
 		{
 			string jarFilePath = GetGeneratedJars(rootDir).SingleOrDefault(r => r.Contains(package.Id.Replace(".", "").ToLower()));
 			jarFilePath.Should().NotBeNull();
@@ -378,7 +377,7 @@ namespace SonarQube.Plugins.IntegrationTests
 			// Now create another checker to check the contents of the zip file (strict check this time)
 			CheckEmbeddedAnalyzerPayload(jarChecker, "static\\" + pluginId + "." + package.Version + ".zip",
 				/* zip file contents */
-				"analyzers\\RoslynAnalyzer11.dll");
+				$"analyzers\\{analyzerAssemblyName}");
 		}
 
 		private static void AssertJarsGenerated(string rootDir, int expectedCount)
