@@ -6,11 +6,11 @@ Copyright 2015-2018 SonarSource.
 
 Licensed under the [GNU Lesser General Public License, Version 3.0](http://www.gnu.org/licenses/lgpl.txt)
 
-[![Build status](https://ci.appveyor.com/api/projects/status/q2gc65s7n4wjusp8/branch/master?svg=true)](https://ci.appveyor.com/project/SonarSource/sonarqube-roslyn-sdk/branch/master)
+[![Build Status](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_apis/build/status/SonarQube%20Roslyn%20Analyzer%20SDK?branchName=master)](https://dev.azure.com/sonarsource/DotNetTeam%20Project/_build/latest?definitionId=17&branchName=master)
 
-[![Build Status](https://sonarsource.visualstudio.com/_apis/public/build/definitions/399fb241-ecc7-4802-8697-dcdd01fbb832/17/badge)](https://sonarsource.visualstudio.com/DotNetTeam%20Project/_build/index?definitionId=17)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=sonarqube-roslyn-sdk&metric=alert_status)](https://sonarcloud.io/dashboard?id=sonarqube-roslyn-sdk)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=sonarqube-roslyn-sdk&metric=coverage)](https://sonarcloud.io/component_measures?id=sonarqube-roslyn-sdk&metric=coverage)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=sonarqube-roslyn-sdk&metric=alert_status&token=5bf9d3f65527e95102fd8af7b5226c50dba35d66)](https://sonarcloud.io/dashboard?id=sonarqube-roslyn-sdk)
+
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=sonarqube-roslyn-sdk&metric=coverage&token=5bf9d3f65527e95102fd8af7b5226c50dba35d66)](https://sonarcloud.io/dashboard?id=sonarqube-roslyn-sdk)
 
 ### Overview
 This repo contains tools to help integrate Roslyn analyzers with SonarQube so that issues detected by the Roslyn analyzers are reported and managed in SonarQube.
