@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{AEB50389-D3DD-4EF3-9974-109BC5F20646}"
 EndProject
@@ -33,6 +33,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoslynAnalyzer11", "Tests\ExampleAnalyzers\RoslynAnalyzer11\RoslynAnalyzer11\RoslynAnalyzer11.csproj", "{B43B3D94-F457-4BBA-A0D2-EF460F43B906}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoslynAnalyzer10", "Tests\ExampleAnalyzers\RoslynAnalyzer10\RoslynAnalyzer10\RoslynAnalyzer10.csproj", "{AAAFF8DB-1438-4066-BE44-353B09CF6518}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RoslynAnalyzer3", "Tests\ExampleAnalyzers\RoslynAnalyzer3\RoslynAnalyzer3\RoslynAnalyzer3.csproj", "{B7A65195-DECE-422A-88A6-5D5D8983D873}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -80,6 +82,10 @@ Global
 		{AAAFF8DB-1438-4066-BE44-353B09CF6518}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAAFF8DB-1438-4066-BE44-353B09CF6518}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAAFF8DB-1438-4066-BE44-353B09CF6518}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7A65195-DECE-422A-88A6-5D5D8983D873}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7A65195-DECE-422A-88A6-5D5D8983D873}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7A65195-DECE-422A-88A6-5D5D8983D873}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7A65195-DECE-422A-88A6-5D5D8983D873}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -93,5 +99,9 @@ Global
 		{CC8197AA-D03C-42DB-A71C-5AEEEE0D9FDD} = {AEB50389-D3DD-4EF3-9974-109BC5F20646}
 		{B43B3D94-F457-4BBA-A0D2-EF460F43B906} = {A0234F11-305B-4409-AEA9-1982C397C395}
 		{AAAFF8DB-1438-4066-BE44-353B09CF6518} = {A0234F11-305B-4409-AEA9-1982C397C395}
+		{B7A65195-DECE-422A-88A6-5D5D8983D873} = {A0234F11-305B-4409-AEA9-1982C397C395}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5A250C84-AE5C-46F7-80D1-907651B94B69}
 	EndGlobalSection
 EndGlobal
