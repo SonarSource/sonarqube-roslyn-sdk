@@ -44,6 +44,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             public const string RecurseDependencies = "recurse.dependencies";
             public const string OutputDirectory = "output.dir";
             public const string CustomNuGetRepository = "custom.nugetrepo";
+            public const string ClearTempNugetCache = "clear.tempnugetcache";
         }
 
         private static IList<ArgumentDescriptor> Descriptors;
@@ -67,7 +68,10 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                 new ArgumentDescriptor(
                     id: KeywordIds.OutputDirectory, prefixes: new string[] { "/ouputdir:", "/o:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_OutputDirectory),
                 new ArgumentDescriptor(
-                    id: KeywordIds.CustomNuGetRepository, prefixes: new string[] { "/customnugetrepo:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDesciption_CustomNuGetRepo)
+                    id: KeywordIds.CustomNuGetRepository, prefixes: new string[] { "/customnugetrepo:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDesciption_CustomNuGetRepo),
+                new ArgumentDescriptor(
+                    id: KeywordIds.ClearTempNugetCache, prefixes: new string[] { "/cleartempnugetcache:","/c:"  }, required: false, allowMultiple: false, description: CmdLineResources.ArgDesciption_cleartempnugetcache)
+
             };
 
             Debug.Assert(Descriptors.All(d => d.Prefixes != null && d.Prefixes.Any()), "All descriptors must provide at least one prefix");
@@ -128,6 +132,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             bool recurseDependencies = GetRecursion(arguments);
             string outputDirectory = GetOutputDirectory(arguments);
             string nuGetRepository = GetNuGetRepository(arguments);
+            bool clearTempNugetCache = ClearTempNugetCache(arguments);
 
             if (parsedOk)
             {
@@ -140,7 +145,8 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                     acceptLicense,
                     recurseDependencies,
                     outputDirectory,
-                    nuGetRepository);
+                    nuGetRepository,
+                    clearTempNugetCache);
             }
 
             return processed;
@@ -261,5 +267,12 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             ArgumentInstance arg = arguments.SingleOrDefault(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.RecurseDependencies, a.Descriptor.Id));
             return arg != null;
         }
+
+        private static bool ClearTempNugetCache(IEnumerable<ArgumentInstance> arguments)
+        {
+            ArgumentInstance arg = arguments.SingleOrDefault(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.ClearTempNugetCache, a.Descriptor.Id));
+            return arg != null;
+        }
+
     }
 }
