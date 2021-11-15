@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup Label="Test packages">
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="2.9.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.2.3" />
     <PackageReference Include="MSTest.TestFramework" Version="2.2.3" />
@@ -21,29 +21,13 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\SonarQube.Plugins.Common.csproj">
-      <Project>{bb89698a-0807-44d2-87ec-6aa271200759}</Project>
-      <Name>SonarQube.Plugins.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\PluginGenerator\SonarQube.Plugins.PluginGenerator.csproj">
-      <Project>{db16ccfa-b97f-4c5e-a99a-a6062ecf5d98}</Project>
-      <Name>SonarQube.Plugins.PluginGenerator</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj">
-      <Project>{ff1a3253-1888-412c-a870-922c08b29a1a}</Project>
-      <Name>SonarQube.Plugins.Roslyn.PluginGenerator</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Common\SonarQube.Plugins.Test.Common.csproj">
-      <Project>{f60478ff-1eea-4fb4-9bf4-50d11f94fa57}</Project>
-      <Name>SonarQube.Plugins.Test.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer10\RoslynAnalyzer10\RoslynAnalyzer10.csproj">
-      <Project>{aaaff8db-1438-4066-be44-353b09cf6518}</Project>
-      <Name>RoslynAnalyzer10</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer11\RoslynAnalyzer11\RoslynAnalyzer11.csproj">
-      <Project>{b43b3d94-f457-4bba-a0d2-ef460f43b906}</Project>
-      <Name>RoslynAnalyzer11</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\..\Common\SonarQube.Plugins.Common.csproj" />
+    <ProjectReference Include="..\..\PluginGenerator\SonarQube.Plugins.PluginGenerator.csproj" />
+    <ProjectReference Include="..\..\RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj" />
+    <ProjectReference Include="..\Common\SonarQube.Plugins.Test.Common.csproj" />
+    <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer10\RoslynAnalyzer10\RoslynAnalyzer10.csproj" />
+    <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer11\RoslynAnalyzer11\RoslynAnalyzer11.csproj" />
+    <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer298\RoslynAnalyzer298.csproj" />
+    <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer333\RoslynAnalyzer333.csproj" />
   </ItemGroup>
 </Project>
