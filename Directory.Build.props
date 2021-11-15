@@ -1,0 +1,8 @@
+<Project>
+  
+  <!-- Common settings for test and product code-->
+  
+  <ItemGroup>
+    <AdditionalFiles Include="SonarLint.xml" />
+  </ItemGroup>
+</Project>

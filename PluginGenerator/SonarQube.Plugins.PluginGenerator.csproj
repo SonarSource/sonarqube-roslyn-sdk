@@ -1,49 +1,13 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!-- This project uses C# syntax that isn't supported by the version of the compiler
-         that is installed with VS2015. If you remove the following line you will be able
-         to open the project in VS2015, but you will need a newer version of VS/MSBuild
-         to be able to compile it successfully. -->
-    <MinimumVisualStudioVersion>15.0.0.0</MinimumVisualStudioVersion>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <TargetFramework>net46</TargetFramework>
     <ProjectGuid>{DB16CCFA-B97F-4C5E-A99A-A6062ECF5D98}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SonarQube.Plugins</RootNamespace>
     <AssemblyName>SonarQube.Plugins.PluginGenerator</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
+
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -51,71 +15,38 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
+
+  
   <ItemGroup>
-    <Compile Include="DataModel\DebtRemediationFunctionType.cs" />
-    <Compile Include="DataModel\IssueType.cs" />
-    <Compile Include="DataModel\Rule.cs" />
-    <Compile Include="DataModel\Rules.cs" />
-    <Compile Include="JarManifestBuilder.cs" />
-    <Compile Include="JarManifestReader.cs" />
-    <Compile Include="PluginKeyUtilities.cs" />
-    <Compile Include="RepositoryKeyUtilities.cs" />
-    <Compile Include="PluginDefinition.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\AssemblyInfo.Shared.cs">
-      <Link>Properties\AssemblyInfo.Shared.cs</Link>
-    </Compile>
-    <Compile Include="SonarQube\NativeMethods.cs" />
-    <Compile Include="SonarQube\ProcessRunner.cs" />
-    <Compile Include="SonarQube\ProcessRunnerArguments.cs" />
-    <Compile Include="SonarQube\Resources.Designer.cs">
+    <Compile Update="SonarQube\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SonarQube\Serializer.cs" />
-    <Compile Include="UIResources.Designer.cs">
+    <Compile Update="UIResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>UIResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="WellKnownPluginProperties.cs" />
   </ItemGroup>
+
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="SonarQube\Resources.resx">
+    <EmbeddedResource Update="SonarQube\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <CustomToolNamespace>SonarQube.Common</CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="UIResources.resx">
+    <EmbeddedResource Update="UIResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>UIResources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="License.txt" />
-  </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\Common\SonarQube.Plugins.Common.csproj">
       <Project>{bb89698a-0807-44d2-87ec-6aa271200759}</Project>
       <Name>SonarQube.Plugins.Common</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <AdditionalFiles Include="..\SonarLint.xml">
-      <Link>Properties\SonarLint.xml</Link>
-    </AdditionalFiles>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
