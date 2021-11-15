@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31815.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{AEB50389-D3DD-4EF3-9974-109BC5F20646}"
 EndProject
@@ -14,25 +14,29 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		SonarLint.xml = SonarLint.xml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonarQube.Plugins.PluginGenerator", "PluginGenerator\SonarQube.Plugins.PluginGenerator.csproj", "{DB16CCFA-B97F-4C5E-A99A-A6062ECF5D98}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SonarQube.Plugins.PluginGenerator", "PluginGenerator\SonarQube.Plugins.PluginGenerator.csproj", "{DB16CCFA-B97F-4C5E-A99A-A6062ECF5D98}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonarQube.Plugins.PluginGeneratorTests", "Tests\PluginGeneratorTests\SonarQube.Plugins.PluginGeneratorTests.csproj", "{F6C01441-DD3F-465B-8E24-BCEB239819F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SonarQube.Plugins.PluginGeneratorTests", "Tests\PluginGeneratorTests\SonarQube.Plugins.PluginGeneratorTests.csproj", "{F6C01441-DD3F-465B-8E24-BCEB239819F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonarQube.Plugins.Common", "Common\SonarQube.Plugins.Common.csproj", "{BB89698A-0807-44D2-87EC-6AA271200759}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SonarQube.Plugins.Common", "Common\SonarQube.Plugins.Common.csproj", "{BB89698A-0807-44D2-87EC-6AA271200759}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonarQube.Plugins.Roslyn.PluginGenerator", "RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj", "{FF1A3253-1888-412C-A870-922C08B29A1A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SonarQube.Plugins.Roslyn.PluginGenerator", "RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj", "{FF1A3253-1888-412C-A870-922C08B29A1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonarQube.Plugins.CommonTests", "Tests\CommonTests\SonarQube.Plugins.CommonTests.csproj", "{2532FD2D-76A6-484D-86AE-732C41554885}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SonarQube.Plugins.CommonTests", "Tests\CommonTests\SonarQube.Plugins.CommonTests.csproj", "{2532FD2D-76A6-484D-86AE-732C41554885}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonarQube.Plugins.Test.Common", "Tests\Common\SonarQube.Plugins.Test.Common.csproj", "{F60478FF-1EEA-4FB4-9BF4-50D11F94FA57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SonarQube.Plugins.Test.Common", "Tests\Common\SonarQube.Plugins.Test.Common.csproj", "{F60478FF-1EEA-4FB4-9BF4-50D11F94FA57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests", "Tests\RoslynPluginGeneratorTests\SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests.csproj", "{AAE84E64-5977-44D7-8959-80F59FA2B0C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests", "Tests\RoslynPluginGeneratorTests\SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests.csproj", "{AAE84E64-5977-44D7-8959-80F59FA2B0C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTests", "Tests\IntegrationTests\IntegrationTests.csproj", "{CC8197AA-D03C-42DB-A71C-5AEEEE0D9FDD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTests", "Tests\IntegrationTests\IntegrationTests.csproj", "{CC8197AA-D03C-42DB-A71C-5AEEEE0D9FDD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoslynAnalyzer11", "Tests\ExampleAnalyzers\RoslynAnalyzer11\RoslynAnalyzer11\RoslynAnalyzer11.csproj", "{B43B3D94-F457-4BBA-A0D2-EF460F43B906}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoslynAnalyzer10", "Tests\ExampleAnalyzers\RoslynAnalyzer10\RoslynAnalyzer10\RoslynAnalyzer10.csproj", "{AAAFF8DB-1438-4066-BE44-353B09CF6518}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RoslynAnalyzer333", "Tests\ExampleAnalyzers\RoslynAnalyzer333\RoslynAnalyzer333.csproj", "{AB6E10CB-6EC9-4032-9C43-2F5BB745DC35}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RoslynAnalyzer298", "Tests\ExampleAnalyzers\RoslynAnalyzer298\RoslynAnalyzer298.csproj", "{4AD02214-637F-40A7-990E-9EA7FDFCB108}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -80,6 +84,14 @@ Global
 		{AAAFF8DB-1438-4066-BE44-353B09CF6518}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAAFF8DB-1438-4066-BE44-353B09CF6518}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAAFF8DB-1438-4066-BE44-353B09CF6518}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB6E10CB-6EC9-4032-9C43-2F5BB745DC35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB6E10CB-6EC9-4032-9C43-2F5BB745DC35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB6E10CB-6EC9-4032-9C43-2F5BB745DC35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB6E10CB-6EC9-4032-9C43-2F5BB745DC35}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AD02214-637F-40A7-990E-9EA7FDFCB108}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AD02214-637F-40A7-990E-9EA7FDFCB108}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AD02214-637F-40A7-990E-9EA7FDFCB108}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AD02214-637F-40A7-990E-9EA7FDFCB108}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -93,5 +105,10 @@ Global
 		{CC8197AA-D03C-42DB-A71C-5AEEEE0D9FDD} = {AEB50389-D3DD-4EF3-9974-109BC5F20646}
 		{B43B3D94-F457-4BBA-A0D2-EF460F43B906} = {A0234F11-305B-4409-AEA9-1982C397C395}
 		{AAAFF8DB-1438-4066-BE44-353B09CF6518} = {A0234F11-305B-4409-AEA9-1982C397C395}
+		{AB6E10CB-6EC9-4032-9C43-2F5BB745DC35} = {A0234F11-305B-4409-AEA9-1982C397C395}
+		{4AD02214-637F-40A7-990E-9EA7FDFCB108} = {A0234F11-305B-4409-AEA9-1982C397C395}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {03EB9717-98C3-4474-BB11-BB40F9BD0A01}
 	EndGlobalSection
 EndGlobal
