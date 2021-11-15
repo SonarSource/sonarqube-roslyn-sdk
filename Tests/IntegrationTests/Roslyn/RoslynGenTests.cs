@@ -44,17 +44,17 @@ namespace SonarQube.Plugins.IntegrationTests
         {
             // Arrange
             TestLogger logger = new TestLogger();
-            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
+            string outputDir = CreateTestDirectory(TestContext, ".out");
 
             // Create a valid analyzer package
             RoslynAnalyzer11.CSharpAnalyzer analyzer = new RoslynAnalyzer11.CSharpAnalyzer();
 
             string packageId = "Analyzer1.Pkgid1"; // package id is not all lowercase
-            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(TestContext, ".fakeRemoteNuGet");
+            string fakeRemoteNuGetDir = CreateTestDirectory(TestContext, ".fakeRemoteNuGet");
             IPackageManager fakeRemotePkgMgr = CreatePackageManager(fakeRemoteNuGetDir);
             IPackage analyzerPkg =  AddPackage(fakeRemotePkgMgr, packageId, "1.0.2", analyzer.GetType().Assembly.Location);
 
-            string localPackageDestination = TestUtils.CreateTestDirectory(TestContext, ".localpackages");
+            string localPackageDestination = CreateTestDirectory(TestContext, ".localpackages");
 
             // Act
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
@@ -76,19 +76,19 @@ namespace SonarQube.Plugins.IntegrationTests
         {
             // Arrange
             TestLogger logger = new TestLogger();
-            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
+            string outputDir = CreateTestDirectory(TestContext, ".out");
             string dummyContentFile = TestUtils.CreateTextFile("dummy.txt", outputDir, "non-analyzer content file");
 
             // Create a valid analyzer package
             RoslynAnalyzer11.CSharpAnalyzer analyzer = new RoslynAnalyzer11.CSharpAnalyzer();
 
-            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(TestContext, ".fakeRemoteNuGet");
+            string fakeRemoteNuGetDir = CreateTestDirectory(TestContext, ".fakeRemoteNuGet");
             IPackageManager fakeRemotePkgMgr = CreatePackageManager(fakeRemoteNuGetDir);
             IPackage child1 = AddPackage(fakeRemotePkgMgr, "Analyzer.Child1", "1.1.0", analyzer.GetType().Assembly.Location);
             IPackage child2 = AddPackage(fakeRemotePkgMgr, "Analyzer.Child2", "1.2.0", analyzer.GetType().Assembly.Location);
             IPackage targetPkg = AddPackage(fakeRemotePkgMgr, "Empty.Parent", "1.0.0", dummyContentFile, child1, child2);
 
-            string localPackageDestination = TestUtils.CreateTestDirectory(TestContext, ".localpackages");
+            string localPackageDestination = CreateTestDirectory(TestContext, ".localpackages");
 
             // Act
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
@@ -111,19 +111,19 @@ namespace SonarQube.Plugins.IntegrationTests
         {
             // Arrange
             TestLogger logger = new TestLogger();
-            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
+            string outputDir = CreateTestDirectory(TestContext, ".out");
 
             // Create a valid analyzer package
             RoslynAnalyzer11.CSharpAnalyzer analyzer = new RoslynAnalyzer11.CSharpAnalyzer();
 
             // Parent and children all have analyzers, expecting plugins for all three
-            string fakeRemoteNuGetDir = TestUtils.CreateTestDirectory(TestContext, ".fakeRemoteNuGet");
+            string fakeRemoteNuGetDir = CreateTestDirectory(TestContext, ".fakeRemoteNuGet");
             IPackageManager fakeRemotePkgMgr = CreatePackageManager(fakeRemoteNuGetDir);
             IPackage child1 = AddPackage(fakeRemotePkgMgr, "Analyzer.Child1", "1.1.0", analyzer.GetType().Assembly.Location);
             IPackage child2 = AddPackage(fakeRemotePkgMgr, "Analyzer.Child2", "1.2.0", analyzer.GetType().Assembly.Location);
             IPackage targetPkg = AddPackage(fakeRemotePkgMgr, "Empty.Parent", "1.0.0", analyzer.GetType().Assembly.Location, child1, child2);
 
-            string localPackageDestination = TestUtils.CreateTestDirectory(TestContext, ".localpackages");
+            string localPackageDestination = CreateTestDirectory(TestContext, ".localpackages");
 
             // Act
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
@@ -231,8 +231,8 @@ namespace SonarQube.Plugins.IntegrationTests
         {
             // Arrange
             var logger = new TestLogger();
-            var outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
-            var localPackageDestination = TestUtils.CreateTestDirectory(TestContext, ".localpackages");
+            var outputDir = CreateTestDirectory(TestContext, ".out");
+            var localPackageDestination = CreateTestDirectory(TestContext, ".localpackages");
             var localRepoWithRemotePackage = InstallRemotePackageLocally(packageId, version);
 
             // Act
@@ -284,6 +284,13 @@ namespace SonarQube.Plugins.IntegrationTests
 
             TestContext.WriteLine($"Test setup: package installed.");
             return packageManager.LocalRepository;
+        }
+
+        private static string CreateTestDirectory(TestContext testContext, string dirName)
+        {
+            var fullPath = Path.Combine(testContext.TestRunDirectory, testContext.TestName, dirName);
+            Directory.CreateDirectory(fullPath);
+            return fullPath;
         }
 
         #endregion Private methods
