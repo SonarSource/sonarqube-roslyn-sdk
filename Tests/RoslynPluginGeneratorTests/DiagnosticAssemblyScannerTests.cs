@@ -145,6 +145,26 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             result.Should().HaveCount(4, "Unexpected number of C# analyzers returned");
         }
 
+        [TestMethod]
+        [DataRow(typeof(RoslynAnalyzer10.ExampleAnalyzer2), 1)]
+        [DataRow(typeof(RoslynAnalyzer11.CSharpAnalyzer), 3)]
+        [DataRow(typeof(RoslynAnalyzer298.RoslynAnalyzer298Analyzer), 1)]
+        [DataRow(typeof(RoslynAnalyzer333.RoslynAnalyzer333Analyzer), 1)]
+        public void InstantiateDiags_DifferentRoslynVersions_AnalyzersFound(Type typeInTargetAssembly, int expectedAnalyzerCount)
+        {
+            // Arrange
+            TestLogger logger = new TestLogger();
+            DiagnosticAssemblyScanner scanner = new DiagnosticAssemblyScanner(logger, TestContext.DeploymentDirectory);
+
+            string analyzerDllPath = typeInTargetAssembly.Assembly.Location;
+
+            // Act
+            IEnumerable<DiagnosticAnalyzer> result = scanner.InstantiateDiagnostics(LanguageNames.CSharp, analyzerDllPath);
+
+            // Assert
+            result.Count().Should().Be(expectedAnalyzerCount, "Expected number of analyzers not found");
+        }
+
         #region Private Methods
 
         private void Assert_AnalyzerIsPresent(IEnumerable<DiagnosticAnalyzer> analyzers, string fullExpectedTypeName)
