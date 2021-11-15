@@ -1,0 +1,12 @@
+<Project>
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <SonarQubeTestProject>true</SonarQubeTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="..\..\SonarLint.xml" />
+  </ItemGroup>
+</Project>
