@@ -149,6 +149,9 @@ publish/
 # Uncomment if necessary however generally it will be regenerated when needed
 #!**/packages/repositories.config
 
+# Include the sample NuGet pacakges used for testing
+!**/Tests/IntegrationTests/SampleNuGetPkgs/*.nupkg
+
 # Windows Azure Build Output
 csx/
 *.build.csdef

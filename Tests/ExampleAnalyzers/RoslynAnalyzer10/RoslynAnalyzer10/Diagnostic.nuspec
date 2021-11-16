@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
-    <id>ExampleAnalyzer2</id>
+    <id>RoslynAnalyzer10</id>
     <version>1.0.0.0</version>
-    <title>ExampleAnalyzer2</title>
+    <title>RoslynAnalyzer10</title>
     <authors>sschen</authors>
     <owners>sschen</owners>
     <licenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</licenseUrl>
