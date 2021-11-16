@@ -38,8 +38,14 @@ namespace RoslynAnalyzer11
         public static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
         public const string Category = "Testing";
 
+#pragma warning disable S1144 // Unused private types or members should be removed
+#pragma warning disable IDE0051 // Remove unused private members
+#pragma warning disable CS0414 // Value is assigned but never used
         // Referencing this forces some commonly-used libraries to be loaded
         private static readonly LanguageVersion vbVersion = Microsoft.CodeAnalysis.VisualBasic.LanguageVersion.VisualBasic10;
+#pragma warning restore CS0414 // Value is assigned but never used
+#pragma warning restore IDE0051 // Remove unused private members
+#pragma warning restore S1144 // Unused private types or members should be removed
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
@@ -47,13 +53,11 @@ namespace RoslynAnalyzer11
 
         public override void Initialize(AnalysisContext context)
         {
-            // TODO: Consider registering other actions that act on syntax instead of or in addition to symbols
             context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.NamedType);
         }
 
         private static void AnalyzeSymbol(SymbolAnalysisContext context)
         {
-            // TODO: Replace the following code with your own analysis, generating Diagnostic objects for any issues you find
             var namedTypeSymbol = (INamedTypeSymbol)context.Symbol;
 
             // Find just those named type symbols with names containing lowercase letters.

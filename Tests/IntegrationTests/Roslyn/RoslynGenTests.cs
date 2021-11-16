@@ -279,7 +279,7 @@ namespace SonarQube.Plugins.IntegrationTests
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException($"Test setup error: failed to install NuGet package locally. Error: {ex.ToString()}");
+                throw new InvalidOperationException($"Test setup error: failed to install NuGet package locally. Error: {ex}");
             }
 
             TestContext.WriteLine($"Test setup: package installed.");

@@ -46,7 +46,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             public const string CustomNuGetRepository = "custom.nugetrepo";
         }
 
-        private static IList<ArgumentDescriptor> Descriptors;
+        private static readonly IList<ArgumentDescriptor> Descriptors;
 
         static ArgumentProcessor()
         {
