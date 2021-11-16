@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.IO.Compression" Version="4.3.0" />
     <PackageReference Include="NuGet.CommandLine" Version="4.7.0" GeneratePathProperty="true" />
     <Reference Include="$(PkgNuGet_CommandLine)\tools\NuGet.exe" />
   </ItemGroup>

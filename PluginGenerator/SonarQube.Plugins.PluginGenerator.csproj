@@ -1,21 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net46</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <ProjectGuid>{DB16CCFA-B97F-4C5E-A99A-A6062ECF5D98}</ProjectGuid>
     <RootNamespace>SonarQube.Plugins</RootNamespace>
     <AssemblyName>SonarQube.Plugins.PluginGenerator</AssemblyName>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-
   
   <ItemGroup>
     <Compile Update="SonarQube\Resources.Designer.cs">
@@ -29,7 +20,7 @@
       <DependentUpon>UIResources.resx</DependentUpon>
     </Compile>
   </ItemGroup>
-
+  
   <ItemGroup>
     <EmbeddedResource Update="SonarQube\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

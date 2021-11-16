@@ -1,19 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net46</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
 
     <ProjectGuid>{BB89698A-0807-44D2-87EC-6AA271200759}</ProjectGuid>
     <RootNamespace>SonarQube.Plugins.Common</RootNamespace>
     <AssemblyName>SonarQube.Plugins.Common</AssemblyName>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
 
   <ItemGroup>
     <Compile Update="Resources.Designer.cs">
