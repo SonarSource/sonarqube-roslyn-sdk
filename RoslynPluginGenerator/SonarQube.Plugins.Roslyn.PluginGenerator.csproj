@@ -1,31 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net46</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <ProjectGuid>{FF1A3253-1888-412C-A870-922C08B29A1A}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>SonarQube.Plugins.Roslyn</RootNamespace>
     <AssemblyName>RoslynSonarQubePluginGenerator</AssemblyName>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <PlatformTarget>AnyCPU</PlatformTarget>
 
   </PropertyGroup>
 
   <ItemGroup Label="NuGet packages">
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="2.9.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="2.9.0" ExcludeAssets="analyzers" />
     <PackageReference Include="NuGet.CommandLine" Version="4.7.0" GeneratePathProperty="true" PrivateAssets="all" />
     <Reference Include="$(PkgNuGet_CommandLine)\tools\NuGet.exe" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.IO.Compression.FileSystem" Private="true" />
   </ItemGroup>
+  
   <ItemGroup>
     <Compile Update="CommandLine\CmdLineResources.Designer.cs">
       <AutoGen>True</AutoGen>
