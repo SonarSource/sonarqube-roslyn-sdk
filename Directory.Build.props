@@ -1,6 +1,10 @@
 <Project>
   
   <!-- Common settings for test and product code-->
+
+  <PropertyGroup>
+    <Version>3.0.0</Version>
+  </PropertyGroup>
   
   <ItemGroup>
     <AdditionalFiles Include="SonarLint.xml" />
