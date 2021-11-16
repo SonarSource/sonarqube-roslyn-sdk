@@ -11,21 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup Label="NuGet packages">
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="2.9.0" />
+    <PackageReference Include="System.IO.Compression" Version="4.3.0" IncludeAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="2.9.0" IncludeAssets="all" />
     <PackageReference Include="NuGet.CommandLine" Version="4.7.0" GeneratePathProperty="true" PrivateAssets="all" />
     <Reference Include="$(PkgNuGet_CommandLine)\tools\NuGet.exe" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
   <ItemGroup>
     <Compile Update="CommandLine\CmdLineResources.Designer.cs">
       <AutoGen>True</AutoGen>
