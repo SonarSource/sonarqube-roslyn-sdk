@@ -7,6 +7,6 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <AdditionalFiles Include="SonarLint.xml" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)SonarLint.xml" Visible="False" />
   </ItemGroup>
 </Project>
