@@ -45,7 +45,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             TestUtils.CreateTextFile("archive2.zip", testDir, "dummy content");
 
             // 1. Exclude zip files
-            Func<string, bool> shouldInclude = f => !f.EndsWith(".zip");
+            bool shouldInclude(string f) => !f.EndsWith(".zip");
             string fullzipFileName = Path.Combine(testDir, "output1.zip");
 
             ZipExtensions.CreateFromDirectory(testDir, fullzipFileName, shouldInclude);
@@ -69,7 +69,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             TestUtils.CreateTextFile("sub2\\archive1.zip", testDir, "dummy content");
             TestUtils.CreateTextFile("archive2.zip", testDir, "dummy content");
 
-            Func<string, bool> shouldInclude = f => f.Contains("sub");
+            bool shouldInclude(string f) => f.Contains("sub");
             string fullzipFileName = Path.Combine(testDir, "output.zip");
 
             ZipExtensions.CreateFromDirectory(testDir, fullzipFileName, shouldInclude);

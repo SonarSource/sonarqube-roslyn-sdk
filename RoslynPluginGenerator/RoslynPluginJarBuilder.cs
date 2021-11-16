@@ -374,7 +374,7 @@ namespace SonarQube.Plugins.Roslyn
 
         private void CopyValueFromExistingManifest(JarManifestReader reader, string property)
         {
-            if (jarManifestBuilder.TryGetValue(property, out string value))
+            if (jarManifestBuilder.TryGetValue(property, out string _))
             {
                 throw new InvalidOperationException(
                     string.Format(System.Globalization.CultureInfo.CurrentCulture,

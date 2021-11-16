@@ -39,8 +39,14 @@ namespace RoslynAnalyzer10
         private static readonly LocalizableString Description = "ExampleAnalyzer2 Description";
         private const string Category = "Naming";
 
+#pragma warning disable S1144 // Unused private types or members should be removed
+#pragma warning disable IDE0051 // Remove unused private members
+#pragma warning disable CS0414 // Value is assigned but never used
         // Referencing this forces some commonly-used libraries to be loaded
         private static readonly LanguageVersion csVersion = Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp1;
+#pragma warning restore CS0414 // Value is assigned but never used
+#pragma warning restore IDE0051 // Remove unused private members
+#pragma warning restore S1144 // Unused private types or members should be removed
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
@@ -48,7 +54,6 @@ namespace RoslynAnalyzer10
 
         public override void Initialize(AnalysisContext context)
         {
-            // TODO: Consider registering other actions that act on syntax instead of or in addition to symbols
             // See https://github.com/dotnet/roslyn/blob/master/docs/analyzers/Analyzer%20Actions%20Semantics.md for more information
             context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.NamedType);
         }
