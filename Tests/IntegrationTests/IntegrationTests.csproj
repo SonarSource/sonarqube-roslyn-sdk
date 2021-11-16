@@ -16,11 +16,8 @@
     <PackageReference Include="FluentAssertions" Version="5.4.1" />
   </ItemGroup>
 
- 
   <ItemGroup>
-
     <PackageReference Include="Microsoft.CodeAnalysis" Version="2.9.0" />
-
     <PackageReference Include="NuGet.CommandLine" Version="4.7.0" GeneratePathProperty="true" PrivateAssets="all" />
     <Reference Include="$(PkgNuGet_CommandLine)\tools\NuGet.exe" />
 
@@ -28,6 +25,19 @@
     <Reference Include="System.XML" />
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="SampleNuGetPkgs\RoslynAnalyzer10.1.0.0.nupkg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="SampleNuGetPkgs\RoslynAnalyzer11.1.0.0.nupkg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="SampleNuGetPkgs\wintellect.analyzers.1.0.6.nupkg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\Common\SonarQube.Plugins.Common.csproj">
       <Project>{bb89698a-0807-44d2-87ec-6aa271200759}</Project>
@@ -50,4 +60,5 @@
       <Name>RoslynAnalyzer11</Name>
     </ProjectReference>
   </ItemGroup>
-</Project>
+
+  </Project>
