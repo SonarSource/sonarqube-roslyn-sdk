@@ -54,10 +54,10 @@
   
   <ItemGroup Label="Embedded jar file">
     <!-- Corresponsds to the following commit:
-    
-      https://github.com/SonarSource/sonarqube-roslyn-sdk-template-plugin/commit/d5788cf9c2bd666fb95f12ee939e848d5dd0fb76
+
+      https://github.com/SonarSource/sonarqube-roslyn-sdk-template-plugin/commit/6e4dd88878f40a44231365494db768a7af3e6096
     -->
-    <EmbeddedResource Include="Resources\sonar-roslyn-sdk-template-plugin-1.2.0.73.jar" />
+    <EmbeddedResource Include="Resources\sonar-roslyn-sdk-template-plugin-1.2.0.76.jar" />
   </ItemGroup>
 
   <ItemGroup>
