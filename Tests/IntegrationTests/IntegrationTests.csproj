@@ -27,13 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="SampleNuGetPkgs\RoslynAnalyzer10.1.0.0.nupkg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="SampleNuGetPkgs\RoslynAnalyzer11.1.0.0.nupkg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="SampleNuGetPkgs\wintellect.analyzers.1.0.6.nupkg">
+    <None Update="SampleNuGetPkgs\*.nupkg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup Label="Test packages">
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.0.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="2.9.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.2.3" />
     <PackageReference Include="MSTest.TestFramework" Version="2.2.3" />
@@ -19,7 +19,11 @@
     <PackageReference Include="NuGet.CommandLine" Version="4.7.0" GeneratePathProperty="true" />
     <Reference Include="$(PkgNuGet_CommandLine)\tools\NuGet.exe" />
   </ItemGroup>
-  
+
+  <!--<ItemGroup>
+    <Reference Include="System.IO.Compression.FileSystem" Private="true" />
+  </ItemGroup>-->
+
   <ItemGroup>
     <ProjectReference Include="..\..\Common\SonarQube.Plugins.Common.csproj" />
     <ProjectReference Include="..\..\PluginGenerator\SonarQube.Plugins.PluginGenerator.csproj" />
@@ -27,7 +31,7 @@
     <ProjectReference Include="..\Common\SonarQube.Plugins.Test.Common.csproj" />
     <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer10\RoslynAnalyzer10\RoslynAnalyzer10.csproj" />
     <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer11\RoslynAnalyzer11\RoslynAnalyzer11.csproj" />
-    <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer298\RoslynAnalyzer298.csproj" />
-    <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer333\RoslynAnalyzer333.csproj" />
+    <!--<ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer298\RoslynAnalyzer298.csproj" />
+    <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer333\RoslynAnalyzer333.csproj" />-->
   </ItemGroup>
 </Project>
