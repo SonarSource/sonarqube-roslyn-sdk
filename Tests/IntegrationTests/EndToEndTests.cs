@@ -55,8 +55,8 @@ namespace SonarQube.Plugins.IntegrationTests
         [DataRow("RoslynAnalyzer10:1.0.0")]
         [DataRow("RoslynAnalyzer11:1.0.0")]
         [DataRow("wintellect.analyzers")]
-        //[DataRow("RoslynV298")]
-        //[DataRow("RoslynV333")]
+        [DataRow("RoslynV298")]
+        [DataRow("RoslynV333")]
         public async Task Execute_ExampleAnalyzers_Succeeds(string analyzerArg)
         {
             var exeFilePath = GetExeFilePath();
