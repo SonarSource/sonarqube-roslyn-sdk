@@ -9,6 +9,9 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <PlatformTarget>AnyCPU</PlatformTarget>
 
+    <!-- Don't include all Roslyn language resources when publishing
+         (need to include this in all product projects that reference Roslyn) -->
+    <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup Label="NuGet packages">

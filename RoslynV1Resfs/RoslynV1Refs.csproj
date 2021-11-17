@@ -12,6 +12,9 @@
   
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
+    <!-- Don't include all Roslyn language resources when publishing
+         (need to include this in all product projects that reference Roslyn) -->
+    <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>    
