@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Dummy project referencing Roslyn v1 packaes.
+  
+  This project does not contain any code.
+  
+  It exists to force the exe project to automatically generate binding updates for the Roslyn
+  assemblies for conflicting packages (the binding redirects won't be auto-generated unless
+  there are conflicts).
+  
+  -->
+  
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>    
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="1.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="1.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Features" Version="1.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="1.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="1.0.0" />
+
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="1.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="1.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="1.0.0" />
+    
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="1.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Features" Version="1.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>

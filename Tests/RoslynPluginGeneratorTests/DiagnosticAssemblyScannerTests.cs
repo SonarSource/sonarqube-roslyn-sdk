@@ -148,8 +148,8 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
         [TestMethod]
         [DataRow(typeof(RoslynAnalyzer10.ExampleAnalyzer2), 1)]
         [DataRow(typeof(RoslynAnalyzer11.CSharpAnalyzer), 3)]
-        //[DataRow(typeof(RoslynAnalyzer298.RoslynAnalyzer298Analyzer), 1)]
-        //[DataRow(typeof(RoslynAnalyzer333.RoslynAnalyzer333Analyzer), 1)]
+        [DataRow(typeof(RoslynAnalyzer298.RoslynAnalyzer298Analyzer), 1)]
+        [DataRow(typeof(RoslynAnalyzer333.RoslynAnalyzer333Analyzer), 1)]
         public void InstantiateDiags_DifferentRoslynVersions_AnalyzersFound(Type typeInTargetAssembly, int expectedAnalyzerCount)
         {
             // Arrange
