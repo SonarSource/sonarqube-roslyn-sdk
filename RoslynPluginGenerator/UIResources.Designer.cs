@@ -19,7 +19,7 @@ namespace SonarQube.Plugins.Roslyn {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class UIResources {
@@ -473,7 +473,7 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Minimum supported SonarQube version: 6.7 (highest version tested against: 7.3-alpha1).
+        ///   Looks up a localized string similar to Minimum supported SonarQube version: 7.9.6 (highest version tested against: 9.1).
         /// </summary>
         public static string Program_SupportedSonarQubeVersions {
             get {
