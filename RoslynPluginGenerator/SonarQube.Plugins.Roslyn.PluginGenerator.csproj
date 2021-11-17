@@ -47,7 +47,14 @@
     <None Update="NuGet.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <EmbeddedResource Include="Resources\sonar-roslyn-sdk-template-plugin-1.1.jar" />
+  </ItemGroup>
+  
+  <ItemGroup Label="Embedded jar file">
+    <!-- Corresponsds to the following commit:
+    
+      https://github.com/SonarSource/sonarqube-roslyn-sdk-template-plugin/commit/d5788cf9c2bd666fb95f12ee939e848d5dd0fb76
+    -->
+    <EmbeddedResource Include="Resources\sonar-roslyn-sdk-template-plugin-1.2.0.73.jar" />
   </ItemGroup>
 
   <ItemGroup>
