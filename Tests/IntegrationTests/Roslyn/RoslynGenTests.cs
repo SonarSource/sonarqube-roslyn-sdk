@@ -402,7 +402,7 @@ namespace SonarQube.Plugins.IntegrationTests
         
         private static void AssertFixedValuesInManifest(JarManifestReader reader)
         {
-            reader.FindValue("Sonar-Version").Should().Be("6.7");
+            reader.FindValue("Sonar-Version").Should().Be("7.9");
             reader.FindValue("Plugin-Class").Should().Be("org.sonar.plugins.roslynsdk.RoslynSdkGeneratedPlugin");
             reader.FindValue("SonarLint-Supported").Should().Be("false");
             reader.FindValue("Plugin-Dependencies").Should().Be("META-INF/lib/jsr305-1.3.9.jar META-INF/lib/commons-io-2.6.jar META-INF/lib/stax2-api-3.1.4.jar META-INF/lib/staxmate-2.0.1.jar META-INF/lib/stax-api-1.0.1.jar");
