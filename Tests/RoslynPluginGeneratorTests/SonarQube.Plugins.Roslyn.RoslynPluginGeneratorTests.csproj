@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NuGet.CommandLine" Version="4.7.0" GeneratePathProperty="true" />
+    <PackageReference Include="NuGet.CommandLine" Version="4.9.5" GeneratePathProperty="true" />
     <Reference Include="$(PkgNuGet_CommandLine)\tools\NuGet.exe" />
   </ItemGroup>
   
