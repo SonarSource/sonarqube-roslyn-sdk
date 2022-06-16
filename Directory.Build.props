@@ -5,7 +5,7 @@
     <PropertyGroup>
         <Version>3.1.0</Version>
         <RoslynPackagesVersion>4.2</RoslynPackagesVersion>
-        <NuGetPackagesVersion>4.7.0</NuGetPackagesVersion>
+        <NuGetPackagesVersion>6.2.1</NuGetPackagesVersion>
     </PropertyGroup>
 
     <ItemGroup>
