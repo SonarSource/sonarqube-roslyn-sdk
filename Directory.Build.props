@@ -1,12 +1,14 @@
 <Project>
-  
-  <!-- Common settings for test and product code-->
 
-  <PropertyGroup>
-    <Version>3.1.0</Version>
-  </PropertyGroup>
-  
-  <ItemGroup>
-    <AdditionalFiles Include="$(MSBuildThisFileDirectory)SonarLint.xml" Visible="False" />
-  </ItemGroup>
+    <!-- Common settings for test and product code-->
+
+    <PropertyGroup>
+        <Version>3.1.0</Version>
+        <RoslynPackagesVersion>4.0.1</RoslynPackagesVersion>
+        <NuGetPackagesVersion>4.7.0</NuGetPackagesVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <AdditionalFiles Include="$(MSBuildThisFileDirectory)SonarLint.xml" Visible="False" />
+    </ItemGroup>
 </Project>
