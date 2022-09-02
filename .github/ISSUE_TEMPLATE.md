@@ -9,4 +9,4 @@ The forum already has answers to many common questions/problems and is actively 
 
 Tagging your new thread with "dotnet" will bring it to the attention of the appropriate team more quickly.
 
-Thank you.
+Thank you!
