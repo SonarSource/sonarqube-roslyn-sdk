@@ -1,35 +1,12 @@
-### Description
+Please use the Community Forum instead of creating issues in this repo.
+The forum already has answers to many common questions/problems and is actively monitored by many SonarSourcers.
 
-Please provide a succinct description of your issue.
+(click on the "Preview" tab above to make the links below clickable)
 
-Note: please ask support questions in the community forum:
-https://community.sonarsource.com/c/help/8
+* for support or to report a bug visit https://community.sonarsource.com/c/sq/10
 
+* to suggest new features visit https://community.sonarsource.com/c/suggestions/features/14
 
-### Repro steps
+Tagging your new thread with "dotnet" will bring it to the attention of the appropriate team more quickly.
 
-Please provide the steps required to reproduce the problem
-
-1. Step A
-
-2. Step B
-
-If possible then please create a git repository with a repro sample or attach a zip to the issue.
-
-### Expected behavior
-
-Please provide a description of the behavior you expect.
-
-### Actual behavior
-
-Please provide a description of the actual behavior you observe.
-
-### Known workarounds
-
-Please provide a description of any known workarounds.
-
-### Related information
-
-* Roslyn version
-* Visual Studio Version (e.g. Professional v15.4.1)
-* Languages targeted by the analyzer (C#, VB.Net)
+Thank you.
