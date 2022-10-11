@@ -16,7 +16,7 @@
 
   <ItemGroup Label="NuGet packages">
     <PackageReference Include="Microsoft.CodeAnalysis" Version="4.0.1" ExcludeAssets="analyzers" />
-    <PackageReference Include="NuGet.CommandLine" Version="4.7.0" GeneratePathProperty="true" PrivateAssets="all" />
+    <PackageReference Include="NuGet.CommandLine" Version="4.9.6" GeneratePathProperty="true" PrivateAssets="all" />
     <Reference Include="$(PkgNuGet_CommandLine)\tools\NuGet.exe" />
     <PackageReference Include="System.IO.Compression" Version="4.0.0" Private="true" />
   </ItemGroup>
