@@ -47,9 +47,9 @@
       },
       "NuGet.CommandLine": {
         "type": "Direct",
-        "requested": "[4.7.0, )",
-        "resolved": "4.7.0",
-        "contentHash": "Y5bKX6as/juVXtHmsyvV9OT4rpTvNydfctzMWn8aufEhcOeg58bK8oDS+7sij0O34V6CtED6of2PdR2EfoEUEw=="
+        "requested": "[6.3.1, )",
+        "resolved": "6.3.1",
+        "contentHash": "GYlR2Uq/cbL9anpMulAceUetsO33qT3VtJgz491s6Msv3+eTdKN7GboRQP9LXbL6tgR9XK3G2NHbpPvOg2p81A=="
       },
       "Humanizer.Core": {
         "type": "Transitive",
@@ -289,27 +289,27 @@
       "RoslynSonarQubePluginGenerator": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.CodeAnalysis": "[4.0.1, )",
-          "RoslynV1Refs": "[3.0.0, )",
-          "SonarQube.Plugins.Common": "[3.0.0, )",
-          "SonarQube.Plugins.PluginGenerator": "[3.0.0, )",
-          "System.IO.Compression": "[4.0.0, )"
+          "Microsoft.CodeAnalysis": "4.0.1",
+          "RoslynV1Refs": "3.0.0",
+          "SonarQube.Plugins.Common": "3.0.0",
+          "SonarQube.Plugins.PluginGenerator": "3.0.0",
+          "System.IO.Compression": "4.0.0"
         }
       },
       "roslynv1refs": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.CodeAnalysis": "[1.0.0, )",
-          "Microsoft.CodeAnalysis.Analyzers": "[1.0.0, )",
-          "Microsoft.CodeAnalysis.CSharp": "[1.0.0, )",
-          "Microsoft.CodeAnalysis.CSharp.Features": "[1.0.0, )",
-          "Microsoft.CodeAnalysis.CSharp.Workspaces": "[1.0.0, )",
-          "Microsoft.CodeAnalysis.Common": "[1.0.0, )",
-          "Microsoft.CodeAnalysis.Features": "[1.0.0, )",
-          "Microsoft.CodeAnalysis.VisualBasic": "[1.0.0, )",
-          "Microsoft.CodeAnalysis.VisualBasic.Features": "[1.0.0, )",
-          "Microsoft.CodeAnalysis.VisualBasic.Workspaces": "[1.0.0, )",
-          "Microsoft.CodeAnalysis.Workspaces.Common": "[1.0.0, )"
+          "Microsoft.CodeAnalysis": "1.0.0",
+          "Microsoft.CodeAnalysis.Analyzers": "1.0.0",
+          "Microsoft.CodeAnalysis.CSharp": "1.0.0",
+          "Microsoft.CodeAnalysis.CSharp.Features": "1.0.0",
+          "Microsoft.CodeAnalysis.CSharp.Workspaces": "1.0.0",
+          "Microsoft.CodeAnalysis.Common": "1.0.0",
+          "Microsoft.CodeAnalysis.Features": "1.0.0",
+          "Microsoft.CodeAnalysis.VisualBasic": "1.0.0",
+          "Microsoft.CodeAnalysis.VisualBasic.Features": "1.0.0",
+          "Microsoft.CodeAnalysis.VisualBasic.Workspaces": "1.0.0",
+          "Microsoft.CodeAnalysis.Workspaces.Common": "1.0.0"
         }
       },
       "sonarqube.plugins.common": {
@@ -318,17 +318,17 @@
       "sonarqube.plugins.plugingenerator": {
         "type": "Project",
         "dependencies": {
-          "SonarQube.Plugins.Common": "[3.0.0, )"
+          "SonarQube.Plugins.Common": "3.0.0"
         }
       },
       "sonarqube.plugins.test.common": {
         "type": "Project",
         "dependencies": {
-          "FluentAssertions": "[5.4.1, )",
-          "MSTest.TestAdapter": "[2.2.3, )",
-          "MSTest.TestFramework": "[2.2.3, )",
-          "Microsoft.NET.Test.Sdk": "[16.9.4, )",
-          "SonarQube.Plugins.Common": "[3.0.0, )"
+          "FluentAssertions": "5.4.1",
+          "MSTest.TestAdapter": "2.2.3",
+          "MSTest.TestFramework": "2.2.3",
+          "Microsoft.NET.Test.Sdk": "16.9.4",
+          "SonarQube.Plugins.Common": "3.0.0"
         }
       }
     }
