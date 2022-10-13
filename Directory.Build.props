@@ -4,6 +4,7 @@
 
   <PropertyGroup>
     <Version>3.0.0</Version>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
   
   <ItemGroup>
