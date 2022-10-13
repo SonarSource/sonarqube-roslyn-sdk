@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis" Version="4.0.1" />
-    <PackageReference Include="NuGet.CommandLine" Version="4.7.0" GeneratePathProperty="true" PrivateAssets="all" />
+    <PackageReference Include="NuGet.CommandLine" Version="6.3.1" GeneratePathProperty="true" PrivateAssets="all" />
     <Reference Include="$(PkgNuGet_CommandLine)\tools\NuGet.exe" />
 
     <Reference Include="System" />
