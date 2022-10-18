@@ -2,7 +2,7 @@
 
 ### License
 
-Copyright 2015-2021 SonarSource.
+Copyright 2015-2022 SonarSource.
 
 Licensed under the [GNU Lesser General Public License, Version 3.0](http://www.gnu.org/licenses/lgpl.txt)
 
@@ -35,9 +35,11 @@ The latest release version (v2.0) is available [here](https://github.com/SonarSo
 ### Compatibility
 v1.0 of the SDK generates plugins that are compatible with SonarQube v4.5.2 -> v6.7.
 
-v2.0 generates plugins that are compatible with versions of SonarQube from v6.7 (tested with the current latest available version, v7.3alpha1).
+v2.0 generates plugins that are compatible with versions of SonarQube from v6.7 (tested with the latest available version at time of release i.e. v7.3alpha1).
 
-v3.0 generates plugins that are compatible with versions of SonarQube from v7.9.6 (tested with the current latest available version, v9.1).
+v3.0 generates plugins that are compatible with versions of SonarQube from v7.9.6 (tested with the latest available version at time of release i.e. v9.1).
+
+v3.1 generates plugins that are compatible with versions of SonarQube from v7.9.6 (tested with the latest available version at time of release i.e. v9.7).
 
 
 If you have an existing plugin that was generated with v1.0 of the SDK and want to use the plugin with SonarQube 7.0 or later, you will need to create a new plugin using v2.0 of the SDK. If you customized the _SQALE.xml_ file for your v1.0 plugin, you will need to move the remediation information to the _rules.xml_ file for the v2.0 plugin.
