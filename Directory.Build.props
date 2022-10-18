@@ -6,7 +6,7 @@
     <Version>3.1.0</Version>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
 
-    <RoslynPackagesVersion>4.0.1</RoslynPackagesVersion>
+    <RoslynPackagesVersion>4.3.1</RoslynPackagesVersion>
     <NuGetPackagesVersion>6.3.1</NuGetPackagesVersion>
   </PropertyGroup>
   
