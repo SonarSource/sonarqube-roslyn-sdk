@@ -260,7 +260,7 @@ The conflict will be ignored.</value>
     <value>Maximum supported Roslyn version:</value>
   </data>
   <data name="Program_SupportedSonarQubeVersions" xml:space="preserve">
-    <value>Minimum supported SonarQube version: 7.9.6 (highest version tested against: 9.1)</value>
+    <value>Minimum supported SonarQube version: 7.9.6 (highest version tested against: 9.7)</value>
   </data>
   <data name="RuleGen_DuplicateKey" xml:space="preserve">
     <value>Skipping rule in analyzer {0}: Duplicate key.</value>
