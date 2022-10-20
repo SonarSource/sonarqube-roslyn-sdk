@@ -473,7 +473,7 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Minimum supported SonarQube version: 7.9.6 (highest version tested against: 9.1).
+        ///   Looks up a localized string similar to Minimum supported SonarQube version: 7.9.6 (highest version tested against: 9.7).
         /// </summary>
         public static string Program_SupportedSonarQubeVersions {
             get {
