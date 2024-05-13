@@ -2,6 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>net45</TargetFramework>
+        <!-- Mark the project as being a test project -->
+        <SonarQubeTestProject>true</SonarQubeTestProject>
     </PropertyGroup>
 
     <ItemGroup>
@@ -12,26 +14,5 @@
         <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="1.1.0"/>
         <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="1.1.0" />
     </ItemGroup>
-
-    <ItemGroup>
-        <None Include="Diagnostic.nuspec">
-            <SubType>Designer</SubType>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Include="tools\install.ps1">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Include="tools\uninstall.ps1">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Include="ReadMe.txt"/>
-    </ItemGroup>
-    
-    <ItemGroup>
-        <AdditionalFiles Include="..\..\..\..\SonarLint.xml">
-            <Link>Properties\SonarLint.xml</Link>
-        </AdditionalFiles>
-    </ItemGroup>
-
 
 </Project>
