@@ -2,7 +2,7 @@
 
 ### License
 
-Copyright 2015-2022 SonarSource.
+Copyright 2015-2024 SonarSource.
 
 Licensed under the [GNU Lesser General Public License, Version 3.0](http://www.gnu.org/licenses/lgpl.txt)
 
@@ -14,20 +14,20 @@ Licensed under the [GNU Lesser General Public License, Version 3.0](http://www.g
 
 ### Overview
 This repo contains tools to help integrate Roslyn analyzers with SonarQube so that issues detected by the Roslyn analyzers are reported and managed in SonarQube.
-Specifically, the tools will generate a Java SonarQube plugin that registers the rules with SonarQube. The generated plugin works with the [C# plugin](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/languages/csharp/) (v4.5 or higher) and the [SonarQube Scanner for MSBuild](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarscanner-for-dotnet/) (v2.0 or higher) to handle executing the analyzer and uploading any issues.
+Specifically, the tools will generate a Java SonarQube plugin that registers the rules with SonarQube. The generated plugin works with the [C# plugin](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/languages/csharp/) and the [SonarScanner for .NET](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarscanner-for-dotnet/) to handle executing the analyzer and uploading any issues.
 See this [blog post](https://devblogs.microsoft.com/devops/sonarqube-scanner-for-msbuild-v2-0-released-support-for-third-party-roslyn-analyzers/) for more information.
 
-#### Integration with the SonarQube Scanner for MSBuild
-The [SonarQube Scanner for MSBuild](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarscanner-for-dotnet/) will automatically execute your custom rules as part of an analysis build using the configuration you have defined in the Quality Profile. There is no need to manually reference your analyzer NuGet package in the MSBuild projects you want to analyse.
+#### Integration with the SonarScanner for .NET
+The [SonarScanner for .NET](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarscanner-for-dotnet/) will automatically execute your custom rules as part of an analysis build using the configuration you have defined in the Quality Profile. There is no need to manually reference your analyzer NuGet package in the MSBuild projects you want to analyse.
 
-The SonarQube Scanner for MSBuild can also import issues from Roslyn analyzers that do not have plugins created using this SDK. However, they will be imported as "external issues" and are handled differently in SonarQube. See [External .NET issues](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/importing-external-issues/external-analyzer-reports/#external-dotnet-issues) for more information.
+The SonarScanner for .NET can also import issues from Roslyn analyzers that do not have plugins created using this SDK. However, they will be imported as "external issues" and are handled differently in SonarQube. See [External .NET issues](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/importing-external-issues/external-analyzer-reports/#external-dotnet-issues) for more information.
 
 #### Integration with SonarLint for Visual Studio
-If you define a Quality Profile that references your custom rules then [SonarLint for Visual Studio ](https://github.com/sonarsource/sonarlint-visualstudio) in *Connected Mode* will include those rules in the ruleset it generates.
+If you define a Quality Profile that references your custom rules then [SonarLint for Visual Studio](https://github.com/sonarsource/sonarlint-visualstudio) in *Connected Mode* will include those rules in the ruleset it generates.
 However, it will **not** automatically configure Visual Studio to execute your custom rules.
 If you want your customer rules to be executed inside Visual Studio then you will need reference your analyzer NuGet package from your MSBuild projects, or install your analyzer VSIX on each developer machine.
 
-See the [SonarLint for Visual Studio wiki](https://docs.sonarsource.com/sonarlint/visual-studio/team-features/connected-mode/) for more information on Connected Mode.
+See the [SonarLint for Visual Studio documentation](https://docs.sonarsource.com/sonarlint/visual-studio/team-features/connected-mode/) for more information on Connected Mode.
 
 ### Download latest release
 The latest release version is available [here](https://github.com/SonarSource/sonarqube-roslyn-sdk/releases/latest).
