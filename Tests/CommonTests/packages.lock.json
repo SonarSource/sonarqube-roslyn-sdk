@@ -45,7 +45,7 @@
       "sonarqube.plugins.plugingenerator": {
         "type": "Project",
         "dependencies": {
-          "SonarQube.Plugins.Common": "[3.0.0, )"
+          "SonarQube.Plugins.Common": "[3.1.0, )"
         }
       },
       "sonarqube.plugins.test.common": {
@@ -55,7 +55,7 @@
           "MSTest.TestAdapter": "[2.2.3, )",
           "MSTest.TestFramework": "[2.2.3, )",
           "Microsoft.NET.Test.Sdk": "[16.9.4, )",
-          "SonarQube.Plugins.Common": "[3.0.0, )"
+          "SonarQube.Plugins.Common": "[3.1.0, )"
         }
       }
     }
