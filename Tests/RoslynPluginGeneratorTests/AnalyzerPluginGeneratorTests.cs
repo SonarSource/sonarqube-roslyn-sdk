@@ -37,8 +37,6 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
     {
         public TestContext TestContext { get; set; }
 
-        private enum Node { Root, Child1, Child2, Grandchild1_1, Grandchild2_1, Grandchild2_2 };
-
         [TestMethod]
         public void Generate_NoAnalyzersFoundInPackage_GenerateFails()
         {
@@ -274,7 +272,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, "non-analyzer.requireAccept.id"));
             logger.AssertSingleWarningExists(UIResources.APG_NoAnalyzersInTargetSuggestRecurse);
             logger.AssertWarningsLogged(2);
-            logger.AssertErrorsLogged(0);
+            logger.AssertErrorsLogged(1);
         }
 
         [TestMethod]
@@ -309,7 +307,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, "parent.id"));
             logger.AssertSingleWarningExists(UIResources.APG_NoAnalyzersInTargetSuggestRecurse);
             logger.AssertWarningsLogged(2);
-            logger.AssertErrorsLogged(0);
+            logger.AssertErrorsLogged(1);
 
             // 1. b) Target package and dependencies. Acceptance not required -> succeeds if generate dependencies = true
             logger.Reset();
@@ -358,7 +356,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             logger.AssertSingleWarningExists(String.Format(UIResources.APG_NoAnalyzersFound, "non-analyzer.parent.requireAccept.id"));
             logger.AssertSingleWarningExists(UIResources.APG_NoAnalyzersInTargetSuggestRecurse);
             logger.AssertWarningsLogged(2);
-            logger.AssertErrorsLogged(0);
+            logger.AssertErrorsLogged(1);
 
             // 1. b) Target package and dependencies. User does not accept.
             // No analyzers in the target package, but analyzers in the dependencies -> fails with error
@@ -395,10 +393,10 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_RulesFileNotSpecified_TemplateFileCreated()
         {
             // Arrange
-            string outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            string outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
 
             var logger = new TestLogger();
-            var remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            var remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
             var child1 = CreatePackageWithAnalyzer(remoteRepoBuilder, "child1.requiredAccept.id", "2.1", License.NotRequired);
             var child2 = CreatePackageWithAnalyzer(remoteRepoBuilder, "child2.id", "2.2", License.NotRequired);
             var parent = CreatePackageWithAnalyzer(remoteRepoBuilder, "parent.id", "1.0", License.NotRequired, child1, child2);
@@ -434,9 +432,9 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         public void Generate_ValidRuleFileSpecified_TemplateFileNotCreated()
         {
             // Arrange
-            var outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            var outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
 
-            var remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            var remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
             var apg = CreateTestSubjectWithFakeRemoteRepo(remoteRepoBuilder);
 
             CreatePackageInFakeRemoteRepo(remoteRepoBuilder, "dummy.id", "1.1");
@@ -460,14 +458,14 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         }
 
         [TestMethod]
-        public void Generate_InvalidRuleFileSpecified_GeneratorError()
+        public void Generate_InvalidRuleFileSpecified_GeneratesError()
         {
             // Arrange
-            var outputDir = TestUtils.CreateTestDirectory(this.TestContext, ".out");
+            var outputDir = TestUtils.CreateTestDirectory(TestContext, ".out");
 
             var logger = new TestLogger();
 
-            var remoteRepoBuilder = new RemoteRepoBuilder(this.TestContext);
+            var remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
             CreatePackageInFakeRemoteRepo(remoteRepoBuilder, "dummy.id", "1.1");
 
             var nuGetHandler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
@@ -491,6 +489,40 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             result.Should().BeFalse();
             AssertRuleTemplateDoesNotExist(outputDir);
             logger.AssertSingleErrorExists("invalidRule.xml"); // expecting an error containing the invalid rule file name
+        }
+
+        [DataTestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        public void Generate_NoAnalyzers_GeneratesError(bool recurseDependencies)
+        {
+            // Arrange
+            var outputDir = TestUtils.CreateTestDirectory(TestContext, $"recurse-{recurseDependencies}", ".out");
+
+            var logger = new TestLogger();
+
+            var remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
+            // Create a package that does not contain analyzers
+            remoteRepoBuilder.CreatePackage("dummy.id", "1.1", typeof(AnalyzerPluginGenerator).Assembly.Location, License.NotRequired);
+
+            var nuGetHandler = new NuGetPackageHandler(remoteRepoBuilder.FakeRemoteRepo, GetLocalNuGetDownloadDir(), logger);
+
+            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
+
+            var args = new ProcessedArgsBuilder("dummy.id", outputDir)
+                .SetLanguage("cs")
+                .SetPackageVersion("1.1")
+                .SetRecurseDependencies(recurseDependencies)
+                .Build();
+
+            // Act
+            bool result = apg.Generate(args);
+
+            // Assert
+            result.Should().BeFalse();
+            AssertRuleTemplateDoesNotExist(outputDir);
+            AssertJarsGenerated(outputDir, 0);
+            logger.AssertSingleErrorExists("Plugin not generated: no analyzers were found");
         }
 
         [TestMethod]
@@ -688,7 +720,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             string expectedFilePath = GetExpectedRuleTemplateFilePath(outputDir, package);
 
             File.Exists(expectedFilePath).Should().BeTrue();
-            this.TestContext.AddResultFile(expectedFilePath);
+            TestContext.AddResultFile(expectedFilePath);
             logger.AssertSingleInfoMessageExists(expectedFilePath); // should be a message about the generated file
         }
 

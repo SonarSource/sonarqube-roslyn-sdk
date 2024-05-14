@@ -156,6 +156,9 @@
   <data name="APG_NoAnalyzersInTargetSuggestRecurse" xml:space="preserve">
     <value>Re-run this generator with /recurse if plugins should be generated for the dependencies of this package.</value>
   </data>
+  <data name="APG_PluginNotGenerated" xml:space="preserve">
+    <value>Plugin not generated: no analyzers were found</value>
+  </data>
   <data name="APG_PluginGenerated" xml:space="preserve">
     <value>Plugin generated: {0}</value>
   </data>

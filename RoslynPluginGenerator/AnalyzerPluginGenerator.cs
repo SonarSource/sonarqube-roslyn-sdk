@@ -90,6 +90,7 @@ namespace SonarQube.Plugins.Roslyn
                 if (!args.RecurseDependencies)
                 {
                     logger.LogWarning(UIResources.APG_NoAnalyzersInTargetSuggestRecurse);
+                    logger.LogError(UIResources.APG_PluginNotGenerated);
                     return false;
                 }
             }
@@ -112,6 +113,7 @@ namespace SonarQube.Plugins.Roslyn
 
                 if (!analyzersByPackage.Any())
                 {
+                    logger.LogError(UIResources.APG_PluginNotGenerated);
                     return false;
                 }
             }
