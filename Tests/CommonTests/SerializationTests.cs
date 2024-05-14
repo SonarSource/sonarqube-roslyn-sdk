@@ -73,7 +73,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
             Rules reloaded = Rules.Load(rulesFile);
 
             string expectedXmlContent = @"<?xml version=""1.0"" encoding=""utf-8""?>
-<rules xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+<rules xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <rule>
     <key>key1</key>
     <name>Rule1</name>

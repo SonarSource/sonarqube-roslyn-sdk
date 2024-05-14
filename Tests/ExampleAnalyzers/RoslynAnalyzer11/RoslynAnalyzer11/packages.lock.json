@@ -1,0 +1,196 @@
+{
+  "version": 1,
+  "dependencies": {
+    ".NETFramework,Version=v4.5": {
+      "Microsoft.CodeAnalysis": {
+        "type": "Direct",
+        "requested": "[1.1.0, )",
+        "resolved": "1.1.0",
+        "contentHash": "5i2/DuXEfFbtFkJnKoLKFVWvGVfdT6Yn1I4p69RT5Q7VIfPzgbQjWPHPmdP0JE1b2pFSZ71JApprnTmYN79dyQ==",
+        "dependencies": {
+          "Microsoft.CodeAnalysis.CSharp.Workspaces": "[1.1.0]",
+          "Microsoft.CodeAnalysis.VisualBasic.Workspaces": "[1.1.0]"
+        }
+      },
+      "Microsoft.CodeAnalysis.CSharp": {
+        "type": "Direct",
+        "requested": "[1.1.0, )",
+        "resolved": "1.1.0",
+        "contentHash": "vLuvAtMCQGq+V8oexIOJo7gDaFlFgCVtJXG2k2kronScTBI7ppCZr8t8eG8sMQI4l4VGAieZEgZYqUAv94LrOg==",
+        "dependencies": {
+          "Microsoft.CodeAnalysis.Common": "[1.1.0]"
+        }
+      },
+      "Microsoft.CodeAnalysis.CSharp.Workspaces": {
+        "type": "Direct",
+        "requested": "[1.1.0, )",
+        "resolved": "1.1.0",
+        "contentHash": "H2rC9Y4JzT0f3k3xB/bTaNaIqMqJ482ErmI/5VSurMJC6/5d4aS8Rut/9KpVMX2qpkC2yvlzI004kI49gqv76A==",
+        "dependencies": {
+          "Microsoft.CodeAnalysis.CSharp": "[1.1.0]",
+          "Microsoft.CodeAnalysis.Workspaces.Common": "[1.1.0]"
+        }
+      },
+      "Microsoft.CodeAnalysis.VisualBasic": {
+        "type": "Direct",
+        "requested": "[1.1.0, )",
+        "resolved": "1.1.0",
+        "contentHash": "UHqZc6aps+irLiS98pmJ+nAfmhK6VTgbm8lelJ6uoWDbDT286WfbU4YIS+iy8RlkAh26xX7EygRq8JVrd0yEwQ==",
+        "dependencies": {
+          "Microsoft.CodeAnalysis.Common": "1.1.0"
+        }
+      },
+      "Microsoft.CodeAnalysis.VisualBasic.Workspaces": {
+        "type": "Direct",
+        "requested": "[1.1.0, )",
+        "resolved": "1.1.0",
+        "contentHash": "IrZ9qYWXyGa9wtsWDKQDKAeWO7ZNxOhwpNOytF1emGRA9yscdM4ApVvDZqZ6dDgYQH0LFdfou0i6pxcDuDt2SA==",
+        "dependencies": {
+          "Microsoft.CodeAnalysis.VisualBasic": "[1.1.0]",
+          "Microsoft.CodeAnalysis.Workspaces.Common": "[1.1.0]"
+        }
+      },
+      "Microsoft.CodeAnalysis.Workspaces.Common": {
+        "type": "Direct",
+        "requested": "[1.1.0, )",
+        "resolved": "1.1.0",
+        "contentHash": "E1jZOcU+SBxuie1VQq785BEIBQfc5QkExW156P0KAJZLHEfAXtLvHOe73KjJis/to2Awu8+OVgDE0dqoaP17Nw==",
+        "dependencies": {
+          "Microsoft.CodeAnalysis.Common": "[1.1.0]",
+          "Microsoft.Composition": "[1.0.27]"
+        }
+      },
+      "Microsoft.CodeAnalysis.Analyzers": {
+        "type": "Transitive",
+        "resolved": "1.0.0",
+        "contentHash": "E7VdmGw6xO3VHWapC+pNLZmo6yncS53UY3bmb5WZm9wliJBB1A6brgzKA4fcqiLrmJFx71r0M2zEbRDphRLUNg=="
+      },
+      "Microsoft.CodeAnalysis.Common": {
+        "type": "Transitive",
+        "resolved": "1.1.0",
+        "contentHash": "uDH4arKhk/0N3kgoNyBUUv/nEY+auFimYyF/QNEQOP6LAFH41ingogGfvXfPVPuzo3I8OlY4zIK8MRHq89oC2A==",
+        "dependencies": {
+          "Microsoft.CodeAnalysis.Analyzers": "[1.0.0, 1.2.0)",
+          "System.Collections.Immutable": "1.1.37",
+          "System.Reflection.Metadata": "1.1.0"
+        }
+      },
+      "Microsoft.Composition": {
+        "type": "Transitive",
+        "resolved": "1.0.27",
+        "contentHash": "pwu80Ohe7SBzZ6i69LVdzowp6V+LaVRzd5F7A6QlD42vQkX0oT7KXKWWPlM/S00w1gnMQMRnEdbtOV12z6rXdQ=="
+      },
+      "System.Collections": {
+        "type": "Transitive",
+        "resolved": "4.0.0",
+        "contentHash": "i2vsGDIEbWdHcUSNDPKZP/ZWod6o740el7mGTCy0dqbCxQh74W4QoC+klUwPEtGEFuvzJ7bJgvwJqscosVNyZQ=="
+      },
+      "System.Collections.Immutable": {
+        "type": "Transitive",
+        "resolved": "1.1.37",
+        "contentHash": "fTpqwZYBzoklTT+XjTRK8KxvmrGkYHzBiylCcKyQcxiOM8k+QvhNBxRvFHDWzy4OEP5f8/9n+xQ9mEgEXY+muA==",
+        "dependencies": {
+          "System.Collections": "4.0.0",
+          "System.Diagnostics.Debug": "4.0.0",
+          "System.Globalization": "4.0.0",
+          "System.Linq": "4.0.0",
+          "System.Resources.ResourceManager": "4.0.0",
+          "System.Runtime": "4.0.0",
+          "System.Runtime.Extensions": "4.0.0",
+          "System.Threading": "4.0.0"
+        }
+      },
+      "System.Diagnostics.Debug": {
+        "type": "Transitive",
+        "resolved": "4.0.0",
+        "contentHash": "AYJsLLGDVTC/nyURjgAo7Lpye0+HuSkcQujUf+NgQVdC/C/ky5NyamQHCforHJzgqspitMMtBe8B4UBdGXy1zQ=="
+      },
+      "System.Globalization": {
+        "type": "Transitive",
+        "resolved": "4.0.0",
+        "contentHash": "IBJyTo1y7ZtzzoJUA60T1XPvNTyw/wfFmjFoBFtlYfkekIOtD/AzDDIg0YdUa7eNtFEfliED2R7HdppTdU4t5A=="
+      },
+      "System.IO": {
+        "type": "Transitive",
+        "resolved": "4.0.0",
+        "contentHash": "MoCHQ0u5n0OMwUS8OX4Gl48qKiQziSW5cXvt82d+MmAcsLq9OL90+ihnu/aJ1h6OOYcBswrZAEuApfZha9w2lg=="
+      },
+      "System.Linq": {
+        "type": "Transitive",
+        "resolved": "4.0.0",
+        "contentHash": "r6Hlc+ytE6m/9UBr+nNRRdoJEWjoeQiT3L3lXYFDHoXk3VYsRBCDNXrawcexw7KPLaH0zamQLiAb6avhZ50cGg=="
+      },
+      "System.Reflection": {
+        "type": "Transitive",
+        "resolved": "4.0.0",
+        "contentHash": "g96Rn8XuG7y4VfxPj/jnXroRJdQ8L3iN3k3zqsuzk4k3Nq4KMXARYiIO4BLW4GwX06uQpuYwRMcAC/aF117knQ=="
+      },
+      "System.Reflection.Extensions": {
+        "type": "Transitive",
+        "resolved": "4.0.0",
+        "contentHash": "dbYaZWCyFAu1TGYUqR2n+Q+1casSHPR2vVW0WVNkXpZbrd2BXcZ7cpvpu9C98CTHtNmyfMWCLpCclDqly23t6A=="
+      },
+      "System.Reflection.Metadata": {
+        "type": "Transitive",
+        "resolved": "1.1.0",
+        "contentHash": "RLIE4sSt2zngMLuqM6YmxBH99mTumtT4DNZE4+msfEaInUP5iCLQT+BHPl+2cjSAP1pdALyAjLB8RtCB+WGGWQ==",
+        "dependencies": {
+          "System.Collections": "4.0.0",
+          "System.Collections.Immutable": "1.1.37",
+          "System.Diagnostics.Debug": "4.0.0",
+          "System.IO": "4.0.0",
+          "System.Reflection": "4.0.0",
+          "System.Reflection.Extensions": "4.0.0",
+          "System.Reflection.Primitives": "4.0.0",
+          "System.Resources.ResourceManager": "4.0.0",
+          "System.Runtime": "4.0.0",
+          "System.Runtime.Extensions": "4.0.0",
+          "System.Runtime.InteropServices": "4.0.0",
+          "System.Text.Encoding": "4.0.0",
+          "System.Text.Encoding.Extensions": "4.0.0",
+          "System.Threading": "4.0.0"
+        }
+      },
+      "System.Reflection.Primitives": {
+        "type": "Transitive",
+        "resolved": "4.0.0",
+        "contentHash": "n9S0XpKv2ruc17FSnaiX6nV47VfHTZ1wLjKZlAirUZCvDQCH71mVp+Ohabn0xXLh5pK2PKp45HCxkqu5Fxn/lA=="
+      },
+      "System.Resources.ResourceManager": {
+        "type": "Transitive",
+        "resolved": "4.0.0",
+        "contentHash": "qmqeZ4BJgjfU+G2JbrZt4Dk1LsMxO4t+f/9HarNY6w8pBgweO6jT+cknUH7c3qIrGvyUqraBhU45Eo6UtA0fAw=="
+      },
+      "System.Runtime": {
+        "type": "Transitive",
+        "resolved": "4.0.0",
+        "contentHash": "Uq9epame8hEqJlj4KaWb67dDJvj4IM37jRFGVeFbugRdPz48bR0voyBhrbf3iSa2tAmlkg4lsa6BUOL9iwlMew=="
+      },
+      "System.Runtime.Extensions": {
+        "type": "Transitive",
+        "resolved": "4.0.0",
+        "contentHash": "zPzwoJcA7qar/b5Ihhzfcdr3vBOR8FIg7u//Qc5mqyAriasXuMFVraBZ5vOQq5asfun9ryNEL8Z2BOlUK5QRqA=="
+      },
+      "System.Runtime.InteropServices": {
+        "type": "Transitive",
+        "resolved": "4.0.0",
+        "contentHash": "J8GBB0OsVuKJXR412x6uZdoyNi4y9OMjjJRHPutRHjqujuvthus6Xdxn/i8J1lL2PK+2jWCLpZp72h8x73hkLg=="
+      },
+      "System.Text.Encoding": {
+        "type": "Transitive",
+        "resolved": "4.0.0",
+        "contentHash": "AMxFNOXpA6Ab8swULbXuJmoT2K5w6TnV3ObF5wsmEcIHQUJghoZtDVfVHb08O2wW15mOSI1i9Wg0Dx0pY13o8g=="
+      },
+      "System.Text.Encoding.Extensions": {
+        "type": "Transitive",
+        "resolved": "4.0.0",
+        "contentHash": "FktA77+2DC0S5oRhgM569pbzFrcA45iQpYiI7+YKl68B6TfI2N5TQbXqSWlh2YXKoFXHi2RFwPMha2lxiFJZ6A=="
+      },
+      "System.Threading": {
+        "type": "Transitive",
+        "resolved": "4.0.0",
+        "contentHash": "H6O/9gUrjPDNYanh/7OFGAZHjVXvEuITD0RcnjfvIV04HOGrOPqUBU0kmz9RIX/7YGgCQn1o1S2DX6Cuv8kVGQ=="
+      }
+    }
+  }
+}
