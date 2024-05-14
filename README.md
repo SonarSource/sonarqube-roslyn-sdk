@@ -56,7 +56,7 @@ The full list of changes is contained is available on the [release page](https:/
 
 #### Updating Roslyn
 
-The SDK is compatible with analyzer targeting Roslyn from version 1.0.0 up to the version specified in [Directory.Build.props](https://github.com/SonarSource/sonarqube-roslyn-sdk/blob/master/Directory.Build.props#L9).
+The SDK is compatible with analyzer targeting Roslyn from version 1.0.0 up to the version specified in [Directory.Build.props](./Directory.Build.props#L9).
 
 If you want to use a newer version of Roslyn, you will need to:
 1. update the version in the Directory.Build.props 
@@ -132,7 +132,7 @@ parameter. This will overwrite the above mentioned NuGet behaviour.
 #### Generating a jar for an analyzer that is not available from a NuGet feed
 If you want to create a jar for Roslyn analyzer that is not available from a NuGet feed (e.g. an analyzer you have created on your local machine) you can specify a package source that points at a local directory containing the *.nupkg* file created by the standard Roslyn templates. See the [NuGet docs](https://docs.nuget.org/create/hosting-your-own-nuget-feeds) for more information.
 
-By default, the [NuGet.config](https://github.com/SonarSource/sonarqube-roslyn-sdk/blob/master/RoslynPluginGenerator/NuGet.config#L16) file shipped with the RoslynSonarQubeGenerator has a local package source configured that points to `C:\LocalNugetFeed`.
+By default, the [NuGet.config](./RoslynPluginGenerator/NuGet.config#L16) file shipped with the RoslynSonarQubeGenerator has a local package source configured that points to `C:\LocalNugetFeed`.
 
 #### NuGet packaging information
 
