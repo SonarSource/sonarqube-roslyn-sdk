@@ -45,8 +45,6 @@ v3.1 generates plugins that are compatible with versions of SonarQube from v7.9.
 If you have an existing plugin that was generated with v1.0 of the SDK and want to use the plugin with SonarQube 7.0 or later, you will need to create a new plugin using v2.0 of the SDK. If you customized the _SQALE.xml_ file for your v1.0 plugin, you will need to move the remediation information to the _rules.xml_ file for the v2.0 plugin.
 
 #### Current limitations:
-   - the analyzer must be available as a NuGet package
-   - the analyzer must use __Roslyn 4.3.0 or lower__
    - only C# rules are supported
 
 #### Changes between v1.0 and v2.0
@@ -55,6 +53,16 @@ The full list of changes is contained is available on the [release page](https:/
 * in v1.0, it was not possible to customize the _rules.xml_ file, although debt remediation information could be supplied in a separate _sqale.xml_ file. SQALE has been deprecated in SonarQube, and the format of the _rules.xml_ file has been extended to support debt remediation information. As a result, v2.0 of the SDK no longer supports providing a _sqale.xml_ file. Instead, it is now possible to manually edit the _rules.xml_ that describes the rule. This means debt remediation data can be added, and it also means that the rest of the metadata describing the rules can be edited to (e.g. to change the severity or classification or the rules, or to add tags).
 * v2.0 is built against Roslyn 2.8.2, so will work against analyzers that use that version of Roslyn or earlier.
 * v2.0 uses NuGet v4.7, which supports the TLS1.3 security protocol.
+
+#### Updating Roslyn
+
+The SDK is compatible with analyzer targeting Roslyn from version 1.0.0 up to the version specified in [Directory.Build.props](./Directory.Build.props#L9).
+
+If you want to use a newer version of Roslyn, you will need to:
+1. update the version in the Directory.Build.props 
+   1. the latest version of Roslyn can be found [here](https://www.nuget.org/packages/Microsoft.CodeAnalysis)
+2. rebuild the SDK
+3. run the SDK against your analyzer
 
 ### Target users
 There are two groups of target users:
@@ -109,8 +117,7 @@ The XML snippet below shows the expected format for tags and debt remediation in
     <debtRemediationFunctionOffset>15min</debtRemediationFunctionOffset>
   </rule>
 </rules>
-```
-
+``` 
 
 #### Configuring NuGet feeds
 The SDK will look for NuGet.config files in the following locations:
@@ -124,6 +131,8 @@ parameter. This will overwrite the above mentioned NuGet behaviour.
 
 #### Generating a jar for an analyzer that is not available from a NuGet feed
 If you want to create a jar for Roslyn analyzer that is not available from a NuGet feed (e.g. an analyzer you have created on your local machine) you can specify a package source that points at a local directory containing the *.nupkg* file created by the standard Roslyn templates. See the [NuGet docs](https://docs.nuget.org/create/hosting-your-own-nuget-feeds) for more information.
+
+By default, the [NuGet.config](./RoslynPluginGenerator/NuGet.config#L16) file shipped with the RoslynSonarQubeGenerator has a local package source configured that points to `C:\LocalNugetFeed`.
 
 #### NuGet packaging information
 
