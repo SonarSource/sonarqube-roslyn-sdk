@@ -280,7 +280,7 @@
       "sonarqube.plugins.plugingenerator": {
         "type": "Project",
         "dependencies": {
-          "SonarQube.Plugins.Common": "[3.1.0, )"
+          "SonarQube.Plugins.Common": "[4.0.0, )"
         }
       }
     }

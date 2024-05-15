@@ -1,6 +1,6 @@
 ﻿/*
  * SonarQube Roslyn SDK
- * Copyright (C) 2015-2022 SonarSource SA
+ * Copyright (C) 2015-2024 SonarSource SA
  * mailto:info AT sonarsource DOT com
  *
  * This program is free software; you can redistribute it and/or
@@ -23,7 +23,6 @@ using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NuGet;
-using SonarQube.Plugins.Common;
 using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
