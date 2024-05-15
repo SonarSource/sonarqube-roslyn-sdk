@@ -31,5 +31,6 @@
         <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer11\RoslynAnalyzer11\RoslynAnalyzer11.csproj" />
         <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer298\RoslynAnalyzer298.csproj" />
         <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer333\RoslynAnalyzer333.csproj" />
+        <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer492\RoslynAnalyzer492.csproj" />
     </ItemGroup>
 </Project>

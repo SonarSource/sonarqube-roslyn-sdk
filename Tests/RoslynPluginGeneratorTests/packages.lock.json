@@ -428,6 +428,9 @@
       "RoslynV333": {
         "type": "Project"
       },
+      "RoslynV492": {
+        "type": "Project"
+      },
       "sonarqube.plugins.common": {
         "type": "Project"
       },

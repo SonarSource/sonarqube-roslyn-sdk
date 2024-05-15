@@ -40,6 +40,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RoslynAnalyzer298", "Tests\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RoslynV1Refs", "RoslynV1Resfs\RoslynV1Refs.csproj", "{60280BDB-61A9-4FC8-A9A9-62E04BF6644E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoslynAnalyzer492", "Tests\ExampleAnalyzers\RoslynAnalyzer492\RoslynAnalyzer492.csproj", "{9C678B9A-0A1E-4404-820E-7CF141BF666E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,6 +100,10 @@ Global
 		{60280BDB-61A9-4FC8-A9A9-62E04BF6644E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{60280BDB-61A9-4FC8-A9A9-62E04BF6644E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{60280BDB-61A9-4FC8-A9A9-62E04BF6644E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C678B9A-0A1E-4404-820E-7CF141BF666E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C678B9A-0A1E-4404-820E-7CF141BF666E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C678B9A-0A1E-4404-820E-7CF141BF666E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C678B9A-0A1E-4404-820E-7CF141BF666E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -113,6 +119,7 @@ Global
 		{AAAFF8DB-1438-4066-BE44-353B09CF6518} = {A0234F11-305B-4409-AEA9-1982C397C395}
 		{AB6E10CB-6EC9-4032-9C43-2F5BB745DC35} = {A0234F11-305B-4409-AEA9-1982C397C395}
 		{4AD02214-637F-40A7-990E-9EA7FDFCB108} = {A0234F11-305B-4409-AEA9-1982C397C395}
+		{9C678B9A-0A1E-4404-820E-7CF141BF666E} = {A0234F11-305B-4409-AEA9-1982C397C395}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {03EB9717-98C3-4474-BB11-BB40F9BD0A01}

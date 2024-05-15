@@ -1,4 +1,4 @@
-/*
+﻿/*
  * SonarQube Roslyn SDK
  * Copyright (C) 2015-2022 SonarSource SA
  * mailto:info AT sonarsource DOT com
@@ -150,6 +150,7 @@ namespace SonarQube.Plugins.Roslyn.RuleGeneratorTests
         [DataRow(typeof(RoslynAnalyzer11.CSharpAnalyzer), 3)]
         [DataRow(typeof(RoslynAnalyzer298.RoslynAnalyzer298Analyzer), 1)]
         [DataRow(typeof(RoslynAnalyzer333.RoslynAnalyzer333Analyzer), 1)]
+        [DataRow(typeof(RoslynAnalyzer492.RoslynAnalyzer492Analyzer), 1)]
         public void InstantiateDiags_DifferentRoslynVersions_AnalyzersFound(Type typeInTargetAssembly, int expectedAnalyzerCount)
         {
             // Arrange
