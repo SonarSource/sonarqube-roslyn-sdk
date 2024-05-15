@@ -41,6 +41,8 @@ v3.0 generates plugins that are compatible with versions of SonarQube from v7.9.
 
 v3.1 generates plugins that are compatible with versions of SonarQube from v7.9.6 (tested with the latest available version at time of release i.e. v9.7).
 
+v4.0 generates plugins that are compatible with versions of SonarQube from v9.9 (tested with the latest available version at time of release i.e. v10.5.1).
+
 If you have an existing plugin that was generated with v1.0 of the SDK and want to use the plugin with SonarQube 7.0 or later, you will need to create a new plugin using v2.0 of the SDK. If you customized the _SQALE.xml_ file for your v1.0 plugin, you will need to move the remediation information to the _rules.xml_ file for the v2.0 plugin.
 
 #### Changes between v1.0 and v2.0
