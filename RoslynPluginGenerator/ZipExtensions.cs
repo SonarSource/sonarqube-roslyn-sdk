@@ -18,10 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using System;
-using System.IO;
 using System.IO.Compression;
-using System.Linq;
 
 namespace SonarQube.Plugins.Roslyn
 {
@@ -49,12 +46,11 @@ namespace SonarQube.Plugins.Roslyn
             string[] files = Directory.GetFiles(sourceDirectoryName, "*.*", SearchOption.AllDirectories);
 
             int pathPrefixLength = sourceDirectoryName.Length + 1;
-
-            using (ZipArchive archive = ZipFile.Open(destinationArchiveFileName, ZipArchiveMode.Create, new ForwardPathSeparatorEncoding()))
+            using (ZipArchive archive = ZipFile.Open(destinationArchiveFileName, ZipArchiveMode.Create))
             {
                 foreach (string file in files.Where(f => fileInclusionPredicate(f)))
                 {
-                    archive.CreateEntryFromFile(file, file.Substring(pathPrefixLength), CompressionLevel.Optimal);
+                    archive.CreateEntryFromFile(file, file.Substring(pathPrefixLength).Replace("\\", "/"), CompressionLevel.Optimal);
                 }
             }
         }
