@@ -134,11 +134,11 @@ namespace SonarQube.Plugins.Roslyn
             List<DiagnosticAnalyzer> analyzers = new List<DiagnosticAnalyzer>();
 
             // It is assumed that analyserAssembly is valid. FileNotFoundException will be thrown if dependency resolution fails.
-            foreach (Type type in analyserAssembly.GetTypes())
+            foreach (Type type in analyserAssembly.GetExportedTypes())
             {
-                if (!type.IsAbstract &&
-                    type.IsSubclassOf(typeof(DiagnosticAnalyzer)) &&
-                    DiagnosticMatchesLanguage(type, language))
+                if (!type.IsAbstract
+                    && type.IsSubclassOf(typeof(DiagnosticAnalyzer))
+                    && DiagnosticMatchesLanguage(type, language))
                 {
                     DiagnosticAnalyzer analyzer = (DiagnosticAnalyzer)Activator.CreateInstance(type);
                     analyzers.Add(analyzer);
