@@ -69,6 +69,15 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to /language:[cs|vb] - specify analyzer languages. Default: cs.
+        /// </summary>
+        internal static string ArgDesciption_Language {
+            get {
+                return ResourceManager.GetString("ArgDesciption_Language", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to indicates that you accept the licenses for any packages that required license acceptance.
         /// </summary>
         internal static string ArgDescription_AcceptLicenses {
@@ -137,6 +146,15 @@ namespace SonarQube.Plugins.Roslyn.CommandLine {
         internal static string DEBUG_UsingRuleFile {
             get {
                 return ResourceManager.GetString("DEBUG_UsingRuleFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid language parameter: {0}.
+        /// </summary>
+        internal static string ERROR_InvalidLanguage {
+            get {
+                return ResourceManager.GetString("ERROR_InvalidLanguage", resourceCulture);
             }
         }
         

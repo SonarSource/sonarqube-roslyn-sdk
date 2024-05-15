@@ -31,14 +31,11 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
     {
         public TestContext TestContext { get; set; }
 
-        #region Tests
-
         [TestMethod]
         public void ArgProc_EmptyArgs()
         {
-            // Arrange
             TestLogger logger = new TestLogger();
-            string[] rawArgs = { };
+            string[] rawArgs = [];
 
             // Act
             ProcessedArgs actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
@@ -57,28 +54,28 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
 
             // 1. No value
             logger = new TestLogger();
-            rawArgs = new string [] { "/analyzer:" };
+            rawArgs = ["/analyzer:"];
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             AssertArgumentsNotProcessed(actualArgs, logger);
 
             // 2. Id and missing version
             logger = new TestLogger();
-            rawArgs = new string[] { "/analyzer:testing.id.missing.version:" };
+            rawArgs = ["/analyzer:testing.id.missing.version:"];
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             AssertArgumentsNotProcessed(actualArgs, logger);
 
             // 3. Id and invalid version
             logger = new TestLogger();
-            rawArgs = new string[] { "/analyzer:testing.id.invalid.version:1.0.-invalid.version.1" };
+            rawArgs = ["/analyzer:testing.id.invalid.version:1.0.-invalid.version.1"];
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             AssertArgumentsNotProcessed(actualArgs, logger);
 
             // 4. Missing id
             logger = new TestLogger();
-            rawArgs = new string[] { "/analyzer::2.1.0" };
+            rawArgs = ["/analyzer::2.1.0"];
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             AssertArgumentsNotProcessed(actualArgs, logger);
@@ -94,21 +91,21 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
 
             // 1. Id but no version
             logger = new TestLogger();
-            rawArgs = new string[] { "/a:testing.id.no.version" };
+            rawArgs = ["/a:testing.id.no.version"];
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             AssertArgumentsProcessed(actualArgs, logger, "testing.id.no.version", null, false);
 
             // 2. Id and version
             logger = new TestLogger();
-            rawArgs = new string[] { "/analyzer:testing.id.with.version:1.0.0-rc1" };
+            rawArgs = ["/analyzer:testing.id.with.version:1.0.0-rc1"];
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             AssertArgumentsProcessed(actualArgs, logger, "testing.id.with.version", "1.0.0-rc1", false);
 
             // 3. Id containing a colon, with version
             logger = new TestLogger();
-            rawArgs = new string[] { "/analyzer:id.with:colon:2.1.0" };
+            rawArgs = ["/analyzer:id.with:colon:2.1.0"];
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             AssertArgumentsProcessed(actualArgs, logger, "id.with:colon", "2.1.0", false);
@@ -117,9 +114,8 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
         [TestMethod]
         public void ArgProc_SqaleParameterIsDeprecated()
         {
-            // Arrange
             TestLogger logger = new TestLogger();
-            string[] rawArgs = new string[] { "/sqale:mySqaleFile.txt", "/a:validId" };
+            string[] rawArgs = ["/sqale:mySqaleFile.txt", "/a:validId"];
 
             ProcessedArgs actualArgs;
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
@@ -138,14 +134,14 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
 
             // 1. No rule file value -> valid
             logger = new TestLogger();
-            rawArgs = new string[] { "/a:validId" };
+            rawArgs = ["/a:validId"];
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             actualArgs.RuleFilePath.Should().BeNull();
 
             // 2. Missing rule file
             logger = new TestLogger();
-            rawArgs = new string[] { "/rules:missingFile.txt", "/a:validId" };
+            rawArgs = ["/rules:missingFile.txt", "/a:validId"];
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             AssertArgumentsNotProcessed(actualArgs, logger);
@@ -156,7 +152,7 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
             string filePath = TestUtils.CreateTextFile("valid.rules.txt", testDir, "rule file contents");
 
             logger = new TestLogger();
-            rawArgs = new string[] { $"/rules:{filePath}", "/a:valid:1.0" };
+            rawArgs = [$"/rules:{filePath}", "/a:valid:1.0"];
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             actualArgs.Should().NotBeNull();
@@ -173,7 +169,7 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
 
             // 1. Correct argument -> valid and accept is true
             logger = new TestLogger();
-            rawArgs = new string[] { "/a:validId", "/acceptLicenses" };
+            rawArgs = ["/a:validId", "/acceptLicenses"];
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             AssertArgumentsProcessed(actualArgs, logger, "validId", null, true);
@@ -189,21 +185,21 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
 
             // 1. Correct text, wrong case -> invalid
             logger = new TestLogger();
-            rawArgs = new string[] { "/a:validId", "/ACCEPTLICENSES" };
+            rawArgs = ["/a:validId", "/ACCEPTLICENSES"];
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             AssertArgumentsNotProcessed(actualArgs, logger);
 
             // 2. Unrecognized argument -> invalid
             logger = new TestLogger();
-            rawArgs = new string[] { "/a:validId", "/acceptLicenses=true" };
+            rawArgs = ["/a:validId", "/acceptLicenses=true"];
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             AssertArgumentsNotProcessed(actualArgs, logger);
 
             // 3. Unrecognized argument -> invalid
             logger = new TestLogger();
-            rawArgs = new string[] { "/a:validId", "/acceptLicensesXXX" };
+            rawArgs = ["/a:validId", "/acceptLicensesXXX"];
             actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             AssertArgumentsNotProcessed(actualArgs, logger);
@@ -214,7 +210,6 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
         {
             var logger = new TestLogger();
             var rawArgs = new string[] { "/a:validId", "/o:My/Output/Directory" };
-
             var actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             actualArgs.OutputDirectory.Should().Be("My/Output/Directory");
@@ -225,7 +220,6 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
         {
             var logger = new TestLogger();
             var rawArgs = new string[] { "/a:validId" };
-
             var actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             actualArgs.OutputDirectory.Should().Be(Directory.GetCurrentDirectory());
@@ -236,7 +230,6 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
         {
             var logger = new TestLogger();
             var rawArgs = new string[] { "/a:validId" };
-
             var actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             actualArgs.CustomNuGetRepository.Should().BeNull();
@@ -247,15 +240,37 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
         {
             var logger = new TestLogger();
             var rawArgs = new string[] { "/a:validId", "/customnugetrepo:file:///somelocalrepo/path" };
-
             var actualArgs = ArgumentProcessor.TryProcessArguments(rawArgs, logger);
 
             actualArgs.CustomNuGetRepository.Should().Be("file:///somelocalrepo/path");
         }
 
-        #endregion Tests
+        [TestMethod]
+        public void ArgProc_Language_Default()
+        {
+            var actualArgs = ArgumentProcessor.TryProcessArguments(["/a:irrelevant"], new TestLogger());
+            actualArgs.Language.Should().Be("cs");
+        }
 
-        #region Checks
+        [TestMethod]
+        public void ArgProc_Language_Valid()
+        {
+            var actualArgs = ArgumentProcessor.TryProcessArguments(["/a:valid", "/language:cs"], new TestLogger());
+            actualArgs.Language.Should().Be("cs");
+
+            actualArgs = ArgumentProcessor.TryProcessArguments(["/a:valid", "/language:vb"], new TestLogger());
+            actualArgs.Language.Should().Be("vb");
+        }
+
+        [TestMethod]
+        public void ArgProc_Language_Invalid()
+        {
+            var logger = new TestLogger();
+            var actualArgs = ArgumentProcessor.TryProcessArguments(["/a:valid", "/language:invalid"], logger);
+
+            AssertArgumentsNotProcessed(actualArgs, logger);
+            logger.AssertErrorLogged("Invalid language parameter: invalid");
+        }
 
         private static void AssertArgumentsNotProcessed(ProcessedArgs actualArgs, TestLogger logger)
         {
@@ -266,10 +281,9 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
         private static void AssertArgumentsProcessed(ProcessedArgs actualArgs, TestLogger logger, string expectedId, string expectedVersion, bool expectedAcceptLicenses)
         {
             actualArgs.Should().NotBeNull("Expecting the arguments to have been processed successfully");
-
             expectedId.Should().Be(actualArgs.PackageId, "Unexpected package id returned");
 
-            if (expectedVersion == null)
+            if (expectedVersion is null)
             {
                 actualArgs.PackageVersion.Should().BeNull("Expecting the version to be null");
             }
@@ -278,12 +292,8 @@ namespace SonarQube.Plugins.Roslyn.PluginGeneratorTests
                 actualArgs.PackageVersion.Should().NotBeNull("Not expecting the version to be null");
                 actualArgs.PackageVersion.ToString().Should().Be(expectedVersion);
             }
-
             actualArgs.AcceptLicenses.Should().Be(expectedAcceptLicenses, "Unexpected value for AcceptLicenses");
-
             logger.AssertErrorsLogged(0);
         }
-
-        #endregion Checks
     }
 }
