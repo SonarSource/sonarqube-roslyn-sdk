@@ -2,6 +2,12 @@
   "version": 1,
   "dependencies": {
     ".NETFramework,Version=v4.8": {
+      "FluentAssertions": {
+        "type": "Direct",
+        "requested": "[5.4.1, )",
+        "resolved": "5.4.1",
+        "contentHash": "ftwjDaILOT2HUVykOWJ2FhAbPo3PUDqydbd3g3flGT9FviKnAFKxCAEaZQi4gJV/mNFij2jLS2LblTYhj0/32g=="
+      },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
         "requested": "[16.9.4, )",
@@ -28,11 +34,6 @@
         "requested": "[5.0.0, )",
         "resolved": "5.0.0",
         "contentHash": "JPJArwA1kdj8qDAkY2XGjSWoYnqiM7q/3yRNkt6n28Mnn95MuEGkZXUbPBf7qc3IjwrGY5ttQon7yqHZyQJmOQ=="
-      },
-      "FluentAssertions": {
-        "type": "Transitive",
-        "resolved": "5.4.1",
-        "contentHash": "ftwjDaILOT2HUVykOWJ2FhAbPo3PUDqydbd3g3flGT9FviKnAFKxCAEaZQi4gJV/mNFij2jLS2LblTYhj0/32g=="
       },
       "Microsoft.CodeCoverage": {
         "type": "Transitive",

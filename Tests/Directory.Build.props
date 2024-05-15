@@ -1,13 +1,13 @@
 <Project>
-  
-  <!-- Test-only settings -->
-  
-  <Import Project="..\Directory.Build.props" />
-  
-  <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
-    <IsPackable>false</IsPackable>
-    <SonarQubeTestProject>true</SonarQubeTestProject>
-  </PropertyGroup>
+
+    <!-- Test-only settings -->
+
+    <Import Project="..\Directory.Build.props" />
+
+    <PropertyGroup>
+        <TargetFramework>net48</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <SonarQubeTestProject>true</SonarQubeTestProject>
+    </PropertyGroup>
 
 </Project>

@@ -1,33 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <ProjectGuid>{AAE84E64-5977-44D7-8959-80F59FA2B0C1}</ProjectGuid>
-    <RootNamespace>SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests</RootNamespace>
-    <AssemblyName>SonarQube.Plugins.Roslyn.PluginGeneratorTests</AssemblyName>
-  </PropertyGroup>
+    <ItemGroup Label="Test packages">
+        <PackageReference Include="Microsoft.CodeAnalysis" Version="$(RoslynPackagesVersion)" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
+        <PackageReference Include="MSTest.TestAdapter" Version="2.2.3" />
+        <PackageReference Include="MSTest.TestFramework" Version="2.2.3" />
+        <PackageReference Include="coverlet.collector" Version="3.0.2" />
+        <PackageReference Include="FluentAssertions" Version="5.4.1" />
+    </ItemGroup>
 
-  <ItemGroup Label="Test packages">
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="$(RoslynPackagesVersion)" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.2.3" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.2.3" />
-    <PackageReference Include="coverlet.collector" Version="3.0.2" />
-    <PackageReference Include="FluentAssertions" Version="5.4.1" />
-  </ItemGroup>
+    <ItemGroup>
+        <Using Include="FluentAssertions" />
+        <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="NuGet.CommandLine" Version="$(NuGetPackagesVersion)" GeneratePathProperty="true" />
-    <Reference Include="$(PkgNuGet_CommandLine)\tools\NuGet.exe" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\..\Common\SonarQube.Plugins.Common.csproj" />
-    <ProjectReference Include="..\..\PluginGenerator\SonarQube.Plugins.PluginGenerator.csproj" />
-    <ProjectReference Include="..\..\RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj" />
-    <ProjectReference Include="..\Common\SonarQube.Plugins.Test.Common.csproj" />
-    <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer10\RoslynAnalyzer10\RoslynAnalyzer10.csproj" />
-    <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer11\RoslynAnalyzer11\RoslynAnalyzer11.csproj" />
-    <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer298\RoslynAnalyzer298.csproj" />
-    <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer333\RoslynAnalyzer333.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="NuGet.CommandLine" Version="$(NuGetPackagesVersion)" GeneratePathProperty="true" />
+        <Reference Include="$(PkgNuGet_CommandLine)\tools\NuGet.exe" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Common\SonarQube.Plugins.Common.csproj" />
+        <ProjectReference Include="..\..\PluginGenerator\SonarQube.Plugins.PluginGenerator.csproj" />
+        <ProjectReference Include="..\..\RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj" />
+        <ProjectReference Include="..\Common\SonarQube.Plugins.Test.Common.csproj" />
+        <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer10\RoslynAnalyzer10\RoslynAnalyzer10.csproj" />
+        <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer11\RoslynAnalyzer11\RoslynAnalyzer11.csproj" />
+        <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer298\RoslynAnalyzer298.csproj" />
+        <ProjectReference Include="..\ExampleAnalyzers\RoslynAnalyzer333\RoslynAnalyzer333.csproj" />
+    </ItemGroup>
 </Project>
