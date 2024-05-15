@@ -13,9 +13,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Common\SonarQube.Plugins.Common.csproj">
-            <Project>{bb89698a-0807-44d2-87ec-6aa271200759}</Project>
-            <Name>SonarQube.Plugins.Common</Name>
-        </ProjectReference>
+        <ProjectReference Include="..\..\Common\SonarQube.Plugins.Common.csproj" />
     </ItemGroup>
 </Project>
