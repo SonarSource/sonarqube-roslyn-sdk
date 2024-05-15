@@ -15,7 +15,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis" Version="$(RoslynPackagesVersion)" ExcludeAssets="analyzers" />
     <PackageReference Include="NuGet.CommandLine" Version="$(NuGetPackagesVersion)" GeneratePathProperty="true" PrivateAssets="all" />
     <Reference Include="$(PkgNuGet_CommandLine)\tools\NuGet.exe" />
-    <PackageReference Include="System.IO.Compression" Version="4.0.0" Private="true" />
+    <PackageReference Include="System.IO.Compression" Version="4.3.0" Private="true" />
   </ItemGroup>
 
   <ItemGroup>
