@@ -1,16 +1,27 @@
 <Project>
 
-  <!-- Common settings for test and product code-->
+    <!-- Common settings for test and product code-->
 
-  <PropertyGroup>
-    <Version>3.1.0</Version>
-    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <PropertyGroup>
+        <LangVersion>12</LangVersion>
+        <Version>3.1.0</Version>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
 
-    <RoslynPackagesVersion>4.9.2</RoslynPackagesVersion>
-    <NuGetPackagesVersion>6.9.1</NuGetPackagesVersion>
-  </PropertyGroup>
-  
-  <ItemGroup>
-    <AdditionalFiles Include="$(MSBuildThisFileDirectory)SonarLint.xml" Visible="False" />
-  </ItemGroup>
+        <RoslynPackagesVersion>4.9.2</RoslynPackagesVersion>
+        <NuGetPackagesVersion>6.9.1</NuGetPackagesVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <AdditionalFiles Include="$(MSBuildThisFileDirectory)SonarLint.xml" Visible="False" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="System" />
+        <Using Include="System.Collections.Generic" />
+        <Using Include="System.Diagnostics" />
+        <Using Include="System.IO" />
+        <Using Include="System.Linq" />
+        <Using Include="System.Text" />
+    </ItemGroup>
+
 </Project>
