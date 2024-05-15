@@ -22,7 +22,6 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
 
 namespace SonarQube.Plugins.Roslyn
 {
@@ -51,41 +50,13 @@ namespace SonarQube.Plugins.Roslyn
 
             int pathPrefixLength = sourceDirectoryName.Length + 1;
 
-            using (ZipArchive archive = ZipFile.Open(destinationArchiveFileName, ZipArchiveMode.Create, new PathEncoder()))
+            using (ZipArchive archive = ZipFile.Open(destinationArchiveFileName, ZipArchiveMode.Create, new ForwardPathSeparatorEncoding()))
             {
                 foreach (string file in files.Where(f => fileInclusionPredicate(f)))
                 {
                     archive.CreateEntryFromFile(file, file.Substring(pathPrefixLength), CompressionLevel.Optimal);
                 }
             }
-        }
-    }
-
-    /// <summary>
-    /// Replaces the back slash to foward slash to attend the international convention of directories separation.
-    /// This will allow the zip file to be unzipped the correct way both linux and windows OS's.
-    /// </summary>
-    /// <seealso cref="System.Text.UTF8Encoding" />
-    class PathEncoder : UTF8Encoding
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PathEncoder"/> class.
-        /// </summary>
-        public PathEncoder() : base(true)
-        {
-        }
-
-        /// <summary>
-        /// When overridden in a derived class, encodes all the characters in the specified string into a sequence of bytes.
-        /// </summary>
-        /// <param name="s">The string containing the characters to encode.</param>
-        /// <returns>
-        /// A byte array containing the results of encoding the specified set of characters.
-        /// </returns>
-        public override byte[] GetBytes(string s)
-        {
-            s = s.Replace("\\", "/");
-            return base.GetBytes(s);
         }
     }
 }
