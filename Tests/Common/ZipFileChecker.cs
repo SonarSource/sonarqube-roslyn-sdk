@@ -91,16 +91,19 @@ namespace SonarQube.Plugins.Test.Common
             allFilesInZip.Length.Should().Be(expectedRelativePaths.Length, "Zip contains more files than expected");
         }
 
-        private void DumpZipFile(string zipFilePath)	
-        {	
-            // Dump the zip contents	
-            var filesInZip = Directory.GetFiles(UnzippedDirectoryPath, "*.*", SearchOption.AllDirectories);	
-            testContext.WriteLine($"Zip file contents: {zipFilePath}");	
-            testContext.WriteLine($"File count: {filesInZip.Length}");	
-            foreach (string file in filesInZip)	
-            {	
-                testContext.WriteLine($"  {file}");	
-            }	
+        public void AssertZipFileContent(string relativeFilePath, string expectedContent) =>
+            File.ReadAllText(AssertFileExists(relativeFilePath)).Should().Be(expectedContent);
+
+        private void DumpZipFile(string zipFilePath)
+        {
+            // Dump the zip contents
+            var filesInZip = Directory.GetFiles(UnzippedDirectoryPath, "*.*", SearchOption.AllDirectories);
+            testContext.WriteLine($"Zip file contents: {zipFilePath}");
+            testContext.WriteLine($"File count: {filesInZip.Length}");
+            foreach (string file in filesInZip)
+            {
+                testContext.WriteLine($"  {file}");
+            }
         }
     }
 }

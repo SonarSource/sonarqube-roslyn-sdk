@@ -41,7 +41,7 @@ namespace SonarQube.Plugins.Roslyn
         private const string RelativeManifestResourcePath = "META-INF/MANIFEST.MF";
         private const string RelativeConfigurationResourcePath = "org/sonar/plugins/roslynsdk/configuration.xml";
         private const string RelativeRulesXmlResourcePath = "org/sonar/plugins/roslynsdk/rules.xml";
-        
+
         private readonly ILogger logger;
 
         private readonly IDictionary<string, string> pluginProperties;
@@ -281,7 +281,7 @@ namespace SonarQube.Plugins.Roslyn
 
                 RepositoryKey = repositoryKey,
                 RepositoryName = repositoryName,
-                RepositoryLanguage = language,
+                RepositoryLanguage = SupportedLanguages.RepositoryLanguage(language),
                 RulesXmlResourcePath = GetAbsoluteResourcePath(RelativeRulesXmlResourcePath)
             };
 

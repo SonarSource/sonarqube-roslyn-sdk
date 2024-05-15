@@ -42,12 +42,13 @@ public static class SupportedLanguages
             _ => throw UnsupportedException(language)
         };
 
-            return supported;
-        }
-
-        public static string GetRoslynLanguageName(string language)
+    public static string RepositoryLanguage(string language) =>
+        language switch
         {
-            ThrowIfNotSupported(language);
+            CSharp => "cs",
+            VisualBasic => "vbnet",
+            _ => throw UnsupportedException(language)
+        };
 
     private static ArgumentOutOfRangeException UnsupportedException(string language) =>
         new(nameof(language), string.Format(System.Globalization.CultureInfo.CurrentCulture, UIResources.APG_UnsupportedLanguage, language));

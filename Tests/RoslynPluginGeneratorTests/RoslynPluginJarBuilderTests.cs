@@ -18,64 +18,56 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using System.Configuration;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SonarQube.Plugins.Test.Common;
 
-namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
+namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests;
+
+[TestClass]
+public class RoslynPluginJarBuilderTests
 {
-    [TestClass]
-    public class RoslynPluginJarBuilderTests
+    public TestContext TestContext { get; set; }
+
+    [DataTestMethod]
+    [DataRow("cs", "cs")]
+    [DataRow("vb", "vbnet")]
+    public void RoslynPlugin(string language, string expectedRepository)
     {
-        public TestContext TestContext { get; set; }
+        string testDir = TestUtils.CreateTestDirectory(TestContext, language);
+        string workingDir = TestUtils.CreateTestDirectory(TestContext, language, ".working");
+        string outputJarFilePath = Path.Combine(testDir, $"created.{language}.jar");
+        string dummyRulesFile = TestUtils.CreateTextFile("rules.txt", testDir, "<rules />");
+        string dummyZipFile = TestUtils.CreateTextFile("payload.txt", testDir, "zip");
+        var manifest = new PluginManifest() { Key = "pluginkey", Description = "description", Name = "name" };
+        var builder = new RoslynPluginJarBuilder(new TestLogger());
+        builder.SetLanguage(language)
+            .SetRepositoryKey("repo.key")
+            .SetRepositoryName("repo.name")
+            .SetRulesFilePath(dummyRulesFile)
+            .SetPluginManifestProperties(manifest)
+            .AddResourceFile(dummyZipFile, @"static\foo.zip")
+            .SetJarFilePath(outputJarFilePath);
+        builder.BuildJar(workingDir);
 
-        #region Tests
-
-        [TestMethod]
-        public void RoslynPlugin_Test()
-        {
-            // Arrange
-            string testDir = TestUtils.CreateTestDirectory(TestContext);
-            string workingDir = TestUtils.CreateTestDirectory(TestContext, ".working");
-            string outputJarFilePath = Path.Combine(testDir, "created.jar");
-
-            string dummyRulesFile = TestUtils.CreateTextFile("rules.txt", testDir, "<rules />");
-            string dummyZipFile = TestUtils.CreateTextFile("payload.txt", testDir, "zip");
-
-            PluginManifest manifest= new PluginManifest()
-            {
-                Key = "pluginkey",
-                Description = "description",
-                Name = "name"
-            };
-
-            // Act
-            RoslynPluginJarBuilder builder = new RoslynPluginJarBuilder(new TestLogger());
-
-            builder.SetLanguage("cs")
-                .SetRepositoryKey("repo.key")
-                .SetRepositoryName("repo.name")
-                .SetRulesFilePath(dummyRulesFile)
-                .SetPluginManifestProperties(manifest)
-                .AddResourceFile(dummyZipFile, "static\\foo.zip")
-                .SetJarFilePath(outputJarFilePath);
-
-            builder.BuildJar(workingDir);
-
-            // Assert
-            ZipFileChecker checker = new ZipFileChecker(TestContext, outputJarFilePath);
-
-            checker.AssertZipContainsFiles(
-                "META-INF\\MANIFEST.MF",
-                "static\\foo.zip",
-                "org\\sonar\\plugins\\roslynsdk\\configuration.xml",
-                "org\\sonar\\plugins\\roslynsdk\\rules.xml"
-                );
-
-            checker.AssertZipDoesNotContainFiles(
-                "org\\sonar\\plugins\\roslynsdk\\sqale.xml");
-        }
-
-        #endregion Tests
+        var checker = new ZipFileChecker(TestContext, outputJarFilePath);
+        checker.AssertZipContainsFiles(
+            @"META-INF\MANIFEST.MF",
+            @"static\foo.zip",
+            @"org\sonar\plugins\roslynsdk\configuration.xml",
+            @"org\sonar\plugins\roslynsdk\rules.xml");
+        checker.AssertZipDoesNotContainFiles(@"org\sonar\plugins\roslynsdk\sqale.xml");
+        checker.AssertZipFileContent(@"org\sonar\plugins\roslynsdk\configuration.xml", $"""
+            <?xml version="1.0" encoding="utf-8"?>
+            <RoslynSdkConfiguration xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <PluginKeyDifferentiator>pluginkey</PluginKeyDifferentiator>
+              <RepositoryKey>repo.key</RepositoryKey>
+              <RepositoryLanguage>{expectedRepository}</RepositoryLanguage>
+              <RepositoryName>repo.name</RepositoryName>
+              <RulesXmlResourcePath>/org/sonar/plugins/roslynsdk/rules.xml</RulesXmlResourcePath>
+              <PluginProperties />
+            </RoslynSdkConfiguration>
+            """);
     }
 }

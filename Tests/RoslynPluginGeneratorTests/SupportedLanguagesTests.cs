@@ -21,7 +21,6 @@
 using System;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SonarQube.Plugins.Test.Common;
 
 namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests;
 
@@ -50,11 +49,25 @@ public class SupportedLanguagesTests
     public void RoslynLanguageName_Valid(string language, string expected) =>
         SupportedLanguages.RoslynLanguageName(language).Should().Be(expected);
 
-            action = () => SupportedLanguages.ThrowIfNotSupported("Visual Basic");
-            action.Should().ThrowExactly<ArgumentOutOfRangeException>();
+    [DataTestMethod]
+    [DataRow("")]
+    [DataRow("123")]
+    [DataRow("CSharp")]
+    [DataRow("CS")]
+    [DataRow("Cs")]
+    [DataRow("cS")]
+    [DataRow("Visual Basic")]
+    [DataRow("VB")]
+    [DataRow("Vb")]
+    [DataRow("vB")]
+    [DataRow("vb.net")]
+    [DataRow("vbnet")]
+    public void RepositoryLanguage_Invalid_Throws(string language) =>
+        ((Func<string>)(() => SupportedLanguages.RepositoryLanguage(language))).Should().Throw<ArgumentOutOfRangeException>();
 
-            action = () => SupportedLanguages.ThrowIfNotSupported("CSharp");
-            action.Should().ThrowExactly<ArgumentOutOfRangeException>();
-
-    // ToDo: Remove this comment (staging issue)
+    [DataTestMethod]
+    [DataRow("cs", "cs")]
+    [DataRow("vb", "vbnet")]
+    public void RepositoryLanguage_Valid(string language, string expected) =>
+        SupportedLanguages.RepositoryLanguage(language).Should().Be(expected);
 }
