@@ -2,10 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-
-    <ProjectGuid>{BB89698A-0807-44D2-87EC-6AA271200759}</ProjectGuid>
-    <RootNamespace>SonarQube.Plugins.Common</RootNamespace>
-    <AssemblyName>SonarQube.Plugins.Common</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

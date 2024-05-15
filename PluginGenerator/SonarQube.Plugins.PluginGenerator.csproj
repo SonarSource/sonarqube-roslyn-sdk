@@ -2,12 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <ProjectGuid>{DB16CCFA-B97F-4C5E-A99A-A6062ECF5D98}</ProjectGuid>
     <RootNamespace>SonarQube.Plugins</RootNamespace>
-    <AssemblyName>SonarQube.Plugins.PluginGenerator</AssemblyName>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <Compile Update="SonarQube\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -20,7 +18,7 @@
       <DependentUpon>UIResources.resx</DependentUpon>
     </Compile>
   </ItemGroup>
-  
+
   <ItemGroup>
     <EmbeddedResource Update="SonarQube\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -33,11 +31,8 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  
+
   <ItemGroup>
-    <ProjectReference Include="..\Common\SonarQube.Plugins.Common.csproj">
-      <Project>{bb89698a-0807-44d2-87ec-6aa271200759}</Project>
-      <Name>SonarQube.Plugins.Common</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\Common\SonarQube.Plugins.Common.csproj" />
   </ItemGroup>
 </Project>

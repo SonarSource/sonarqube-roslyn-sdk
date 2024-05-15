@@ -2,15 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
-    <ProjectGuid>{FF1A3253-1888-412C-A870-922C08B29A1A}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>SonarQube.Plugins.Roslyn</RootNamespace>
     <AssemblyName>RoslynSonarQubePluginGenerator</AssemblyName>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <PlatformTarget>AnyCPU</PlatformTarget>
-
-    <!-- Don't include all Roslyn language resources when publishing
-         (need to include this in all product projects that reference Roslyn) -->
+    <!-- Don't include all Roslyn language resources when publishing (need to include this in all product projects that reference Roslyn) -->
     <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
   </PropertyGroup>
 
@@ -51,7 +48,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  
+
   <ItemGroup Label="Embedded jar file">
     <!-- Corresponsds to the following commit:
 
@@ -61,14 +58,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Common\SonarQube.Plugins.Common.csproj">
-      <Project>{bb89698a-0807-44d2-87ec-6aa271200759}</Project>
-      <Name>SonarQube.Plugins.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PluginGenerator\SonarQube.Plugins.PluginGenerator.csproj">
-      <Project>{db16ccfa-b97f-4c5e-a99a-a6062ecf5d98}</Project>
-      <Name>SonarQube.Plugins.PluginGenerator</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\Common\SonarQube.Plugins.Common.csproj" />
+    <ProjectReference Include="..\PluginGenerator\SonarQube.Plugins.PluginGenerator.csproj" />
     <ProjectReference Include="..\RoslynV1Resfs\RoslynV1Refs.csproj" />
   </ItemGroup>
 
