@@ -182,11 +182,30 @@ namespace SonarQube.Common
                 bool exists = argument != null && !string.IsNullOrWhiteSpace(argument.Value);
                 if (!exists)
                 {
-                    logger.LogError(Resources.ERROR_CmdLine_MissingRequiredArgument, desc.Description);
+                    logger.LogError(Resources.ERROR_CmdLine_MissingRequiredArgument, desc.Prefixes[0]);
+                    ShowHelpMessage(logger);
                     return false;
                 }
             }
             return true;
+        }
+
+        private void ShowHelpMessage(ILogger logger)
+        {
+            logger.LogInfo(Resources.CmdLine_Help_RequiredArguments);
+            foreach (ArgumentDescriptor descriptor in descriptors.Where(x => x.Required).OrderBy(x => x.Prefixes[0]))
+            {
+                DisplayArgumentHelp(descriptor);
+            }
+            logger.LogInfo(string.Empty);
+            logger.LogInfo(Resources.CmdLine_Help_OptionalArguments);
+            foreach (ArgumentDescriptor descriptor in descriptors.Where(x => !x.Required).OrderBy(x => x.Prefixes[0]))
+            {
+                DisplayArgumentHelp(descriptor);
+            }
+
+            void DisplayArgumentHelp(ArgumentDescriptor argument) =>
+                logger.LogInfo(Resources.CmdLine_Help_Argument, string.Join(", ", argument.Prefixes), argument.Description);
         }
     }
 }

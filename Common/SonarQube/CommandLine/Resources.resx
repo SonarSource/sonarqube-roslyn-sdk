@@ -117,6 +117,15 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CmdLine_Help_RequiredArguments" xml:space="preserve">
+    <value>Required argument:</value>
+  </data>
+  <data name="CmdLine_Help_OptionalArguments" xml:space="preserve">
+    <value>Optional arguments:</value>
+  </data>
+  <data name="CmdLine_Help_Argument" xml:space="preserve">
+    <value>  {0,-25}{1}</value>
+  </data>
   <data name="ERROR_CmdLine_DuplicateArg" xml:space="preserve">
     <value>A value has already been supplied for this argument: {0}. Existing: '{1}'</value>
   </data>
