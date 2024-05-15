@@ -496,11 +496,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
         [DataRow(true)]
         public void Generate_NoAnalyzers_GeneratesError(bool recurseDependencies)
         {
-            // Arrange
             var outputDir = TestUtils.CreateTestDirectory(TestContext, $"recurse-{recurseDependencies}", ".out");
-
             var logger = new TestLogger();
-
             var remoteRepoBuilder = new RemoteRepoBuilder(TestContext);
             // Create a package that does not contain analyzers
             remoteRepoBuilder.CreatePackage("dummy.id", "1.1", typeof(AnalyzerPluginGenerator).Assembly.Location, License.NotRequired);
@@ -515,14 +512,12 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
                 .SetRecurseDependencies(recurseDependencies)
                 .Build();
 
-            // Act
             bool result = apg.Generate(args);
 
-            // Assert
             result.Should().BeFalse();
             AssertRuleTemplateDoesNotExist(outputDir);
             AssertJarsGenerated(outputDir, 0);
-            logger.AssertSingleErrorExists("Plugin not generated: no analyzers were found");
+            logger.AssertSingleErrorExists("Plugin was not generated: No Roslyn analyzers were found. Check NuGet content and the minimal compatible Roslyn version.");
         }
 
         [TestMethod]

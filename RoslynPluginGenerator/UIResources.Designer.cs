@@ -186,7 +186,7 @@ namespace SonarQube.Plugins.Roslyn {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Plugin not generated: no analyzers were found.
+        ///   Looks up a localized string similar to Plugin was not generated: No Roslyn analyzers were found. Check NuGet content and the minimal compatible Roslyn version..
         /// </summary>
         public static string APG_PluginNotGenerated {
             get {
