@@ -33,7 +33,6 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                 throw new ArgumentNullException(nameof(packageId));
             }
             // Version can be null
-            SupportedLanguages.ThrowIfNotSupported(language);
             if (string.IsNullOrWhiteSpace(outputDirectory))
             {
                 throw new ArgumentNullException(nameof(outputDirectory));
