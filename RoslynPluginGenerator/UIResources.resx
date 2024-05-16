@@ -156,6 +156,9 @@
   <data name="APG_NoAnalyzersInTargetSuggestRecurse" xml:space="preserve">
     <value>Re-run this generator with /recurse if plugins should be generated for the dependencies of this package.</value>
   </data>
+  <data name="APG_PluginNotGenerated" xml:space="preserve">
+    <value>Plugin was not generated: No Roslyn analyzers were found. Check NuGet content and the minimal compatible Roslyn version.</value>
+  </data>
   <data name="APG_PluginGenerated" xml:space="preserve">
     <value>Plugin generated: {0}</value>
   </data>
