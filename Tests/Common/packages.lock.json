@@ -36,6 +36,12 @@
         "resolved": "3.3.1",
         "contentHash": "020SuA2p8N7o+/AHC0SLgzGpyS1hNjR8m5tWxnuGqJ3HeJhArUbuPAU8RZr8Ll38ij8oiutGCkQ/G+ymyO51Ow=="
       },
+      "System.IO.Compression": {
+        "type": "Direct",
+        "requested": "[4.3.0, )",
+        "resolved": "4.3.0",
+        "contentHash": "YHndyoiV90iu4iKG115ibkhrG+S3jBm8Ap9OwoUAzO5oPDAWcr0SFwQFm0HjM8WkEZWo0zvLTyLmbvTkW1bXgg=="
+      },
       "Microsoft.ApplicationInsights": {
         "type": "Transitive",
         "resolved": "2.22.0",

@@ -69,9 +69,9 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             updater.UpdateArchive();
 
             // Assert
-            using var upDatedChecker = new ZipFileChecker(TestContext, updatedZipFile);
+            using var updatedChecker = new ZipFileChecker(TestContext, updatedZipFile);
 
-            upDatedChecker.AssertZipContainsOnlyExpectedFiles(
+            updatedChecker.AssertZipContainsOnlyExpectedFiles(
                 // Original files
                 "file1.txt",
                 "sub1\\sub2\\file2.txt",

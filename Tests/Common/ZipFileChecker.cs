@@ -90,7 +90,7 @@ namespace SonarQube.Plugins.Test.Common
         }
         
         public void Dispose() =>
-            archiveFile?.Dispose();
+            archiveFile.Dispose();
 
         public void AssertZipFileContent(string relativeFilePath, string expectedContent) =>
             File.ReadAllText(AssertFileExists(relativeFilePath)).Should().Be(expectedContent);
