@@ -400,9 +400,9 @@
         "type": "Project",
         "dependencies": {
           "Microsoft.CodeAnalysis": "[4.9.2, )",
-          "RoslynV1Refs": "[3.1.0, )",
-          "SonarQube.Plugins.Common": "[3.1.0, )",
-          "SonarQube.Plugins.PluginGenerator": "[3.1.0, )",
+          "RoslynV1Refs": "[4.0.0, )",
+          "SonarQube.Plugins.Common": "[4.0.0, )",
+          "SonarQube.Plugins.PluginGenerator": "[4.0.0, )",
           "System.IO.Compression": "[4.3.0, )"
         }
       },
@@ -437,7 +437,7 @@
       "sonarqube.plugins.plugingenerator": {
         "type": "Project",
         "dependencies": {
-          "SonarQube.Plugins.Common": "[3.1.0, )"
+          "SonarQube.Plugins.Common": "[4.0.0, )"
         }
       },
       "sonarqube.plugins.test.common": {
@@ -447,7 +447,7 @@
           "MSTest.TestAdapter": "[3.3.1, )",
           "MSTest.TestFramework": "[3.3.1, )",
           "Microsoft.NET.Test.Sdk": "[17.9.0, )",
-          "SonarQube.Plugins.Common": "[3.1.0, )",
+          "SonarQube.Plugins.Common": "[4.0.0, )",
           "System.IO.Compression": "[4.3.0, )"
         }
       }

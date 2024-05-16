@@ -1,6 +1,6 @@
 ﻿/*
  * SonarQube Roslyn SDK
- * Copyright (C) 2015-2022 SonarSource SA
+ * Copyright (C) 2015-2024 SonarSource SA
  * mailto:info AT sonarsource DOT com
  *
  * This program is free software; you can redistribute it and/or
@@ -38,6 +38,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             TestUtils.CreateTextFile(@"sub2\bar.123", testDir, "dummy content");
             TestUtils.CreateTextFile(@"sub2\archive1.zip", testDir, "dummy content");
             TestUtils.CreateTextFile("archive2.zip", testDir, "dummy content");
+
             // 1. Exclude zip files
             bool shouldInclude(string f) => !f.EndsWith(".zip");
             string fullzipFileName = Path.Combine(testDir, "output1.zip");
