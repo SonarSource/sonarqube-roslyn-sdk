@@ -129,11 +129,6 @@
           "System.Runtime.CompilerServices.Unsafe": "5.0.0"
         }
       },
-      "System.IO.Compression": {
-        "type": "Transitive",
-        "resolved": "4.3.0",
-        "contentHash": "YHndyoiV90iu4iKG115ibkhrG+S3jBm8Ap9OwoUAzO5oPDAWcr0SFwQFm0HjM8WkEZWo0zvLTyLmbvTkW1bXgg=="
-      },
       "System.Memory": {
         "type": "Transitive",
         "resolved": "4.5.4",
@@ -186,8 +181,7 @@
           "MSTest.TestAdapter": "[3.3.1, )",
           "MSTest.TestFramework": "[3.3.1, )",
           "Microsoft.NET.Test.Sdk": "[17.9.0, )",
-          "SonarQube.Plugins.Common": "[3.1.0, )",
-          "System.IO.Compression": "[4.3.0, )"
+          "SonarQube.Plugins.Common": "[3.1.0, )"
         }
       }
     }

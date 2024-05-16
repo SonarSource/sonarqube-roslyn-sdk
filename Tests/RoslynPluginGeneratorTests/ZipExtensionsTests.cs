@@ -44,7 +44,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             ZipExtensions.CreateFromDirectory(testDir, fullzipFileName, shouldInclude);
 
-            ZipFileChecker checker = new ZipFileChecker(TestContext, fullzipFileName);
+            using var checker = new ZipFileChecker(TestContext, fullzipFileName);
             checker.AssertZipContainsOnlyExpectedEntries(
                 "dummy.txt",
                 "sub1/foo.txt",
@@ -69,7 +69,7 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
 
             ZipExtensions.CreateFromDirectory(testDir, fullzipFileName, shouldInclude);
 
-            ZipFileChecker checker = new ZipFileChecker(TestContext, fullzipFileName);
+            using var checker = new ZipFileChecker(TestContext, fullzipFileName);
             checker.AssertZipContainsOnlyExpectedEntries(
                 "sub1/foo.txt",
                 "sub2/bar.123",

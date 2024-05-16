@@ -51,7 +51,7 @@ public class RoslynPluginJarBuilderTests
             .SetJarFilePath(outputJarFilePath);
         builder.BuildJar(workingDir);
 
-        var checker = new ZipFileChecker(TestContext, outputJarFilePath);
+        using var checker = new ZipFileChecker(TestContext, outputJarFilePath);
         checker.AssertZipContainsFiles(
             @"META-INF\MANIFEST.MF",
             @"static\foo.zip",

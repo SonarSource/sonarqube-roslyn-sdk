@@ -25,7 +25,7 @@ namespace SonarQube.Plugins.Test.Common
     /// <summary>
     /// Utility class used to check the file content of zipped files, which could be jar files
     /// </summary>
-    public class ZipFileChecker
+    public sealed class ZipFileChecker : IDisposable
     {
         private readonly string unzippedDirectoryPath;
         private readonly TestContext testContext;
@@ -78,10 +78,8 @@ namespace SonarQube.Plugins.Test.Common
             }
         }
 
-        public void AssertZipContainsOnlyExpectedEntries(params string[] expectedEntriesName)
-        {
-            archiveFile.Entries.Select(x => x.FullName).Should().HaveSameCount(expectedEntriesName).And.Contain(expectedEntriesName);
-        }
+        public void AssertZipContainsOnlyExpectedEntries(params string[] expectedEntriesName) =>
+            archiveFile.Entries.Select(x => x.FullName).Should().BeEquivalentTo(expectedEntriesName);
 
         public void AssertZipContainsOnlyExpectedFiles(params string[] expectedRelativePaths)
         {
@@ -90,6 +88,9 @@ namespace SonarQube.Plugins.Test.Common
             string[] allFilesInZip = Directory.GetFiles(unzippedDirectoryPath, "*.*", SearchOption.AllDirectories);
             allFilesInZip.Length.Should().Be(expectedRelativePaths.Length, "Zip contains more files than expected");
         }
+        
+        public void Dispose() =>
+            archiveFile?.Dispose();
 
         public void AssertZipFileContent(string relativeFilePath, string expectedContent) =>
             File.ReadAllText(AssertFileExists(relativeFilePath)).Should().Be(expectedContent);

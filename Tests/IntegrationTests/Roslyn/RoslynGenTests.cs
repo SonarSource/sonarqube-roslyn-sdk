@@ -249,7 +249,7 @@ namespace SonarQube.Plugins.IntegrationTests
             AssertJarsGenerated(outputDir, 1);
 
             var jarFilePath = Directory.GetFiles(outputDir, "*.jar", SearchOption.TopDirectoryOnly).Single();
-            var jarChecker = new ZipFileChecker(TestContext, jarFilePath);
+            using var jarChecker = new ZipFileChecker(TestContext, jarFilePath);
             var actualManifestFilePath = jarChecker.AssertFileExists("META-INF\\MANIFEST.MF");
 
             JarManifestReader reader = new JarManifestReader(File.ReadAllText(actualManifestFilePath));
@@ -308,7 +308,7 @@ namespace SonarQube.Plugins.IntegrationTests
             jarFilePath.Should().NotBeNull();
 
             // Check the content of the files embedded in the jar
-            ZipFileChecker jarChecker = new ZipFileChecker(TestContext, jarFilePath);
+            using var jarChecker = new ZipFileChecker(TestContext, jarFilePath);
 
             // Check the contents of the embedded config file
             string embeddedConfigFile = jarChecker.AssertFileExists("org\\sonar\\plugins\\roslynsdk\\configuration.xml");
@@ -414,7 +414,7 @@ namespace SonarQube.Plugins.IntegrationTests
             // Now create another checker to check the contents of the zip file (strict check this time)
             string embeddedZipFilePath = jarChecker.AssertFileExists(staticResourceName);
 
-            ZipFileChecker embeddedFileChecker = new ZipFileChecker(TestContext, embeddedZipFilePath);
+            using var embeddedFileChecker = new ZipFileChecker(TestContext, embeddedZipFilePath);
             embeddedFileChecker.AssertZipContainsOnlyExpectedFiles(expectedZipContents);
         }
 

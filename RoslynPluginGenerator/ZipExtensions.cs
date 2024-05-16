@@ -50,7 +50,7 @@ namespace SonarQube.Plugins.Roslyn
             {
                 foreach (string file in files.Where(f => fileInclusionPredicate(f)))
                 {
-                    archive.CreateEntryFromFile(file, file.Substring(pathPrefixLength).Replace("\\", "/"), CompressionLevel.Optimal);
+                    archive.CreateEntryFromFile(file, file.Substring(pathPrefixLength).Replace('\\', '/'), CompressionLevel.Optimal);
                 }
             }
         }

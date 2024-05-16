@@ -427,8 +427,7 @@
           "MSTest.TestAdapter": "[3.3.1, )",
           "MSTest.TestFramework": "[3.3.1, )",
           "Microsoft.NET.Test.Sdk": "[17.9.0, )",
-          "SonarQube.Plugins.Common": "[3.1.0, )",
-          "System.IO.Compression": "[4.3.0, )"
+          "SonarQube.Plugins.Common": "[3.1.0, )"
         }
       }
     }
