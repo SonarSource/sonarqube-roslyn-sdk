@@ -44,6 +44,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             public const string RecurseDependencies = "recurse.dependencies";
             public const string OutputDirectory = "output.dir";
             public const string CustomNuGetRepository = "custom.nugetrepo";
+            public const string Language = "language";
         }
 
         private static readonly IList<ArgumentDescriptor> Descriptors;
@@ -54,20 +55,14 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             // To add a new argument, just add it to the list.
             Descriptors = new List<ArgumentDescriptor>
             {
-                new ArgumentDescriptor(
-                    id: KeywordIds.AnalyzerRef, prefixes: new string[] { "/analyzer:", "/a:" }, required: true, allowMultiple: false, description: CmdLineResources.ArgDescription_AnalzyerRef),
-                new ArgumentDescriptor(
-                    id: KeywordIds.SqaleXmlFile, prefixes: new string[] { "/sqale:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_SqaleXmlFile),
-                new ArgumentDescriptor(
-                    id: KeywordIds.RuleXmlFile, prefixes: new string[] { "/rules:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_RuleXmlFile),
-                new ArgumentDescriptor(
-                    id: KeywordIds.AcceptLicenses, prefixes: new string[] { "/acceptLicenses" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_AcceptLicenses, isVerb: true),
-                new ArgumentDescriptor(
-                    id: KeywordIds.RecurseDependencies, prefixes: new string[] { "/recurse" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_RecurseDependencies, isVerb: true),
-                new ArgumentDescriptor(
-                    id: KeywordIds.OutputDirectory, prefixes: new string[] { "/ouputdir:", "/o:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_OutputDirectory),
-                new ArgumentDescriptor(
-                    id: KeywordIds.CustomNuGetRepository, prefixes: new string[] { "/customnugetrepo:" }, required: false, allowMultiple: false, description: CmdLineResources.ArgDesciption_CustomNuGetRepo)
+                new(KeywordIds.AnalyzerRef, [ "/analyzer:", "/a:" ], required: true, allowMultiple: false, description: CmdLineResources.ArgDescription_AnalzyerRef),
+                new(KeywordIds.SqaleXmlFile, [ "/sqale:" ], required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_SqaleXmlFile),
+                new(KeywordIds.RuleXmlFile, [ "/rules:" ], required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_RuleXmlFile),
+                new(KeywordIds.AcceptLicenses, [ "/acceptLicenses" ], required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_AcceptLicenses, isVerb: true),
+                new(KeywordIds.RecurseDependencies, [ "/recurse" ], required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_RecurseDependencies, isVerb: true),
+                new(KeywordIds.OutputDirectory, [ "/ouputdir:", "/o:" ], required: false, allowMultiple: false, description: CmdLineResources.ArgDescription_OutputDirectory),
+                new(KeywordIds.CustomNuGetRepository, [ "/customnugetrepo:" ], required: false, allowMultiple: false, description: CmdLineResources.ArgDesciption_CustomNuGetRepo),
+                new(KeywordIds.Language, [ "/language:" ], required: false, allowMultiple: false, description: CmdLineResources.ArgDesciption_Language)
             };
 
             Debug.Assert(Descriptors.All(d => d.Prefixes != null && d.Prefixes.Any()), "All descriptors must provide at least one prefix");
@@ -99,16 +94,14 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            ArgumentProcessor processor = new ArgumentProcessor(logger);
+            var processor = new ArgumentProcessor(logger);
             return processor.Process(commandLineArgs);
         }
 
         private readonly ILogger logger;
 
-        private ArgumentProcessor(ILogger logger)
-        {
+        private ArgumentProcessor(ILogger logger) =>
             this.logger = logger;
-        }
 
         public ProcessedArgs Process(string[] commandLineArgs)
         {
@@ -117,12 +110,10 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             // This call will fail if there are duplicate, missing, or unrecognized arguments
             CommandLineParser parser = new CommandLineParser(Descriptors, false /* don't allow unrecognized */);
             bool parsedOk = parser.ParseArguments(commandLineArgs, logger, out IEnumerable<ArgumentInstance> arguments);
-
             parsedOk &= TryParseAnalyzerRef(arguments, out NuGetReference analyzerRef);
-
             parsedOk &= TryParseSqaleArgument(arguments);
-
             parsedOk &= TryParseRuleFile(arguments, out string ruleFilePath);
+            parsedOk &= TryParseLanguage(arguments, out string language);
 
             bool acceptLicense = GetLicenseAcceptance(arguments);
             bool recurseDependencies = GetRecursion(arguments);
@@ -135,7 +126,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                 processed = new ProcessedArgs(
                     analyzerRef.PackageId,
                     analyzerRef.Version,
-                    SupportedLanguages.CSharp, /* TODO: support multiple languages */
+                    language,
                     ruleFilePath,
                     acceptLicense,
                     recurseDependencies,
@@ -229,6 +220,29 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
                 this.logger.LogError(CmdLineResources.ERROR_RuleFileNotFound, arg.Value);
             }
             return success;
+        }
+
+        private bool TryParseLanguage(IEnumerable<ArgumentInstance> arguments, out string language)
+        {
+            if (arguments.SingleOrDefault(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.Language, a.Descriptor.Id)) is { Value.Length: > 0 } arg)
+            {
+                if(arg.Value == SupportedLanguages.CSharp || arg.Value == SupportedLanguages.VisualBasic)
+                {
+                    language = arg.Value;
+                    return true;
+                }
+                else
+                {
+                    logger.LogError(CmdLineResources.ERROR_InvalidLanguage, arg.Value);
+                    language = null;
+                    return false;
+                }
+            }
+            else
+            {
+                language = SupportedLanguages.CSharp;
+                return true;
+            }
         }
 
         private string GetNuGetRepository(IEnumerable<ArgumentInstance> arguments)

@@ -120,6 +120,9 @@
   <data name="ArgDesciption_CustomNuGetRepo" xml:space="preserve">
     <value>&lt;Path/Url to Repo&gt; - overwrites default nuget behaviour and only uses this repository.</value>
   </data>
+  <data name="ArgDesciption_Language" xml:space="preserve">
+    <value>&lt;language&gt; - specify analyzer languages. Possible values: cs, vb. Default: cs</value>
+  </data>
   <data name="ArgDescription_AcceptLicenses" xml:space="preserve">
     <value>indicates that you accept the licenses for any packages that required license acceptance</value>
   </data>
@@ -143,6 +146,9 @@
   </data>
   <data name="DEBUG_UsingRuleFile" xml:space="preserve">
     <value>Using rules xml file '{0}'</value>
+  </data>
+  <data name="ERROR_InvalidLanguage" xml:space="preserve">
+    <value>Invalid language parameter: {0}</value>
   </data>
   <data name="ERROR_InvalidVersion" xml:space="preserve">
     <value>Invalid NuGet package version: {0}</value>

@@ -18,43 +18,38 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-namespace SonarQube.Plugins.Roslyn
+using System;
+
+namespace SonarQube.Plugins.Roslyn;
+
+/// <summary>
+/// List of languages supported by the Roslyn plugin generator
+/// </summary>
+/// <remarks>The values of the constants are the language ids used by SonarQube</remarks>
+public static class SupportedLanguages
 {
-    /// <summary>
-    /// List of languages supported by the Roslyn plugin generator
-    /// </summary>
-    /// <remarks>The values of the constants are the language ids used by SonarQube</remarks>
-    public static class SupportedLanguages
-    {
-        public const string CSharp = "cs";
-        public const string VisualBasic = "vb";
+    public const string CSharp = "cs";
+    public const string VisualBasic = "vb";
 
-        public static bool IsSupported(string language)
+    public static bool IsSupported(string language) =>
+        string.Equals(language, CSharp, StringComparison.Ordinal) || string.Equals(language, VisualBasic, StringComparison.Ordinal);
+
+    public static string RoslynLanguageName(string language) =>
+        language switch
         {
-            bool supported = string.Equals(language, CSharp, System.StringComparison.Ordinal) ||
-                string.Equals(language, VisualBasic, System.StringComparison.Ordinal);
+            CSharp => Microsoft.CodeAnalysis.LanguageNames.CSharp,
+            VisualBasic => Microsoft.CodeAnalysis.LanguageNames.VisualBasic,
+            _ => throw UnsupportedException(language)
+        };
 
-            return supported;
-        }
-
-        public static string GetRoslynLanguageName(string language)
+    public static string RepositoryLanguage(string language) =>
+        language switch
         {
-            ThrowIfNotSupported(language);
+            CSharp => "cs",
+            VisualBasic => "vbnet",
+            _ => throw UnsupportedException(language)
+        };
 
-            if (string.Equals(language, CSharp, System.StringComparison.OrdinalIgnoreCase))
-            {
-                return Microsoft.CodeAnalysis.LanguageNames.CSharp;
-            }
-            return Microsoft.CodeAnalysis.LanguageNames.VisualBasic;
-        }
-
-        public static void ThrowIfNotSupported(string language)
-        {
-            if (!IsSupported(language))
-            {
-                throw new System.ArgumentOutOfRangeException(nameof(language),
-                    string.Format(System.Globalization.CultureInfo.CurrentCulture, UIResources.APG_UnsupportedLanguage, language));
-            }
-        }
-    }
+    private static ArgumentOutOfRangeException UnsupportedException(string language) =>
+        new(nameof(language), string.Format(System.Globalization.CultureInfo.CurrentCulture, UIResources.APG_UnsupportedLanguage, language));
 }

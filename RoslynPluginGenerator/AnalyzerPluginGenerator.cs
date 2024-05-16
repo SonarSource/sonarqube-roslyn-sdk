@@ -292,7 +292,7 @@ namespace SonarQube.Plugins.Roslyn
             logger.LogInfo(UIResources.APG_LocatingAnalyzers);
             string[] analyzerFiles = Directory.GetFiles(packageRootDir, "*.dll", SearchOption.AllDirectories);
 
-            string roslynLanguageName = SupportedLanguages.GetRoslynLanguageName(language);
+            string roslynLanguageName = SupportedLanguages.RoslynLanguageName(language);
             logger.LogDebug(UIResources.APG_LogAnalyzerLanguage, roslynLanguageName);
 
             DiagnosticAssemblyScanner diagnosticAssemblyScanner = new DiagnosticAssemblyScanner(logger, additionalSearchFolder);

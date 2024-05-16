@@ -21,69 +21,53 @@
 using System;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SonarQube.Plugins.Test.Common;
 
-namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
+namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests;
+
+[TestClass]
+public class SupportedLanguagesTests
 {
-    [TestClass]
-    public class SupportedLanguagesTests
-    {
-        [TestMethod]
-        public void ThrowIfNotSupported_Unrecognised_Throws()
-        {
-            Action action = () => SupportedLanguages.ThrowIfNotSupported("");
-            action.Should().ThrowExactly<ArgumentOutOfRangeException>();
+    [DataTestMethod]
+    [DataRow("")]
+    [DataRow("123")]
+    [DataRow("CSharp")]
+    [DataRow("CS")]
+    [DataRow("Cs")]
+    [DataRow("cS")]
+    [DataRow("Visual Basic")]
+    [DataRow("VB")]
+    [DataRow("Vb")]
+    [DataRow("vB")]
+    [DataRow("vb.net")]
+    [DataRow("vbnet")]
+    public void RoslynLanguageName_Invalid_Throws(string language) =>
+        ((Func<string>)(() => SupportedLanguages.RoslynLanguageName(language))).Should().Throw<ArgumentOutOfRangeException>();
 
-            action = () => SupportedLanguages.ThrowIfNotSupported("123");
-            action.Should().ThrowExactly<ArgumentOutOfRangeException>();
+    [DataTestMethod]
+    [DataRow("cs", "C#")]
+    [DataRow("vb", "Visual Basic")]
+    public void RoslynLanguageName_Valid(string language, string expected) =>
+        SupportedLanguages.RoslynLanguageName(language).Should().Be(expected);
 
-            action = () => SupportedLanguages.ThrowIfNotSupported("Visual Basic");
-            action.Should().ThrowExactly<ArgumentOutOfRangeException>();
+    [DataTestMethod]
+    [DataRow("")]
+    [DataRow("123")]
+    [DataRow("CSharp")]
+    [DataRow("CS")]
+    [DataRow("Cs")]
+    [DataRow("cS")]
+    [DataRow("Visual Basic")]
+    [DataRow("VB")]
+    [DataRow("Vb")]
+    [DataRow("vB")]
+    [DataRow("vb.net")]
+    [DataRow("vbnet")]
+    public void RepositoryLanguage_Invalid_Throws(string language) =>
+        ((Func<string>)(() => SupportedLanguages.RepositoryLanguage(language))).Should().Throw<ArgumentOutOfRangeException>();
 
-            action = () => SupportedLanguages.ThrowIfNotSupported("CSharp");
-            action.Should().ThrowExactly<ArgumentOutOfRangeException>();
-
-            action = () => SupportedLanguages.ThrowIfNotSupported("Cs");
-            action.Should().ThrowExactly<ArgumentOutOfRangeException>();
-
-            action = () => SupportedLanguages.ThrowIfNotSupported("CS");
-            action.Should().ThrowExactly<ArgumentOutOfRangeException>();
-
-            action = () => SupportedLanguages.ThrowIfNotSupported("vB");
-            action.Should().ThrowExactly<ArgumentOutOfRangeException>();
-
-            action = () => SupportedLanguages.ThrowIfNotSupported("VB");
-            action.Should().ThrowExactly<ArgumentOutOfRangeException>();
-        }
-
-        [TestMethod]
-        public void ThrowIfNotSupported_Recognised_DoesNotThrow()
-        {
-            SupportedLanguages.ThrowIfNotSupported("vb");
-            SupportedLanguages.ThrowIfNotSupported("cs");
-        }
-
-        [TestMethod]
-        public void GetRoslynName_Unrecognised_Throws()
-        {
-            Action action = () => SupportedLanguages.GetRoslynLanguageName("foo");
-            action.Should().ThrowExactly<ArgumentOutOfRangeException>();
-
-            action = () => SupportedLanguages.GetRoslynLanguageName("CS");
-            action.Should().ThrowExactly<ArgumentOutOfRangeException>(); // case-sensitive
-
-            action = () => SupportedLanguages.GetRoslynLanguageName("VB");
-            action.Should().ThrowExactly<ArgumentOutOfRangeException>(); // case-sensitive
-        }
-
-        [TestMethod]
-        public void GetRoslynName_Recognised_ReturnsExpected()
-        {
-            string result = SupportedLanguages.GetRoslynLanguageName("cs");
-            result.Should().Be("C#");
-
-            result = SupportedLanguages.GetRoslynLanguageName("vb");
-            result.Should().Be("Visual Basic");
-        }
-    }
+    [DataTestMethod]
+    [DataRow("cs", "cs")]
+    [DataRow("vb", "vbnet")]
+    public void RepositoryLanguage_Valid(string language, string expected) =>
+        SupportedLanguages.RepositoryLanguage(language).Should().Be(expected);
 }
