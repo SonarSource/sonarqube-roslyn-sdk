@@ -48,8 +48,8 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             ZipFile.CreateFromDirectory(setupDir, originalZipFile);
 
             // Sanity check that the test archive was built correctly
-            ZipFileChecker checker = new ZipFileChecker(TestContext, originalZipFile);
-            checker.AssertZipContainsOnlyExpectedFiles(
+            using var originalChecker = new ZipFileChecker(TestContext, originalZipFile);
+            originalChecker.AssertZipContainsOnlyExpectedFiles(
                 // Original files
                 "file1.txt",
                 "sub1\\sub2\\file2.txt");
@@ -69,9 +69,9 @@ namespace SonarQube.Plugins.Roslyn.RoslynPluginGeneratorTests
             updater.UpdateArchive();
 
             // Assert
-            checker = new ZipFileChecker(TestContext, updatedZipFile);
+            using var updatedChecker = new ZipFileChecker(TestContext, updatedZipFile);
 
-            checker.AssertZipContainsOnlyExpectedFiles(
+            updatedChecker.AssertZipContainsOnlyExpectedFiles(
                 // Original files
                 "file1.txt",
                 "sub1\\sub2\\file2.txt",
