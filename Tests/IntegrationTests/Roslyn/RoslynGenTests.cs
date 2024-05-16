@@ -93,7 +93,7 @@ namespace SonarQube.Plugins.IntegrationTests
             // Act
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
-            ProcessedArgs args = new ProcessedArgs(targetPkg.Id, targetPkg.Version, "cs", null, false, 
+            ProcessedArgs args = new ProcessedArgs(targetPkg.Id, targetPkg.Version, "cs", null, false,
                 true /* generate plugins for dependencies with analyzers*/, outputDir, null);
             bool result = apg.Generate(args);
 
@@ -399,13 +399,13 @@ namespace SonarQube.Plugins.IntegrationTests
             manifestReader.FindValue("Plugin-Developers").Should().Be(String.Join(",", package.Authors));
             manifestReader.FindValue("Plugin-TermsConditionsUrl").Should().Be(package.LicenseUrl.ToString());
         }
-        
+
         private static void AssertFixedValuesInManifest(JarManifestReader reader)
         {
-            reader.FindValue("Sonar-Version").Should().Be("7.9");
+            reader.FindValue("Sonar-Version").Should().Be("9.14.0.375");
             reader.FindValue("Plugin-Class").Should().Be("org.sonar.plugins.roslynsdk.RoslynSdkGeneratedPlugin");
             reader.FindValue("SonarLint-Supported").Should().Be("false");
-            reader.FindValue("Plugin-Dependencies").Should().Be("META-INF/lib/jsr305-1.3.9.jar META-INF/lib/commons-io-2.6.jar META-INF/lib/stax2-api-3.1.4.jar META-INF/lib/staxmate-2.0.1.jar META-INF/lib/stax-api-1.0.1.jar");
+            reader.FindValue("Plugin-Dependencies").Should().Be("META-INF/lib/jsr305-3.0.2.jar META-INF/lib/staxmate-2.4.1.jar META-INF/lib/stax2-api-4.2.1.jar META-INF/lib/commons-io-2.16.1.jar");
         }
 
         private void CheckEmbeddedAnalyzerPayload(ZipFileChecker jarChecker, string staticResourceName,

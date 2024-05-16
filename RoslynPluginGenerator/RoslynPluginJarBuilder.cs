@@ -34,7 +34,7 @@ namespace SonarQube.Plugins.Roslyn
         /// <summary>
         /// Name of the embedded resource that contains the .jar file to update
         /// </summary>
-        private const string TemplateJarResourceName = "SonarQube.Plugins.Roslyn.Resources.sonar-roslyn-sdk-template-plugin-1.2.0.76.jar";
+        private const string TemplateJarResourceName = "SonarQube.Plugins.Roslyn.Resources.sonar-roslyn-sdk-template-plugin-1.3.0.1139.jar";
 
         // Locations in the jar archive where various file should be embedded.
         // Using forward-slash since that is the separator used by Java for archive entry names.
