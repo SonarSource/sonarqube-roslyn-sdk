@@ -65,7 +65,7 @@ Plugins generated with a specific SDK version will not work with SonarQube versi
 
 ## Updating compatible Roslyn version
 
-The SDK is compatible with analyzer targeting Roslyn from version 1.0.0 up to the version specified in [Directory.Build.props](./Directory.Build.props#L9).
+The SDK is compatible with analyzer targeting Roslyn from version 1.0.0 up to the version specified in [Directory.Build.props](./Directory.Build.props#L10).
 
 To support a newer version of Roslyn, follow these steps:
 1. Find the latest version of Roslyn on [NuGet](https://www.nuget.org/packages/Microsoft.CodeAnalysis).
@@ -119,7 +119,7 @@ The SDK will look for NuGet.config files in the following locations:
 If the analyzer you want to package is available in a private NuGet feed then you will need to create an appropriate `NuGet.config` file to point to the private feed. Alternatively you can use the `/customnugetrepo:file:///PathToRepo` parameter. This will overwrite the above mentioned NuGet behaviour.
 
 ### Generating a jar for an analyzer that is not available from a NuGet feed
-If you want to create a jar for Roslyn analyzer that is not available from a NuGet feed (e.g. an analyzer you have created on your local machine) you can specify a package source that points at a local directory containing the *.nupkg* file created by the standard Roslyn templates. See the [NuGet docs](https://docs.nuget.org/create/hosting-your-own-nuget-feeds) for more information.
+If you want to create a jar for Roslyn analyzer that is not available from a NuGet feed (e.g. an analyzer you have created on your local machine) you can specify a package source that points at a local directory containing the *.nupkg* file created by the standard Roslyn templates. See the [NuGet docs](https://learn.microsoft.com/en-us/nuget/hosting-packages/overview) for more information.
 
 By default, the [NuGet.config](./RoslynPluginGenerator/NuGet.config#L16) file shipped with the RoslynSonarQubeGenerator has a local package source configured that points to `C:\LocalNugetFeed`.
 
@@ -127,7 +127,7 @@ By default, the [NuGet.config](./RoslynPluginGenerator/NuGet.config#L16) file sh
 
 The SDK uses information from the NuGet package to populate the fields in the generated plugin that affect how the plugin is described in the Update Centre in the SonarQube UI. It is not currently possible to customise these values.
 
-The NuGet package properties are documented [here](http://docs.nuget.org/Create/Nuspec-Reference) and the SonarQube plugin properties are documented [here](https://docs.sonarsource.com/sonarqube/latest/extension-guide/developing-a-plugin/plugin-basics/#advanced-build-properties>).
+The NuGet package properties are documented [here](https://learn.microsoft.com/en-us/nuget/reference/nuspec#required-metadata-elements) and the SonarQube plugin properties are documented [here](https://docs.sonarsource.com/sonarqube/latest/extension-guide/developing-a-plugin/plugin-basics/#advanced-build-properties).
 
 The NuGet package properties are mapped to plugin properties as follows:
 
