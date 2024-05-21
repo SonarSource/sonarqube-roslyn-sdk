@@ -31,7 +31,7 @@ See the [SonarLint for Visual Studio documentation](https://docs.sonarsource.com
 
 ## Getting started
 
-1. Download the latest [released version](./releases/latest), or clone and build this repository.
+1. Download the latest [released version](https://github.com/SonarSource/sonarqube-roslyn-sdk/releases/latest), or clone and build this repository.
   
 1. Run the generator tool `RoslynSonarQubePluginGenerator.exe` specifying the analyzer NuGet package id
     ```
