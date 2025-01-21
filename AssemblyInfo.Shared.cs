@@ -1,6 +1,6 @@
 ﻿/*
  * SonarQube Roslyn SDK
- * Copyright (C) 2015-2017 SonarSource SA
+ * Copyright (C) 2015-2025 SonarSource SA
  * mailto:info AT sonarsource DOT com
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyVersion("2.0.0.0")]
 [assembly: AssemblyFileVersion("2.0.0.0")]
-[assembly: AssemblyCompany("SonarSource and Microsoft")]
-[assembly: AssemblyCopyright("Copyright © SonarSource and Microsoft 2015-2018")]
+[assembly: AssemblyCompany("SonarSource")]
+[assembly: AssemblyCopyright("Copyright © SonarSource 2015-2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
