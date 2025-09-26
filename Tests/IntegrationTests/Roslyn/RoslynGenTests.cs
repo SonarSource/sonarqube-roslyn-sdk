@@ -405,7 +405,7 @@ namespace SonarQube.Plugins.IntegrationTests
             reader.FindValue("Sonar-Version").Should().Be("9.14.0.375");
             reader.FindValue("Plugin-Class").Should().Be("org.sonar.plugins.roslynsdk.RoslynSdkGeneratedPlugin");
             reader.FindValue("SonarLint-Supported").Should().Be("false");
-            reader.FindValue("Plugin-Dependencies").Should().Be("META-INF/lib/jsr305-3.0.2.jar META-INF/lib/staxmate-2.4.1.jar META-INF/lib/stax2-api-4.2.1.jar META-INF/lib/commons-io-2.16.1.jar");
+            reader.FindValue("Plugin-Dependencies").Should().Be("META-INF/lib/staxmate-2.4.1.jar META-INF/lib/stax2-api-4.2.1.jar META-INF/lib/commons-io-2.16.1.jar");
         }
 
         private void CheckEmbeddedAnalyzerPayload(ZipFileChecker jarChecker, string staticResourceName,
