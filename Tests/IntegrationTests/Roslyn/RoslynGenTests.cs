@@ -18,21 +18,15 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NuGet;
 using SonarQube.Plugins.Common;
 using SonarQube.Plugins.Roslyn;
 using SonarQube.Plugins.Roslyn.CommandLine;
 using SonarQube.Plugins.Test.Common;
 
-namespace SonarQube.Plugins.IntegrationTests
+namespace SonarQube.Plugins.IntegrationTests;
 {
     [TestClass]
     public class RoslynGenTests
@@ -47,7 +41,7 @@ namespace SonarQube.Plugins.IntegrationTests
             string outputDir = CreateTestDirectory(TestContext, ".out");
 
             // Create a valid analyzer package
-            RoslynAnalyzer11.CSharpAnalyzer analyzer = new RoslynAnalyzer11.CSharpAnalyzer();
+            RoslynAnalyzer11.CSharpAnalyzer analyzer = new ();
 
             string packageId = "Analyzer1.Pkgid1"; // package id is not all lowercase
             string fakeRemoteNuGetDir = CreateTestDirectory(TestContext, ".fakeRemoteNuGet");
@@ -57,9 +51,9 @@ namespace SonarQube.Plugins.IntegrationTests
             string localPackageDestination = CreateTestDirectory(TestContext, ".localpackages");
 
             // Act
-            NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
-            AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
-            ProcessedArgs args = new ProcessedArgs(packageId, new SemanticVersion("1.0.2"), "cs", null, false, false, outputDir, null);
+            NuGetPackageHandler nuGetHandler = new (fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
+            AnalyzerPluginGenerator apg = new (nuGetHandler, logger);
+            ProcessedArgs args = new (packageId, new SemanticVersion("1.0.2"), "cs", null, false, false, outputDir, null);
             bool result = apg.Generate(args);
 
             // Assert
@@ -75,12 +69,12 @@ namespace SonarQube.Plugins.IntegrationTests
         public void RoslynPlugin_GenerateForDependencyAnalyzers_Succeeds()
         {
             // Arrange
-            TestLogger logger = new TestLogger();
+            TestLogger logger = new ();
             string outputDir = CreateTestDirectory(TestContext, ".out");
             string dummyContentFile = TestUtils.CreateTextFile("dummy.txt", outputDir, "non-analyzer content file");
 
             // Create a valid analyzer package
-            RoslynAnalyzer11.CSharpAnalyzer analyzer = new RoslynAnalyzer11.CSharpAnalyzer();
+            RoslynAnalyzer11.CSharpAnalyzer analyzer = new ();
 
             string fakeRemoteNuGetDir = CreateTestDirectory(TestContext, ".fakeRemoteNuGet");
             IPackageManager fakeRemotePkgMgr = CreatePackageManager(fakeRemoteNuGetDir);
@@ -93,7 +87,7 @@ namespace SonarQube.Plugins.IntegrationTests
             // Act
             NuGetPackageHandler nuGetHandler = new NuGetPackageHandler(fakeRemotePkgMgr.LocalRepository, localPackageDestination, logger);
             AnalyzerPluginGenerator apg = new AnalyzerPluginGenerator(nuGetHandler, logger);
-            ProcessedArgs args = new ProcessedArgs(targetPkg.Id, targetPkg.Version, "cs", null, false,
+            ProcessedArgs args = new (targetPkg.Id, targetPkg.Version, "cs", null, false,
                 true /* generate plugins for dependencies with analyzers*/, outputDir, null);
             bool result = apg.Generate(args);
 
@@ -110,7 +104,7 @@ namespace SonarQube.Plugins.IntegrationTests
         public void RoslynPlugin_GenerateForMultiLevelAnalyzers_Succeeds()
         {
             // Arrange
-            TestLogger logger = new TestLogger();
+            TestLogger logger = new ();
             string outputDir = CreateTestDirectory(TestContext, ".out");
 
             // Create a valid analyzer package

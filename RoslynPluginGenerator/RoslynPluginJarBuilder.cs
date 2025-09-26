@@ -18,13 +18,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.IO.Compression;
 using SonarQube.Plugins.Common;
 
-namespace SonarQube.Plugins.Roslyn
+namespace SonarQube.Plugins.Roslyn;
 {
     /// <summary>
     /// Creates a SonarQube rules plugin
@@ -315,7 +312,7 @@ namespace SonarQube.Plugins.Roslyn
 
             using (Stream resourceStream = typeof(RoslynPluginJarBuilder).Assembly.GetManifestResourceStream(TemplateJarResourceName))
             {
-                using (FileStream file = new FileStream(templateJarFilePath, FileMode.CreateNew, FileAccess.Write))
+                using (FileStream file = new (templateJarFilePath, FileMode.CreateNew, FileAccess.Write))
                 {
                     resourceStream.CopyTo(file);
                     file.Flush();
@@ -341,7 +338,7 @@ namespace SonarQube.Plugins.Roslyn
             using (var archive = new ZipArchive(new FileStream(pathToArchive, FileMode.Open)))
             {
                 var entry = archive.GetEntry(fullEntryName);
-                if (entry == null)
+                if (entry is null)
                 {
                     throw new InvalidOperationException(
                         string.Format(System.Globalization.CultureInfo.CurrentCulture,
