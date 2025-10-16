@@ -112,16 +112,8 @@ jobs:
           $archiveFile = "${{ github.workspace }}\RoslynPluginGenerator\bin\${{ env.BUILD_CONFIGURATION }}\net48\publish.zip"
           Compress-Archive -Path "$publishDir\*" -DestinationPath $archiveFile
 
-      - name: Setup VSTest
-        uses: darenm/Setup-VSTest@v1
-
       - name: Run Tests with Coverage
-        shell: powershell
-        run: |
-          vstest.console.exe **\${{ env.BUILD_CONFIGURATION }}\**\*test*.dll `
-            /Platform:"${{ env.BUILD_PLATFORM }}" `
-            /Logger:trx `
-            /Enablecodecoverage
+        run: dotnet test ${{ env.SOLUTION }} --no-build --configuration ${{ env.BUILD_CONFIGURATION }} --logger trx --collect "Code Coverage"
 
       - name: Run SonarCloud Analysis
         shell: powershell
