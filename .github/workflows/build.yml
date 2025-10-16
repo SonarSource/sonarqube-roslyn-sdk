@@ -119,7 +119,6 @@ jobs:
         shell: powershell
         run: |
           vstest.console.exe **\${{ env.BUILD_CONFIGURATION }}\**\*test*.dll `
-            /Settings:CodeCoverage.runsettings `
             /Platform:"${{ env.BUILD_PLATFORM }}" `
             /Logger:trx `
             /Enablecodecoverage
