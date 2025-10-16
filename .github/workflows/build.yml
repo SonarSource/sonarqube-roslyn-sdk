@@ -18,6 +18,7 @@ jobs:
     runs-on: windows-latest
     permissions:
       contents: read
+      id-token: write
 
     env:
       SOLUTION: 'PluginGenerator.sln'
