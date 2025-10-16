@@ -1,0 +1,132 @@
+name: Build
+on:
+  push:
+    branches: [master, dev, branch-*, dogfood-*]
+  pull_request:
+  merge_group:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 22 * * 1'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+jobs:
+  build:
+    name: Build and Analyze
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    env:
+      SOLUTION: '**/*.sln'
+      BUILD_PLATFORM: 'Any CPU'
+      BUILD_CONFIGURATION: 'Release'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v1
+        with:
+          nuget-version: '6.9.x'
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: NuGet Restore
+        run: nuget restore ${{ env.SOLUTION }}
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v4
+        with:
+          path: ~\sonar\cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache SonarCloud scanner
+        id: cache-sonar-scanner
+        uses: actions/cache@v4
+        with:
+          path: .\.sonar\scanner
+          key: ${{ runner.os }}-sonar-scanner
+          restore-keys: ${{ runner.os }}-sonar-scanner
+
+      - name: Install SonarCloud scanner
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        shell: powershell
+        run: |
+          New-Item -Path .\.sonar\scanner -ItemType Directory -Force
+          dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
+
+      - name: Prepare SonarCloud Analysis
+        shell: powershell
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          .\.sonar\scanner\dotnet-sonarscanner begin `
+            /k:"sonarqube-roslyn-sdk" `
+            /o:"sonarsource" `
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" `
+            /d:sonar.host.url="https://sonarcloud.io" `
+            /d:sonar.verbose=true `
+            /v:1.1 `
+            /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+
+      - name: Build Solution
+        run: msbuild ${{ env.SOLUTION }} /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:Platform="${{ env.BUILD_PLATFORM }}"
+
+      - name: Publish Plugin Generator
+        run: dotnet publish "${{ github.workspace }}\RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj" --no-build -c ${{ env.BUILD_CONFIGURATION }} --verbosity detailed
+
+      - name: Copy Project License
+        shell: powershell
+        run: |
+          $targetDir = "${{ github.workspace }}\RoslynPluginGenerator\bin\${{ env.BUILD_CONFIGURATION }}\net48\publish\licenses"
+          New-Item -Path $targetDir -ItemType Directory -Force
+          Copy-Item -Path "${{ github.workspace }}\LICENSE.txt" -Destination $targetDir
+
+      - name: Copy Third Party Licenses
+        shell: powershell
+        run: |
+          $targetDir = "${{ github.workspace }}\RoslynPluginGenerator\bin\${{ env.BUILD_CONFIGURATION }}\net48\publish\licenses\THIRD_PARTY_LICENSES"
+          New-Item -Path $targetDir -ItemType Directory -Force
+          Copy-Item -Path "${{ github.workspace }}\Licenses\THIRD_PARTY_LICENSES\*.txt" -Destination $targetDir
+
+      - name: Create Publish Archive
+        shell: powershell
+        run: |
+          $publishDir = "${{ github.workspace }}\RoslynPluginGenerator\bin\${{ env.BUILD_CONFIGURATION }}\net48\publish"
+          $archiveFile = "${{ github.workspace }}\RoslynPluginGenerator\bin\${{ env.BUILD_CONFIGURATION }}\net48\publish.zip"
+          Compress-Archive -Path "$publishDir\*" -DestinationPath $archiveFile
+
+      - name: Setup VSTest
+        uses: darenm/Setup-VSTest@v1
+
+      - name: Run Tests with Coverage
+        shell: powershell
+        run: |
+          vstest.console.exe **\${{ env.BUILD_CONFIGURATION }}\**\*test*.dll `
+            /Settings:CodeCoverage.runsettings `
+            /Platform:"${{ env.BUILD_PLATFORM }}" `
+            /Logger:trx `
+            /Enablecodecoverage
+
+      - name: Run SonarCloud Analysis
+        shell: powershell
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: SonarQube.Roslyn.SDK-x.y
+          path: ${{ github.workspace }}\RoslynPluginGenerator\bin\${{ env.BUILD_CONFIGURATION }}\net48\publish.zip
+          if-no-files-found: error
