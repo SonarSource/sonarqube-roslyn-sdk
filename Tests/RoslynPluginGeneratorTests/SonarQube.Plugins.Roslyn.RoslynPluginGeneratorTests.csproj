@@ -1,5 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+    <PropertyGroup>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    </PropertyGroup>
+
     <ItemGroup Label="Test packages">
         <PackageReference Include="Microsoft.CodeAnalysis" Version="$(RoslynPackagesVersion)" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
