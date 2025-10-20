@@ -129,6 +129,7 @@ namespace SonarQube.Plugins.Roslyn
             {
                 logger.LogError("Loading failed of assembly {0} failed with exception: {1}", assemblyPath, ex.ToString());
                 logger.LogDebug("File {0} exists: {1}", assemblyPath, File.Exists(assemblyPath));
+                logger.LogDebug("File {0} blocked: {1}", assemblyPath, File.Exists(assemblyPath + ":Zone.Identifier"));
                 throw;
             }
 
