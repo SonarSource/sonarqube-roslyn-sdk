@@ -59,16 +59,16 @@ jobs:
         shell: powershell
         env:
           SONAR_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).SONAR_TOKEN }}
-        run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin `
-            /k:"sonarqube-roslyn-sdk" `
-            /o:"sonarsource" `
-            /d:sonar.token="${{ fromJSON(steps.secrets.outputs.vault).SONAR_TOKEN }}" `
-            /d:sonar.host.url="https://sonarcloud.io" `
-            /d:sonar.verbose=true `
-            /v:1.1 `
-            /d:sonar.cs.vscoveragexml.reportsPaths=TestResults/**/*.xml `
-            /d:sonar.cs.vstest.reportsPaths=TestResults/*.trx
+        run: >
+          .\.sonar\scanner\dotnet-sonarscanner begin
+          /k:"sonarqube-roslyn-sdk"
+          /o:"sonarsource"
+          /d:sonar.token="${{ fromJSON(steps.secrets.outputs.vault).SONAR_TOKEN }}"
+          /d:sonar.host.url="https://sonarcloud.io"
+          /d:sonar.verbose=true
+          /v:1.1
+          /d:sonar.cs.vscoveragexml.reportsPaths=TestResults/**/*.xml
+          /d:sonar.cs.vstest.reportsPaths=TestResults/*.trx
 
       - name: Build Solution
         run: msbuild ${{ env.SOLUTION }} /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:Platform="${{ env.BUILD_PLATFORM }}"
