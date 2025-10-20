@@ -100,12 +100,11 @@ jobs:
         uses: microsoft/vstest-action@v1.0.0
         with:
           testAssembly: |
-            **\${{ env.BUILD_CONFIGURATION }}\**\*test*.dll
+            **\${{ env.BUILD_CONFIGURATION }}\**\*Test*.dll
             !**\obj\**
           searchFolder: '${{ github.workspace }}'
           codeCoverageEnabled: true
           platform: '${{ env.BUILD_PLATFORM }}'
-          configuration: '${{ env.BUILD_CONFIGURATION }}'
           otherConsoleOptions: '/ResultsDirectory:${{ runner.temp }}\TestResults /logger:trx /diag:logs\vstest.log'
 
       - name: Run SonarCloud Analysis
