@@ -74,7 +74,9 @@ namespace SonarQube.Plugins.Roslyn
                 try
                 {
                     // Prerelease packages enabled by default
+                    packageManager.PackageInstalled += PackageManager_PackageInstalled;
                     packageManager.InstallPackage(package, false, true, false);
+                    packageManager.PackageInstalled -= PackageManager_PackageInstalled;
                 }
                 catch (InvalidOperationException e)
                 {
@@ -84,6 +86,11 @@ namespace SonarQube.Plugins.Roslyn
             }
 
             return package;
+        }
+
+        private void PackageManager_PackageInstalled(object sender, PackageOperationEventArgs e)
+        {
+            logger.LogDebug("Package installed. Id={0}, To: {1}", e.Package.Id, e.InstallPath);
         }
 
         public IEnumerable<IPackage> GetInstalledDependencies(IPackage package)

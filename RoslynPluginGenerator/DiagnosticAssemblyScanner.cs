@@ -121,7 +121,16 @@ namespace SonarQube.Plugins.Roslyn
         private Assembly LoadAnalyzerAssembly(string assemblyPath)
         {
             Assembly analyzerAssembly;
-            analyzerAssembly = Assembly.LoadFrom(assemblyPath);
+            try
+            {
+                analyzerAssembly = Assembly.LoadFrom(assemblyPath);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Loading failed of assembly {0} failed with exception: {1}", assemblyPath, ex.ToString());
+                logger.LogDebug("File {0} exists: {1}", assemblyPath, File.Exists(assemblyPath));
+                throw;
+            }
 
             logger.LogInfo(UIResources.Scanner_AssemblyLoadSuccess, analyzerAssembly.FullName);
             return analyzerAssembly;
