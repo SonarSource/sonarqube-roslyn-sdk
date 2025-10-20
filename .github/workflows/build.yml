@@ -67,7 +67,7 @@ jobs:
             /d:sonar.host.url="https://sonarcloud.io" `
             /d:sonar.verbose=true `
             /v:1.1 `
-            /d:sonar.cs.vscoveragexml.reportsPaths=TestResults/**/*.xmlcoverage
+            /d:sonar.cs.vscoveragexml.reportsPaths=TestResults/**/*.xml
 
       - name: Build Solution
         run: msbuild ${{ env.SOLUTION }} /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:Platform="${{ env.BUILD_PLATFORM }}"
@@ -97,7 +97,7 @@ jobs:
           Compress-Archive -Path "$publishDir\*" -DestinationPath $archiveFile
 
       - name: Run Tests with Coverage
-        run: '& "$(vswhere -property installationPath)\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" **\bin\Release\**\*test*.dll --Collect:"Code Coverage;Format=Xml" --logger:trx'
+        run: '& "$(vswhere -property installationPath)\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" **\bin\${{ env.BUILD_CONFIGURATION }}\**\*test*.dll --Collect:"Code Coverage;Format=Xml" --logger:trx'
 
       - name: Test Report
         uses: dorny/test-reporter@v2
