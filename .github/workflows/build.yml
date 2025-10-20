@@ -67,7 +67,7 @@ jobs:
             /d:sonar.host.url="https://sonarcloud.io" `
             /d:sonar.verbose=true `
             /v:1.1 `
-            /d:sonar.cs.vscoveragexml.reportsPaths=TestResults/**/*.xml
+            /d:sonar.cs.vscoveragexml.reportsPaths=TestResults/**/*.xml `
             /d:sonar.cs.vstest.reportsPaths=TestResults/*.trx
 
       - name: Build Solution
