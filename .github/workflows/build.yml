@@ -100,8 +100,9 @@ jobs:
         uses: microsoft/vstest-action@v1.0.0
         with:
           testAssembly: |
-            /**/*Test*.dll
-            !**/obj/**
+            /**/*test*.dll
+            !./**/*TestAdapter.dll
+            !./**/obj/**
           codeCoverageEnabled: true
           platform: '${{ env.BUILD_PLATFORM }}'
           otherConsoleOptions: '/ResultsDirectory:${{ runner.temp }}\TestResults /logger:trx /diag:logs\vstest.log'
