@@ -100,8 +100,8 @@ jobs:
         uses: microsoft/vstest-action@v1.0.0
         with:
           testAssembly: |
-            **\${{ env.BUILD_CONFIGURATION }}\**\*Test*.dll
-            !**\obj\**
+            **/${{ env.BUILD_CONFIGURATION }}/**/*Test*.dll
+            !**/obj/**
           searchFolder: '${{ github.workspace }}'
           codeCoverageEnabled: true
           platform: '${{ env.BUILD_PLATFORM }}'
