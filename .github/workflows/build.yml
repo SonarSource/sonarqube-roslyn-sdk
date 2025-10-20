@@ -68,6 +68,7 @@ jobs:
             /d:sonar.verbose=true `
             /v:1.1 `
             /d:sonar.cs.vscoveragexml.reportsPaths=TestResults/**/*.xml
+            /d:sonar.cs.vstest.reportsPaths=TestResults/*.trx
 
       - name: Build Solution
         run: msbuild ${{ env.SOLUTION }} /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:Platform="${{ env.BUILD_PLATFORM }}"
