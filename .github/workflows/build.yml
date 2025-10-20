@@ -103,6 +103,7 @@ jobs:
             /**/*test*.dll
             !./**/*TestAdapter.dll
             !./**/obj/**
+          searchFolder: '.' 
           codeCoverageEnabled: true
           platform: '${{ env.BUILD_PLATFORM }}'
           otherConsoleOptions: '/ResultsDirectory:${{ runner.temp }}\TestResults /logger:trx /diag:logs\vstest.log'
