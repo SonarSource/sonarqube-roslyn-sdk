@@ -97,16 +97,7 @@ jobs:
           Compress-Archive -Path "$publishDir\*" -DestinationPath $archiveFile
 
       - name: Run Tests with Coverage
-        uses: microsoft/vstest-action@v1.0.0
-        with:
-          testAssembly: |
-            /**/*test*.dll
-            !./**/*TestAdapter.dll
-            !./**/obj/**
-          searchFolder: '.' 
-          codeCoverageEnabled: true
-          platform: '${{ env.BUILD_PLATFORM }}'
-          otherConsoleOptions: '/ResultsDirectory:${{ runner.temp }}\TestResults /logger:trx /diag:logs\vstest.log'
+        run: '& "$(vswhere -property installationPath)\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" **\bin\Release\**\*test*.dll --Collect:"Code Coverage" --logger:trx
 
       - name: Run SonarCloud Analysis
         shell: powershell
