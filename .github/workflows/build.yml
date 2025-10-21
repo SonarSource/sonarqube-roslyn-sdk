@@ -101,9 +101,9 @@ jobs:
         uses: dorny/test-reporter@6e6a65b7a0bd2c9197df7d0ae36ac5cee784230c # v2.0.0
         if: ${{ !cancelled() }}
         with:
-          name: UT Results            # Name of the check run which will be created
-          path: TestResults/*.trx     # Path to test results
-          reporter: dotnet-trx        # Format of test results
+          name: UT Results
+          path: TestResults/*.trx
+          reporter: dotnet-trx
 
       - name: Run SonarCloud Analysis
         run: dotnet-sonarscanner end /d:sonar.token="${{ fromJSON(steps.secrets.outputs.vault).SONAR_TOKEN }}"
