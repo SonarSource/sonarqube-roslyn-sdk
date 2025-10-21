@@ -98,7 +98,11 @@ jobs:
           Compress-Archive -Path "$publishDir\*" -DestinationPath $archiveFile
 
       - name: Run Tests with Coverage
-        run: '& "$(vswhere -property installationPath)\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" **\bin\${{ env.BUILD_CONFIGURATION }}\**\*test*.dll --Collect:"Code Coverage;Format=Xml;SourceRoot=${{ github.workspace }}" --logger:trx'
+        run: >
+         '& "$(vswhere -property installationPath)\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+         **\bin\${{ env.BUILD_CONFIGURATION }}\**\*test*.dll
+         --Collect:"Code Coverage;Format=Xml"
+         --logger:trx'
 
       - name: Test Report
         uses: dorny/test-reporter@6e6a65b7a0bd2c9197df7d0ae36ac5cee784230c # v2.0.0
