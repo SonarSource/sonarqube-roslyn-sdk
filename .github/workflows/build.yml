@@ -40,8 +40,6 @@ jobs:
 
       - name: Setup NuGet
         uses: nuget/setup-nuget@296fd3ccf8528660c91106efefe2364482f86d6f # v1
-        with:
-          nuget-version: '6.9.x'
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2
