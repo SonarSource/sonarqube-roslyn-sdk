@@ -38,7 +38,7 @@ jobs:
           secrets: |
             development/kv/data/sonarcloud token | SONAR_TOKEN;
 
-      - name: Install SonarCloud scanner
+      - name: Install SonarScanner for .NET
         run: dotnet tool install --global dotnet-sonarscanner
 
       - name: NuGet Restore
