@@ -68,25 +68,7 @@ jobs:
         run: msbuild ${{ env.SOLUTION }} /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:Platform="${{ env.BUILD_PLATFORM }}"
 
       - name: Publish Plugin Generator
-        run: dotnet publish "${{ github.workspace }}\RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj" --no-build -c ${{ env.BUILD_CONFIGURATION }} --verbosity detailed
-
-      - name: Copy Project License
-        run: |
-          $targetDir = "${{ github.workspace }}\RoslynPluginGenerator\bin\${{ env.BUILD_CONFIGURATION }}\net48\publish\licenses"
-          New-Item -Path $targetDir -ItemType Directory -Force
-          Copy-Item -Path "${{ github.workspace }}\LICENSE.txt" -Destination $targetDir
-
-      - name: Copy Third Party Licenses
-        run: |
-          $targetDir = "${{ github.workspace }}\RoslynPluginGenerator\bin\${{ env.BUILD_CONFIGURATION }}\net48\publish\licenses\THIRD_PARTY_LICENSES"
-          New-Item -Path $targetDir -ItemType Directory -Force
-          Copy-Item -Path "${{ github.workspace }}\Licenses\THIRD_PARTY_LICENSES\*.txt" -Destination $targetDir
-
-      - name: Create Publish Archive
-        run: |
-          $publishDir = "${{ github.workspace }}\RoslynPluginGenerator\bin\${{ env.BUILD_CONFIGURATION }}\net48\publish"
-          $archiveFile = "${{ github.workspace }}\RoslynPluginGenerator\bin\${{ env.BUILD_CONFIGURATION }}\net48\publish.zip"
-          Compress-Archive -Path "$publishDir\*" -DestinationPath $archiveFile
+        run: dotnet publish "${{ github.workspace }}\RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj" --no-build -c ${{ env.BUILD_CONFIGURATION }} --verbosity detailed -p:PublishProfile=FolderProfile
 
       - name: Run Tests with Coverage
         run: > # https://github.com/microsoft/vswhere/wiki/Find-VSTest
