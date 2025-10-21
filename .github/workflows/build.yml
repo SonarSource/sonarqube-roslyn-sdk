@@ -38,6 +38,9 @@ jobs:
           secrets: |
             development/kv/data/sonarcloud token | SONAR_TOKEN;
 
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2
+
       - name: Install SonarScanner for .NET
         run: dotnet tool install --global dotnet-sonarscanner
 
@@ -59,7 +62,7 @@ jobs:
       - name: Build Solution
         run: msbuild ${{ env.SOLUTION }} /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:Platform="${{ env.BUILD_PLATFORM }}"
 
-      - name: Publish Plugin Generator
+      - name: Publish Plugin Generator # see also RoslynPluginGenerator\Properties\PublishProfiles\FolderProfile.pubxml
         run: dotnet publish "${{ github.workspace }}\RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj" --no-build -c ${{ env.BUILD_CONFIGURATION }} --verbosity detailed -p:PublishProfile=FolderProfile
 
       - name: Run Tests with Coverage
