@@ -46,16 +46,13 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2
 
+      - name: Install SonarCloud scanner
+        run: dotnet tool install --global dotnet-sonarscanner
+
       - name: NuGet Restore
         run: nuget restore ${{ env.SOLUTION }}
 
-      - name: Install SonarCloud scanner
-        shell: powershell
-        run: |
-          dotnet tool install --global dotnet-sonarscanner
-
       - name: Prepare SonarCloud Analysis
-        shell: powershell
         env:
           SONAR_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).SONAR_TOKEN }}
         run: >
@@ -76,21 +73,18 @@ jobs:
         run: dotnet publish "${{ github.workspace }}\RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj" --no-build -c ${{ env.BUILD_CONFIGURATION }} --verbosity detailed
 
       - name: Copy Project License
-        shell: powershell
         run: |
           $targetDir = "${{ github.workspace }}\RoslynPluginGenerator\bin\${{ env.BUILD_CONFIGURATION }}\net48\publish\licenses"
           New-Item -Path $targetDir -ItemType Directory -Force
           Copy-Item -Path "${{ github.workspace }}\LICENSE.txt" -Destination $targetDir
 
       - name: Copy Third Party Licenses
-        shell: powershell
         run: |
           $targetDir = "${{ github.workspace }}\RoslynPluginGenerator\bin\${{ env.BUILD_CONFIGURATION }}\net48\publish\licenses\THIRD_PARTY_LICENSES"
           New-Item -Path $targetDir -ItemType Directory -Force
           Copy-Item -Path "${{ github.workspace }}\Licenses\THIRD_PARTY_LICENSES\*.txt" -Destination $targetDir
 
       - name: Create Publish Archive
-        shell: powershell
         run: |
           $publishDir = "${{ github.workspace }}\RoslynPluginGenerator\bin\${{ env.BUILD_CONFIGURATION }}\net48\publish"
           $archiveFile = "${{ github.workspace }}\RoslynPluginGenerator\bin\${{ env.BUILD_CONFIGURATION }}\net48\publish.zip"
@@ -112,12 +106,10 @@ jobs:
           reporter: dotnet-trx        # Format of test results
 
       - name: Run SonarCloud Analysis
-        shell: powershell
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).SONAR_TOKEN }}
-        run: |
-          dotnet-sonarscanner end /d:sonar.token="${{ fromJSON(steps.secrets.outputs.vault).SONAR_TOKEN }}"
+        run: dotnet-sonarscanner end /d:sonar.token="${{ fromJSON(steps.secrets.outputs.vault).SONAR_TOKEN }}"
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
