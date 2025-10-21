@@ -52,15 +52,14 @@ jobs:
       - name: Install SonarCloud scanner
         shell: powershell
         run: |
-          New-Item -Path .\.sonar\scanner -ItemType Directory -Force
-          dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
+          dotnet tool install --global dotnet-sonarscanner
 
       - name: Prepare SonarCloud Analysis
         shell: powershell
         env:
           SONAR_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).SONAR_TOKEN }}
         run: >
-          .\.sonar\scanner\dotnet-sonarscanner begin
+          dotnet-sonarscanner begin
           /k:"sonarqube-roslyn-sdk"
           /o:"sonarsource"
           /d:sonar.token="${{ fromJSON(steps.secrets.outputs.vault).SONAR_TOKEN }}"
@@ -118,7 +117,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).SONAR_TOKEN }}
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ fromJSON(steps.secrets.outputs.vault).SONAR_TOKEN }}"
+          dotnet-sonarscanner end /d:sonar.token="${{ fromJSON(steps.secrets.outputs.vault).SONAR_TOKEN }}"
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
