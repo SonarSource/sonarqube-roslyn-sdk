@@ -15,7 +15,7 @@ concurrency:
 jobs:
   build:
     name: Build and Analyze
-    runs-on: windows-latest
+    runs-on: github-windows-latest-s
     permissions:
       contents: read
       id-token: write
