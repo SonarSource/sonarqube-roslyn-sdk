@@ -33,18 +33,18 @@ jobs:
       
       - name: Fetch Vault secrets
         id: secrets
-        uses: SonarSource/vault-action-wrapper@v3
+        uses: SonarSource/vault-action-wrapper@d0877ce7085bc313bd7a7b99c4e4489d42fb40e1 # v3.0.0
         with:
           secrets: |
             development/kv/data/sonarcloud token | SONAR_TOKEN;
 
       - name: Setup NuGet
-        uses: nuget/setup-nuget@v1
+        uses: nuget/setup-nuget@296fd3ccf8528660c91106efefe2364482f86d6f # v1
         with:
           nuget-version: '6.9.x'
 
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2
 
       - name: NuGet Restore
         run: nuget restore ${{ env.SOLUTION }}
@@ -101,7 +101,7 @@ jobs:
         run: '& "$(vswhere -property installationPath)\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" **\bin\${{ env.BUILD_CONFIGURATION }}\**\*test*.dll --Collect:"Code Coverage;Format=Xml;SourceRoot=${{ github.workspace }}" --logger:trx'
 
       - name: Test Report
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@6e6a65b7a0bd2c9197df7d0ae36ac5cee784230c # v2.0.0
         if: ${{ !cancelled() }}
         with:
           name: UT Results            # Name of the check run which will be created
