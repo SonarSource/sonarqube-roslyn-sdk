@@ -53,8 +53,6 @@ jobs:
         run: nuget restore ${{ env.SOLUTION }}
 
       - name: Prepare SonarCloud Analysis
-        env:
-          SONAR_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).SONAR_TOKEN }}
         run: >
           dotnet-sonarscanner begin
           /k:"sonarqube-roslyn-sdk"
