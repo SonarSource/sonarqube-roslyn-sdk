@@ -63,7 +63,7 @@ jobs:
         run: msbuild ${{ env.SOLUTION }} /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:Platform="${{ env.BUILD_PLATFORM }}"
 
       - name: Publish Plugin Generator # see also RoslynPluginGenerator\Properties\PublishProfiles\FolderProfile.pubxml
-        run: dotnet publish "${{ github.workspace }}\RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj" --no-build -c ${{ env.BUILD_CONFIGURATION }} --verbosity detailed -p:PublishProfile=FolderProfile
+        run: dotnet publish "${{ github.workspace }}\RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj" --no-build -c ${{ env.BUILD_CONFIGURATION }} -p:PublishProfile=FolderProfile
 
       - name: Run Tests with Coverage
         run: > # https://github.com/microsoft/vswhere/wiki/Find-VSTest
