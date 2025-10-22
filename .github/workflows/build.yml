@@ -62,7 +62,10 @@ jobs:
         run: msbuild ${{ env.SOLUTION }} /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:Platform="Any CPU" /p:RestorePackages=false
 
       - name: Publish Plugin Generator # see also RoslynPluginGenerator\Properties\PublishProfiles\FolderProfile.pubxml
-        run: dotnet publish "${{ github.workspace }}\RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj" --no-build -c ${{ env.BUILD_CONFIGURATION }} -p:PublishProfile=FolderProfile
+        id: publish
+        run: |
+          $absolutePublishDir = dotnet publish "${{ github.workspace }}\RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj" --no-build -c ${{ env.BUILD_CONFIGURATION }} -p:PublishProfile=FolderProfile -getProperty:AbsolutePublishDir
+          echo "absolutePublishDir=$($absolutePublishDir)" >> $env:GITHUB_OUTPUT
 
       - name: Run Tests with Coverage
         # https://github.com/microsoft/vswhere/wiki/Find-VSTest
@@ -89,5 +92,5 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: SonarQube.Roslyn.SDK-x.y
-          path: ${{ github.workspace }}\RoslynPluginGenerator\bin\${{ env.BUILD_CONFIGURATION }}\net48\publish.zip
+          path: ${{ steps.publish.outputs.absolutePublishDir }}
           if-no-files-found: error
