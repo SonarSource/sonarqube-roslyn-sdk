@@ -1,7 +1,7 @@
 name: Build
 on:
   push:
-    branches: [master, dev, branch-*, dogfood-*]
+    branches: [master, branch-*]
   pull_request:
   merge_group:
   workflow_dispatch:
@@ -66,7 +66,10 @@ jobs:
         run: dotnet publish "${{ github.workspace }}\RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj" --no-build -c ${{ env.BUILD_CONFIGURATION }} -p:PublishProfile=FolderProfile
 
       - name: Run Tests with Coverage
-        run: > # https://github.com/microsoft/vswhere/wiki/Find-VSTest
+        # https://github.com/microsoft/vswhere/wiki/Find-VSTest
+        # dotnet test -> Fails because Assebmly.LoadFrom throws FileNotFoundException for analyzer dlls, even though they are present
+        # vstest-action -> Fails because https://github.com/microsoft/vstest-action/issues/31
+        run: > 
           & "$(vswhere -property installationPath)\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
           **\bin\${{ env.BUILD_CONFIGURATION }}\**\*test*.dll
           --Collect:"Code Coverage;Format=Xml"
