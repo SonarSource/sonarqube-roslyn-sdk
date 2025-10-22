@@ -22,7 +22,6 @@ jobs:
 
     env:
       SOLUTION: 'PluginGenerator.sln'
-      BUILD_PLATFORM: 'Any CPU'
       BUILD_CONFIGURATION: 'Release'
 
     steps:
@@ -60,7 +59,7 @@ jobs:
           /d:sonar.cs.vstest.reportsPaths=TestResults/*.trx
 
       - name: Build Solution
-        run: msbuild ${{ env.SOLUTION }} /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:Platform="${{ env.BUILD_PLATFORM }}" /p:RestorePackages=false
+        run: msbuild ${{ env.SOLUTION }} /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:Platform="Any CPU" /p:RestorePackages=false
 
       - name: Publish Plugin Generator # see also RoslynPluginGenerator\Properties\PublishProfiles\FolderProfile.pubxml
         run: dotnet publish "${{ github.workspace }}\RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj" --no-build -c ${{ env.BUILD_CONFIGURATION }} -p:PublishProfile=FolderProfile
