@@ -67,7 +67,7 @@ jobs:
           $absolutePublishDir = dotnet publish "${{ github.workspace }}\RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj" --no-build -c ${{ env.BUILD_CONFIGURATION }} -p:PublishProfile=FolderProfile -getProperty:AbsolutePublishDir
           echo "Content of absolutePublishDir $absolutePublishDir is:"
           ls $absolutePublishDir -Recurse -File -Name
-          echo "absolutePublishDir=$($absolutePublishDir)" >> $env:GITHUB_OUTPUT
+          echo "absolutePublishDir=$absolutePublishDir" >> $env:GITHUB_OUTPUT
 
       - name: Run Tests with Coverage
         # https://github.com/microsoft/vswhere/wiki/Find-VSTest
