@@ -65,7 +65,7 @@ jobs:
         id: publish
         run: |
           $absolutePublishDir = dotnet publish "${{ github.workspace }}\RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj" --no-build -c ${{ env.BUILD_CONFIGURATION }} -p:PublishProfile=FolderProfile -getProperty:AbsolutePublishDir
-          echo "Content of $absolutePublishDir $($absolutePublishDir) is:"
+          echo "Content of absolutePublishDir $absolutePublishDir is:"
           ls $absolutePublishDir -Recurse -File -Name
           echo "absolutePublishDir=$($absolutePublishDir)" >> $env:GITHUB_OUTPUT
 
