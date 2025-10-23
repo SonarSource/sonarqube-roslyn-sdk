@@ -1,0 +1,99 @@
+name: Build
+
+on:
+  push:
+    branches: [master, branch-*]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 22 * * 1' # 22:00 on Monday
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref_name != github.event.repository.default_branch }}
+
+jobs:
+  build:
+    name: Build and Analyze
+    runs-on: github-windows-latest-s
+    permissions:
+      contents: read
+      id-token: write
+
+    env:
+      SOLUTION: 'PluginGenerator.sln'
+      BUILD_CONFIGURATION: 'Release'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+      
+      - name: Fetch Vault secrets
+        id: secrets
+        uses: SonarSource/vault-action-wrapper@d0877ce7085bc313bd7a7b99c4e4489d42fb40e1 # v3.0.0
+        with:
+          secrets: |
+            development/kv/data/sonarcloud token | SONAR_TOKEN;
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2
+
+      - name: Install SonarScanner for .NET
+        run: dotnet tool install --global dotnet-sonarscanner
+
+      - name: NuGet Restore
+        run: nuget restore ${{ env.SOLUTION }}
+
+      - name: Prepare SonarCloud Analysis
+        run: >
+          dotnet-sonarscanner begin
+          /k:"sonarqube-roslyn-sdk"
+          /o:"sonarsource"
+          /d:sonar.token="${{ fromJSON(steps.secrets.outputs.vault).SONAR_TOKEN }}"
+          /d:sonar.host.url="https://sonarcloud.io"
+          /d:sonar.verbose=true
+          /v:1.1
+          /d:sonar.cs.vscoveragexml.reportsPaths=TestResults/**/*.xml
+          /d:sonar.cs.vstest.reportsPaths=TestResults/*.trx
+
+      - name: Build Solution
+        run: msbuild ${{ env.SOLUTION }} /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:Platform="Any CPU" /p:RestorePackages=false
+
+      - name: Publish Plugin Generator # see also RoslynPluginGenerator\Properties\PublishProfiles\FolderProfile.pubxml
+        id: publish
+        run: |
+          $absolutePublishDir = dotnet publish "${{ github.workspace }}\RoslynPluginGenerator\SonarQube.Plugins.Roslyn.PluginGenerator.csproj" --no-build -c ${{ env.BUILD_CONFIGURATION }} -p:PublishProfile=FolderProfile -getProperty:AbsolutePublishDir
+          echo "::group::Content of absolutePublishDir $absolutePublishDir"
+          ls $absolutePublishDir -Recurse -File -Name
+          echo "::endgroup::"
+          echo "absolutePublishDir=$absolutePublishDir" >> $env:GITHUB_OUTPUT
+
+      - name: Run Tests with Coverage
+        # https://github.com/microsoft/vswhere/wiki/Find-VSTest
+        # dotnet test -> Fails because Assebmly.LoadFrom throws FileNotFoundException for analyzer dlls, even though they are present
+        # vstest-action -> Fails because https://github.com/microsoft/vstest-action/issues/31
+        run: > 
+          & "$(vswhere -property installationPath)\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+          **\bin\${{ env.BUILD_CONFIGURATION }}\**\*test*.dll
+          --Collect:"Code Coverage;Format=Xml"
+          --logger:trx
+
+      - name: Test Report
+        uses: dorny/test-reporter@6e6a65b7a0bd2c9197df7d0ae36ac5cee784230c # v2.0.0
+        if: ${{ !cancelled() }}
+        with:
+          name: UT Results
+          path: TestResults/*.trx
+          reporter: dotnet-trx
+
+      - name: Run SonarCloud Analysis
+        run: dotnet-sonarscanner end /d:sonar.token="${{ fromJSON(steps.secrets.outputs.vault).SONAR_TOKEN }}"
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: SonarQube.Roslyn.SDK-x.y
+          path: ${{ steps.publish.outputs.absolutePublishDir }}
+          if-no-files-found: error
