@@ -3,7 +3,6 @@ on:
   push:
     branches: [master, branch-*]
   pull_request:
-  merge_group:
   workflow_dispatch:
   schedule:
     - cron: '0 22 * * 1' # 22:00 on Monday
