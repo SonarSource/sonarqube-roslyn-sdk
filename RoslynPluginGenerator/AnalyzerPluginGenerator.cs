@@ -302,7 +302,7 @@ namespace SonarQube.Plugins.Roslyn
             return analyzers;
         }
 
-        private string CreateAnalyzerStaticPayloadFile(string packageRootDir, string outputDir)
+        private static string CreateAnalyzerStaticPayloadFile(string packageRootDir, string outputDir)
         {
             string zipFilePath = Path.GetFileName(packageRootDir) + ".zip";
             zipFilePath = Path.Combine(outputDir, zipFilePath);
@@ -493,7 +493,7 @@ namespace SonarQube.Plugins.Roslyn
             return fullJarPath;
         }
 
-        private void AddRoslynMetadata(RoslynPluginJarBuilder builder, RoslynPluginDefinition definition, string repositoryId)
+        private static void AddRoslynMetadata(RoslynPluginJarBuilder builder, RoslynPluginDefinition definition, string repositoryId)
         {
             builder.SetPluginProperty(repositoryId + ".nuget.packageId", definition.PackageId);
             builder.SetPluginProperty(repositoryId + ".nuget.packageVersion", definition.PackageVersion);

@@ -40,14 +40,11 @@ namespace SonarQube.Plugins
                 throw new ArgumentNullException(nameof(key));
             }
 
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
-            foreach (char c in key)
+            foreach (char c in key.Where(IsValidChar))
             {
-                if (IsValidChar(c))
-                {
-                    sb.Append(c);
-                }
+                sb.Append(c);
             }
             string retVal = sb.ToString().ToLowerInvariant(); // lower-case by convention
 

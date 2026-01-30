@@ -332,7 +332,7 @@ public class RoslynPluginJarBuilder
         return manifestFilePath;
     }
 
-    private string GetContentsOfFileFromArchive(string pathToArchive, string fullEntryName)
+    private static string GetContentsOfFileFromArchive(string pathToArchive, string fullEntryName)
     {
         string text = null;
         using (var archive = new ZipArchive(new FileStream(pathToArchive, FileMode.Open)))
@@ -345,12 +345,16 @@ public class RoslynPluginJarBuilder
                         UIResources.Builder_Error_EntryNotFoundInTemplatePlugin, fullEntryName));
             }
 
+            using var entryStream = entry.Open();
+            using var ms = new MemoryStream();
             var buffer = new byte[entry.Length];
-            using (var entryStream = entry.Open())
+            int read;
+
+            while ((read = entryStream.Read(buffer, 0, buffer.Length)) > 0)
             {
-                entryStream.Read(buffer, 0, buffer.Length);
-                text = System.Text.Encoding.UTF8.GetString(buffer);
+                ms.Write(buffer, 0, read);
             }
+            text = System.Text.Encoding.UTF8.GetString(ms.ToArray());
         }
 
         return text;

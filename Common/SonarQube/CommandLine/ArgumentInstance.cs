@@ -28,7 +28,7 @@ namespace SonarQube.Common
     /// <summary>
     /// Data class for an instance of an argument
     /// </summary>
-    [DebuggerDisplay("{descriptor.Id}={value}")]
+    [DebuggerDisplay("{Descriptor.Id}={Value}")]
     public class ArgumentInstance
     {
         public ArgumentInstance(ArgumentDescriptor descriptor, string value)

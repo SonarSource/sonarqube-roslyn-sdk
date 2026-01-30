@@ -42,7 +42,7 @@ namespace SonarQube.Plugins.CommonTests
         public void AssemblyResolver_Creation()
         {
             // 1. Null logger
-            Action action = () => new AssemblyResolver(null, new string[] { TestContext.TestDeploymentDir });
+            Action action = () => new AssemblyResolver(null, TestContext.DeploymentDirectory);
             action.Should().ThrowExactly<ArgumentNullException>();
 
             // 2. Null paths
@@ -205,7 +205,7 @@ namespace SonarQube.Plugins.CommonTests
 
         #region Private methods
 
-        private Assembly CompileSimpleAssembly(string assemblyFileName, string asmFolder, ILogger logger, string version = "1.0.0.0")
+        private static Assembly CompileSimpleAssembly(string assemblyFileName, string asmFolder, ILogger logger, string version = "1.0.0.0")
         {
             Directory.CreateDirectory(asmFolder);
             string fullAssemblyFilePath = Path.Combine(asmFolder, assemblyFileName);
@@ -262,7 +262,7 @@ namespace SonarQube.Plugins.CommonTests
             action.Should().ThrowExactly<FileNotFoundException>();
         }
 
-        private Assembly AssertAssemblyLoadSucceedsOnlyWithResolver(string asmRef, string searchPath)
+        private static Assembly AssertAssemblyLoadSucceedsOnlyWithResolver(string asmRef, string searchPath)
         {
             // Check the assembly load fails without the assembly resolver
             AssertAssemblyLoadFails(asmRef);

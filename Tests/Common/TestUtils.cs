@@ -106,7 +106,7 @@ namespace SonarQube.Plugins.Test.Common
         {
             List<string> parts = new List<string>
             {
-                testContext.TestDeploymentDir,
+                testContext.DeploymentDirectory,
                 testContext.TestName
             };
 
