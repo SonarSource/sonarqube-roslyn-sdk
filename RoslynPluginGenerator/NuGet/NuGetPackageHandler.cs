@@ -177,7 +177,7 @@ namespace SonarQube.Plugins.Roslyn
 
             if (package == null)
             {
-                package = packages.Last();
+                package = packages[packages.Count -1];
             }
             else
             {

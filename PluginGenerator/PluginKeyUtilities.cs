@@ -42,12 +42,9 @@ namespace SonarQube.Plugins
 
             StringBuilder sb = new StringBuilder();
 
-            foreach (char c in key)
+            foreach (char c in key.Where(x=> IsValidChar(x)))
             {
-                if (IsValidChar(c))
-                {
-                    sb.Append(c);
-                }
+                sb.Append(c);
             }
             string retVal = sb.ToString().ToLowerInvariant(); // lower-case by convention
 

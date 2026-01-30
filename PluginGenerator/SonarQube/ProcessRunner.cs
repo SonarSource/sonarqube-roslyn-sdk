@@ -124,10 +124,13 @@ namespace SonarQube.Common
             }
             finally
             {
-                process.ErrorDataReceived -= OnErrorDataReceived;
-                process.OutputDataReceived -= OnOutputDataReceived;
+                if(process is not null)
+                {
+                    process.ErrorDataReceived -= OnErrorDataReceived;
+                    process.OutputDataReceived -= OnOutputDataReceived;
 
-                process.Dispose();
+                    process.Dispose();
+                }
             }
             return succeeded;
         }

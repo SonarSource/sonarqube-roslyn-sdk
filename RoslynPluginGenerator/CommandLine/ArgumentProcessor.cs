@@ -71,7 +71,7 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
 
         #endregion Argument definitions
 
-        private class NuGetReference
+        private sealed class NuGetReference
         {
             public NuGetReference(string packageId, NuGet.SemanticVersion version)
             {
@@ -245,14 +245,14 @@ namespace SonarQube.Plugins.Roslyn.CommandLine
             }
         }
 
-        private string GetNuGetRepository(IEnumerable<ArgumentInstance> arguments)
+        private static string GetNuGetRepository(IEnumerable<ArgumentInstance> arguments)
         {
             ArgumentInstance arg = arguments.SingleOrDefault(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.CustomNuGetRepository, a.Descriptor.Id));
 
             return arg?.Value;
         }
 
-        private string GetOutputDirectory(IEnumerable<ArgumentInstance> arguments)
+        private static string GetOutputDirectory(IEnumerable<ArgumentInstance> arguments)
         {
             ArgumentInstance arg = arguments.SingleOrDefault(a => ArgumentDescriptor.IdComparer.Equals(KeywordIds.OutputDirectory, a.Descriptor.Id));
 
