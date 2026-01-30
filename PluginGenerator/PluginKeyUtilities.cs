@@ -40,9 +40,9 @@ namespace SonarQube.Plugins
                 throw new ArgumentNullException(nameof(key));
             }
 
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
-            foreach (char c in key.Where(x=> IsValidChar(x)))
+            foreach (char c in key.Where(IsValidChar))
             {
                 sb.Append(c);
             }

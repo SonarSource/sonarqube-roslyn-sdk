@@ -45,7 +45,7 @@ namespace SonarQube.Plugins
 
             var sb = new StringBuilder();
 
-            foreach (char c in key.Where(x => IsValidChar(x)))
+            foreach (char c in key.Where(IsValidChar))
             {
                 sb.Append(c);
             }

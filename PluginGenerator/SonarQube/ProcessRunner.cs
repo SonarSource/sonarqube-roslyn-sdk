@@ -78,15 +78,12 @@ namespace SonarQube.Common
             SetEnvironmentVariables(psi, runnerArgs.EnvironmentVariables, runnerArgs.Logger);
 
             bool succeeded;
-            Process process = null;
+            var process = new Process();
+            process.ErrorDataReceived += OnErrorDataReceived;
+            process.OutputDataReceived += OnOutputDataReceived;
             try
             {
-                process = new Process
-                {
-                    StartInfo = psi
-                };
-                process.ErrorDataReceived += OnErrorDataReceived;
-                process.OutputDataReceived += OnOutputDataReceived;
+                process.StartInfo = psi;
 
                 process.Start();
                 process.BeginErrorReadLine();
@@ -124,13 +121,9 @@ namespace SonarQube.Common
             }
             finally
             {
-                if(process is not null)
-                {
                     process.ErrorDataReceived -= OnErrorDataReceived;
                     process.OutputDataReceived -= OnOutputDataReceived;
-
                     process.Dispose();
-                }
             }
             return succeeded;
         }
