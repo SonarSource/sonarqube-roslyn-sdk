@@ -35,7 +35,7 @@ namespace SonarQube.Common
         /// <summary>
         /// Save the object as XML
         /// </summary>
-        public static void SaveModel<T>(T model, string fileName) where T : class
+        public static void SaveModel<T>(T model, string fileName)
         {
             if (model == null)
             {
