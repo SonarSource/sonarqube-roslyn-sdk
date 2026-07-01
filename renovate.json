@@ -2,21 +2,5 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "local>SonarSource/core-languages-tooling-public:renovate-config"
-  ],
-  "rebaseWhen": "conflicted",
-  "minimumReleaseAgeBehaviour": "timestamp-required",
-  "packageRules": [
-    {
-      "description": "Group GitHub Actions updates",
-      "matchManagers": ["github-actions"],
-      "groupName": "GitHub Actions dependencies",
-      "groupSlug": "github-actions-dependencies"
-    },
-    {
-      "description": "Group NuGet updates",
-      "matchManagers": ["nuget"],
-      "groupName": "NuGet dependencies",
-      "groupSlug": "nuget-dependencies"
-    }
   ]
 }
