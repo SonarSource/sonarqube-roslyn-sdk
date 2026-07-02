@@ -81,7 +81,7 @@ jobs:
           --logger:trx
 
       - name: Test Report
-        uses: dorny/test-reporter@6e6a65b7a0bd2c9197df7d0ae36ac5cee784230c # v2.0.0
+        uses: dorny/test-reporter@df6247429542221bc30d46a036ee47af1102c451 # v2.7.0
         if: ${{ !cancelled() }}
         with:
           name: UT Results
