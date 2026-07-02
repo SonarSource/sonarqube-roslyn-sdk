@@ -26,6 +26,15 @@
           "Microsoft.CodeCoverage": "17.9.0"
         }
       },
+      "Microsoft.NETFramework.ReferenceAssemblies": {
+        "type": "Direct",
+        "requested": "[1.0.3, )",
+        "resolved": "1.0.3",
+        "contentHash": "vUc9Npcs14QsyOD01tnv/m8sQUnGTGOw1BCmKcv77LBJY7OxhJ+zJF7UD/sCL3lYNFuqmQEVlkfS4Quif6FyYg==",
+        "dependencies": {
+          "Microsoft.NETFramework.ReferenceAssemblies.net48": "1.0.3"
+        }
+      },
       "MSTest.TestAdapter": {
         "type": "Direct",
         "requested": "[3.3.1, )",
@@ -38,9 +47,12 @@
       },
       "MSTest.TestFramework": {
         "type": "Direct",
-        "requested": "[3.3.1, )",
-        "resolved": "3.3.1",
-        "contentHash": "020SuA2p8N7o+/AHC0SLgzGpyS1hNjR8m5tWxnuGqJ3HeJhArUbuPAU8RZr8Ll38ij8oiutGCkQ/G+ymyO51Ow=="
+        "requested": "[4.2.3, )",
+        "resolved": "4.2.3",
+        "contentHash": "9zzij59YLh+tf+FRLNqhzHjmdspR91bol+jdQxLlxxTGMAML6LDbvuyXKMGdcrE84+QpKkk6KjTVBC5PBGrDeA==",
+        "dependencies": {
+          "MSTest.Analyzers": "4.2.3"
+        }
       },
       "Microsoft.ApplicationInsights": {
         "type": "Transitive",
@@ -54,6 +66,11 @@
         "type": "Transitive",
         "resolved": "17.9.0",
         "contentHash": "RGD37ZSrratfScYXm7M0HjvxMxZyWZL4jm+XgMZbkIY1UPgjUpbNA/t+WTGj/rC/0Hm9A3IrH3ywbKZkOCnoZA=="
+      },
+      "Microsoft.NETFramework.ReferenceAssemblies.net48": {
+        "type": "Transitive",
+        "resolved": "1.0.3",
+        "contentHash": "zMk4D+9zyiEWByyQ7oPImPN/Jhpj166Ky0Nlla4eXlNL8hI/BtSJsgR8Inldd4NNpIAH3oh8yym0W2DrhXdSLQ=="
       },
       "Microsoft.Testing.Extensions.Telemetry": {
         "type": "Transitive",
@@ -104,6 +121,11 @@
           "NuGet.Frameworks": "5.11.0",
           "System.Reflection.Metadata": "1.6.0"
         }
+      },
+      "MSTest.Analyzers": {
+        "type": "Transitive",
+        "resolved": "4.2.3",
+        "contentHash": "dxOZt8/LWuiox7rugInJoIa5Mmu3pBmXdfaoZOx/mxx8+sUFFpjBXPlWXQXGeWzpkVPNC3x1Jf7rt2h2Zjyvvg=="
       },
       "NuGet.Frameworks": {
         "type": "Transitive",
@@ -184,7 +206,7 @@
         "dependencies": {
           "FluentAssertions": "[6.12.0, )",
           "MSTest.TestAdapter": "[3.3.1, )",
-          "MSTest.TestFramework": "[3.3.1, )",
+          "MSTest.TestFramework": "[4.2.3, )",
           "Microsoft.NET.Test.Sdk": "[17.9.0, )",
           "SonarQube.Plugins.Common": "[4.0.0, )",
           "System.IO.Compression": "[4.3.0, )"
