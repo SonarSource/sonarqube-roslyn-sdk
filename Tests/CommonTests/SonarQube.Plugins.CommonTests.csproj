@@ -4,7 +4,7 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
         <PackageReference Include="MSTest.TestAdapter" Version="3.3.1" />
         <PackageReference Include="MSTest.TestFramework" Version="3.3.1" />
-        <PackageReference Include="System.CodeDom" Version="8.0.0" />
+        <PackageReference Include="System.CodeDom" Version="10.0.9" />
         <PackageReference Include="FluentAssertions" Version="6.12.0" />
     </ItemGroup>
 
