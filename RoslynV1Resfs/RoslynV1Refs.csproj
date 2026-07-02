@@ -28,7 +28,7 @@
 
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="1.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Features" Version="1.0.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="1.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="5.3.0" />
   </ItemGroup>
 
 </Project>
