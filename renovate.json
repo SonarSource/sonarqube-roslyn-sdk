@@ -2,5 +2,13 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "local>SonarSource/core-languages-tooling-public:renovate-config"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "Microsoft.CodeAnalysis*"
+      ],
+      "enabled": false
+    }
   ]
 }
