@@ -38,7 +38,7 @@ jobs:
             development/kv/data/sonarcloud token | SONAR_TOKEN;
 
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2
+        uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2.0.0
 
       - name: Install SonarScanner for .NET
         run: dotnet tool install --global dotnet-sonarscanner
