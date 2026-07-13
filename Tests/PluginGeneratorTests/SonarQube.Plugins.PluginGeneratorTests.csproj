@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup Label="Test packages">
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.7.0" />
-        <PackageReference Include="MSTest.TestAdapter" Version="4.2.3" />
-        <PackageReference Include="MSTest.TestFramework" Version="4.2.3" />
+        <PackageReference Include="MSTest.TestAdapter" Version="4.3.0" />
+        <PackageReference Include="MSTest.TestFramework" Version="4.3.0" />
         <PackageReference Include="coverlet.collector" Version="6.0.2">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
