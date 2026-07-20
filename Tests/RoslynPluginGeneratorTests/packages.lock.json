@@ -29,11 +29,11 @@
       },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
-        "requested": "[18.8.0, )",
-        "resolved": "18.8.0",
-        "contentHash": "hPDKx0E8VRtSFoKI0T745tISQX86u9Ta7t7GwSEHE88j0HZJCrRADf0hfEytEyxB5qPetmzzmvDzUZ+/POGFrA==",
+        "requested": "[18.8.1, )",
+        "resolved": "18.8.1",
+        "contentHash": "dknJL3/9Y3t4XuCBqnc0PevPxgLsUMmVhjwup/b1HNovA8zWcj3XsfIf7c6p05363DWcqL7X/YhDL9B+Zymv1w==",
         "dependencies": {
-          "Microsoft.CodeCoverage": "18.8.0"
+          "Microsoft.CodeCoverage": "18.8.1"
         }
       },
       "Microsoft.NETFramework.ReferenceAssemblies": {
@@ -191,8 +191,8 @@
       },
       "Microsoft.CodeCoverage": {
         "type": "Transitive",
-        "resolved": "18.8.0",
-        "contentHash": "qPdM0iW4hyQXyCxbvM1p8cVxfGJGj6W93FYd53p7QqJBxCRniCgvK1r+OyOdi52MeprgaUbUsh4+L8Mx79lVZA=="
+        "resolved": "18.8.1",
+        "contentHash": "Eclse/ZZjr4lmWzZFNN9h/OluhKL+SK/QbUyKUewgX139aGeyMEO/DkMPwuFs2MixvanTnz6891rF8UHDg+W4Q=="
       },
       "Microsoft.NETFramework.ReferenceAssemblies.net48": {
         "type": "Transitive",
@@ -466,7 +466,7 @@
           "FluentAssertions": "[7.2.2, )",
           "MSTest.TestAdapter": "[4.3.2, )",
           "MSTest.TestFramework": "[4.3.2, )",
-          "Microsoft.NET.Test.Sdk": "[18.8.0, )",
+          "Microsoft.NET.Test.Sdk": "[18.8.1, )",
           "SonarQube.Plugins.Common": "[4.0.0, )",
           "System.IO.Compression": "[4.3.0, )"
         }
