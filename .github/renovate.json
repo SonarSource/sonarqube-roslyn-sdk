@@ -3,12 +3,40 @@
   "extends": [
     "github>SonarSource/renovate-config:quality-corelang-squad"
   ],
+  "nuget": {
+    "description": "Keep global.json as the canonical SDK declaration; CI verifies the Renovate constraint matches it",
+    "ignorePaths": [
+      "global.json"
+    ]
+  },
   "packageRules": [
     {
       "matchPackageNames": [
         "Microsoft.CodeAnalysis*"
       ],
       "enabled": false
+    },
+    {
+      "description": "Refresh NuGet lockfiles with .NET 10 after dependency updates",
+      "matchManagers": [
+        "nuget"
+      ],
+      "skipArtifactsUpdate": true,
+      "constraints": {
+        "dotnet": "10.0.100"
+      },
+      "postUpgradeTasks": {
+        "executionMode": "update",
+        "installTools": {
+          "dotnet": {}
+        },
+        "commands": [
+          "dotnet restore PluginGenerator.sln --force-evaluate"
+        ],
+        "fileFilters": [
+          "**/packages.lock.json"
+        ]
+      }
     }
   ]
 }
