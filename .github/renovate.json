@@ -9,6 +9,28 @@
         "Microsoft.CodeAnalysis*"
       ],
       "enabled": false
+    },
+    {
+      "description": "Refresh NuGet lockfiles with .NET 10 after dependency updates",
+      "matchManagers": [
+        "nuget"
+      ],
+      "skipArtifactsUpdate": true,
+      "constraints": {
+        "dotnet": "10.0.100"
+      },
+      "postUpgradeTasks": {
+        "executionMode": "branch",
+        "installTools": {
+          "dotnet": {}
+        },
+        "commands": [
+          "dotnet restore PluginGenerator.sln --force-evaluate"
+        ],
+        "fileFilters": [
+          "**/packages.lock.json"
+        ]
+      }
     }
   ]
 }
