@@ -3,6 +3,12 @@
   "extends": [
     "github>SonarSource/renovate-config:quality-corelang-squad"
   ],
+  "nuget": {
+    "description": "Keep global.json as the canonical SDK declaration; CI verifies the Renovate constraint matches it",
+    "ignorePaths": [
+      "global.json"
+    ]
+  },
   "packageRules": [
     {
       "matchPackageNames": [
