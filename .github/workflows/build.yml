@@ -118,3 +118,22 @@ jobs:
           name: SonarQube.Roslyn.SDK-x.y
           path: ${{ steps.publish.outputs.absolutePublishDir }}
           if-no-files-found: error
+
+  notify-build-failure:
+    needs: [build]
+    if: >-
+      always()
+      && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-'))
+      && contains(needs.*.result, 'failure')
+    runs-on: sonar-xs
+    permissions:
+      actions: read
+      id-token: write # required for vault-action-wrapper in the shared slack-notify action
+    steps:
+      - name: Slack Notification
+        uses: SonarSource/core-languages-tooling-public/common-actions/slack-notify@v1
+        with:
+          slack-channel: squad-corelang-notifs
+          branch-patterns: 'master,branch-*'
+          github-token: ${{ github.token }}
+          branch: ${{ github.ref_name }}
