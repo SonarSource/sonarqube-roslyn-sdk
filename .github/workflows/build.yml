@@ -53,7 +53,7 @@ jobs:
       
       - name: Fetch Vault secrets
         id: secrets
-        uses: SonarSource/vault-action-wrapper@d0877ce7085bc313bd7a7b99c4e4489d42fb40e1 # v3.0.0
+        uses: SonarSource/vault-action-wrapper@v3
         with:
           secrets: |
             development/kv/data/sonarcloud token | SONAR_TOKEN;
